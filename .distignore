@@ -1,0 +1,17 @@
+node_modules
+Thumbs.db
+.DS_Store
+*.zip
+.idea
+/vendor/
+.gitignore
+assets
+bin
+tests
+composer.json
+composer.lock
+package.json
+package.lock
+phpcs.xml
+phpunit.xml
+README.md

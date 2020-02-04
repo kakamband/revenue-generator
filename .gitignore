@@ -1,0 +1,12 @@
+# Project files.
+node_modules
+build
+
+# System files.
+Thumbs.db
+.DS_Store
+*.zip
+.idea
+
+# Composer.
+/vendor/
