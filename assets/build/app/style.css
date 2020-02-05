@@ -1,0 +1,38 @@
+body {
+  background: #FFFFFF; }
+  body #wpcontent {
+    padding-left: 0; }
+
+.rev-gen-layout_wrapper {
+  display: flex;
+  justify-content: center;
+  min-height: 100%; }
+  .rev-gen-layout_wrapper .welcome-screen-wrapper {
+    margin-top: 5%;
+    font-family: sans-serif;
+    min-height: 600px;
+    font-size: 14px;
+    text-align: center;
+    width: 50%; }
+    .rev-gen-layout_wrapper .welcome-screen-wrapper .welcome-screen--heading {
+      font-size: 30px; }
+    .rev-gen-layout_wrapper .welcome-screen-wrapper .welcome-screen--sub-heading {
+      font-size: 18px;
+      font-weight: 400; }
+    .rev-gen-layout_wrapper .welcome-screen-wrapper .welcome-screen__description {
+      font-size: 15px; }
+    .rev-gen-layout_wrapper .welcome-screen-wrapper .welcome-screen-question--sub-heading {
+      font-size: 18px;
+      margin: 0; }
+    .rev-gen-layout_wrapper .welcome-screen-wrapper .welcome-screen-question--description {
+      font-size: 15px;
+      margin: 0; }
+    .rev-gen-layout_wrapper .welcome-screen-wrapper .welcome-screen-publish-questionnaire {
+      margin-top: 50px; }
+      .rev-gen-layout_wrapper .welcome-screen-wrapper .welcome-screen-publish-questionnaire--heading {
+        font-size: 15px;
+        font-weight: 600; }
+
+#wpfooter {
+  display: none; }
+
