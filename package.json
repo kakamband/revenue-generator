@@ -6,6 +6,10 @@
 	"author": "laterpay",
 	"license": "MIT",
 	"scripts": {
+		"format:js": "wp-scripts format-js assets/src",
+		"lint:js": "npm run lint:js:src",
+		"lint:js:src": "wp-scripts lint-js assets/src",
+		"lint:js:fix": "wp-scripts lint-js assets/src --fix",
 		"dev": "NODE_ENV=development webpack --mode=development --watch",
 		"build": "NODE_ENV=production webpack --mode=production",
 		"language:make-po": "wp i18n make-pot . --exclude=\"build\" languages/revenue-generator.po",
@@ -21,6 +25,7 @@
 		"@wordpress/dom-ready": "^2.7.0",
 		"@wordpress/element": "^2.11.0",
 		"@wordpress/i18n": "^3.9.0",
+		"@wordpress/scripts": "^7.0.1",
 		"autoprefixer": "^9.7.4",
 		"babel-loader": "^8.0.5",
 		"clean-webpack-plugin": "^3.0.0",

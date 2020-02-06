@@ -15,4 +15,3 @@ domReady( function() {
 		render( <Layout />, mainApp );
 	}
 } );
-

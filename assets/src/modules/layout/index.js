@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-import {Component} from '@wordpress/element';
+import { Component } from '@wordpress/element';
 
 /**
- * External dependencies
+ * Internal dependencies
  */
 import './style.scss';
-
-import Welcome from "../welcome";
+import Welcome from '../welcome';
 
 const { revenueGenerator } = window;
 
@@ -16,16 +15,9 @@ const { revenueGenerator } = window;
 const globalOptions = revenueGenerator.globalOptions;
 
 class Layout extends Component {
-
-	constructor(props) {
-		super(props);
-	}
-
 	render() {
-		const isSetupDone = !!globalOptions.average_post_publish_count.length;
-		return (
-			<Welcome isSetupDone={isSetupDone} />
-		);
+		const isSetupDone = !! globalOptions.average_post_publish_count.length;
+		return <Welcome isSetupDone={ isSetupDone } />;
 	}
 }
 
