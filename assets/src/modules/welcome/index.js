@@ -56,8 +56,7 @@ class Welcome extends Component {
 						</h4>
 						<p className="welcome-screen-question--description">
 							{ __(
-								'Below, you can take a tour of the features we offer and see a step-by-step demonstration ' +
-									'of how to set up your own flexible paywall.',
+								'Below, you can take a tour of the features we offer and see a step-by-step demonstration of how to set up your own flexible paywall.',
 								'revenue-generator'
 							) }
 						</p>

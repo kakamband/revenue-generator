@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-02-06T18:49:59+05:30\n"
+"POT-Creation-Date: 2020-02-06T23:12:00+05:30\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: revenue-generator\n"
@@ -36,34 +36,38 @@ msgstr ""
 msgid "https://laterpay.net/"
 msgstr ""
 
-#: assets/src/js/modules/welcome/index.js:32
+#: assets/src/modules/welcome/index.js:28
 msgid "Welcome to Revenue Generator"
 msgstr ""
 
-#: assets/src/js/modules/welcome/index.js:34
+#: assets/src/modules/welcome/index.js:34
 msgid "Selling single articles, time passes, and subscriptions have never been easier."
 msgstr ""
 
-#: assets/src/js/modules/welcome/index.js:38
+#: assets/src/modules/welcome/index.js:40
 msgid "Your readers and viewers already love your content - LaterPay's revenue generator makes it easy for them to support you. Sell individual pieces of content, timed access to your site, or recurring subscriptions - at any price point."
 msgstr ""
 
-#: assets/src/js/modules/welcome/index.js:44
+#: assets/src/modules/welcome/index.js:44
 msgid "Instead of requiring upfront registration and payment, we defer this process until customer purchases combined reach a $5 threshold. Earn money from all of your users, not just subscribers."
 msgstr ""
 
-#: assets/src/js/modules/welcome/index.js:52
+#: assets/src/modules/welcome/index.js:52
 msgid "Want to see how LaterPay would work on your own site?"
 msgstr ""
 
-#: assets/src/js/modules/welcome/index.js:62
+#: assets/src/modules/welcome/index.js:58
+msgid "Below, you can take a tour of the features we offer and see a step-by-step demonstration of how to set up your own flexible paywall."
+msgstr ""
+
+#: assets/src/modules/welcome/index.js:66
 msgid "How often do you publish premium content?"
 msgstr ""
 
-#: assets/src/js/modules/welcome/index.js:65
+#: assets/src/modules/welcome/index.js:75
 msgid "Fewer than 10 posts per month"
 msgstr ""
 
-#: assets/src/js/modules/welcome/index.js:66
+#: assets/src/modules/welcome/index.js:82
 msgid "More than 10 posts per month"
 msgstr ""
