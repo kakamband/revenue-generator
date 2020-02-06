@@ -29,8 +29,6 @@ class Config {
 	 * Setup plugin options.
 	 */
 	protected function setup_options() {
-		// No options available, setup default options.
-
 		// Check if plugin installation is fresh install.
 		if ( false === get_option( 'lp_rg_version' ) ) {
 			update_option( 'lp_rg_version', REVENUE_GENERATOR_VERSION );
@@ -47,12 +45,6 @@ class Config {
 				]
 			);
 		}
-
-		// Handle plugin option update for version updates.
-		if ( version_compare( REVENUE_GENERATOR_VERSION, get_option( 'lp_rg_version' ), '>' ) ) {
-			// Handle plugin options on version update.
-			// $this->add_update_options(); @todo Add version update logic.
-		}
 	}
 
 	/**
@@ -62,6 +54,127 @@ class Config {
 	 */
 	public static function get_global_options() {
 		return get_option( 'lp_rg_global_options', [] );
+	}
+
+	/**
+	 * Get pricing default values for all types else for requested publish count.
+	 *
+	 * @param string $publish_count Get merchant post publish count.
+	 *
+	 * @return array|mixed
+	 */
+	public static function get_pricing_defaults( $publish_count = '' ) {
+		$all_price_defaults = self::get_price_defaults();
+		if ( ! empty( $publish_count ) ) {
+			return $all_price_defaults[ $publish_count ];
+		} else {
+			return $all_price_defaults;
+		}
+	}
+
+	/**
+	 * Returns default pricing values.
+	 *
+	 * @return array
+	 */
+	protected static function get_price_defaults() {
+		return [
+			'low'  => [
+				'single_article' => [
+					'tier_1' => [ // 0-250 content length.
+						'price' => array(
+							'amount'        => self::get_connector_price( 1.49 ),
+							'payment_model' => 'pay_now'
+						),
+					],
+					'tier_2' => [ // 251-500 content length.
+						'price' => array(
+							'amount'        => self::get_connector_price( 2.49 ),
+							'payment_model' => 'pay_now'
+						),
+					],
+					'tier_3' => [ // 501+ content length.
+						'price' => array(
+							'amount'        => self::get_connector_price( 4 ),
+							'payment_model' => 'pay_now'
+						),
+					]
+				],
+				'time_pass'      => [
+					'price'  => array(
+						'amount'        => self::get_connector_price( 2.49 ),
+						'payment_model' => 'pay_now'
+					),
+					'expiry' => [
+						'unit'  => 'd',
+						'value' => '7'
+					]
+				],
+				'subscription'   => [
+					'price'  => array(
+						'amount'        => self::get_connector_price( 4.99 ),
+						'payment_model' => 'pay_now'
+					),
+					'expiry' => [
+						'unit'  => 'm',
+						'value' => '1'
+					]
+				]
+			],
+			'high' => [
+				'single_article' => [
+					'tier_1' => [ // 0-250 content length.
+						'price' => array(
+							'amount'        => self::get_connector_price( 0.49 ),
+							'payment_model' => 'pay_later'
+						),
+					],
+					'tier_2' => [ // 251-500 content length.
+						'price' => array(
+							'amount'        => self::get_connector_price( 0.99 ),
+							'payment_model' => 'pay_later'
+						),
+					],
+					'tier_3' => [ // 501+ content length.
+						'price' => array(
+							'amount'        => self::get_connector_price( 1.49 ),
+							'payment_model' => 'pay_later'
+						),
+					]
+				],
+				'time_pass'      => [
+					'price'  => array(
+						'amount'        => self::get_connector_price( 2.49 ),
+						'payment_model' => 'pay_now'
+					),
+					'expiry' => [
+						'unit'  => 'd',
+						'value' => '7'
+					]
+				],
+				'subscription'   => [
+					'price'  => array(
+						'amount'        => self::get_connector_price( 4.99 ),
+						'payment_model' => 'pay_now'
+					),
+					'expiry' => [
+						'unit'  => 'm',
+						'value' => '1'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Returns price value to work in connector config.
+	 *
+	 * @param float|int $price Price of the purchase option.
+	 *
+	 * @return float|int
+	 */
+	protected static function get_connector_price( $price ) {
+		return floatval( $price ) * 100;
 	}
 
 }

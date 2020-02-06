@@ -63,7 +63,7 @@ class Plugin {
 		wp_register_script(
 			'revenue-generator',
 			REVENUE_GENERATOR_BUILD_URL . 'app/index.js',
-			[ 'wp-element' ],
+			[ 'wp-element', 'wp-components' ],
 			$this->get_asset_version( 'app/index.js' )
 		);
 
@@ -73,6 +73,13 @@ class Plugin {
 			[
 				'globalOptions' => $current_global_options
 			]
+		);
+
+		// Sets translated strings for JS script.
+		wp_set_script_translations(
+			'revenue-generator',
+			'revenue-generator',
+			REVENUE_GENERATOR_PLUGIN_DIR . 'languages/'
 		);
 
 		wp_register_style(
@@ -109,9 +116,11 @@ class Plugin {
 	}
 
 	/**
-	 * Load Dashboard page.
+	 * Load main app.
 	 *
 	 * @return string
+	 *
+	 * @codeCoverageIgnore -- Test will be covered in e2e tests.
 	 */
 	public function load_main_dashboard() {
 		?>
@@ -133,9 +142,15 @@ class Plugin {
 	 *
 	 * @param string $file Path to file.
 	 *
-	 * @return string Current modified time of the file..
+	 * @return string Current modified time of the file.
+	 *
+	 * @codeCoverageIgnore  -- method checked in enqueue
 	 */
 	public function get_asset_version( $file ) {
-		return filemtime( REVENUE_GENERATOR_BUILD_DIR . $file );
+		if ( defined( 'SCRIPT_DEBUG' ) && true === SCRIPT_DEBUG ) {
+			return filemtime( REVENUE_GENERATOR_BUILD_DIR . $file );
+		} else {
+			return REVENUE_GENERATOR_VERSION;
+		}
 	}
 }

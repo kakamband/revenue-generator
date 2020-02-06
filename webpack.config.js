@@ -11,7 +11,7 @@ const env = process.env.NODE_ENV;
 
 module.exports = {
 	entry: {
-		app: './assets/src/js/modules/index.js',
+		app: './assets/src/modules/index.js',
 	},
 	output: {
 		path: path.resolve( __dirname, 'assets/build' ),
@@ -30,7 +30,8 @@ module.exports = {
 				use: [
 					MiniCssExtractPlugin.loader,
 					'css-loader',
-					'sass-loader',
+					'postcss-loader',
+					'sass-loader'
 				],
 			},
 		],

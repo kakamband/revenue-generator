@@ -1,0 +1,17 @@
+body {
+	background: #FFFFFF;
+
+	#wpcontent {
+		padding-left: 0;
+	}
+}
+
+.rev-gen-layout_wrapper {
+	display: flex;
+	justify-content: center;
+	min-height: 100%;
+}
+
+#wpfooter {
+	display: none;
+}
