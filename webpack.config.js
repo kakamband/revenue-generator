@@ -5,7 +5,6 @@
 const path = require( 'path' );
 
 const MiniCssExtractPlugin = require( 'mini-css-extract-plugin' );
-const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
 
 const env = process.env.NODE_ENV;
 
@@ -34,6 +33,11 @@ module.exports = {
 					'sass-loader'
 				],
 			},
+			{
+				test: /\.(png|woff|woff2|eot|ttf|svg)$/,
+				loader: 'url-loader?limit=100000'
+			}
+
 		],
 	},
 	plugins: [

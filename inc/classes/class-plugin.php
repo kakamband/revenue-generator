@@ -110,7 +110,7 @@ class Plugin {
 			'manage_options',
 			'revenue-generator',
 			[ $this, 'load_main_dashboard' ],
-			'dashicons-cart',
+			'dashicons-laterpay-logo',
 			5
 		);
 	}
