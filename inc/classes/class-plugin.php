@@ -59,11 +59,12 @@ class Plugin {
 	public function register_scripts() {
 
 		$current_global_options = Config::get_global_options();
+		$script_file            = require_once REVENUE_GENERATOR_BUILD_DIR . 'app/index.asset.php';
 
 		wp_register_script(
 			'revenue-generator',
 			REVENUE_GENERATOR_BUILD_URL . 'app/index.js',
-			[ 'wp-element', 'wp-components' ],
+			$script_file['dependencies'],
 			$this->get_asset_version( 'app/index.js' )
 		);
 
@@ -88,25 +89,34 @@ class Plugin {
 			[],
 			$this->get_asset_version( 'app/style.css' )
 		);
+
+		wp_register_style(
+			'revenue-generator-admin',
+			REVENUE_GENERATOR_BUILD_URL . 'admin/style.css',
+			[],
+			$this->get_asset_version( 'admin/style.css' )
+		);
 	}
 
 	/**
 	 * Enqueue the registered scripts.
 	 */
 	public function load_scripts() {
-		if ( is_admin() ) {
+		$screen_info = get_current_screen();
+		if ( is_admin() && 'toplevel_page_revenue-generator' === $screen_info->id ) {
 			wp_enqueue_script( 'revenue-generator' );
 			wp_enqueue_style( 'revenue-generator' );
 		}
+		wp_enqueue_style( 'revenue-generator-admin' );
 	}
 
 	/**
 	 * Register a new menu page for the Dashboard.
 	 */
-	public function revenue_generator_register_page(){
+	public function revenue_generator_register_page() {
 		add_menu_page(
 			__( 'Revenue Generator', 'revenue-generator' ),
-			__( 'Revenue Generator', 'revenue-generator'  ),
+			__( 'Revenue Generator', 'revenue-generator' ),
 			'manage_options',
 			'revenue-generator',
 			[ $this, 'load_main_dashboard' ],
@@ -133,7 +143,7 @@ class Plugin {
 	 */
 	protected function add_constants() {
 		define( 'REVENUE_GENERATOR_VERSION', '0.1.0' );
-		define( 'REVENUE_GENERATOR_BUILD_DIR', REVENUE_GENERATOR_PLUGIN_DIR . '/build/' );
+		define( 'REVENUE_GENERATOR_BUILD_DIR', REVENUE_GENERATOR_PLUGIN_DIR . '/assets/build/' );
 		define( 'REVENUE_GENERATOR_BUILD_URL', plugins_url( '/assets/build/', REVENUE_GENERATOR_PLUGIN_FILE ) );
 	}
 

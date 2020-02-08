@@ -8,16 +8,11 @@ import { Component } from '@wordpress/element';
  */
 import './style.scss';
 import Welcome from '../welcome';
-
-const { revenueGenerator } = window;
-
-// No preview image if preview doesn't exist.
-const globalOptions = revenueGenerator.globalOptions;
+import '../../store';
 
 class Layout extends Component {
 	render() {
-		const isSetupDone = !! globalOptions.average_post_publish_count.length;
-		return <Welcome isSetupDone={ isSetupDone } />;
+		return <Welcome />;
 	}
 }
 

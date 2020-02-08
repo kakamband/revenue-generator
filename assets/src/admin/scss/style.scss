@@ -1,0 +1,22 @@
+// load LaterPay icon font ---------------------------------------------------------------------------------------------
+@font-face {
+	font-family: laterpay-wordpress-icons;
+	font-style: normal;
+	font-weight: normal;
+	src: url('../../fonts/laterpay-wordpress-icons_v099.eot');
+	src: url('../../fonts/laterpay-wordpress-icons_v099.eot?#iefix') format('embedded-opentype'),
+	url('../../fonts/laterpay-wordpress-icons_v099.woff') format('woff'),
+	url('../../fonts/laterpay-wordpress-icons_v099.ttf') format('truetype'),
+	url('../../fonts/laterpay-wordpress-icons_v099.svg#laterpay-wordpress-icons') format('svg');
+}
+
+i.mce-i-laterpay-logo:before,
+#adminmenu div.wp-menu-image.dashicons-laterpay-logo:before { // WordPress selector
+	content: 'b' !important;
+	font-family: laterpay-wordpress-icons !important;
+	font-size: 33px !important;
+	font-weight: 400 !important;
+	line-height: 0.6 !important;
+	left: -5px !important;
+	position: relative !important;
+}

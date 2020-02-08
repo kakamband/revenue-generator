@@ -4,6 +4,8 @@
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import PropTypes from 'prop-types';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies.
@@ -18,7 +20,7 @@ import { lowPublish, highPublish } from '../../components/card/icons';
 class Welcome extends Component {
 	render() {
 		// Get required information.
-		const { isSetupDone } = this.props;
+		const { isSetupDone, handleClick } = this.props;
 		return (
 			// Show welcome screen if initial post count setup is not done.
 			! isSetupDone && (
@@ -71,6 +73,7 @@ class Welcome extends Component {
 					</div>
 					<div className="welcome-screen-wrapper--card">
 						<Card
+							handleClick={ () => handleClick( 'low' ) }
 							cardIcon={ lowPublish }
 							cardTitle={ __(
 								'Fewer than 10 posts per month',
@@ -78,6 +81,7 @@ class Welcome extends Component {
 							) }
 						/>
 						<Card
+							handleClick={ () => handleClick( 'high' ) }
 							cardIcon={ highPublish }
 							cardTitle={ __(
 								'More than 10 posts per month',
@@ -100,4 +104,24 @@ Welcome.defaultProps = {
 	isSetupDone: false,
 };
 
-export default Welcome;
+export default compose( [
+	withSelect( ( select ) => {
+		return {
+			isSetupDone: select(
+				'laterpay-revenue-generator'
+			).getGlobalOptionValue( 'average_post_publish_count' ).length
+				? true
+				: false,
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		return {
+			handleClick: ( postPublishRate ) => {
+				dispatch( 'laterpay-revenue-generator' ).setConfig(
+					'average_post_publish_count',
+					postPublishRate
+				);
+			},
+		};
+	} ),
+] )( Welcome );

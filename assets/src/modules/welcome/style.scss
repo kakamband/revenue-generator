@@ -10,7 +10,12 @@
 
 	.welcome-screen {
 		&--heading {
-			font-size: 30px;
+			font-size: 40px;
+			font-weight: bold;
+			font-stretch: normal;
+			font-style: normal;
+			line-height: 1.05;
+			letter-spacing: normal;
 		}
 
 		&--sub-heading {
@@ -20,6 +25,7 @@
 
 		&__description {
 			font-size: 15px;
+			color: #333333
 		}
 	}
 
@@ -31,6 +37,7 @@
 
 		&--description {
 			font-size: 15px;
+			color: #333333;
 			margin: 0;
 		}
 	}

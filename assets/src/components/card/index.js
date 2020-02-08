@@ -14,9 +14,9 @@ import './style.scss';
  */
 class Card extends Component {
 	render() {
-		const { cardTitle, cardIcon } = this.props;
+		const { cardTitle, cardIcon, handleClick } = this.props;
 		return (
-			<div className="rg-card">
+			<div className="rg-card" onClick={ handleClick }>
 				{ cardIcon }
 				<h5 className="rg-card--title">{ cardTitle }</h5>
 			</div>
@@ -27,6 +27,7 @@ class Card extends Component {
 Card.propTypes = {
 	className: PropTypes.string,
 	cardTitle: PropTypes.string,
+	handleClick: PropTypes.func,
 	cardIcon: PropTypes.object,
 };
 
