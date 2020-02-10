@@ -59,13 +59,12 @@ class Plugin {
 	public function register_scripts() {
 
 		$current_global_options = Config::get_global_options();
-		$script_file            = require_once REVENUE_GENERATOR_BUILD_DIR . 'app/index.asset.php';
 
 		wp_register_script(
 			'revenue-generator',
-			REVENUE_GENERATOR_BUILD_URL . 'app/index.js',
-			$script_file['dependencies'],
-			$this->get_asset_version( 'app/index.js' )
+			REVENUE_GENERATOR_BUILD_URL . 'revenue-generator-admin.js',
+			[ 'jquery' ],
+			$this->get_asset_version( 'revenue-generator-admin.js' )
 		);
 
 		wp_localize_script(
@@ -85,16 +84,16 @@ class Plugin {
 
 		wp_register_style(
 			'revenue-generator',
-			REVENUE_GENERATOR_BUILD_URL . 'app/style.css',
+			REVENUE_GENERATOR_BUILD_URL . 'css/revenue-generator-dashboard.css',
 			[],
-			$this->get_asset_version( 'app/style.css' )
+			$this->get_asset_version( 'css/revenue-generator-dashboard.css' )
 		);
 
 		wp_register_style(
 			'revenue-generator-admin',
-			REVENUE_GENERATOR_BUILD_URL . 'admin/style.css',
+			REVENUE_GENERATOR_BUILD_URL . 'css/revenue-generator-admin.css',
 			[],
-			$this->get_asset_version( 'admin/style.css' )
+			$this->get_asset_version( 'css/revenue-generator-admin.css' )
 		);
 	}
 
@@ -119,23 +118,31 @@ class Plugin {
 			__( 'Revenue Generator', 'revenue-generator' ),
 			'manage_options',
 			'revenue-generator',
-			[ $this, 'load_main_dashboard' ],
+			[ $this, 'load_dashboard' ],
 			'dashicons-laterpay-logo',
 			5
 		);
 	}
 
 	/**
-	 * Load main app.
+	 * Load admin screen.
 	 *
 	 * @return string
 	 *
 	 * @codeCoverageIgnore -- Test will be covered in e2e tests.
 	 */
-	public function load_main_dashboard() {
-		?>
-		<div id="lp_rev_gen_root" class="rev-gen-layout_wrapper"></div>
-		<?php
+	public function load_dashboard() {
+		$current_global_options = Config::get_global_options();
+
+		if ( empty( $current_global_options['average_post_publish_count'] ) ) {
+			$welcome_page_data = [
+				'low_count_icon'  => Config::$plugin_defaults['img_dir'] . 'low-publish.svg',
+				'high_count_icon' => Config::$plugin_defaults['img_dir'] . 'high-publish.svg'
+			];
+
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
+			echo View::render_template( 'backend/welcome/welcome', $welcome_page_data );
+		}
 	}
 
 	/**

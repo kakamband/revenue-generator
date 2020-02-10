@@ -1,6 +1,6 @@
 <?php
 /**
- * Revenue Generator Plugin Main Class.
+ * Revenue Generator Plugin Config Class.
  *
  * @package revenue-generator
  */
@@ -19,10 +19,18 @@ class Config {
 	use Singleton;
 
 	/**
+	 * Store common values used in the plugin.
+	 *
+	 * @var array Common values used throughout the plugin.
+	 */
+	public static $plugin_defaults;
+
+	/**
 	 * Class Config construct method.
 	 */
 	protected function __construct() {
 		$this->setup_options();
+		$this->setup_common_vars();
 	}
 
 	/**
@@ -70,6 +78,15 @@ class Config {
 		} else {
 			return $all_price_defaults;
 		}
+	}
+
+	/**
+	 * Setup common values used throughout the plugin.
+	 */
+	private function setup_common_vars() {
+		self::$plugin_defaults = [
+			'img_dir' => REVENUE_GENERATOR_BUILD_URL . 'img/'
+		];
 	}
 
 	/**

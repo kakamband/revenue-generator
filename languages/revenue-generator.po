@@ -9,14 +9,14 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-02-06T23:12:00+05:30\n"
+"POT-Creation-Date: 2020-02-10T17:05:34+05:30\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: revenue-generator\n"
 
 #. Plugin Name of the plugin
-#: inc/classes/class-plugin.php:108
-#: inc/classes/class-plugin.php:109
+#: inc/classes/class-plugin.php:117
+#: inc/classes/class-plugin.php:118
 msgid "Revenue Generator"
 msgstr ""
 
@@ -36,38 +36,34 @@ msgstr ""
 msgid "https://laterpay.net/"
 msgstr ""
 
-#: assets/src/modules/welcome/index.js:28
+#: templates/backend/welcome/welcome.php:17
 msgid "Welcome to Revenue Generator"
 msgstr ""
 
-#: assets/src/modules/welcome/index.js:34
+#: templates/backend/welcome/welcome.php:18
 msgid "Selling single articles, time passes, and subscriptions have never been easier."
 msgstr ""
 
-#: assets/src/modules/welcome/index.js:40
-msgid "Your readers and viewers already love your content - LaterPay's revenue generator makes it easy for them to support you. Sell individual pieces of content, timed access to your site, or recurring subscriptions - at any price point."
+#: templates/backend/welcome/welcome.php:19
+msgid "Your readers and viewers already love your content - LaterPay's revenue generator makes it easy for them to support you. Sell individual pieces of content, timed access to your site, or recurring subscriptions - at any price point.Instead of requiring upfront registration and payment, we defer this process until customer purchases combined reach a $5 threshold. Earn money from all of your users, not just subscribers."
 msgstr ""
 
-#: assets/src/modules/welcome/index.js:44
-msgid "Instead of requiring upfront registration and payment, we defer this process until customer purchases combined reach a $5 threshold. Earn money from all of your users, not just subscribers."
-msgstr ""
-
-#: assets/src/modules/welcome/index.js:52
+#: templates/backend/welcome/welcome.php:22
 msgid "Want to see how LaterPay would work on your own site?"
 msgstr ""
 
-#: assets/src/modules/welcome/index.js:58
+#: templates/backend/welcome/welcome.php:23
 msgid "Below, you can take a tour of the features we offer and see a step-by-step demonstration of how to set up your own flexible paywall."
 msgstr ""
 
-#: assets/src/modules/welcome/index.js:66
+#: templates/backend/welcome/welcome.php:26
 msgid "How often do you publish premium content?"
 msgstr ""
 
-#: assets/src/modules/welcome/index.js:75
+#: templates/backend/welcome/welcome.php:31
 msgid "Fewer than 10 posts per month"
 msgstr ""
 
-#: assets/src/modules/welcome/index.js:82
+#: templates/backend/welcome/welcome.php:35
 msgid "More than 10 posts per month"
 msgstr ""
