@@ -76,6 +76,8 @@ class Admin {
 
 	/**
 	 * Update the global config with provided data.
+	 *
+	 * @codeCoverageIgnore -- @todo add AJAX test base class to cover this.
 	 */
 	public function update_global_config() {
 

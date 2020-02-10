@@ -25,6 +25,8 @@ class View {
 	 * @param array  $variables     Pass an array of variables you want to use in array keys.
 	 *
 	 * @return void
+	 *
+	 * @codeCoverageIgnore Covered in test for render_template
 	 */
 	public static function get_template_part( $template_path, $variables = array() ) {
 		$template = sprintf( '%s.php', REVENUE_GENERATOR_PLUGIN_DIR . '/templates/' . $template_path );
