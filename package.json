@@ -6,9 +6,9 @@
 	"author": "laterpay",
 	"license": "MIT",
 	"scripts": {
-		"format:js": "wp-scripts format-js assets/src",
+		"format:js": "wp-scripts format-js assets/src/js",
 		"lint:js": "npm run lint:js:src",
-		"lint:js:src": "wp-scripts lint-js assets/src",
+		"lint:js:src": "wp-scripts lint-js assets/src/js",
 		"lint:js:fix": "wp-scripts lint-js assets/src --fix",
 		"dev": "NODE_ENV=development webpack --mode=development --watch",
 		"build": "NODE_ENV=production webpack --mode=production",

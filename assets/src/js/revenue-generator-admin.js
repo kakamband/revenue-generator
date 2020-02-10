@@ -4,4 +4,4 @@
  * @package revenue-generator
  */
 
-import './pages/revenue-geneator-welcome'
+import './pages/revenue-geneator-welcome';

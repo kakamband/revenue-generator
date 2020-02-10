@@ -31,9 +31,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<h5 class="rg-card--title"><?php esc_html_e( 'Fewer than 10 posts per month', 'revenue-generator' ); ?></h5>
 			</div>
 			<div id="rg_js_highPostCard" class="rg-card">
-				<img alt="<?php esc_attr_e( 'More posts icon' ); ?>" src="<?php echo esc_url( $high_count_icon ); ?>">
+				<img class="rg-card--icon" alt="<?php esc_attr_e( 'More posts icon' ); ?>" src="<?php echo esc_url( $high_count_icon ); ?>">
 				<h5 class="rg-card--title"><?php esc_html_e( 'More than 10 posts per month', 'revenue-generator' ); ?></h5>
 			</div>
 		</div>
 	</div>
+	<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
 </div>
