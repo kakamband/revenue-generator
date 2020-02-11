@@ -2,13 +2,18 @@
 
 // Main welcome screen.
 .welcome-screen-wrapper {
-	color: #1D1D1D;
-	margin-top: 5%;
-	font-family: Helvetica Neue, serif;
-	min-height: 600px;
-	font-size: 14px;
-	text-align: center;
-	width: 50%;
+
+	display: flex;
+	justify-content: center;
+	min-height: 750px;
+	max-height: 100%;
+
+	&--main {
+		margin-top: 5%;
+		font-size: 14px;
+		text-align: center;
+		width: 50%;
+	}
 
 	.welcome-screen {
 		&--heading {

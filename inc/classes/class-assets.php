@@ -36,7 +36,7 @@ class Assets {
 	 */
 	protected function setup_hooks() {
 		add_action( 'admin_enqueue_scripts', [ $this, 'register_scripts' ] );
-		add_action( 'admin_enqueue_scripts', [ $this, 'load_scripts' ], 11 );
+		add_action( 'admin_enqueue_scripts', [ $this, 'load_admin_assets' ], 11 );
 	}
 
 	/**
@@ -75,27 +75,7 @@ class Assets {
 	/**
 	 * Enqueue the registered scripts.
 	 */
-	public function load_scripts() {
-		$screen_info = get_current_screen();
-		if ( is_admin() && 'toplevel_page_revenue-generator' === $screen_info->id ) {
-
-			// Localize required data.
-			$current_global_options = Config::get_global_options();
-
-			// Script date required for operations.
-			$rg_script_data = [
-				'globalOptions'          => $current_global_options,
-				'ajaxUrl'                => admin_url( 'admin-ajax.php' ),
-				'rg_global_config_nonce' => wp_create_nonce( 'rg_global_config_nonce' )
-			];
-
-			// Create variable and add data.
-			$rg_global_data = 'var revenueGeneratorGlobalOptions = ' . wp_json_encode( $rg_script_data ) . '; ';
-			wp_add_inline_script( 'revenue-generator', $rg_global_data, 'before' );
-
-			wp_enqueue_script( 'revenue-generator' );
-			wp_enqueue_style( 'revenue-generator' );
-		}
+	public function load_admin_assets() {
 		wp_enqueue_style( 'revenue-generator-admin' );
 	}
 
