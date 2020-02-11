@@ -52,4 +52,15 @@ class View {
 		return ob_get_clean();
 	}
 
+	/**
+	 * Outputs the footer with LaterPay logo.
+	 */
+	public static function render_footer_backend() {
+		$footer_data = [
+			'laterpay_logo' => Config::$plugin_defaults['img_dir'] . 'lp-logo.svg',
+		];
+		// phpcs:ignore -- WordPress.Security.EscapeOutput.OutputNotEscaped, template escaped in templates/backend/common/footer.php
+		echo self::render_template( 'backend/common/footer', $footer_data );
+	}
+
 }

@@ -104,7 +104,7 @@ class Admin {
 		}
 
 		// Update the option value.
-		update_option( 'lp_rg_global_options', $rg_global_options );
+		//update_option( 'lp_rg_global_options', $rg_global_options );
 
 		// Send success message.
 		wp_send_json( [
