@@ -49,7 +49,7 @@ class Config {
 				[
 					'average_post_publish_count' => '',
 					'merchant_currency'          => '',
-					'is_tutorial_completed'      => '',
+					'is_tutorial_completed'      => 0,
 					'current_tutorial_progress'  => ''
 				]
 			);
@@ -91,39 +91,39 @@ class Config {
 			'low'  => [
 				'single_article' => [
 					'tier_1' => [ // 0-250 content length.
-						'price' => array(
+						'price' => [
 							'amount'        => self::get_connector_price( 1.49 ),
 							'payment_model' => 'pay_now'
-						),
+						],
 					],
 					'tier_2' => [ // 251-500 content length.
-						'price' => array(
+						'price' => [
 							'amount'        => self::get_connector_price( 2.49 ),
 							'payment_model' => 'pay_now'
-						),
+						],
 					],
 					'tier_3' => [ // 501+ content length.
-						'price' => array(
+						'price' => [
 							'amount'        => self::get_connector_price( 4 ),
 							'payment_model' => 'pay_now'
-						),
+						],
 					]
 				],
 				'time_pass'      => [
-					'price'  => array(
+					'price'  => [
 						'amount'        => self::get_connector_price( 2.49 ),
 						'payment_model' => 'pay_now'
-					),
+					],
 					'expiry' => [
 						'unit'  => 'd',
 						'value' => '7'
 					]
 				],
 				'subscription'   => [
-					'price'  => array(
+					'price'  => [
 						'amount'        => self::get_connector_price( 4.99 ),
 						'payment_model' => 'pay_now'
-					),
+					],
 					'expiry' => [
 						'unit'  => 'm',
 						'value' => '1'
@@ -133,39 +133,39 @@ class Config {
 			'high' => [
 				'single_article' => [
 					'tier_1' => [ // 0-250 content length.
-						'price' => array(
+						'price' => [
 							'amount'        => self::get_connector_price( 0.49 ),
 							'payment_model' => 'pay_later'
-						),
+						],
 					],
 					'tier_2' => [ // 251-500 content length.
-						'price' => array(
+						'price' => [
 							'amount'        => self::get_connector_price( 0.99 ),
 							'payment_model' => 'pay_later'
-						),
+						],
 					],
 					'tier_3' => [ // 501+ content length.
-						'price' => array(
+						'price' => [
 							'amount'        => self::get_connector_price( 1.49 ),
 							'payment_model' => 'pay_later'
-						),
+						],
 					]
 				],
 				'time_pass'      => [
-					'price'  => array(
+					'price'  => [
 						'amount'        => self::get_connector_price( 2.49 ),
 						'payment_model' => 'pay_now'
-					),
+					],
 					'expiry' => [
 						'unit'  => 'd',
 						'value' => '7'
 					]
 				],
 				'subscription'   => [
-					'price'  => array(
+					'price'  => [
 						'amount'        => self::get_connector_price( 4.99 ),
 						'payment_model' => 'pay_now'
-					),
+					],
 					'expiry' => [
 						'unit'  => 'm',
 						'value' => '1'

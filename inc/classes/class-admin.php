@@ -34,7 +34,8 @@ class Admin {
 	protected function setup_hooks() {
 		add_action( 'admin_menu', [ $this, 'revenue_generator_register_page' ] );
 		add_action( 'admin_head', [ $this, 'hide_paywall' ] );
-		add_action( 'wp_ajax_rg_update_global_config', array( $this, 'update_global_config' ) );
+		add_action( 'current_screen', [ $this, 'redirect_merchant' ] );
+		add_action( 'wp_ajax_rg_update_global_config', [ $this, 'update_global_config' ] );
 	}
 
 	/**
@@ -103,7 +104,7 @@ class Admin {
 				$page_data['title'],
 				$page_data['cap'],
 				$slug,
-				array( $this, $page_callback )
+				[ $this, $page_callback ]
 			);
 		}
 	}
@@ -128,6 +129,30 @@ class Admin {
 	}
 
 	/**
+	 * If the tutorial is incomplete, redirect user to paywall page before dashboard.
+	 *
+	 * @param $current_screen
+	 */
+	public function redirect_merchant( $current_screen ) {
+		$dashboard_pages = [ 'toplevel_page_revenue-generator', 'revenue-generator_page_revenue-generator-dashboard' ];
+		if ( in_array( $current_screen->id, $dashboard_pages ) ) {
+			$current_global_options = Config::get_global_options();
+			$admin_menus            = self::get_admin_menus();
+
+			// Check if tutorial is completed, and load page accordingly.
+			$is_welcome_setup_done = empty( $current_global_options['average_post_publish_count'] ) ? false : true;
+			$is_tutorial_completed = (bool) $current_global_options['is_tutorial_completed'];
+
+			$paywall_page = add_query_arg( [ 'page' => $admin_menus['paywall']['url'] ], admin_url( 'admin.php' ) );
+
+			if ( true === $is_welcome_setup_done && false === $is_tutorial_completed ) {
+				wp_safe_redirect( $paywall_page );
+				exit;
+			}
+		}
+	}
+
+	/**
 	 * Load admin dashboard.
 	 *
 	 * @return string
@@ -137,13 +162,14 @@ class Admin {
 	public function load_dashboard() {
 		self::load_assets();
 
-		$admin_menus = self::get_admin_menus();
+		$admin_menus         = self::get_admin_menus();
 		$dashboard_page_data = [
-			'new_paywall_url'  => add_query_arg( array( 'page' => $admin_menus['paywall']['url'] ) ), admin_url( 'admin.php' ),
+			'new_paywall_url' => add_query_arg( [ 'page' => $admin_menus['paywall']['url'] ], admin_url( 'admin.php' ) ),
 		];
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
 		echo View::render_template( 'backend/dashboard/dashboard', $dashboard_page_data );
+
 		return '';
 	}
 
@@ -156,8 +182,16 @@ class Admin {
 	 */
 	public function load_paywall() {
 		self::load_assets();
+		$latest_post_id = Post_Types::get_latest_post_for_preview();
+		$formatted_post_data = Post_Types::get_formatted_post_data( $latest_post_id );
 
-		return 'Paywall';
+		$post_preview_data = [
+			'rg_preview_post' => $formatted_post_data,
+		];
+
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
+		echo View::render_template( 'backend/paywall/post-preview', $post_preview_data );
+		return '';
 	}
 
 	/**
@@ -206,19 +240,19 @@ class Admin {
 	 * @return array
 	 */
 	public static function get_admin_menus() {
-		$menus['dashboard'] = array(
+		$menus['dashboard'] = [
 			'url'    => 'revenue-generator-dashboard',
 			'title'  => __( 'Dashboard', 'revenue-generator' ),
 			'cap'    => 'manage_options',
 			'method' => 'dashboard'
-		);
+		];
 
-		$menus['paywall'] = array(
+		$menus['paywall'] = [
 			'url'    => 'revenue-generator-paywall',
 			'title'  => __( 'New Paywall', 'revenue-generator' ),
 			'cap'    => 'manage_options',
 			'method' => 'paywall'
-		);
+		];
 
 		return $menus;
 	}

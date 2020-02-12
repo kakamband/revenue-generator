@@ -28,7 +28,7 @@ class View {
 	 *
 	 * @codeCoverageIgnore Covered in test for render_template
 	 */
-	public static function get_template_part( $template_path, $variables = array() ) {
+	public static function get_template_part( $template_path, $variables = [] ) {
 		$template = sprintf( '%s.php', REVENUE_GENERATOR_PLUGIN_DIR . '/templates/' . $template_path );
 		if ( ! empty( $variables ) && is_array( $variables ) ) {
 			// All output is being escaped in loaded template files.
@@ -45,7 +45,7 @@ class View {
 	 *
 	 * @return string Template markup.
 	 */
-	public static function render_template( $template_path, $vars = array() ) {
+	public static function render_template( $template_path, $vars = [] ) {
 		ob_start();
 		self::get_template_part( $template_path, $vars );
 

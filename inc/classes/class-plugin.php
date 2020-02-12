@@ -25,11 +25,14 @@ class Plugin {
 		// Define required constants.
 		$this->add_constants();
 
+		// Initialize assets.
+		Assets::get_instance();
+
 		// Initialize plugin options.
 		Config::get_instance();
 
-		// Initialize assets.
-		Assets::get_instance();
+		// Initialize plugin custom post types.
+		Post_Types::get_instance();
 
 		// Initialize admin backend class.
 		Admin::get_instance();

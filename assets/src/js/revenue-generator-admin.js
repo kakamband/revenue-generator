@@ -5,3 +5,4 @@
  */
 
 import './pages/revenue-geneator-welcome';
+import './pages/revenue-generator-paywall';
