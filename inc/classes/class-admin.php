@@ -7,6 +7,7 @@
 
 namespace LaterPay\Revenue_Generator\Inc;
 
+use FakerPress\Module\Post;
 use \LaterPay\Revenue_Generator\Inc\Traits\Singleton;
 
 defined( 'ABSPATH' ) || exit;
@@ -182,12 +183,20 @@ class Admin {
 	 */
 	public function load_paywall() {
 		self::load_assets();
-		$latest_post_id = Post_Types::get_latest_post_for_preview();
-		$formatted_post_data = Post_Types::get_formatted_post_data( $latest_post_id );
 
+		$post_types = Post_Types::get_instance();
+
+		// Get latest post info for preview.
+		$latest_post_id = $post_types->get_latest_post_for_preview();
+		$formatted_post_data = $post_types->get_formatted_post_data( $latest_post_id );
+
+		// Paywall purchase options data.
 		$post_preview_data = [
 			'rg_preview_post' => $formatted_post_data,
 		];
+
+		// Get paywall options data.
+		$purchase_options_data = $post_types->get_post_purchase_options( $formatted_post_data );
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
 		echo View::render_template( 'backend/paywall/post-preview', $post_preview_data );

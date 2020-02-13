@@ -183,7 +183,7 @@ class Config {
 	 * @return float|int
 	 */
 	protected static function get_connector_price( $price ) {
-		return floatval( $price ) * 100;
+		return $price * 100;
 	}
 
 }
