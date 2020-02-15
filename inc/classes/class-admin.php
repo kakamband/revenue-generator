@@ -187,19 +187,31 @@ class Admin {
 		$post_types = Post_Types::get_instance();
 
 		// Get latest post info for preview.
-		$latest_post_id = $post_types->get_latest_post_for_preview();
+		$latest_post_id      = $post_types->get_latest_post_for_preview();
 		$formatted_post_data = $post_types->get_formatted_post_data( $latest_post_id );
-
-		// Paywall purchase options data.
-		$post_preview_data = [
-			'rg_preview_post' => $formatted_post_data,
-		];
 
 		// Get paywall options data.
 		$purchase_options_data = $post_types->get_post_purchase_options( $formatted_post_data );
 
+		// Paywall purchase options data.
+		$post_preview_data = [
+			'rg_preview_post'       => $formatted_post_data,
+			'purchase_options_data' => $purchase_options_data,
+			'action_icons'          => [
+				'option_add'         => Config::$plugin_defaults['img_dir'] . 'add-option.svg',
+				'option_edit'        => Config::$plugin_defaults['img_dir'] . 'edit-option.svg',
+				'option_remove'      => Config::$plugin_defaults['img_dir'] . 'remove-option.svg',
+				'option_move_up'     => Config::$plugin_defaults['img_dir'] . 'move-up.svg',
+				'option_move_down'   => Config::$plugin_defaults['img_dir'] . 'move-down.svg',
+				'option_move_around' => Config::$plugin_defaults['img_dir'] . 'move-option.svg',
+				'option_warning'     => Config::$plugin_defaults['img_dir'] . 'option-warning.svg',
+				'option_info'        => Config::$plugin_defaults['img_dir'] . 'option-info.svg',
+			]
+		];
+
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
 		echo View::render_template( 'backend/paywall/post-preview', $post_preview_data );
+
 		return '';
 	}
 

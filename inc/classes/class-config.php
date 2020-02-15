@@ -92,39 +92,43 @@ class Config {
 				'single_article' => [
 					'tier_1' => [ // 0-250 content length.
 						'price' => [
-							'amount'        => self::get_connector_price( 1.49 ),
+							'amount'        => 1.49,
 							'payment_model' => 'pay_now'
 						],
 					],
 					'tier_2' => [ // 251-500 content length.
 						'price' => [
-							'amount'        => self::get_connector_price( 2.49 ),
+							'amount'        => 2.49,
 							'payment_model' => 'pay_now'
 						],
 					],
 					'tier_3' => [ // 501+ content length.
 						'price' => [
-							'amount'        => self::get_connector_price( 4 ),
+							'amount'        => 4.00,
 							'payment_model' => 'pay_now'
 						],
 					]
 				],
 				'time_pass'      => [
-					'price'  => [
-						'amount'        => self::get_connector_price( 2.49 ),
+					'title'       => esc_html__( '24 Hour Pass', 'revenue-generator' ),
+					'description' => esc_html__( 'Enjoy unlimited access to all our content for 24 hours.', 'revenue-generator' ),
+					'price'       => [
+						'amount'        => 2.49,
 						'payment_model' => 'pay_now'
 					],
-					'expiry' => [
+					'expiry'      => [
 						'unit'  => 'd',
 						'value' => '7'
 					]
 				],
 				'subscription'   => [
-					'price'  => [
-						'amount'        => self::get_connector_price( 4.99 ),
+					'title'       => esc_html__( '1 Month Subscription', 'revenue-generator' ),
+					'description' => esc_html__( 'Enjoy unlimited access to all our content for one month.', 'revenue-generator' ),
+					'price'       => [
+						'amount'        => 4.99,
 						'payment_model' => 'pay_now'
 					],
-					'expiry' => [
+					'expiry'      => [
 						'unit'  => 'm',
 						'value' => '1'
 					]
@@ -134,39 +138,43 @@ class Config {
 				'single_article' => [
 					'tier_1' => [ // 0-250 content length.
 						'price' => [
-							'amount'        => self::get_connector_price( 0.49 ),
+							'amount'        => 0.49,
 							'payment_model' => 'pay_later'
 						],
 					],
 					'tier_2' => [ // 251-500 content length.
 						'price' => [
-							'amount'        => self::get_connector_price( 0.99 ),
+							'amount'        => 0.99,
 							'payment_model' => 'pay_later'
 						],
 					],
 					'tier_3' => [ // 501+ content length.
 						'price' => [
-							'amount'        => self::get_connector_price( 1.49 ),
+							'amount'        => 1.49,
 							'payment_model' => 'pay_later'
 						],
 					]
 				],
 				'time_pass'      => [
-					'price'  => [
-						'amount'        => self::get_connector_price( 2.49 ),
+					'title'       => esc_html__( '24 Hour Pass', 'revenue-generator' ),
+					'description' => esc_html__( 'Enjoy unlimited access to all our content for 24 hours.', 'revenue-generator' ),
+					'price'       => [
+						'amount'        => 2.49,
 						'payment_model' => 'pay_now'
 					],
-					'expiry' => [
+					'expiry'      => [
 						'unit'  => 'd',
 						'value' => '7'
 					]
 				],
 				'subscription'   => [
-					'price'  => [
-						'amount'        => self::get_connector_price( 4.99 ),
+					'title'       => esc_html__( '1 Month Subscription', 'revenue-generator' ),
+					'description' => esc_html__( 'Enjoy unlimited access to all our content for one month.', 'revenue-generator' ),
+					'price'       => [
+						'amount'        => 4.99,
 						'payment_model' => 'pay_now'
 					],
-					'expiry' => [
+					'expiry'      => [
 						'unit'  => 'm',
 						'value' => '1'
 					]
