@@ -125,10 +125,10 @@ class Post_Types {
 		$teaser_content = Utility::truncate(
 			preg_replace( '/\s+/', ' ', strip_shortcodes( $post_content ) ),
 			Utility::determine_number_of_words( $post_content ),
-			array(
+			[
 				'html'  => true,
 				'words' => true,
-			)
+			]
 		);
 
 		return [
@@ -199,7 +199,7 @@ class Post_Types {
 			}
 		} elseif ( $current_purchase_options['time_pass'] > 0 && empty( $current_purchase_options['subscription'] ) ) {
 			$purchase_options['subscriptions'][] = $purchase_options_all['subscription'];
-			$purchase_options['time_passes'] = Time_Pass::get_instance()->get_time_passes_by_criteria();
+			$purchase_options['time_passes']     = Time_Pass::get_instance()->get_time_passes_by_criteria();
 		}
 
 		return $purchase_options;
@@ -227,4 +227,95 @@ class Post_Types {
 
 		return 'tier_1';
 	}
+
+	/**
+	 * Get valid durations.
+	 *
+	 * @return array array of options
+	 */
+	public static function get_duration_options() {
+		return [
+			1 => 1,
+			2,
+			3,
+			4,
+			5,
+			6,
+			7,
+			8,
+			9,
+			10,
+			11,
+			12,
+			13,
+			14,
+			15,
+			16,
+			17,
+			18,
+			19,
+			20,
+			21,
+			22,
+			23,
+			24,
+		];
+	}
+
+	/**
+	 * Get valid periods.
+	 *
+	 * @param null $key option name
+	 * @param bool $pluralized
+	 *
+	 * @return array array of options
+	 */
+	public static function get_period_options( $key = null ) {
+		// singular periods.
+		$periods = [
+			'h' => __( 'Hour', 'revenue-generator' ),
+			'd' => __( 'Day', 'revenue-generator' ),
+			'w' => __( 'Week', 'revenue-generator' ),
+			'm' => __( 'Month', 'revenue-generator' ),
+			'y' => __( 'Year', 'revenue-generator' ),
+		];
+
+		return $periods;
+	}
+
+	/**
+	 * Get time pass select options by type.
+	 *
+	 * @param string $type type of select
+	 *
+	 * @return string of options
+	 */
+	public static function get_select_options( $type ) {
+		$options_html  = '';
+		$default_value = null;
+
+		switch ( $type ) {
+			case 'duration':
+				$elements      = self::get_duration_options();
+				$default_value = 1;
+				break;
+
+			case 'period':
+				$elements      = self::get_period_options();
+				$default_value = 'd';
+				break;
+
+			default:
+				return $options_html;
+		}
+
+		if ( $elements && is_array( $elements ) ) {
+			foreach ( $elements as $id => $name ) {
+				$options_html .= sprintf( '<option value="%1$s" %2$s>%3$s</option>', esc_attr( $id ), esc_attr( selected( $default_value, $id, false ) ), esc_html( $name ) );
+			}
+		}
+
+		return $options_html;
+	}
+
 }

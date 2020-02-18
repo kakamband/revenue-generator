@@ -196,4 +196,41 @@ class Subscription extends Base {
 		return $subscriptions;
 	}
 
+	/**
+	 * Update subscription information.
+	 *
+	 * @param array $subscription_data Subscription data.
+	 *
+	 * @return int|\WP_Error
+	 */
+	public function update_subscription( $subscription_data ) {
+		if ( empty( $subscription_data['id'] ) ) {
+			$subscription_id = wp_insert_post( [
+				'post_content' => $subscription_data['description'],
+				'post_title'   => $subscription_data['title'],
+				'post_status'  => 'publish',
+				'post_type'    => static::SLUG,
+				'meta_input'   => [
+					'_rg_price'    => $subscription_data['price'],
+					'_rg_revenue'  => $subscription_data['revenue'],
+					'_rg_duration' => $subscription_data['duration'],
+					'_rg_period'   => $subscription_data['period'],
+				],
+			] );
+		} else {
+			$subscription_id = $subscription_data['id'];
+			wp_update_post( [
+				'ID'           => $subscription_id,
+				'post_content' => $subscription_data['description'],
+				'post_title'   => $subscription_data['title'],
+			] );
+
+			update_post_meta( $subscription_id, '_rg_price', $subscription_data['price'] );
+			update_post_meta( $subscription_id, '_rg_revenue', $subscription_data['revenue'] );
+			update_post_meta( $subscription_id, '_rg_duration', $subscription_data['duration'] );
+			update_post_meta( $subscription_id, '_rg_period', $subscription_data['period'] );
+		}
+
+		return $subscription_id;
+	}
 }

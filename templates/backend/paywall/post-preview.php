@@ -6,6 +6,7 @@
  */
 
 use LaterPay\Revenue_Generator\Inc\View;
+use LaterPay\Revenue_Generator\Inc\Post_Types;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	// prevent direct access to this file
@@ -40,6 +41,44 @@ $time_passes_purchase_option   = isset( $purchase_options_data['time_passes'] ) 
 			<div class="rg-purchase-overlay" id="rg_js_purchaseOverly">
 			</div>
 		</div>
+		<div class="rev-gen-preview-main--paywall-actions">
+			<div class="rev-gen-preview-main--paywall-actions-apply">
+				<p>
+					<?php
+					echo wp_kses(
+						sprintf(
+							__( 'Apply <span contenteditable="true" class="rev-gen-preview-main-paywall-name">%s</span> to', 'revenue-generator' ),
+							esc_html( 'Paywall 1' )
+						),
+						[
+							'span' => [
+								'class'           => [],
+								'contenteditable' => true,
+							]
+						]
+					);
+					?>
+				</p>
+				<select class="rev-gen-preview-main-paywall-applies-to">
+					<option value="all"><?php esc_html_e( 'all posts and pages', 'revenue-generator' ); ?></option>
+					<option value="category"><?php esc_html_e( 'category', 'revenue-generator' ); ?></option>
+					<option value="page"><?php esc_html_e( 'page', 'revenue-generator' ); ?></option>
+					<option value="post"><?php esc_html_e( 'post', 'revenue-generator' ); ?></option>
+				</select>
+			</div>
+			<div class="rev-gen-preview-main--paywall-actions-search">
+				<input type="text" id="rg_js_searchPaywallContent" placeholder="<?php esc_attr_e( 'search', 'revenue-generator' ); ?>" />
+				<i class="dashicons dashicons-search"></i>
+			</div>
+			<div class="rev-gen-preview-main--paywall-actions-update">
+				<button id="rg_js_savePaywall" class="rev-gen-preview-main-paywall-actions-update-save">
+					<?php esc_html_e( 'Save', 'revenue-generator' ); ?>
+				</button>
+				<button id="rg_js_activatePaywall" class="rev-gen-preview-main--paywall-actions-update-publish">
+					<?php esc_html_e( 'Publish', 'revenue-generator' ); ?>
+				</button>
+			</div>
+		</div>
 	</div>
 	<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
 </div>
@@ -65,31 +104,53 @@ $time_passes_purchase_option   = isset( $purchase_options_data['time_passes'] ) 
 <script type="text/template" id="tmpl-revgen-purchase-overlay-item-manager">
 	<div class="rg-purchase-overlay-option-manager">
 		<div class="rg-purchase-overlay-option-manager-entity-selection">
-			<select class="rg-purchase-overlay-option-manager-entity">
-				<option value="individual"><?php esc_html_e( 'Individual Article', 'revenue-generator' ); ?></option>
-				<option value="time_pass"><?php esc_html_e( 'Time Pass', 'revenue-generator' ); ?></option>
-				<option value="subscription"><?php esc_html_e( 'Subscription', 'revenue-generator' ); ?></option>
+			<select id="rg_js_purchaseOptionType" class="rg-purchase-overlay-option-manager-entity">
+				<option
+				<# data.entityType === 'individual' ? print("selected") : print('') #> value="individual"><?php esc_html_e( 'Individual Article', 'revenue-generator' ); ?></option>
+				<option
+				<# data.entityType === 'time-pass' ? print("selected") : print('') #> value="time-pass"><?php esc_html_e( 'Time Pass', 'revenue-generator' ); ?></option>
+				<option
+				<# data.entityType === 'subscription' ? print("selected") : print('') #> value="subscription"><?php esc_html_e( 'Subscription', 'revenue-generator' ); ?></option>
 			</select>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-revenue">
 			<span><?php esc_html_e( 'Pay Now', 'revenue-generator' ); ?></span>
 			<label class="switch">
-				<input class="rg-purchase-overlay-option-revenue-selection" type="checkbox" value="1">
+				<input class="rg-purchase-overlay-option-revenue-selection" type="checkbox">
 				<span class="slider round"></span>
 			</label>
 			<span><?php esc_html_e( 'Pay Later', 'revenue-generator' ); ?></span>
 			<button class="rg-purchase-overlay-option-info">
-				<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>"></button>
+				<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
+			</button>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-pricing">
 			<span><?php esc_html_e( 'Static Pricing', 'revenue-generator' ); ?></span>
 			<label class="switch">
-				<input class="rg-purchase-overlay-option-pricing-selection" type="checkbox" value="1">
+				<input class="rg-purchase-overlay-option-pricing-selection" type="checkbox">
 				<span class="slider round"></span>
 			</label>
 			<span><?php esc_html_e( 'Dynamic Pricing', 'revenue-generator' ); ?></span>
 			<button class="rg-purchase-overlay-option-info">
 				<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>"></button>
+		</div>
+		<div class="rg-purchase-overlay-option-manager-duration">
+			<select class="rg-purchase-overlay-option-manager-duration-count">
+				<?php echo wp_kses( Post_Types::get_select_options( 'duration' ), array(
+					'option' => array(
+						'selected' => array(),
+						'value'    => array(),
+					)
+				) ); ?>
+			</select>
+			<select class="rg-purchase-overlay-option-manager-duration-period">
+				<?php echo wp_kses( Post_Types::get_select_options( 'period' ), array(
+					'option' => array(
+						'selected' => array(),
+						'value'    => array(),
+					)
+				) ); ?>
+			</select>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-action">
 			<button class="rg-purchase-overlay-option-remove"><?php esc_html_e( 'Delete This Purchase Option', 'revenue-generator' ); ?></button>
@@ -105,10 +166,16 @@ $time_passes_purchase_option   = isset( $purchase_options_data['time_passes'] ) 
 	<div class="rg-purchase-overlay-description" contenteditable="true">
 		<?php echo esc_html( sprintf( 'Support %s to get access to this content and more.', esc_url( get_home_url() ) ) ); ?>
 	</div>
-	<div class="rg-purchase-overlay-purchase-options">
+	<div class="rg-purchase-overlay-purchase-options" data-paywall-id="">
 		<?php if ( ! empty( $individual_purchase_option ) ) : ?>
-			<div class="rg-purchase-overlay-purchase-options-item">
-				<div class="rg-purchase-overlay-purchase-options-item-info" data-purchase-type="individual">
+			<div
+				class="rg-purchase-overlay-purchase-options-item"
+				data-purchase-type="individual"
+				data-pricing-type="static"
+				data-tlp-id=""
+				data-uid=""
+			>
+				<div class="rg-purchase-overlay-purchase-options-item-info">
 					<div class="rg-purchase-overlay-purchase-options-item-info-title" contenteditable="true">
 						<?php esc_html_e( 'Access Article Now', 'revenue-generator' ); ?>
 					</div>
@@ -117,7 +184,7 @@ $time_passes_purchase_option   = isset( $purchase_options_data['time_passes'] ) 
 					</div>
 				</div>
 				<div class="rg-purchase-overlay-purchase-options-item-price">
-					<span id="rg_js_individualPricing" data-pay-model="<?php echo esc_attr( $individual_purchase_option['price']['payment_model'] ); ?>" contenteditable="true">
+					<span class="rg-purchase-overlay-purchase-options-item-price-span" data-pay-model="<?php echo esc_attr( $individual_purchase_option['price']['payment_model'] ); ?>" contenteditable="true">
 						<?php echo esc_html( $individual_purchase_option['price']['amount'] ); ?>
 					</span>
 				</div>
@@ -129,12 +196,15 @@ $time_passes_purchase_option   = isset( $purchase_options_data['time_passes'] ) 
 				$time_pass_price  = $time_pass['price'];
 				$time_pass_expiry = $time_pass['expiry'];
 				?>
-				<div class="rg-purchase-overlay-purchase-options-item">
-					<div class="rg-purchase-overlay-purchase-options-item-info"
-						 data-purchase-type="time_pass"
-						 data-expiry-unit="<?php echo esc_attr( $time_pass_expiry['unit'] ); ?>"
-						 data-expiry-value="<?php echo esc_attr( $time_pass_expiry['value'] ); ?>"
-					>
+				<div
+					class="rg-purchase-overlay-purchase-options-item"
+					data-purchase-type="time-pass"
+					data-expiry-unit="<?php echo esc_attr( $time_pass_expiry['unit'] ); ?>"
+					data-expiry-value="<?php echo esc_attr( $time_pass_expiry['value'] ); ?>"
+					data-tlp-id=""
+					data-uid=""
+				>
+					<div class="rg-purchase-overlay-purchase-options-item-info">
 						<div class="rg-purchase-overlay-purchase-options-item-info-title" contenteditable="true">
 							<?php echo esc_html( $time_pass['title'] ); ?>
 						</div>
@@ -143,10 +213,7 @@ $time_passes_purchase_option   = isset( $purchase_options_data['time_passes'] ) 
 						</div>
 					</div>
 					<div class="rg-purchase-overlay-purchase-options-item-price">
-						<span id="rg_js_individualPricing"
-							  data-pay-model="<?php echo esc_attr( $time_pass_price['payment_model'] ); ?>"
-							  contenteditable="true"
-						>
+						<span class="rg-purchase-overlay-purchase-options-item-price-span" data-pay-model="<?php echo esc_attr( $time_pass_price['payment_model'] ); ?>" contenteditable="true">
 						<?php echo esc_html( $time_pass_price['amount'] ); ?>
 					</span>
 					</div>
@@ -161,12 +228,15 @@ $time_passes_purchase_option   = isset( $purchase_options_data['time_passes'] ) 
 				$subscription_price  = $subscription['price'];
 				$subscription_expiry = $subscription['expiry'];
 				?>
-				<div class="rg-purchase-overlay-purchase-options-item">
-					<div class="rg-purchase-overlay-purchase-options-item-info"
-						 data-purchase-type="subscription"
-						 data-expiry-unit="<?php echo esc_attr( $subscription_expiry['unit'] ); ?>"
-						 data-expiry-value="<?php echo esc_attr( $subscription_expiry['value'] ); ?>"
-					>
+				<div
+					class="rg-purchase-overlay-purchase-options-item"
+					data-purchase-type="subscription"
+					data-expiry-unit="<?php echo esc_attr( $subscription_expiry['unit'] ); ?>"
+					data-expiry-value="<?php echo esc_attr( $subscription_expiry['value'] ); ?>"
+					data-sub-id=""
+					data-uid=""
+				>
+					<div class="rg-purchase-overlay-purchase-options-item-info">
 						<div class="rg-purchase-overlay-purchase-options-item-info-title" contenteditable="true">
 							<?php echo esc_html( $subscription['title'] ); ?>
 						</div>
@@ -175,10 +245,7 @@ $time_passes_purchase_option   = isset( $purchase_options_data['time_passes'] ) 
 						</div>
 					</div>
 					<div class="rg-purchase-overlay-purchase-options-item-price">
-						<span id="rg_js_individualPricing"
-							  data-pay-model="<?php echo esc_attr( $subscription_price['payment_model'] ); ?>"
-							  contenteditable="true"
-						>
+						<span class="rg-purchase-overlay-purchase-options-item-price-span" data-pay-model="<?php echo esc_attr( $subscription_price['payment_model'] ); ?>" contenteditable="true">
 						<?php echo esc_html( $subscription_price['amount'] ); ?>
 					</span>
 					</div>

@@ -7,7 +7,9 @@
 
 namespace LaterPay\Revenue_Generator\Inc;
 
-use FakerPress\Module\Post;
+use \LaterPay\Revenue_Generator\Inc\Post_Types\Paywall;
+use LaterPay\Revenue_Generator\Inc\Post_Types\Subscription;
+use LaterPay\Revenue_Generator\Inc\Post_Types\Time_Pass;
 use \LaterPay\Revenue_Generator\Inc\Traits\Singleton;
 
 defined( 'ABSPATH' ) || exit;
@@ -37,6 +39,7 @@ class Admin {
 		add_action( 'admin_head', [ $this, 'hide_paywall' ] );
 		add_action( 'current_screen', [ $this, 'redirect_merchant' ] );
 		add_action( 'wp_ajax_rg_update_global_config', [ $this, 'update_global_config' ] );
+		add_action( 'wp_ajax_rg_update_paywall', [ $this, 'update_paywall' ] );
 	}
 
 	/**
@@ -46,12 +49,20 @@ class Admin {
 		// Localize required data.
 		$current_global_options = Config::get_global_options();
 
+		// Check if setup is done, and load page accordingly.
+		$is_welcome_setup_done = empty( $current_global_options['average_post_publish_count'] ) ? false : true;
+
 		// Script date required for operations.
 		$rg_script_data = [
-			'globalOptions'          => $current_global_options,
-			'ajaxUrl'                => admin_url( 'admin-ajax.php' ),
-			'rg_global_config_nonce' => wp_create_nonce( 'rg_global_config_nonce' )
+			'globalOptions'    => $current_global_options,
+			'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
+			'rg_paywall_nonce' => wp_create_nonce( 'rg_paywall_nonce' ),
 		];
+
+		// If setup is not done
+		if ( ! $is_welcome_setup_done ) {
+			$rg_script_data['rg_global_config_nonce'] = wp_create_nonce( 'rg_global_config_nonce' );
+		}
 
 		// Create variable and add data.
 		$rg_global_data = 'var revenueGeneratorGlobalOptions = ' . wp_json_encode( $rg_script_data ) . '; ';
@@ -276,5 +287,83 @@ class Admin {
 		];
 
 		return $menus;
+	}
+
+	/**
+	 * Update Paywall
+	 *
+	 */
+	public function update_paywall() {
+
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Sanitize the data.
+		$rg_post_id      = sanitize_text_field( filter_input( INPUT_POST, 'post_id', FILTER_SANITIZE_NUMBER_INT ) );
+		$paywall_data    = filter_input( INPUT_POST, 'paywall', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+		$individual_data = filter_input( INPUT_POST, 'individual', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+		$time_passes     = filter_input( INPUT_POST, 'time_passes', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+		$subscriptions   = filter_input( INPUT_POST, 'subscriptions', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+
+
+		$paywall_instance           = Paywall::get_instance();
+		$paywall['title']           = sanitize_text_field( wp_unslash( $paywall_data['title'] ) );
+		$paywall['description']     = sanitize_text_field( wp_unslash( $paywall_data['desc'] ) );
+		$paywall['name']            = sanitize_text_field( wp_unslash( $paywall_data['name'] ) );
+		$paywall['id']              = sanitize_text_field( $paywall_data['id'] );
+		$paywall['support_type']    = 'post';
+		$paywall['support_type_id'] = $rg_post_id;
+
+		// Create Paywall.
+		$paywall_id = $paywall_instance->update_paywall( $paywall );
+
+		$individual['title']       = sanitize_text_field( wp_unslash( $individual_data['title'] ) );
+		$individual['description'] = sanitize_text_field( wp_unslash( $individual_data['desc'] ) );
+		$individual['price']       = floatval( $individual_data['price'] );
+		$individual['revenue']     = sanitize_text_field( $individual_data['revenue'] );
+		$individual['type']        = sanitize_text_field( $individual_data['type'] );
+
+		// Add Individual option to paywall.
+		$paywall_instance->update_paywall_individual_option( $paywall_id, $individual );
+
+		$time_pass_instance = Time_Pass::get_instance();
+		$time_pass_response = [];
+
+		// Store time pass.
+		foreach ( $time_passes as $time_pass ) {
+			$timepass['id']                          = sanitize_text_field( $time_pass['tlp_id'] );
+			$timepass['title']                       = sanitize_text_field( wp_unslash( $time_pass['title'] ) );
+			$timepass['description']                 = sanitize_text_field( wp_unslash( $time_pass['desc'] ) );
+			$timepass['price']                       = floatval( $time_pass['price'] );
+			$timepass['revenue']                     = sanitize_text_field( $time_pass['revenue'] );
+			$timepass['duration']                    = sanitize_text_field( $time_pass['unit'] );
+			$timepass['period']                      = sanitize_text_field( $time_pass['value'] );
+			$time_pass_response[ $time_pass['uid'] ] = $time_pass_instance->update_time_pass( $timepass );
+		}
+
+		$subscription_instance = Subscription::get_instance();
+		$subscription_response = [];
+
+		// Store time pass.
+		foreach ( $subscriptions as $subscription_data ) {
+			$subscription['id']                                 = sanitize_text_field( $subscription_data['sub_id'] );
+			$subscription['title']                              = sanitize_text_field( wp_unslash( $subscription_data['title'] ) );
+			$subscription['description']                        = sanitize_text_field( wp_unslash( $subscription_data['desc'] ) );
+			$subscription['price']                              = floatval( $subscription_data['price'] );
+			$subscription['revenue']                            = sanitize_text_field( $subscription_data['revenue'] );
+			$subscription['duration']                           = sanitize_text_field( $subscription_data['unit'] );
+			$subscription['period']                             = sanitize_text_field( $subscription_data['value'] );
+			$subscription_response[ $subscription_data['uid'] ] = $subscription_instance->update_subscription( $subscription );
+		}
+
+		// Send success message.
+		wp_send_json( [
+			'success'       => true,
+			'msg'           => __( 'Paywall saved successfully!', 'revenue-generator' ),
+			'paywall_id'    => $paywall_id,
+			'time_passes'   => $time_pass_response,
+			'subscriptions' => $subscription_response,
+		] );
+
 	}
 }

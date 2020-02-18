@@ -184,7 +184,7 @@ class Time_Pass extends Base {
 		$get_time_passes_query = new \WP_Query();
 
 		// Get posts for requested args.
-		$posts         = $get_time_passes_query->query( $query_args );
+		$posts       = $get_time_passes_query->query( $query_args );
 		$time_passes = [];
 
 		foreach ( $posts as $key => $post ) {
@@ -192,6 +192,44 @@ class Time_Pass extends Base {
 		}
 
 		return $time_passes;
+	}
+
+	/**
+	 * Update time pass data.
+	 *
+	 * @param array $time_pass_data Time Pass data.
+	 *
+	 * @return int|\WP_Error
+	 */
+	public function update_time_pass( $time_pass_data ) {
+		if ( empty( $time_pass_data['id'] ) ) {
+			$time_pass_id = wp_insert_post( [
+				'post_content' => $time_pass_data['description'],
+				'post_title'   => $time_pass_data['title'],
+				'post_status'  => 'publish',
+				'post_type'    => static::SLUG,
+				'meta_input'   => [
+					'_rg_price'    => $time_pass_data['price'],
+					'_rg_revenue'  => $time_pass_data['revenue'],
+					'_rg_duration' => $time_pass_data['duration'],
+					'_rg_period'   => $time_pass_data['period'],
+				],
+			] );
+		} else {
+			$paywall_id = $time_pass_data['id'];
+			wp_update_post( [
+				'ID'           => $paywall_id,
+				'post_content' => $time_pass_data['description'],
+				'post_title'   => $time_pass_data['title'],
+			] );
+
+			update_post_meta( $paywall_id, '_rg_price', $time_pass_data['price'] );
+			update_post_meta( $paywall_id, '_rg_revenue', $time_pass_data['revenue'] );
+			update_post_meta( $paywall_id, '_rg_duration', $time_pass_data['duration'] );
+			update_post_meta( $paywall_id, '_rg_period', $time_pass_data['period'] );
+		}
+
+		return $time_pass_id;
 	}
 
 }

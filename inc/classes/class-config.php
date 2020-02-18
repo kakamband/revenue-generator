@@ -93,19 +93,19 @@ class Config {
 					'tier_1' => [ // 0-250 content length.
 						'price' => [
 							'amount'        => 1.49,
-							'payment_model' => 'pay_now'
+							'payment_model' => 'sis'
 						],
 					],
 					'tier_2' => [ // 251-500 content length.
 						'price' => [
 							'amount'        => 2.49,
-							'payment_model' => 'pay_now'
+							'payment_model' => 'sis'
 						],
 					],
 					'tier_3' => [ // 501+ content length.
 						'price' => [
 							'amount'        => 4.00,
-							'payment_model' => 'pay_now'
+							'payment_model' => 'sis'
 						],
 					]
 				],
@@ -114,11 +114,11 @@ class Config {
 					'description' => esc_html__( 'Enjoy unlimited access to all our content for 24 hours.', 'revenue-generator' ),
 					'price'       => [
 						'amount'        => 2.49,
-						'payment_model' => 'pay_now'
+						'payment_model' => 'sis'
 					],
 					'expiry'      => [
-						'unit'  => 'd',
-						'value' => '7'
+						'unit'  => 'h',
+						'value' => '24'
 					]
 				],
 				'subscription'   => [
@@ -126,7 +126,7 @@ class Config {
 					'description' => esc_html__( 'Enjoy unlimited access to all our content for one month.', 'revenue-generator' ),
 					'price'       => [
 						'amount'        => 4.99,
-						'payment_model' => 'pay_now'
+						'payment_model' => 'sis'
 					],
 					'expiry'      => [
 						'unit'  => 'm',
@@ -139,19 +139,19 @@ class Config {
 					'tier_1' => [ // 0-250 content length.
 						'price' => [
 							'amount'        => 0.49,
-							'payment_model' => 'pay_later'
+							'payment_model' => 'ppu'
 						],
 					],
 					'tier_2' => [ // 251-500 content length.
 						'price' => [
 							'amount'        => 0.99,
-							'payment_model' => 'pay_later'
+							'payment_model' => 'ppu'
 						],
 					],
 					'tier_3' => [ // 501+ content length.
 						'price' => [
 							'amount'        => 1.49,
-							'payment_model' => 'pay_later'
+							'payment_model' => 'ppu'
 						],
 					]
 				],
@@ -160,11 +160,11 @@ class Config {
 					'description' => esc_html__( 'Enjoy unlimited access to all our content for 24 hours.', 'revenue-generator' ),
 					'price'       => [
 						'amount'        => 2.49,
-						'payment_model' => 'pay_now'
+						'payment_model' => 'sis'
 					],
 					'expiry'      => [
-						'unit'  => 'd',
-						'value' => '7'
+						'unit'  => 'h',
+						'value' => '24'
 					]
 				],
 				'subscription'   => [
@@ -172,7 +172,7 @@ class Config {
 					'description' => esc_html__( 'Enjoy unlimited access to all our content for one month.', 'revenue-generator' ),
 					'price'       => [
 						'amount'        => 4.99,
-						'payment_model' => 'pay_now'
+						'payment_model' => 'sis'
 					],
 					'expiry'      => [
 						'unit'  => 'm',

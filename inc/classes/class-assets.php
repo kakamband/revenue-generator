@@ -46,7 +46,7 @@ class Assets {
 		wp_register_script(
 			'revenue-generator',
 			REVENUE_GENERATOR_BUILD_URL . 'revenue-generator-admin.js',
-			[ 'jquery', 'wp-util', 'jquery-ui-sortable' ],
+			[ 'jquery', 'wp-util' ],
 			$this->get_asset_version( 'revenue-generator-admin.js' )
 		);
 

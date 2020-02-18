@@ -121,6 +121,10 @@
     font-weight: bold;
 
     div {
+      border: 0;
+      border-color: #e3e4e6;
+      border-top: 1px solid;
+      border-bottom: 1px solid;
       height: 30px;
       font-size: 12px;
       display: table;
@@ -150,20 +154,14 @@
     }
 
     div.rg-purchase-overlay-option-manager-pricing, div.rg-purchase-overlay-option-manager-revenue {
-      border: 0;
-      border-color: #e3e4e6;
-      border-top: 1px solid;
-      border-bottom: 1px solid;
-
+      input[type="checkbox"] + .slider {
+        background-color: #1e1e1e;
+      }
 
       input[type="checkbox"] {
         opacity: 0;
         width: 0;
         height: 0;
-
-        &:checked + .slider {
-          background-color: #1e1e1e;
-        }
 
         &:checked + .slider:before {
           transform: translateX(26px);
@@ -221,10 +219,31 @@
     }
 
     div.rg-purchase-overlay-option-manager-action {
-      margin-top: 10px;
       button {
         width: 100%;
         cursor: pointer;
+      }
+    }
+
+    button.rg-purchase-overlay-option-remove {
+        text-transform: uppercase;
+    }
+
+    &-duration {
+      select {
+        border-radius: 0;
+        padding: 0 0 0 5px;
+      }
+
+      &-count {
+        border: 0;
+        width: 15%;
+        border-right: 1px solid;
+      }
+
+      &-period {
+        border: 0;
+        width: 75%;
       }
     }
   }
