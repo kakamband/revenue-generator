@@ -40,6 +40,7 @@ class Admin {
 		add_action( 'current_screen', [ $this, 'redirect_merchant' ] );
 		add_action( 'wp_ajax_rg_update_global_config', [ $this, 'update_global_config' ] );
 		add_action( 'wp_ajax_rg_update_paywall', [ $this, 'update_paywall' ] );
+		add_action( 'wp_ajax_rg_update_currency_selection', [ $this, 'update_currency_selection' ] );
 	}
 
 	/**
@@ -52,11 +53,15 @@ class Admin {
 		// Check if setup is done, and load page accordingly.
 		$is_welcome_setup_done = empty( $current_global_options['average_post_publish_count'] ) ? false : true;
 
+		$currency_limits = Config::get_currency_limits();
+
 		// Script date required for operations.
 		$rg_script_data = [
 			'globalOptions'    => $current_global_options,
 			'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
 			'rg_paywall_nonce' => wp_create_nonce( 'rg_paywall_nonce' ),
+			'currency'         => $currency_limits[ $current_global_options['merchant_currency'] ],
+			'locale'           => get_locale()
 		];
 
 		// If setup is not done
@@ -194,6 +199,7 @@ class Admin {
 	 */
 	public function load_paywall() {
 		self::load_assets();
+		$config_data = Config::get_global_options();
 
 		$post_types = Post_Types::get_instance();
 
@@ -202,12 +208,13 @@ class Admin {
 		$formatted_post_data = $post_types->get_formatted_post_data( $latest_post_id );
 
 		// Get paywall options data.
-		$purchase_options_data = $post_types->get_post_purchase_options( $formatted_post_data );
+		$purchase_options_data = $post_types->get_post_purchase_options( $latest_post_id, $formatted_post_data );
 
 		// Paywall purchase options data.
 		$post_preview_data = [
 			'rg_preview_post'       => $formatted_post_data,
 			'purchase_options_data' => $purchase_options_data,
+			'merchant_symbol'       => 'USD' === $config_data['merchant_currency'] ? '$' : '€',
 			'action_icons'          => [
 				'option_add'         => Config::$plugin_defaults['img_dir'] . 'add-option.svg',
 				'option_edit'        => Config::$plugin_defaults['img_dir'] . 'edit-option.svg',
@@ -290,7 +297,7 @@ class Admin {
 	}
 
 	/**
-	 * Update Paywall
+	 * Update Paywall.
 	 *
 	 */
 	public function update_paywall() {
@@ -305,14 +312,13 @@ class Admin {
 		$time_passes     = filter_input( INPUT_POST, 'time_passes', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 		$subscriptions   = filter_input( INPUT_POST, 'subscriptions', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 
-
-		$paywall_instance           = Paywall::get_instance();
-		$paywall['title']           = sanitize_text_field( wp_unslash( $paywall_data['title'] ) );
-		$paywall['description']     = sanitize_text_field( wp_unslash( $paywall_data['desc'] ) );
-		$paywall['name']            = sanitize_text_field( wp_unslash( $paywall_data['name'] ) );
-		$paywall['id']              = sanitize_text_field( $paywall_data['id'] );
-		$paywall['support_type']    = 'post';
-		$paywall['support_type_id'] = $rg_post_id;
+		$paywall_instance         = Paywall::get_instance();
+		$paywall['title']         = sanitize_text_field( wp_unslash( $paywall_data['title'] ) );
+		$paywall['description']   = sanitize_text_field( wp_unslash( $paywall_data['desc'] ) );
+		$paywall['name']          = sanitize_text_field( wp_unslash( $paywall_data['name'] ) );
+		$paywall['id']            = sanitize_text_field( $paywall_data['id'] );
+		$paywall['access_to']     = 'post';
+		$paywall['access_entity'] = $rg_post_id;
 
 		// Create Paywall.
 		$paywall_id = $paywall_instance->update_paywall( $paywall );
@@ -336,8 +342,9 @@ class Admin {
 			$timepass['description']                 = sanitize_text_field( wp_unslash( $time_pass['desc'] ) );
 			$timepass['price']                       = floatval( $time_pass['price'] );
 			$timepass['revenue']                     = sanitize_text_field( $time_pass['revenue'] );
-			$timepass['duration']                    = sanitize_text_field( $time_pass['unit'] );
-			$timepass['period']                      = sanitize_text_field( $time_pass['value'] );
+			$timepass['duration']                    = sanitize_text_field( $time_pass['duration'] );
+			$timepass['period']                      = sanitize_text_field( $time_pass['period'] );
+			$timepass['access_to']                   = 'all'; // @todo make it dynamic
 			$time_pass_response[ $time_pass['uid'] ] = $time_pass_instance->update_time_pass( $timepass );
 		}
 
@@ -351,18 +358,56 @@ class Admin {
 			$subscription['description']                        = sanitize_text_field( wp_unslash( $subscription_data['desc'] ) );
 			$subscription['price']                              = floatval( $subscription_data['price'] );
 			$subscription['revenue']                            = sanitize_text_field( $subscription_data['revenue'] );
-			$subscription['duration']                           = sanitize_text_field( $subscription_data['unit'] );
-			$subscription['period']                             = sanitize_text_field( $subscription_data['value'] );
+			$subscription['duration']                           = sanitize_text_field( $subscription_data['duration'] );
+			$subscription['period']                             = sanitize_text_field( $subscription_data['period'] );
+			$subscription['access_to']                          = 'all'; // @todo make it dynamic
 			$subscription_response[ $subscription_data['uid'] ] = $subscription_instance->update_subscription( $subscription );
 		}
 
 		// Send success message.
 		wp_send_json( [
 			'success'       => true,
-			'msg'           => __( 'Paywall saved successfully!', 'revenue-generator' ),
+			'msg'           => empty( $paywall_data['id'] ) ? __( 'Paywall updated successfully!', 'revenue-generator' ) : __( 'Paywall saved successfully!', 'revenue-generator' ),
 			'paywall_id'    => $paywall_id,
 			'time_passes'   => $time_pass_response,
 			'subscriptions' => $subscription_response,
+		] );
+
+	}
+
+	/**
+	 * Update the global currency config.
+	 */
+	public function update_currency_selection() {
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Get all data and sanitize it.
+		$config_key   = sanitize_text_field( filter_input( INPUT_POST, 'config_key', FILTER_SANITIZE_STRING ) );
+		$config_value = sanitize_text_field( filter_input( INPUT_POST, 'config_value', FILTER_SANITIZE_STRING ) );
+
+		$rg_global_options = Config::get_global_options();
+
+		// Check if the option exists already.
+		if ( ! isset( $rg_global_options[ $config_key ] ) ) {
+			wp_send_json( [
+				'success' => false,
+				'msg'     => __( 'Invalid data passed!', 'revenue-generator' )
+			] );
+		}
+
+		// Check and verify updated option.
+		if ( ! empty( $config_value ) ) {
+			$rg_global_options[ $config_key ] = $config_value;
+		}
+
+		// Update the option value.
+		update_option( 'lp_rg_global_options', $rg_global_options );
+
+		// Send success message.
+		wp_send_json( [
+			'success' => true,
+			'msg'     => __( 'Currency stored successfully!', 'revenue-generator' )
 		] );
 
 	}

@@ -51,8 +51,8 @@ class Paywall extends Base {
 				'post_type'    => static::SLUG,
 				'meta_input'   => [
 					'_rg_name'            => $paywall_data['name'],
-					'_rg_support_type'    => $paywall_data['support_type'],
-					'_rg_support_type_id' => $paywall_data['support_type_id'],
+					'_rg_access_to'    => $paywall_data['access_to'],
+					'_rg_access_entity' => $paywall_data['access_entity'],
 				],
 			] );
 		} else {
@@ -64,8 +64,8 @@ class Paywall extends Base {
 			] );
 
 			update_post_meta( $paywall_id, '_rg_name', $paywall_data['name'] );
-			update_post_meta( $paywall_id, '_rg_support_type', $paywall_data['support_type'] );
-			update_post_meta( $paywall_id, '_rg_support_type_id', $paywall_data['support_type_id'] );
+			update_post_meta( $paywall_id, '_rg_access_to', $paywall_data['access_to'] );
+			update_post_meta( $paywall_id, '_rg_access_entity', $paywall_data['access_entity'] );
 		}
 
 		return $paywall_id;
@@ -79,6 +79,63 @@ class Paywall extends Base {
 	 */
 	public function update_paywall_individual_option( $paywall_id, $individual_data ) {
 		update_post_meta( $paywall_id, '_rg_individual_option', $individual_data );
+	}
+
+	/**
+	 * Get related paywall information.
+	 *
+	 * @param int $post_id Post ID.
+	 *
+	 * @return array
+	 */
+	public function get_purchase_option_data( $post_id ) {
+		$paywall_info = [];
+		$query_args   = [
+			'post_type'      => static::SLUG,
+			'post_status'    => [ 'publish' ],
+			'posts_per_page' => 1,
+		];
+
+		$meta_query = array(
+			'relation' => 'AND',
+			array(
+				'key'     => '_rg_access_entity',
+				'compare' => '=',
+				'value'   => $post_id
+			),
+			array(
+				'key'     => '_rg_access_to',
+				'value'   => 'post',
+				'compare' => '=',
+			)
+		);
+
+		$query_args['meta_query'] = $meta_query;
+
+		$query = new \WP_Query( $query_args );
+
+		$current_post = $query->posts;
+
+		if ( ! empty( $current_post[0] ) ) {
+			$pay_wall                    = $current_post[0];
+			$paywall_info['id']          = $pay_wall->ID;
+			$paywall_info['title']       = $pay_wall->post_title;
+			$paywall_info['description'] = $pay_wall->post_content;
+			$paywall_info['name'] = get_post_meta( $pay_wall->ID, '_rg_name', true );
+		}
+
+		return $paywall_info;
+	}
+
+	/**
+	 * Get individual pricing information.
+	 *
+	 * @param int $paywall_id Paywall ID.
+	 *
+	 * @return mixed
+	 */
+	public function get_individual_purchase_option_data( $paywall_id ) {
+		return get_post_meta( $paywall_id, '_rg_individual_option', true );
 	}
 
 }

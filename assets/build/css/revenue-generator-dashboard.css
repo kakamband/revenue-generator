@@ -282,12 +282,12 @@ body {
         flex: 1;
         display: flex;
         flex-flow: column;
-        align-items: center;
         align-self: center;
         color: #2e2e2e;
-        cursor: auto; }
+        cursor: auto;
+        flex-direction: row;
+        justify-content: center; }
         .rg-purchase-overlay-purchase-options-item-price span {
-          width: 100%;
           text-align: center; }
   .rg-purchase-overlay-option-manager {
     position: absolute;
@@ -532,6 +532,68 @@ body {
     -webkit-filter: blur(5px);
             filter: blur(5px);
     opacity: 0.5; }
+  .rev-gen-preview-main-currency-modal {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    position: fixed;
+    left: 54%;
+    overflow: hidden;
+    bottom: 20px;
+    height: 330px;
+    width: 430px;
+    margin: 0 0 0 -190px;
+    padding: 30px 0 0;
+    background-color: #fff;
+    z-index: 999;
+    border-radius: 5px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); }
+    .rev-gen-preview-main-currency-modal-cross {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      color: darkgray;
+      cursor: pointer; }
+    .rev-gen-preview-main-currency-modal-title {
+      font-size: 20px; }
+    .rev-gen-preview-main-currency-modal-question {
+      font-size: 14px;
+      font-weight: 500;
+      margin: 10px 0; }
+    .rev-gen-preview-main-currency-modal-inputs {
+      display: flex;
+      flex-direction: column;
+      margin: 10px 0; }
+      .rev-gen-preview-main-currency-modal-inputs label {
+        margin: 10px 0; }
+      .rev-gen-preview-main-currency-modal-inputs input[type="radio"] {
+        background: #fff; }
+        .rev-gen-preview-main-currency-modal-inputs input[type="radio"]:checked {
+          background: #1e1e1e; }
+          .rev-gen-preview-main-currency-modal-inputs input[type="radio"]:checked:before {
+            background-color: #fff; }
+    .rev-gen-preview-main-currency-modal-button {
+      cursor: pointer;
+      width: 50%;
+      height: 35px;
+      border: 2px solid #000;
+      padding: 5px;
+      font-weight: 600;
+      font-size: 14px;
+      border-radius: 3px;
+      background-color: #000;
+      color: #ffffff; }
+      .rev-gen-preview-main-currency-modal-button:disabled {
+        background-color: darkgray;
+        border: 2px solid darkgray;
+        cursor: not-allowed; }
+
+.modal-blur {
+  background-color: darkgrey;
+  overflow: hidden;
+  height: 100%; }
 
 .rev-gen-snackbar {
   left: 15px;

@@ -91,93 +91,65 @@ class Config {
 			'low'  => [
 				'single_article' => [
 					'tier_1' => [ // 0-250 content length.
-						'price' => [
-							'amount'        => 1.49,
-							'payment_model' => 'sis'
-						],
+						'price'   => 1.49,
+						'revenue' => 'sis',
 					],
 					'tier_2' => [ // 251-500 content length.
-						'price' => [
-							'amount'        => 2.49,
-							'payment_model' => 'sis'
-						],
+						'price'   => 2.49,
+						'revenue' => 'sis',
 					],
 					'tier_3' => [ // 501+ content length.
-						'price' => [
-							'amount'        => 4.00,
-							'payment_model' => 'sis'
-						],
+						'price'   => 4.00,
+						'revenue' => 'sis',
 					]
 				],
 				'time_pass'      => [
 					'title'       => esc_html__( '24 Hour Pass', 'revenue-generator' ),
 					'description' => esc_html__( 'Enjoy unlimited access to all our content for 24 hours.', 'revenue-generator' ),
-					'price'       => [
-						'amount'        => 2.49,
-						'payment_model' => 'sis'
-					],
-					'expiry'      => [
-						'unit'  => 'h',
-						'value' => '24'
-					]
+					'price'       => 2.49,
+					'revenue'     => 'sis',
+					'duration'    => 'h',
+					'period'      => '24',
 				],
 				'subscription'   => [
 					'title'       => esc_html__( '1 Month Subscription', 'revenue-generator' ),
 					'description' => esc_html__( 'Enjoy unlimited access to all our content for one month.', 'revenue-generator' ),
-					'price'       => [
-						'amount'        => 4.99,
-						'payment_model' => 'sis'
-					],
-					'expiry'      => [
-						'unit'  => 'm',
-						'value' => '1'
-					]
+					'price'       => 4.99,
+					'revenue'     => 'sis',
+					'duration'    => 'm',
+					'period'      => '1',
 				]
 			],
 			'high' => [
 				'single_article' => [
 					'tier_1' => [ // 0-250 content length.
-						'price' => [
-							'amount'        => 0.49,
-							'payment_model' => 'ppu'
-						],
+						'price'   => 0.49,
+						'revenue' => 'ppu',
 					],
 					'tier_2' => [ // 251-500 content length.
-						'price' => [
-							'amount'        => 0.99,
-							'payment_model' => 'ppu'
-						],
+						'price'   => 0.99,
+						'revenue' => 'ppu',
 					],
 					'tier_3' => [ // 501+ content length.
-						'price' => [
-							'amount'        => 1.49,
-							'payment_model' => 'ppu'
-						],
+						'price'   => 1.49,
+						'revenue' => 'ppu',
 					]
 				],
 				'time_pass'      => [
 					'title'       => esc_html__( '24 Hour Pass', 'revenue-generator' ),
 					'description' => esc_html__( 'Enjoy unlimited access to all our content for 24 hours.', 'revenue-generator' ),
-					'price'       => [
-						'amount'        => 2.49,
-						'payment_model' => 'sis'
-					],
-					'expiry'      => [
-						'unit'  => 'h',
-						'value' => '24'
-					]
+					'price'       => 2.49,
+					'revenue'     => 'sis',
+					'duration'    => 'h',
+					'period'      => '24',
 				],
 				'subscription'   => [
 					'title'       => esc_html__( '1 Month Subscription', 'revenue-generator' ),
 					'description' => esc_html__( 'Enjoy unlimited access to all our content for one month.', 'revenue-generator' ),
-					'price'       => [
-						'amount'        => 4.99,
-						'payment_model' => 'sis'
-					],
-					'expiry'      => [
-						'unit'  => 'm',
-						'value' => '1'
-					]
+					'price'       => 4.99,
+					'revenue'     => 'sis',
+					'duration'    => 'm',
+					'period'      => '1',
 				]
 			]
 		];
@@ -192,6 +164,32 @@ class Config {
 	 */
 	protected static function get_connector_price( $price ) {
 		return $price * 100;
+	}
+
+	/**
+	 * Get current default limit prices.
+	 *
+	 * @return array
+	 */
+	public static function get_currency_limits() {
+		return [
+			'EUR' => [
+				'ppu_min'        => 0.05,
+				'ppu_only_limit' => 1.48,
+				'ppu_max'        => 5.00,
+				'sis_min'        => 1.49,
+				'sis_only_limit' => 5.00,
+				'sis_max'        => 1000.00
+			],
+			'USD' => [
+				'ppu_min'        => 0.05,
+				'ppu_only_limit' => 1.98,
+				'ppu_max'        => 5.00,
+				'sis_min'        => 1.99,
+				'sis_only_limit' => 5.00,
+				'sis_max'        => 1000.00
+			]
+		];
 	}
 
 }

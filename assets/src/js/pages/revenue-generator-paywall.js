@@ -29,13 +29,14 @@ import '../utils';
 				postContent       : $('#rg_js_postPreviewContent'),
 
 				// Overlay elements.
-				purchaseOverly         : $('#rg_js_purchaseOverly'),
-				purchaseOptionItems    : '.rg-purchase-overlay-purchase-options',
-				purchaseOptionItem     : '.rg-purchase-overlay-purchase-options-item',
-				purchaseOptionItemInfo : '.rg-purchase-overlay-purchase-options-item-info',
-				purchaseOptionItemTitle: '.rg-purchase-overlay-purchase-options-item-info-title',
-				purchaseOptionItemDesc : '.rg-purchase-overlay-purchase-options-item-info-description',
-				purchaseOptionItemPrice: '.rg-purchase-overlay-purchase-options-item-price-span',
+				purchaseOverly           : $('#rg_js_purchaseOverly'),
+				purchaseOptionItems      : '.rg-purchase-overlay-purchase-options',
+				purchaseOptionItem       : '.rg-purchase-overlay-purchase-options-item',
+				purchaseOptionItemInfo   : '.rg-purchase-overlay-purchase-options-item-info',
+				purchaseOptionItemTitle  : '.rg-purchase-overlay-purchase-options-item-info-title',
+				purchaseOptionItemDesc   : '.rg-purchase-overlay-purchase-options-item-info-description',
+				purchaseOptionItemPrice  : '.rg-purchase-overlay-purchase-options-item-price-span',
+				purchaseOptionPriceSymbol: '.rg-purchase-overlay-purchase-options-item-price-symbol',
 
 				// Action buttons
 				editOption    : '.rg-purchase-overlay-option-edit',
@@ -60,6 +61,13 @@ import '../utils';
 				paywallName         : $('.rev-gen-preview-main-paywall-name'),
 				paywallTitle        : '.rg-purchase-overlay-title',
 				paywallDesc         : '.rg-purchase-overlay-description',
+				paywallAppliesTo    : '.rev-gen-preview-main-paywall-applies-to',
+
+				// Currency overlay.
+				currencyOverlay   : '.rev-gen-preview-main-currency-modal',
+				currencyRadio     : '.rev-gen-preview-main-currency-modal-inputs-currency',
+				currencyButton    : '.rev-gen-preview-main-currency-modal-button',
+				currencyModalClose: '.rev-gen-preview-main-currency-modal-cross',
 
 				snackBar: $('#rg_js_SnackBar'),
 			};
@@ -69,12 +77,16 @@ import '../utils';
 			 */
 			const bindEvents = function () {
 
-				// When the page has loaded, load the post content.
+				/**
+				 * When the page has loaded, load the post content.
+				 */
 				$(document).ready(function () {
 					$('#rg_js_postPreviewWrapper').fadeIn('slow');
 				});
 
-				// When merchant types in the search box blur out the rest of the area.
+				/**
+				 * When merchant types in the search box blur out the rest of the area.
+				 */
 				$o.searchContent.on('focus', function () {
 					$o.postPreviewWrapper.addClass('blury');
 					$('html, body').animate({scrollTop: 0}, 'slow');
@@ -84,7 +96,9 @@ import '../utils';
 					});
 				});
 
-				// Revert back to original state once the focus is no more on search box.
+				/**
+				 * Revert back to original state once the focus is no more on search box.
+				 */
 				$o.searchContent.on('focusout', function () {
 					$o.body.css({
 						overflow: 'auto',
@@ -93,7 +107,9 @@ import '../utils';
 					$o.postPreviewWrapper.removeClass('blury');
 				});
 
-				// Add action items on purchase item hover.
+				/**
+				 * Add action items on purchase item hover.
+				 */
 				$o.body.on('mouseenter', $o.purchaseOptionItem, function () {
 
 					const currentActions = $(this).find('.rg-purchase-overlay-purchase-options-item-actions');
@@ -121,12 +137,17 @@ import '../utils';
 					}
 				});
 
-				// Remove action items when purchase item is not being edited.
+				/**
+				 * Remove action items when purchase item is not being edited.
+				 */
 				$o.body.on('mouseleave', $o.purchaseOptionItem, function () {
 					$(this).removeClass('option-highlight');
 					$(this).find('.rg-purchase-overlay-purchase-options-item-actions').hide();
 				});
 
+				/**
+				 * Handle purchase option edit operations.
+				 */
 				$o.body.on('click', $o.editOption, function () {
 
 					const optionItem = $(this).parents('.rg-purchase-overlay-purchase-options-item');
@@ -150,22 +171,34 @@ import '../utils';
 						// Add purchase option manager to the selected item.
 						actionItems.prepend(actionMarkup);
 
+						// Duration selection.
+						const periodSelection = actionItems.find($o.durationWrapper);
+
 						if ('individual' !== entityType) {
 							// hide pricing type selection if not individual.
 							const dynamicPricing = actionItems.find($o.individualPricingWrapper);
-							const periodSelection = actionItems.find($o.durationWrapper);
 							dynamicPricing.hide();
 
 							// show period selection if not individual.
-							periodSelection.find($o.periodSelection).val(optionItem.data('expiry-unit'));
-							periodSelection.find($o.periodCountSelection).val(optionItem.data('expiry-value'));
+							periodSelection.find($o.periodSelection).val(optionItem.data('expiry-duration'));
+							periodSelection.find($o.periodCountSelection).val(optionItem.data('expiry-period'));
 							periodSelection.show();
+						} else {
+							periodSelection.hide();
 						}
 
 						const revenueWrapper = actionItems.find($o.purchaseRevenueWrapper);
 						if ('subscription' === entityType) {
 							revenueWrapper.hide();
 						} else {
+							// Set revenue model for selected option.
+							const priceItem = optionItem.find($o.purchaseOptionItemPrice);
+							const revenueModel = priceItem.data('pay-model');
+							if ('ppu' === revenueModel) {
+								revenueWrapper.find($o.purchaseRevenueSelection).prop('checked', true);
+							} else {
+								revenueWrapper.find($o.purchaseRevenueSelection).prop('checked', false);
+							}
 							revenueWrapper.show();
 						}
 
@@ -174,25 +207,33 @@ import '../utils';
 					}
 				});
 
-				// Remove purchase option.
+				/**
+				 * Remove purchase option.
+				 */
 				$o.body.on('click', $o.optionRemove, function () {
 					// @todo add functionality to delete entity from db when removed.
 					$(this).parents('.rg-purchase-overlay-purchase-options-item').remove();
 				});
 
-				//  Move purchase option one up.
+				/**
+				 * Move purchase option one up.
+				 */
 				$o.body.on('click', $o.moveOptionUp, function () {
 					const pruchaseOption = $(this).parents('.rg-purchase-overlay-purchase-options-item');
 					$(this).parents('.rg-purchase-overlay-purchase-options-item').prev().insertAfter(pruchaseOption);
 				});
 
-				//  Move purchase option one down.
+				/**
+				 * Move purchase option one down.
+				 */
 				$o.body.on('click', $o.moveOptionDown, function () {
 					const purchaseOption = $(this).parents('.rg-purchase-overlay-purchase-options-item');
 					$(this).parents('.rg-purchase-overlay-purchase-options-item').next().insertBefore(purchaseOption);
 				});
 
-				// Handle change of purchase option type.
+				/**
+				 * Handle change of purchase option type.
+				 */
 				$o.body.on('change', $o.purchaseOptionType, function () {
 					const purchaseManager = $(this).parents('.rg-purchase-overlay-option-manager');
 					const pricingManager = purchaseManager.find('.rg-purchase-overlay-option-manager-entity');
@@ -217,7 +258,9 @@ import '../utils';
 					}
 				});
 
-				// Handle revenue model change.
+				/**
+				 * Handle revenue model change.
+				 */
 				$o.body.on('change', $o.individualPricingSelection, function () {
 					const optionItem = $(this).parents($o.purchaseOptionItem);
 					const purchaseManager = $(this).parents('.rg-purchase-overlay-option-manager');
@@ -231,7 +274,9 @@ import '../utils';
 					}
 				});
 
-				// Handle pricing type change for individual type..
+				/**
+				 * Handle pricing type change for individual type.
+				 */
 				$o.body.on('change', $o.purchaseRevenueSelection, function () {
 					const optionItem = $(this).parents($o.purchaseOptionItem);
 					const purchaseManager = $(this).parents('.rg-purchase-overlay-option-manager');
@@ -246,28 +291,109 @@ import '../utils';
 					}
 				});
 
-				// Period selection change handler.
+				/**
+				 * Period selection change handler.
+				 */
 				$o.body.on('change', $o.periodSelection, function () {
 					const purchaseManager = $(this).parents('.rg-purchase-overlay-option-manager');
 					const periodSelection = purchaseManager.find($o.periodSelection);
 					const periodCountSelection = purchaseManager.find($o.periodCountSelection);
 					changeDurationOptions(periodSelection.val(), periodCountSelection);
 					const optionItem = $(this).parents($o.purchaseOptionItem);
-					optionItem.data('expiry-unit', periodSelection.val());
+					optionItem.data('expiry-duration', periodSelection.val());
 				});
 
-				// Period count selection change handler.
+				/**
+				 * Period count selection change handler.
+				 */
 				$o.body.on('change', $o.periodCountSelection, function () {
 					const purchaseManager = $(this).parents('.rg-purchase-overlay-option-manager');
 					const periodCountSelection = purchaseManager.find($o.periodCountSelection);
 					const optionItem = $(this).parents($o.purchaseOptionItem);
-					optionItem.data('expiry-value', periodCountSelection.val());
+					optionItem.data('expiry-period', periodCountSelection.val());
 				});
 
+				/**
+				 * Handle price input and change.
+				 */
+				$o.body.on('focus input', $o.purchaseOptionItemPrice, debounce(function () {
+					const optionItem = $(this).parents($o.purchaseOptionItem);
+					const priceItem = optionItem.find($o.purchaseOptionItemPrice);
+					const priceSymbol = optionItem.find($o.purchaseOptionPriceSymbol);
+
+					const symbol = priceSymbol.text().trim();
+					if (!symbol.length && !revenueGeneratorGlobalOptions.globalOptions.merchant_currency.length) {
+						showCurrencySelectionModal();
+					}
+
+					const validatedPrice = validatePrice( priceItem.text().trim(), 'subscription' === optionItem.data('purchase-type') );
+					priceItem.empty().text(validatedPrice);
+					validateRevenue(validatedPrice, optionItem);
+				}, 1500) );
+
+				/**
+				 * Handle currency selection.
+				 */
+				$o.body.on('change', $o.currencyRadio, function () {
+					if ($(this).val().length) {
+						const currencyButton = $($o.currencyOverlay).find($o.currencyButton);
+						currencyButton.removeProp('disabled');
+					}
+				});
+
+				/**
+				 * Handle currency submission.
+				 */
+				$o.body.on('click', $o.currencyButton, function () {
+					// form data for currency.
+					const formData = {
+						action      : 'rg_update_currency_selection',
+						config_key  : 'merchant_currency',
+						config_value: $('input:radio[name=currency]:checked').val(),
+						security    : revenueGeneratorGlobalOptions.rg_paywall_nonce,
+					};
+
+					$.ajax({
+						url     : revenueGeneratorGlobalOptions.ajaxUrl,
+						method  : 'POST',
+						data    : formData,
+						dataType: 'json',
+					}).done(function (r) {
+						$($o.currencyModalClose).trigger('click');
+						$o.snackBar.showSnackbar(r.msg, 1500);
+
+						const purchaseOptions = $($o.purchaseOptionItems);
+						purchaseOptions.children($o.purchaseOptionItem).each(function () {
+							const priceSymbol = $(this).find($o.purchaseOptionPriceSymbol);
+							const symbol = 'USD' === formData.config_value ? '$' : '€';
+							priceSymbol.empty().text(symbol);
+						});
+					});
+				});
+
+				/**
+				 * Close currency modal.
+				 */
+				$o.body.on('click', $o.currencyModalClose, function () {
+					$o.previewWrapper.find($o.currencyOverlay).remove();
+					$o.body.removeClass('modal-blur');
+					$o.purchaseOverly.css({
+						filter: 'unset',
+					});
+				});
+
+				/**
+				 * Save Paywall and its purchase options.
+				 */
 				$o.savePaywall.on('click', function () {
 
+					// Get all purchase options.
 					const purchaseOptions = $($o.purchaseOptionItems);
 
+					/**
+					 * Loop through Time Passes and Subscriptions and add unique ids
+					 * so that created id can be added accordingly.
+					 */
 					purchaseOptions.children($o.purchaseOptionItem).each(function () {
 						// To add appropriate ids after saving.
 						$(this).data('uid', createUniqueID());
@@ -277,6 +403,9 @@ import '../utils';
 					const individualOption = purchaseOptions.find("[data-purchase-type='individual']");
 					let individualObj;
 
+					/**
+					 * Create individual purchase option data.
+					 */
 					if (individualOption.length) {
 						individualObj = {
 							title  : individualOption.find($o.purchaseOptionItemTitle).text().trim(),
@@ -291,17 +420,20 @@ import '../utils';
 					const timePassOptions = purchaseOptions.find("[data-purchase-type='time-pass']");
 					const timePasses = [];
 
+					/**
+					 * Create time passes data array.
+					 */
 					timePassOptions.each(function () {
 						const timePass = $(this);
 						const timePassObj = {
-							title  : timePass.find($o.purchaseOptionItemTitle).text().trim(),
-							desc   : timePass.find($o.purchaseOptionItemDesc).text().trim(),
-							price  : timePass.find($o.purchaseOptionItemPrice).text().trim(),
-							revenue: $(timePass.find($o.purchaseOptionItemPrice)).data('pay-model'),
-							unit   : $(timePass).data('expiry-unit'),
-							value  : $(timePass).data('expiry-value'),
-							tlp_id : $(timePass).data('tlp-id'),
-							uid    : $(timePass).data('uid'),
+							title   : timePass.find($o.purchaseOptionItemTitle).text().trim(),
+							desc    : timePass.find($o.purchaseOptionItemDesc).text().trim(),
+							price   : timePass.find($o.purchaseOptionItemPrice).text().trim(),
+							revenue : $(timePass.find($o.purchaseOptionItemPrice)).data('pay-model'),
+							duration: $(timePass).data('expiry-duration'),
+							period  : $(timePass).data('expiry-period'),
+							tlp_id  : $(timePass).data('tlp-id'),
+							uid     : $(timePass).data('uid'),
 						};
 						timePasses.push(timePassObj)
 					});
@@ -310,42 +442,133 @@ import '../utils';
 					const subscriptionOptions = purchaseOptions.find("[data-purchase-type='subscription']");
 					const subscriptions = [];
 
+					/**
+					 * Create subscriptions data array.
+					 */
 					subscriptionOptions.each(function () {
 						const subscription = $(this);
 						const subscriptionObj = {
-							title  : subscription.find($o.purchaseOptionItemTitle).text().trim(),
-							desc   : subscription.find($o.purchaseOptionItemDesc).text().trim(),
-							price  : subscription.find($o.purchaseOptionItemPrice).text().trim(),
-							revenue: $(subscription.find($o.purchaseOptionItemPrice)).data('pay-model'),
-							unit   : $(subscription).data('expiry-unit'),
-							value  : $(subscription).data('expiry-value'),
-							sub_id : $(subscription).data('sub-id'),
-							uid    : $(subscription).data('uid'),
+							title   : subscription.find($o.purchaseOptionItemTitle).text().trim(),
+							desc    : subscription.find($o.purchaseOptionItemDesc).text().trim(),
+							price   : subscription.find($o.purchaseOptionItemPrice).text().trim(),
+							revenue : $(subscription.find($o.purchaseOptionItemPrice)).data('pay-model'),
+							duration: $(subscription).data('expiry-duration'),
+							period  : $(subscription).data('expiry-period'),
+							sub_id  : $(subscription).data('sub-id'),
+							uid     : $(subscription).data('uid'),
 						};
 						subscriptions.push(subscriptionObj)
 					});
 
+					/**
+					 * Paywall data.
+					 */
 					const paywall = {
-						id   : purchaseOptions.data('paywall-id'),
-						title: $o.purchaseOverly.find($o.paywallTitle).text().trim(),
-						desc : $o.purchaseOverly.find($o.paywallDesc).text().trim(),
-						name : $o.paywallName.text().trim(),
+						id     : purchaseOptions.data('paywall-id'),
+						title  : $o.purchaseOverly.find($o.paywallTitle).text().trim(),
+						desc   : $o.purchaseOverly.find($o.paywallDesc).text().trim(),
+						name   : $o.paywallName.text().trim(),
+						applies: $($o.paywallAppliesTo).val(),
 					};
 
+					/**
+					 * Final data of paywall.
+					 */
 					const data = {
-						action       : 'rg_update_paywall',
-						post_id      : $o.postPreviewWrapper.data('post-id'),
+						action     : 'rg_update_paywall',
+						post_id    : $o.postPreviewWrapper.data('post-id'),
 						paywall,
-						individual   : individualObj,
-						time_passes  : timePasses,
+						individual : individualObj,
+						time_passes: timePasses,
 						subscriptions,
-						security     : revenueGeneratorGlobalOptions.rg_paywall_nonce,
+						security   : revenueGeneratorGlobalOptions.rg_paywall_nonce,
 					};
 
+					// Update paywall data.
 					updatePaywall(revenueGeneratorGlobalOptions.ajaxUrl, data);
 
 				});
 
+			};
+
+			/**
+			 * Validate the purchase item revenue model.
+			 *
+			 * @param {string} price         Price of the item.
+			 * @param {Object} purchaseItem  Purchase option.
+			 */
+			const validateRevenue = function ( price, purchaseItem ) {
+				const purchaseManager = $(purchaseItem).find('.rg-purchase-overlay-option-manager');
+				const revenueWrapper = purchaseManager.find($o.purchaseRevenueWrapper);
+				if (price > revenueGeneratorGlobalOptions.currency.sis_only_limit) {
+					$(purchaseItem).find($o.purchaseOptionItemPrice).data('pay-model', 'sis');
+					revenueWrapper.find($o.purchaseRevenueSelection).prop('checked', false);
+				} else if (price > revenueGeneratorGlobalOptions.currency.ppu_min && price < revenueGeneratorGlobalOptions.currency.sis_min) {
+					$(purchaseItem).find($o.purchaseOptionItemPrice).data('pay-model', 'ppu');
+					revenueWrapper.find($o.purchaseRevenueSelection).prop('checked', true);
+				}
+			};
+
+			/**
+			 * Get validated price.
+			 *
+			 * @param {string}  price                   Purchase option price.
+			 * @param {boolean} subscriptionValidation  Is current item subscription.
+			 * @returns {string}
+			 */
+			const validatePrice = function ( price, subscriptionValidation) {
+				// strip non-number characters
+				price = price.replace(/[^0-9\,\.]/g, '');
+
+				// convert price to proper float value
+				price = parseFloat(price.replace(',', '.')).toFixed(2);
+
+				// prevent non-number prices
+				if (isNaN(price)) {
+					price = 0;
+				}
+
+				// prevent negative prices
+				price = Math.abs(price);
+
+				if (subscriptionValidation) {
+					if (price < revenueGeneratorGlobalOptions.currency.sis_min) {
+						price = revenueGeneratorGlobalOptions.currency.sis_min;
+					} else if (price > revenueGeneratorGlobalOptions.currency.sis_max) {
+						price = revenueGeneratorGlobalOptions.currency.sis_max;
+					}
+				} else {
+					// correct prices outside the allowed range of 0.05 - 149.99
+					if (price > revenueGeneratorGlobalOptions.currency.sis_max) {
+						price = revenueGeneratorGlobalOptions.currency.sis_max;
+					} else if (price > 0 && price < revenueGeneratorGlobalOptions.currency.ppu_min) {
+						price = revenueGeneratorGlobalOptions.currency.ppu_min;
+					}
+				}
+
+				// format price with two digits
+				price = price.toFixed(2);
+
+				// localize price
+				if (revenueGeneratorGlobalOptions.locale.indexOf('de_DE') !== -1) {
+					price = price.replace('.', ',');
+				}
+
+				return price;
+			};
+
+			/**
+			 * Add currency modal.
+			 */
+			const showCurrencySelectionModal = function () {
+				$o.previewWrapper.find($o.currencyOverlay).remove();
+				// Get the template for currency popup and add it.
+				const template = wp.template('revgen-purchase-currency-overlay');
+				$o.previewWrapper.append(template);
+				$o.body.addClass('modal-blur');
+				$o.purchaseOverly.css({
+					filter: 'blur(5px)',
+				});
 			};
 
 			/**
@@ -364,20 +587,22 @@ import '../utils';
 
 					const purchaseOptions = $($o.purchaseOptionItems);
 
-					purchaseOptions.data('paywall-id', r.paywall_id );
+					purchaseOptions.data('paywall-id', r.paywall_id);
 
 					const timePassOptions = purchaseOptions.find("[data-purchase-type='time-pass']");
 
+					// Add returned ids to appropriate purchase option.
 					timePassOptions.each(function () {
 						const timePassUID = $(this).data('uid');
-						$(this).data('tlp-id',r.time_passes[timePassUID]);
-					} );
+						$(this).data('tlp-id', r.time_passes[timePassUID]);
+					});
 
 					const subscriptionOptions = purchaseOptions.find("[data-purchase-type='subscription']");
 
+					// Add returned ids to appropriate purchase option.
 					subscriptionOptions.each(function () {
 						const subscriptionUID = $(this).data('uid');
-						$(this).data('sub-id',r.subscriptions[subscriptionUID]);
+						$(this).data('sub-id', r.subscriptions[subscriptionUID]);
 					});
 				});
 			};
@@ -435,6 +660,23 @@ import '../utils';
 					$o.purchaseOverly.append(template);
 					$o.purchaseOverly.show();
 				}
+			};
+
+			/**
+			 * Throttle the execution of a function by a given delay.
+			 */
+			const debounce = function (fn, delay) {
+				var timer;
+				return function () {
+					var context = this,
+						args = arguments;
+
+					clearTimeout(timer);
+
+					timer = setTimeout(function () {
+						fn.apply(context, args);
+					}, delay);
+				};
 			};
 
 			// Initialize all required events.

@@ -160,46 +160,96 @@ class Post_Types {
 	/**
 	 * Get pricing options based on post data.
 	 *
+	 * @param int   $post_id   Post ID.
 	 * @param array $post_data Post data for preview.
 	 *
 	 * @return array
 	 */
-	public function get_post_purchase_options( $post_data ) {
-		// Global options data.
-		$current_global_options = Config::get_global_options();
+	public function get_post_purchase_options( $post_id, $post_data ) {
+
+		$purchase_options = $this->get_current_post_purchase_options( $post_id );
+
+		if ( ! empty( $purchase_options ) ) {
+			return $purchase_options;
+		} else {
+			// Global options data.
+			$current_global_options = Config::get_global_options();
+
+			// Get information on the post to create a pricing configuration.
+			$purchase_options     = [];
+			$post_tier            = $this->get_post_tier( $post_data['post_content'] );
+			$purchase_options_all = Config::get_pricing_defaults( $current_global_options['average_post_publish_count'] );
+
+			// Get individual article pricing based on post content word count, i.e "tier".
+			$purchase_options['individual'] = $purchase_options_all['single_article'][ $post_tier ];
+
+			// Check if we have existing time passes or subscriptions.
+			$current_purchase_options = $this->has_purchase_options_available();
+
+			/**
+			 * - If no option exits, set the default pricing values.
+			 * - If one of either options exist, add it to the pricing config.
+			 */
+			if ( false === $current_purchase_options ) {
+				$purchase_options['time_passes'][]   = $purchase_options_all['time_pass'];
+				$purchase_options['subscriptions'][] = $purchase_options_all['subscription'];
+
+				if ( 'low' === $current_global_options['average_post_publish_count'] ) {
+					unset( $purchase_options['time_passes'] );
+				}
+			} elseif ( $current_purchase_options['subscription'] > 0 && empty( $current_purchase_options['time_pass'] ) ) {
+				$purchase_options['time_passes'][] = $purchase_options_all['time_passes'];
+				$purchase_options['subscriptions'] = Subscription::get_instance()->get_subscriptions_by_criteria( true );
+
+				if ( 'low' === $current_global_options['average_post_publish_count'] ) {
+					unset( $purchase_options['time_passes'] );
+				}
+			} elseif ( $current_purchase_options['time_pass'] > 0 && empty( $current_purchase_options['subscription'] ) ) {
+				$purchase_options['subscriptions'][] = $purchase_options_all['subscription'];
+				$purchase_options['time_passes']     = Time_Pass::get_instance()->get_time_passes_by_criteria();
+			}
+
+			return $purchase_options;
+		}
+	}
+
+	/**
+	 * Get purchase options related to post content.
+	 *
+	 * @param int $post_id Post ID.
+	 *
+	 * @return array
+	 */
+	public function get_current_post_purchase_options( $post_id ) {
+		$paywall_instance      = Paywall::get_instance();
+		$time_pass_instance    = Time_Pass::get_instance();
+		$subscription_instance = Subscription::get_instance();
 
 		// Get information on the post to create a pricing configuration.
-		$purchase_options     = [];
-		$post_tier            = $this->get_post_tier( $post_data['post_content'] );
-		$purchase_options_all = Config::get_pricing_defaults( $current_global_options['average_post_publish_count'] );
+		$purchase_options = [];
 
-		// Get individual article pricing based on post content word count, i.e "tier".
-		$purchase_options['individual'] = $purchase_options_all['single_article'][ $post_tier ];
+		$paywall_data = $paywall_instance->get_purchase_option_data( $post_id );
 
-		// Check if we have existing time passes or subscriptions.
-		$current_purchase_options = $this->has_purchase_options_available();
+		// Get paywall data.
+		if ( ! empty( $paywall_data ) ) {
+			$purchase_options['paywall'] = $paywall_data;
+		}
 
-		/**
-		 * - If no option exits, set the default pricing values.
-		 * - If one of either options exist, add it to the pricing config.
-		 */
-		if ( false === $current_purchase_options ) {
-			$purchase_options['time_passes'][]   = $purchase_options_all['time_pass'];
-			$purchase_options['subscriptions'][] = $purchase_options_all['subscription'];
+		// Get individual purchase options data.
+		if ( ! empty( $purchase_options['paywall'] ) ) {
+			$purchase_options['individual'] = $paywall_instance->get_individual_purchase_option_data( $purchase_options['paywall']['id'] );
+		}
 
-			if ( 'low' === $current_global_options['average_post_publish_count'] ) {
-				unset( $purchase_options['time_passes'] );
-			}
-		} elseif ( $current_purchase_options['subscription'] > 0 && empty( $current_purchase_options['time_pass'] ) ) {
-			$purchase_options['time_passes'][] = $purchase_options_all['time_passes'];
-			$purchase_options['subscriptions'] = Subscription::get_instance()->get_subscriptions_by_criteria( true );
+		// Get time passes and subscriptions purchase options data.
+		$time_passes   = $time_pass_instance->get_applicable_time_passes();
+		$subscriptions = $subscription_instance->get_applicable_subscriptions();
 
-			if ( 'low' === $current_global_options['average_post_publish_count'] ) {
-				unset( $purchase_options['time_passes'] );
-			}
-		} elseif ( $current_purchase_options['time_pass'] > 0 && empty( $current_purchase_options['subscription'] ) ) {
-			$purchase_options['subscriptions'][] = $purchase_options_all['subscription'];
-			$purchase_options['time_passes']     = Time_Pass::get_instance()->get_time_passes_by_criteria();
+		if ( ! empty( $time_passes ) ) {
+			$purchase_options['time_passes'] = $time_passes;
+		}
+
+		if ( ! empty( $subscriptions ) ) {
+			$purchase_options['subscriptions'] = $subscriptions;
 		}
 
 		return $purchase_options;

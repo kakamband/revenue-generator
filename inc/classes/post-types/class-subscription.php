@@ -106,16 +106,18 @@ class Subscription extends Base {
 	private function formatted_subscription( $post ) {
 
 		$post_meta = get_post_meta( $post->ID );
-		$is_active = ( $post->post_status === 'draft' ) ? 1 : 0;
+		$is_active = ( $post->post_status === 'draft' ) ? 0 : 1;
 
 		$post_meta = $this->formatted_post_meta( $post_meta );
 
 		$subscription                    = [];
-		$subscription['id']              = $post_meta['_rg_id'];
+		$subscription['id']            = $post->ID;
 		$subscription['title']           = $post->post_title;
 		$subscription['description']     = $post->post_content;
 		$subscription['price']           = $post_meta['price'];
-		$subscription['expiry']          = $post_meta['expiry'];
+		$subscription['revenue']         = $post_meta['revenue'];
+		$subscription['duration']        = $post_meta['duration'];
+		$subscription['period']          = $post_meta['period'];
 		$subscription['is_active']       = $is_active;
 		$post_meta_data['access_to']     = $post_meta['access_to'];
 		$post_meta_data['access_entity'] = $post_meta['access_entity'];
@@ -134,15 +136,15 @@ class Subscription extends Base {
 		$post_meta_data = [];
 
 		/**
-		 * _rg_id - store the internal counter for subscription, this will be set as article_id in the config.
 		 * _rg_price - store the pricing configuration array.
 		 * _rg_expiry - store the content access expiry configuration array.
 		 * _rg_access_to - store the content to which the subscription will allow access, can be category / all.
 		 * _rg_access_entity - store the id to which the subscription will allow access if access to is category.
 		 */
-		$post_meta_data['rg_id']         = ( isset( $post_meta['_rg_id'][0] ) ) ? $post_meta['_rg_id'][0] : '';
 		$post_meta_data['price']         = ( isset( $post_meta['_rg_price'][0] ) ) ? $post_meta['_rg_price'][0] : '';
-		$post_meta_data['expiry']        = ( isset( $post_meta['_rg_expiry'][0] ) ) ? $post_meta['_rg_expiry'][0] : '';
+		$post_meta_data['revenue']       = ( isset( $post_meta['_rg_revenue'][0] ) ) ? $post_meta['_rg_revenue'][0] : '';
+		$post_meta_data['duration']      = ( isset( $post_meta['_rg_duration'][0] ) ) ? $post_meta['_rg_duration'][0] : '';
+		$post_meta_data['period']        = ( isset( $post_meta['_rg_period'][0] ) ) ? $post_meta['_rg_period'][0] : '';
 		$post_meta_data['access_to']     = ( isset( $post_meta['_rg_access_to'][0] ) ) ? $post_meta['_rg_access_to'][0] : '';
 		$post_meta_data['access_entity'] = ( isset( $post_meta['_rg_access_entity'][0] ) ) ? $post_meta['_rg_access_entity'][0] : '';
 
@@ -211,10 +213,11 @@ class Subscription extends Base {
 				'post_status'  => 'publish',
 				'post_type'    => static::SLUG,
 				'meta_input'   => [
-					'_rg_price'    => $subscription_data['price'],
-					'_rg_revenue'  => $subscription_data['revenue'],
-					'_rg_duration' => $subscription_data['duration'],
-					'_rg_period'   => $subscription_data['period'],
+					'_rg_price'     => $subscription_data['price'],
+					'_rg_revenue'   => $subscription_data['revenue'],
+					'_rg_duration'  => $subscription_data['duration'],
+					'_rg_period'    => $subscription_data['period'],
+					'_rg_access_to' => $subscription_data['access_to'],
 				],
 			] );
 		} else {
@@ -228,9 +231,24 @@ class Subscription extends Base {
 			update_post_meta( $subscription_id, '_rg_price', $subscription_data['price'] );
 			update_post_meta( $subscription_id, '_rg_revenue', $subscription_data['revenue'] );
 			update_post_meta( $subscription_id, '_rg_duration', $subscription_data['duration'] );
-			update_post_meta( $subscription_id, '_rg_period', $subscription_data['period'] );
+			update_post_meta( $subscription_id, '_rg_access_to', $subscription_data['access_to'] );
 		}
 
 		return $subscription_id;
+	}
+
+	/**
+	 * Get all subscriptions applicable to content.
+	 *
+	 * @return array
+	 */
+	public function get_applicable_subscriptions() {
+		$subscriptions  = [];
+		$all_subscriptions = $this->get_active_subscriptions();
+		foreach ( $all_subscriptions as $subscription ) {
+			$subscriptions[] = $subscription;
+		}
+
+		return $subscriptions;
 	}
 }
