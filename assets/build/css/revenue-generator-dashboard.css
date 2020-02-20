@@ -293,7 +293,7 @@ body {
     position: absolute;
     top: -15px;
     border: 2px solid;
-    left: -300px;
+    left: -345px;
     width: 300px;
     background: #fff;
     font-weight: bold; }
@@ -311,8 +311,6 @@ body {
         vertical-align: middle;
         text-align: center; }
       .rg-purchase-overlay-option-manager div button {
-        display: table-cell;
-        vertical-align: middle;
         cursor: pointer; }
     .rg-purchase-overlay-option-manager div.rg-purchase-overlay-option-manager-entity-selection select {
       border: 0;
@@ -366,6 +364,8 @@ body {
         width: 20px; }
     .rg-purchase-overlay-option-manager div.rg-purchase-overlay-option-manager-action button {
       width: 100%;
+      height: 100%;
+      background: transparent;
       cursor: pointer; }
     .rg-purchase-overlay-option-manager button.rg-purchase-overlay-option-remove {
       text-transform: uppercase; }
@@ -401,6 +401,25 @@ body {
     text-decoration: underline;
     display: block;
     margin-top: 8px; }
+  .rg-purchase-overlay-option-area {
+    height: 50px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center; }
+    .rg-purchase-overlay-option-area-add-option {
+      display: none;
+      margin-top: 10px; }
+      .rg-purchase-overlay-option-area-add-option button {
+        background: transparent;
+        border: 0; }
+      .rg-purchase-overlay-option-area-add-option hr {
+        border: 0;
+        border-bottom: 2px solid #000;
+        width: 150px;
+        align-self: center;
+        margin: 0 10px; }
+      .rg-purchase-overlay-option-area-add-option span {
+        align-self: center; }
   .rg-purchase-overlay .rev-gen-powered-by-footer {
     color: #2e2e2e;
     opacity: .4;

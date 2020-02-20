@@ -115,7 +115,7 @@
     position: absolute;
     top: -15px;
     border: 2px solid;
-    left: -300px;
+    left: -345px;
     width: 300px;
     background: #fff;
     font-weight: bold;
@@ -137,8 +137,6 @@
       }
 
       button {
-        display: table-cell;
-        vertical-align: middle;
         cursor: pointer;
       }
     }
@@ -221,6 +219,8 @@
     div.rg-purchase-overlay-option-manager-action {
       button {
         width: 100%;
+        height: 100%;
+        background: transparent;
         cursor: pointer;
       }
     }
@@ -278,6 +278,34 @@
     margin-top: 8px;
   }
 
+  &-option-area {
+    height: 50px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+
+    &-add-option {
+      display: none;
+      margin-top: 10px;
+
+      button {
+        background: transparent;
+        border: 0;
+      }
+
+      hr {
+        border: 0;
+        border-bottom: 2px solid #000;
+        width: 150px;
+        align-self: center;
+        margin: 0 10px;
+      }
+
+      span {
+        align-self: center;
+      }
+    }
+  }
   .rev-gen-powered-by-footer {
     color: #2e2e2e;
     opacity: .4;

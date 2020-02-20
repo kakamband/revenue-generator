@@ -16,12 +16,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Create data for view.
 $rg_teaser = empty( $rg_preview_post['excerpt'] ) ? $rg_preview_post['teaser'] : $rg_preview_post['excerpt'];
 
-$paywall_data                  = isset( $purchase_options_data['paywall'] ) ? $purchase_options_data['paywall'] : [];
-$paywall_id                    = empty( $paywall_data['id'] ) ? '' : $paywall_data['id'];
-$individual_purchase_option    = isset( $purchase_options_data['individual'] ) ? $purchase_options_data['individual'] : [];
-$individual_type               = empty( $individual_purchase_option['type'] ) ? 'static' : $individual_purchase_option['type'];
-$subscriptions_purchase_option = isset( $purchase_options_data['subscriptions'] ) ? $purchase_options_data['subscriptions'] : [];
-$time_passes_purchase_option   = isset( $purchase_options_data['time_passes'] ) ? $purchase_options_data['time_passes'] : [];
+$paywall_data          = isset( $purchase_options_data['paywall'] ) ? $purchase_options_data['paywall'] : [];
+$paywall_id            = empty( $paywall_data['id'] ) ? '' : $paywall_data['id'];
+$paywall_access_to     = $paywall_data['access_to'];
+$purchase_option_items = $purchase_options_data['options'];
 ?>
 
 <div class="rev-gen-layout-wrapper">
@@ -41,7 +39,7 @@ $time_passes_purchase_option   = isset( $purchase_options_data['time_passes'] ) 
 			<div id="rg_js_postPreviewContent" class="rev-gen-preview-main--post--content">
 				<?php echo wp_kses_post( $rg_preview_post['post_content'] ); ?>
 			</div>
-			<div class="rg-purchase-overlay" id="rg_js_purchaseOverly">
+			<div class="rg-purchase-overlay" id="rg_js_purchaseOverlay">
 			</div>
 		</div>
 		<div class="rev-gen-preview-main--paywall-actions">
@@ -63,10 +61,10 @@ $time_passes_purchase_option   = isset( $purchase_options_data['time_passes'] ) 
 					?>
 				</p>
 				<select class="rev-gen-preview-main-paywall-applies-to">
-					<option value="all"><?php esc_html_e( 'all posts and pages', 'revenue-generator' ); ?></option>
-					<option value="category"><?php esc_html_e( 'category', 'revenue-generator' ); ?></option>
-					<option value="page"><?php esc_html_e( 'page', 'revenue-generator' ); ?></option>
-					<option value="post"><?php esc_html_e( 'post', 'revenue-generator' ); ?></option>
+					<option <?php selected( $paywall_access_to, 'all', true ); ?> value="all"><?php esc_html_e( 'all posts and pages', 'revenue-generator' ); ?></option>
+					<option <?php selected( $paywall_access_to, 'category', true ); ?> value="category"><?php esc_html_e( 'category', 'revenue-generator' ); ?></option>
+					<option <?php selected( $paywall_access_to, 'page', true ); ?> value="page"><?php esc_html_e( 'page', 'revenue-generator' ); ?></option>
+					<option <?php selected( $paywall_access_to, 'post', true ); ?> value="post"><?php esc_html_e( 'post', 'revenue-generator' ); ?></option>
 				</select>
 			</div>
 			<div class="rev-gen-preview-main--paywall-actions-search">
@@ -111,7 +109,7 @@ $time_passes_purchase_option   = isset( $purchase_options_data['time_passes'] ) 
 				<option
 				<# data.entityType === 'individual' ? print("selected") : print('') #> value="individual"><?php esc_html_e( 'Individual Article', 'revenue-generator' ); ?></option>
 				<option
-				<# data.entityType === 'time-pass' ? print("selected") : print('') #> value="time-pass"><?php esc_html_e( 'Time Pass', 'revenue-generator' ); ?></option>
+				<# data.entityType === 'timepass' ? print("selected") : print('') #> value="timepass"><?php esc_html_e( 'Time Pass', 'revenue-generator' ); ?></option>
 				<option
 				<# data.entityType === 'subscription' ? print("selected") : print('') #> value="subscription"><?php esc_html_e( 'Subscription', 'revenue-generator' ); ?></option>
 			</select>
@@ -167,103 +165,72 @@ $time_passes_purchase_option   = isset( $purchase_options_data['time_passes'] ) 
 		<?php echo empty( $paywall_data['title'] ) ? esc_html__( 'Keep Reading', 'revenue-generator' ) : esc_html( $paywall_data['title'] ); ?>
 	</div>
 	<div class="rg-purchase-overlay-description" contenteditable="true">
-		<?php empty( $paywall_data['description'] ) ? esc_html( sprintf( 'Support %s to get access to this content and more.', esc_url( get_home_url() ) ) ) : esc_html( $paywall_data['description'] ); ?>
+		<?php echo empty( $paywall_data['description'] ) ? esc_html( sprintf( 'Support %s to get access to this content and more.', esc_url( get_home_url() ) ) ) : esc_html( $paywall_data['description'] ); ?>
 	</div>
 	<div class="rg-purchase-overlay-purchase-options" data-paywall-id="<?php echo esc_attr( $paywall_id ); ?>">
-		<?php if ( ! empty( $individual_purchase_option ) ) : ?>
-			<div
-				class="rg-purchase-overlay-purchase-options-item"
-				data-purchase-type="individual"
-				data-pricing-type="<?php echo esc_attr( $individual_type ); ?>"
-			>
-				<div class="rg-purchase-overlay-purchase-options-item-info">
-					<div class="rg-purchase-overlay-purchase-options-item-info-title" contenteditable="true">
-						<?php echo empty( $individual_purchase_option['title'] ) ? esc_html__( 'Access Article Now', 'revenue-generator' ) : esc_html( $individual_purchase_option['title'] ); ?>
-					</div>
-					<div class="rg-purchase-overlay-purchase-options-item-info-description" contenteditable="true">
-						<?php echo empty( $individual_purchase_option['description'] ) ? esc_html__( 'You\'ll only be charged once you\'ve reached $5.', 'revenue-generator' ) : esc_html( $individual_purchase_option['description'] ); ?>
-					</div>
-				</div>
-				<div class="rg-purchase-overlay-purchase-options-item-price">
-					<span class="rg-purchase-overlay-purchase-options-item-price-symbol"><?php echo esc_html( $merchant_symbol ); ?></span>
-					<span class="rg-purchase-overlay-purchase-options-item-price-span" data-pay-model="<?php echo esc_attr( $individual_purchase_option['revenue'] ); ?>" contenteditable="true">
-						<?php echo esc_html( $individual_purchase_option['price'] ); ?>
-					</span>
-				</div>
-			</div>
-		<?php endif ?>
-		<?php
-		if ( ! empty( $time_passes_purchase_option ) ) {
-			foreach ( $time_passes_purchase_option as $time_pass ) {
-				$time_pass_id       = empty( $time_pass['id'] ) ? '' : $time_pass['id'];
-				$time_pass_price    = $time_pass['price'];
-				$time_pass_revenue  = $time_pass['revenue'];
-				$time_pass_duration = $time_pass['duration'];
-				$time_pass_period   = $time_pass['period'];
+		<?php if ( ! empty( $purchase_option_items ) ) :
+			foreach ( $purchase_option_items as $purchase_option ) {
+				$purchase_option_id       = empty( $purchase_option['id'] ) ? '' : $purchase_option['id'];
+				$purchase_option_price    = number_format( $purchase_option['price'], 2 );
+				$purchase_option_type     = $purchase_option['purchase_type'];
+				$is_individual            = 'individual' === $purchase_option_type;
+				$individual_type          = '';
+				$purchase_option_revenue  = $purchase_option['revenue'];
+				$purchase_option_duration = $is_individual ? '' : $purchase_option['duration'];
+				$purchase_option_period   = $is_individual ? '' : $purchase_option['period'];
+				$purchase_option_order    = $purchase_option['order'];
+
+				if ( $is_individual ) {
+					$individual_type = empty( $purchase_option['type'] ) ? 'static' : $purchase_option['type'];
+				}
 				?>
 				<div
 					class="rg-purchase-overlay-purchase-options-item"
-					data-purchase-type="time-pass"
-					data-expiry-duration="<?php echo esc_attr( $time_pass_duration ); ?>"
-					data-expiry-period="<?php echo esc_attr( $time_pass_period ); ?>"
-					data-tlp-id="<?php echo esc_attr( $time_pass_id ); ?>"
+					data-purchase-type="<?php echo esc_attr( $purchase_option_type ); ?>"
+					<?php if ( 'individual' !== $purchase_option_type ): ?>
+						data-expiry-duration="<?php echo esc_attr( $purchase_option_duration ); ?>"
+						data-expiry-period="<?php echo esc_attr( $purchase_option_period ); ?>"
+					<?php else: ?>
+						data-pricing-type="<?php echo esc_attr( $individual_type ); ?>"
+					<?php endif; ?>
+					<?php if ( 'timepass' === $purchase_option_type ): ?>
+						data-tlp-id="<?php echo esc_attr( $purchase_option_id ); ?>"
+					<?php endif;
+					if ( 'subscription' === $purchase_option_type ): ?>
+						data-sub-id="<?php echo esc_attr( $purchase_option_id ); ?>"
+					<?php endif; ?>
 					data-uid=""
+					data-order="<?php echo esc_attr( $purchase_option_order ); ?>"
 				>
 					<div class="rg-purchase-overlay-purchase-options-item-info">
 						<div class="rg-purchase-overlay-purchase-options-item-info-title" contenteditable="true">
-							<?php echo esc_html( $time_pass['title'] ); ?>
+							<?php echo empty( $purchase_option['title'] ) ? esc_html__( 'Access Article Now', 'revenue-generator' ) : esc_html( $purchase_option['title'] ); ?>
 						</div>
 						<div class="rg-purchase-overlay-purchase-options-item-info-description" contenteditable="true">
-							<?php echo esc_html( $time_pass['description'] ); ?>
+							<?php echo empty( $purchase_option['description'] ) ? esc_html__( 'You\'ll only be charged once you\'ve reached $5.', 'revenue-generator' ) : esc_html( $purchase_option['description'] ); ?>
 						</div>
 					</div>
 					<div class="rg-purchase-overlay-purchase-options-item-price">
 						<span class="rg-purchase-overlay-purchase-options-item-price-symbol"><?php echo esc_html( $merchant_symbol ); ?></span>
-						<span class="rg-purchase-overlay-purchase-options-item-price-span" data-pay-model="<?php echo esc_attr( $time_pass_revenue ); ?>" contenteditable="true">
-						<?php echo esc_html( $time_pass_price ); ?>
+						<span class="rg-purchase-overlay-purchase-options-item-price-span" data-pay-model="<?php echo esc_attr( $purchase_option_revenue ); ?>" contenteditable="true">
+						<?php echo esc_html( $purchase_option_price ); ?>
 					</span>
 					</div>
 				</div>
 				<?php
 			}
-		}
+		endif;
 		?>
-		<?php
-		if ( ! empty( $subscriptions_purchase_option ) ) {
-			foreach ( $subscriptions_purchase_option as $subscription ) {
-				$subscription_id       = empty( $subscription['id'] ) ? '' : $subscription['id'];
-				$subscription_price    = $subscription['price'];
-				$subscription_revenue  = $subscription['revenue'];
-				$subscription_duration = $subscription['duration'];
-				$subscription_period   = $subscription['period'];
-				?>
-				<div
-					class="rg-purchase-overlay-purchase-options-item"
-					data-purchase-type="subscription"
-					data-expiry-duration="<?php echo esc_attr( $subscription_duration ); ?>"
-					data-expiry-period="<?php echo esc_attr( $subscription_period ); ?>"
-					data-sub-id="<?php echo esc_attr( $subscription_id ); ?>"
-					data-uid=""
-				>
-					<div class="rg-purchase-overlay-purchase-options-item-info">
-						<div class="rg-purchase-overlay-purchase-options-item-info-title" contenteditable="true">
-							<?php echo esc_html( $subscription['title'] ); ?>
-						</div>
-						<div class="rg-purchase-overlay-purchase-options-item-info-description" contenteditable="true">
-							<?php echo esc_html( $subscription['description'] ); ?>
-						</div>
-					</div>
-					<div class="rg-purchase-overlay-purchase-options-item-price">
-						<span class="rg-purchase-overlay-purchase-options-item-price-symbol"><?php echo esc_html( $merchant_symbol ); ?></span>
-						<span class="rg-purchase-overlay-purchase-options-item-price-span" data-pay-model="<?php echo esc_attr( $subscription_revenue ); ?>" contenteditable="true">
-						<?php echo esc_html( $subscription_price ); ?>
-					</span>
-					</div>
-				</div>
-				<?php
-			}
-		}
-		?>
+	</div>
+	<div class="rg-purchase-overlay-option-area">
+		<div class="rg-purchase-overlay-option-area-add-option">
+			<button>
+				<img alt="<?php echo esc_attr( 'Option add', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['option_add'] ); ?>" />
+			</button>
+			<hr />
+			<span><?php esc_html_e( 'Add a new purchase option', 'revenue-generator' ); ?></span>
+			<hr />
+		</div>
 	</div>
 	<div class="rg-purchase-overlay-privacy">
 		<p>
@@ -304,5 +271,32 @@ $time_passes_purchase_option   = isset( $purchase_options_data['time_passes'] ) 
 		<button disabled="disabled" class="rev-gen-preview-main-currency-modal-button">
 			<?php esc_html_e( 'Apply currency', 'revenue-generator' ); ?>
 		</button>
+	</div>
+</script>
+
+<script type="text/template" id="tmpl-revgen-default-purchase-option-item">
+	<div
+		class="rg-purchase-overlay-purchase-options-item"
+		data-purchase-type="subscription"
+		data-expiry-duration="<?php echo esc_attr( $default_option_data['duration'] ); ?>"
+		data-expiry-period="<?php echo esc_attr( $default_option_data['period'] ); ?>"
+		data-sub-id=""
+		data-uid=""
+		data-order=""
+	>
+		<div class="rg-purchase-overlay-purchase-options-item-info">
+			<div class="rg-purchase-overlay-purchase-options-item-info-title" contenteditable="true">
+				<?php echo esc_html( $default_option_data['title'] ); ?>
+			</div>
+			<div class="rg-purchase-overlay-purchase-options-item-info-description" contenteditable="true">
+				<?php echo esc_html( $default_option_data['description'] ); ?>
+			</div>
+		</div>
+		<div class="rg-purchase-overlay-purchase-options-item-price">
+			<span class="rg-purchase-overlay-purchase-options-item-price-symbol"><?php echo esc_html( $merchant_symbol ); ?></span>
+			<span class="rg-purchase-overlay-purchase-options-item-price-span" data-pay-model="<?php echo esc_attr( $default_option_data['revenue'] ); ?>" contenteditable="true">
+				<?php echo esc_html( $default_option_data['price'] ); ?>
+			</span>
+		</div>
 	</div>
 </script>

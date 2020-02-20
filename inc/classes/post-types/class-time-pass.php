@@ -251,4 +251,8 @@ class Time_Pass extends Base {
 		return $timepasses;
 	}
 
+	public static function remove_time_pass_purchase_option() {
+		// remove the time pass purchase option.
+	}
+
 }

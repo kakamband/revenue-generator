@@ -119,8 +119,8 @@ class Subscription extends Base {
 		$subscription['duration']        = $post_meta['duration'];
 		$subscription['period']          = $post_meta['period'];
 		$subscription['is_active']       = $is_active;
-		$post_meta_data['access_to']     = $post_meta['access_to'];
-		$post_meta_data['access_entity'] = $post_meta['access_entity'];
+		$subscription['access_to']     = $post_meta['access_to'];
+		$subscription['access_entity'] = $post_meta['access_entity'];
 
 		return $subscription;
 	}
@@ -250,5 +250,9 @@ class Subscription extends Base {
 		}
 
 		return $subscriptions;
+	}
+
+	public static function remove_subscription_purchase_option() {
+		// remove the subscription purchase option.
 	}
 }

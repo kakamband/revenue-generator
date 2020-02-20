@@ -41,6 +41,7 @@ class Admin {
 		add_action( 'wp_ajax_rg_update_global_config', [ $this, 'update_global_config' ] );
 		add_action( 'wp_ajax_rg_update_paywall', [ $this, 'update_paywall' ] );
 		add_action( 'wp_ajax_rg_update_currency_selection', [ $this, 'update_currency_selection' ] );
+		add_action( 'wp_ajax_rg_remove_purchase_option', [ $this, 'remove_purchase_option' ] );
 	}
 
 	/**
@@ -209,11 +210,14 @@ class Admin {
 
 		// Get paywall options data.
 		$purchase_options_data = $post_types->get_post_purchase_options( $latest_post_id, $formatted_post_data );
+		$default_option_data   = $post_types->get_default_purchase_option();
+		$purchase_options      = $post_types->convert_to_purchase_options( $purchase_options_data );
 
 		// Paywall purchase options data.
 		$post_preview_data = [
 			'rg_preview_post'       => $formatted_post_data,
-			'purchase_options_data' => $purchase_options_data,
+			'purchase_options_data' => $purchase_options,
+			'default_option_data'   => $default_option_data,
 			'merchant_symbol'       => 'USD' === $config_data['merchant_currency'] ? '$' : '€',
 			'action_icons'          => [
 				'option_add'         => Config::$plugin_defaults['img_dir'] . 'add-option.svg',
@@ -317,52 +321,69 @@ class Admin {
 		$paywall['description']   = sanitize_text_field( wp_unslash( $paywall_data['desc'] ) );
 		$paywall['name']          = sanitize_text_field( wp_unslash( $paywall_data['name'] ) );
 		$paywall['id']            = sanitize_text_field( $paywall_data['id'] );
-		$paywall['access_to']     = 'post';
+		$paywall['access_to']     = sanitize_text_field( wp_unslash( $paywall_data['applies'] ) );
 		$paywall['access_entity'] = $rg_post_id;
+
+		$order_items = [];
 
 		// Create Paywall.
 		$paywall_id = $paywall_instance->update_paywall( $paywall );
 
-		$individual['title']       = sanitize_text_field( wp_unslash( $individual_data['title'] ) );
-		$individual['description'] = sanitize_text_field( wp_unslash( $individual_data['desc'] ) );
-		$individual['price']       = floatval( $individual_data['price'] );
-		$individual['revenue']     = sanitize_text_field( $individual_data['revenue'] );
-		$individual['type']        = sanitize_text_field( $individual_data['type'] );
+		if ( ! empty( $individual_data ) ) {
+			$individual['title']       = sanitize_text_field( wp_unslash( $individual_data['title'] ) );
+			$individual['description'] = sanitize_text_field( wp_unslash( $individual_data['desc'] ) );
+			$individual['price']       = floatval( $individual_data['price'] );
+			$individual['revenue']     = sanitize_text_field( $individual_data['revenue'] );
+			$individual['type']        = sanitize_text_field( $individual_data['type'] );
+			$order_items['individual'] = absint( $individual_data['order'] );
 
-		// Add Individual option to paywall.
-		$paywall_instance->update_paywall_individual_option( $paywall_id, $individual );
+			// Add Individual option to paywall.
+			$paywall_instance->update_paywall_individual_option( $paywall_id, $individual );
+		}
 
 		$time_pass_instance = Time_Pass::get_instance();
 		$time_pass_response = [];
 
-		// Store time pass.
-		foreach ( $time_passes as $time_pass ) {
-			$timepass['id']                          = sanitize_text_field( $time_pass['tlp_id'] );
-			$timepass['title']                       = sanitize_text_field( wp_unslash( $time_pass['title'] ) );
-			$timepass['description']                 = sanitize_text_field( wp_unslash( $time_pass['desc'] ) );
-			$timepass['price']                       = floatval( $time_pass['price'] );
-			$timepass['revenue']                     = sanitize_text_field( $time_pass['revenue'] );
-			$timepass['duration']                    = sanitize_text_field( $time_pass['duration'] );
-			$timepass['period']                      = sanitize_text_field( $time_pass['period'] );
-			$timepass['access_to']                   = 'all'; // @todo make it dynamic
-			$time_pass_response[ $time_pass['uid'] ] = $time_pass_instance->update_time_pass( $timepass );
+		if ( ! empty( $time_passes ) ) {
+			// Store time pass.
+			foreach ( $time_passes as $time_pass ) {
+				$timepass['id']          = sanitize_text_field( $time_pass['tlp_id'] );
+				$timepass['title']       = sanitize_text_field( wp_unslash( $time_pass['title'] ) );
+				$timepass['description'] = sanitize_text_field( wp_unslash( $time_pass['desc'] ) );
+				$timepass['price']       = floatval( $time_pass['price'] );
+				$timepass['revenue']     = sanitize_text_field( $time_pass['revenue'] );
+				$timepass['duration']    = sanitize_text_field( $time_pass['duration'] );
+				$timepass['period']      = sanitize_text_field( $time_pass['period'] );
+				$timepass['access_to']   = 'all'; // @todo make it dynamic
+
+				$tp_id                                   = $time_pass_instance->update_time_pass( $timepass );
+				$time_pass_response[ $time_pass['uid'] ] = $tp_id;
+				$order_items[ 'tlp_' . $tp_id ]          = absint( $time_pass['order'] );
+			}
 		}
 
 		$subscription_instance = Subscription::get_instance();
 		$subscription_response = [];
 
-		// Store time pass.
-		foreach ( $subscriptions as $subscription_data ) {
-			$subscription['id']                                 = sanitize_text_field( $subscription_data['sub_id'] );
-			$subscription['title']                              = sanitize_text_field( wp_unslash( $subscription_data['title'] ) );
-			$subscription['description']                        = sanitize_text_field( wp_unslash( $subscription_data['desc'] ) );
-			$subscription['price']                              = floatval( $subscription_data['price'] );
-			$subscription['revenue']                            = sanitize_text_field( $subscription_data['revenue'] );
-			$subscription['duration']                           = sanitize_text_field( $subscription_data['duration'] );
-			$subscription['period']                             = sanitize_text_field( $subscription_data['period'] );
-			$subscription['access_to']                          = 'all'; // @todo make it dynamic
-			$subscription_response[ $subscription_data['uid'] ] = $subscription_instance->update_subscription( $subscription );
+		if ( ! empty( $subscriptions ) ) {
+			// Store time pass.
+			foreach ( $subscriptions as $subscription_data ) {
+				$subscription['id']          = sanitize_text_field( $subscription_data['sub_id'] );
+				$subscription['title']       = sanitize_text_field( wp_unslash( $subscription_data['title'] ) );
+				$subscription['description'] = sanitize_text_field( wp_unslash( $subscription_data['desc'] ) );
+				$subscription['price']       = floatval( $subscription_data['price'] );
+				$subscription['revenue']     = sanitize_text_field( $subscription_data['revenue'] );
+				$subscription['duration']    = sanitize_text_field( $subscription_data['duration'] );
+				$subscription['period']      = sanitize_text_field( $subscription_data['period'] );
+				$subscription['access_to']   = 'all'; // @todo make it dynamic
+
+				$sub_id                                             = $subscription_instance->update_subscription( $subscription );
+				$subscription_response[ $subscription_data['uid'] ] = $sub_id;
+				$order_items[ 'sub_' . $sub_id ]                    = absint( $subscription_data['order'] );
+			}
 		}
+
+		$paywall_instance->update_paywall_option_order( $paywall_id, $order_items );
 
 		// Send success message.
 		wp_send_json( [
@@ -409,6 +430,30 @@ class Admin {
 			'success' => true,
 			'msg'     => __( 'Currency stored successfully!', 'revenue-generator' )
 		] );
+
+	}
+
+	/**
+	 * Update the global currency config.
+	 */
+	public function remove_purchase_option() {
+
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Get all data and sanitize it.
+		$purchase_option_type = sanitize_text_field( filter_input( INPUT_POST, 'type', FILTER_SANITIZE_STRING ) );
+		$purchase_option_id = sanitize_text_field( filter_input( INPUT_POST, 'id', FILTER_SANITIZE_STRING ) );
+
+		$post_types_instance   = Post_Types::get_instance();
+		$time_pass_instance = Time_Pass::get_instance();
+		$subscription_instance = Subscription::get_instance();
+
+		if ( 'individual' === $purchase_option_type ) {
+			$post_types_instance->remove_individual_purchase_option();
+		} elseif ( 'subscription'=== $purchase_option_type ) {
+		} elseif ( 'timepass' === $purchase_option_type ) {
+		}
 
 	}
 }

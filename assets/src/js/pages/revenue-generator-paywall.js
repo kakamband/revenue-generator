@@ -29,7 +29,7 @@ import '../utils';
 				postContent       : $('#rg_js_postPreviewContent'),
 
 				// Overlay elements.
-				purchaseOverly           : $('#rg_js_purchaseOverly'),
+				purchaseOverlay           : $('#rg_js_purchaseOverlay'),
 				purchaseOptionItems      : '.rg-purchase-overlay-purchase-options',
 				purchaseOptionItem       : '.rg-purchase-overlay-purchase-options-item',
 				purchaseOptionItemInfo   : '.rg-purchase-overlay-purchase-options-item-info',
@@ -37,6 +37,8 @@ import '../utils';
 				purchaseOptionItemDesc   : '.rg-purchase-overlay-purchase-options-item-info-description',
 				purchaseOptionItemPrice  : '.rg-purchase-overlay-purchase-options-item-price-span',
 				purchaseOptionPriceSymbol: '.rg-purchase-overlay-purchase-options-item-price-symbol',
+				optionArea               : '.rg-purchase-overlay-option-area',
+				addOptionArea            : '.rg-purchase-overlay-option-area-add-option',
 
 				// Action buttons
 				editOption    : '.rg-purchase-overlay-option-edit',
@@ -58,6 +60,7 @@ import '../utils';
 				activatePaywall     : $('#rg_js_activatePaywall'),
 				savePaywall         : $('#rg_js_savePaywall'),
 				searchPaywallContent: $('#rg_js_searchPaywallContent'),
+				searchPaywallWrapper: $('.rev-gen-preview-main--paywall-actions-search'),
 				paywallName         : $('.rev-gen-preview-main-paywall-name'),
 				paywallTitle        : '.rg-purchase-overlay-title',
 				paywallDesc         : '.rg-purchase-overlay-description',
@@ -81,7 +84,8 @@ import '../utils';
 				 * When the page has loaded, load the post content.
 				 */
 				$(document).ready(function () {
-					$('#rg_js_postPreviewWrapper').fadeIn('slow');
+					$o.postPreviewWrapper.fadeIn('slow');
+					$($o.paywallAppliesTo).trigger('change');
 				});
 
 				/**
@@ -111,30 +115,22 @@ import '../utils';
 				 * Add action items on purchase item hover.
 				 */
 				$o.body.on('mouseenter', $o.purchaseOptionItem, function () {
+					// Get the template for purchase overlay action.
+					const actionTemplate = wp.template('revgen-purchase-overlay-actions');
 
-					const currentActions = $(this).find('.rg-purchase-overlay-purchase-options-item-actions');
+					// Send the data to our new template function, get the HTML markup back.
+					const data = {
+						showMoveUp  : $(this).prev('.rg-purchase-overlay-purchase-options-item').length,
+						showMoveDown: $(this).next('.rg-purchase-overlay-purchase-options-item').length
+					};
 
-					if (currentActions.length) {
-						currentActions.find('.rg-purchase-overlay-option-manager').hide();
-						currentActions.show();
-					} else {
-						// Get the template for purchase overlay action.
-						const actionTemplate = wp.template('revgen-purchase-overlay-actions');
+					const overlayMarkup = actionTemplate(data);
 
-						// Send the data to our new template function, get the HTML markup back.
-						const data = {
-							showMoveUp  : $(this).prev('.rg-purchase-overlay-purchase-options-item').length,
-							showMoveDown: $(this).next('.rg-purchase-overlay-purchase-options-item').length
-						};
+					// Highlight the current option being edited.
+					$(this).addClass('option-highlight');
 
-						const overlayMarkup = actionTemplate(data);
-
-						// Highlight the current option being edited.
-						$(this).addClass('option-highlight');
-
-						// Add purchase option actions to the highlighted item.
-						$(this).prepend(overlayMarkup);
-					}
+					// Add purchase option actions to the highlighted item.
+					$(this).prepend(overlayMarkup);
 				});
 
 				/**
@@ -142,7 +138,8 @@ import '../utils';
 				 */
 				$o.body.on('mouseleave', $o.purchaseOptionItem, function () {
 					$(this).removeClass('option-highlight');
-					$(this).find('.rg-purchase-overlay-purchase-options-item-actions').hide();
+					$(this).find('.rg-purchase-overlay-purchase-options-item-actions').remove();
+					$(this).find('.rg-purchase-overlay-option-manager').hide();
 				});
 
 				/**
@@ -151,8 +148,7 @@ import '../utils';
 				$o.body.on('click', $o.editOption, function () {
 
 					const optionItem = $(this).parents('.rg-purchase-overlay-purchase-options-item');
-					const actionItems = optionItem.find('.rg-purchase-overlay-purchase-options-item-actions');
-					const actionManager = actionItems.find('.rg-purchase-overlay-option-manager');
+					let actionManager = optionItem.find('.rg-purchase-overlay-option-manager');
 
 					if (!actionManager.length) {
 
@@ -169,14 +165,16 @@ import '../utils';
 						const actionMarkup = actionTemplate(data);
 
 						// Add purchase option manager to the selected item.
-						actionItems.prepend(actionMarkup);
+						optionItem.prepend(actionMarkup);
+
+						actionManager = optionItem.find('.rg-purchase-overlay-option-manager');
 
 						// Duration selection.
-						const periodSelection = actionItems.find($o.durationWrapper);
+						const periodSelection = actionManager.find($o.durationWrapper);
 
 						if ('individual' !== entityType) {
 							// hide pricing type selection if not individual.
-							const dynamicPricing = actionItems.find($o.individualPricingWrapper);
+							const dynamicPricing = actionManager.find($o.individualPricingWrapper);
 							dynamicPricing.hide();
 
 							// show period selection if not individual.
@@ -187,7 +185,7 @@ import '../utils';
 							periodSelection.hide();
 						}
 
-						const revenueWrapper = actionItems.find($o.purchaseRevenueWrapper);
+						const revenueWrapper = actionManager.find($o.purchaseRevenueWrapper);
 						if ('subscription' === entityType) {
 							revenueWrapper.hide();
 						} else {
@@ -211,16 +209,26 @@ import '../utils';
 				 * Remove purchase option.
 				 */
 				$o.body.on('click', $o.optionRemove, function () {
-					// @todo add functionality to delete entity from db when removed.
-					$(this).parents('.rg-purchase-overlay-purchase-options-item').remove();
+					const purchaseItem = $(this).parents('.rg-purchase-overlay-purchase-options-item');
+					const type = purchaseItem.data('purchase-type');
+					if ( 'individual' === type ) {
+						const paywallId = $($o.purchaseOverlay).data('paywall-id');
+					} else if ( 'timepass' === type ) {
+						const timePassId = $($o.purchaseOverlay).data('tlp-id');
+					} else if ( 'subscription' === type ) {
+						const subscriptionId = $($o.purchaseOverlay).data('sub-id');
+					}
+					purchaseItem.remove();
+					reorderPurchaseItems();
 				});
 
 				/**
 				 * Move purchase option one up.
 				 */
 				$o.body.on('click', $o.moveOptionUp, function () {
-					const pruchaseOption = $(this).parents('.rg-purchase-overlay-purchase-options-item');
-					$(this).parents('.rg-purchase-overlay-purchase-options-item').prev().insertAfter(pruchaseOption);
+					const purchaseOption = $(this).parents('.rg-purchase-overlay-purchase-options-item');
+					$(this).parents('.rg-purchase-overlay-purchase-options-item').prev().insertAfter(purchaseOption);
+					reorderPurchaseItems();
 				});
 
 				/**
@@ -229,6 +237,7 @@ import '../utils';
 				$o.body.on('click', $o.moveOptionDown, function () {
 					const purchaseOption = $(this).parents('.rg-purchase-overlay-purchase-options-item');
 					$(this).parents('.rg-purchase-overlay-purchase-options-item').next().insertBefore(purchaseOption);
+					reorderPurchaseItems();
 				});
 
 				/**
@@ -326,10 +335,10 @@ import '../utils';
 						showCurrencySelectionModal();
 					}
 
-					const validatedPrice = validatePrice( priceItem.text().trim(), 'subscription' === optionItem.data('purchase-type') );
+					const validatedPrice = validatePrice(priceItem.text().trim(), 'subscription' === optionItem.data('purchase-type'));
 					priceItem.empty().text(validatedPrice);
 					validateRevenue(validatedPrice, optionItem);
-				}, 1500) );
+				}, 1500));
 
 				/**
 				 * Handle currency selection.
@@ -338,6 +347,17 @@ import '../utils';
 					if ($(this).val().length) {
 						const currencyButton = $($o.currencyOverlay).find($o.currencyButton);
 						currencyButton.removeProp('disabled');
+					}
+				});
+
+				/**
+				 * Handle paywall applicable dropdown.
+				 */
+				$o.body.on('change', $o.paywallAppliesTo, function () {
+					if ('post' === $(this).val() || 'page' === $(this).val()) {
+						$o.searchPaywallWrapper.hide();
+					} else {
+						$o.searchPaywallWrapper.show();
 					}
 				});
 
@@ -377,9 +397,41 @@ import '../utils';
 				$o.body.on('click', $o.currencyModalClose, function () {
 					$o.previewWrapper.find($o.currencyOverlay).remove();
 					$o.body.removeClass('modal-blur');
-					$o.purchaseOverly.css({
+					$o.purchaseOverlay.css({
 						filter: 'unset',
 					});
+				});
+
+				/**
+				 * Hide the purchase option add button.
+				 */
+				$o.body.on('mouseenter', $o.optionArea, function () {
+					// Only show if total count limit doesn't exceed.
+					const currentOptionCount = $($o.purchaseOptionItems).find($o.purchaseOptionItem).length;
+					if (currentOptionCount < 5) {
+						$($o.addOptionArea).css({display: 'flex'});
+					}
+				});
+
+				/**
+				 * Hide the add option button when not in focus.
+				 */
+				$o.body.on('mouseleave', $o.optionArea, function () {
+					$($o.addOptionArea).hide();
+				});
+
+				/**
+				 * Add new option handler.
+				 */
+				$o.body.on('click', $o.addOptionArea, function () {
+					// Only add if total count limit doesn't exceed.
+					const currentOptionCount = $($o.purchaseOptionItems).find($o.purchaseOptionItem).length;
+					if (currentOptionCount < 5) {
+						// Get the template for default option.
+						const optionItem = wp.template('revgen-default-purchase-option-item');
+						$($o.purchaseOptionItems).append(optionItem);
+					}
+					reorderPurchaseItems();
 				});
 
 				/**
@@ -412,12 +464,13 @@ import '../utils';
 							desc   : individualOption.find($o.purchaseOptionItemDesc).text().trim(),
 							price  : individualOption.find($o.purchaseOptionItemPrice).text().trim(),
 							revenue: individualOption.find($o.purchaseOptionItemPrice).data('pay-model'),
-							type   : individualOption.data('pricing-type')
+							type   : individualOption.data('pricing-type'),
+							order  : individualOption.data('order')
 						};
 					}
 
 					// Store time pass pricing.
-					const timePassOptions = purchaseOptions.find("[data-purchase-type='time-pass']");
+					const timePassOptions = purchaseOptions.find("[data-purchase-type='timepass']");
 					const timePasses = [];
 
 					/**
@@ -434,6 +487,7 @@ import '../utils';
 							period  : $(timePass).data('expiry-period'),
 							tlp_id  : $(timePass).data('tlp-id'),
 							uid     : $(timePass).data('uid'),
+							order   : $(timePass).data('order')
 						};
 						timePasses.push(timePassObj)
 					});
@@ -456,6 +510,7 @@ import '../utils';
 							period  : $(subscription).data('expiry-period'),
 							sub_id  : $(subscription).data('sub-id'),
 							uid     : $(subscription).data('uid'),
+							order   : $(subscription).data('order')
 						};
 						subscriptions.push(subscriptionObj)
 					});
@@ -465,8 +520,8 @@ import '../utils';
 					 */
 					const paywall = {
 						id     : purchaseOptions.data('paywall-id'),
-						title  : $o.purchaseOverly.find($o.paywallTitle).text().trim(),
-						desc   : $o.purchaseOverly.find($o.paywallDesc).text().trim(),
+						title  : $o.purchaseOverlay.find($o.paywallTitle).text().trim(),
+						desc   : $o.purchaseOverlay.find($o.paywallDesc).text().trim(),
 						name   : $o.paywallName.text().trim(),
 						applies: $($o.paywallAppliesTo).val(),
 					};
@@ -488,7 +543,43 @@ import '../utils';
 					updatePaywall(revenueGeneratorGlobalOptions.ajaxUrl, data);
 
 				});
+			};
 
+			const removePurchaseOption = function( type, id ) {
+				const formData = {
+					action: 'rg_remove_purchase_option',
+					type: type,
+					id: id,
+					security    : revenueGeneratorGlobalOptions.rg_paywall_nonce,
+				};
+
+				$.ajax({
+					url     : revenueGeneratorGlobalOptions.ajaxUrl,
+					method  : 'POST',
+					data    : formData,
+					dataType: 'json',
+				}).done(function (r) {
+					$o.snackBar.showSnackbar(r.msg, 1500);
+					if ( r.success ) {
+						return true;
+					}
+				});
+			};
+
+			/**
+			 * Update purchase options order.
+			 */
+			const reorderPurchaseItems = function () {
+				// Get all purchase options.
+				const purchaseOptions = $($o.purchaseOptionItems);
+
+				/**
+				 * Loop through all purchase options and update reorder.
+				 */
+				purchaseOptions.children($o.purchaseOptionItem).each(function (i) {
+					const order = i + 1;
+					$(this).data('order', order);
+				});
 			};
 
 			/**
@@ -497,7 +588,7 @@ import '../utils';
 			 * @param {string} price         Price of the item.
 			 * @param {Object} purchaseItem  Purchase option.
 			 */
-			const validateRevenue = function ( price, purchaseItem ) {
+			const validateRevenue = function (price, purchaseItem) {
 				const purchaseManager = $(purchaseItem).find('.rg-purchase-overlay-option-manager');
 				const revenueWrapper = purchaseManager.find($o.purchaseRevenueWrapper);
 				if (price > revenueGeneratorGlobalOptions.currency.sis_only_limit) {
@@ -516,7 +607,7 @@ import '../utils';
 			 * @param {boolean} subscriptionValidation  Is current item subscription.
 			 * @returns {string}
 			 */
-			const validatePrice = function ( price, subscriptionValidation) {
+			const validatePrice = function (price, subscriptionValidation) {
 				// strip non-number characters
 				price = price.replace(/[^0-9\,\.]/g, '');
 
@@ -566,7 +657,7 @@ import '../utils';
 				const template = wp.template('revgen-purchase-currency-overlay');
 				$o.previewWrapper.append(template);
 				$o.body.addClass('modal-blur');
-				$o.purchaseOverly.css({
+				$o.purchaseOverlay.css({
 					filter: 'blur(5px)',
 				});
 			};
@@ -589,7 +680,7 @@ import '../utils';
 
 					purchaseOptions.data('paywall-id', r.paywall_id);
 
-					const timePassOptions = purchaseOptions.find("[data-purchase-type='time-pass']");
+					const timePassOptions = purchaseOptions.find("[data-purchase-type='timepass']");
 
 					// Add returned ids to appropriate purchase option.
 					timePassOptions.each(function () {
@@ -657,8 +748,8 @@ import '../utils';
 					const template = wp.template('revgen-purchase-overlay');
 
 					// Send the data to our new template function, get the HTML markup back.
-					$o.purchaseOverly.append(template);
-					$o.purchaseOverly.show();
+					$o.purchaseOverlay.append(template);
+					$o.purchaseOverlay.show();
 				}
 			};
 

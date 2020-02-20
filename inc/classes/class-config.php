@@ -192,4 +192,15 @@ class Config {
 		];
 	}
 
+	public static function default_purchase_option() {
+		return [
+			'title'       => esc_html__( '1 Month Subscription', 'revenue-generator' ),
+			'description' => esc_html__( 'Enjoy unlimited access to all our content for one month.', 'revenue-generator' ),
+			'price'       => 4.99,
+			'revenue'     => 'sis',
+			'duration'    => 'm',
+			'period'      => '1',
+		];
+	}
+
 }

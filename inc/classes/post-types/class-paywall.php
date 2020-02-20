@@ -50,8 +50,8 @@ class Paywall extends Base {
 				'post_status'  => 'publish',
 				'post_type'    => static::SLUG,
 				'meta_input'   => [
-					'_rg_name'            => $paywall_data['name'],
-					'_rg_access_to'    => $paywall_data['access_to'],
+					'_rg_name'          => $paywall_data['name'],
+					'_rg_access_to'     => $paywall_data['access_to'],
 					'_rg_access_entity' => $paywall_data['access_entity'],
 				],
 			] );
@@ -79,6 +79,16 @@ class Paywall extends Base {
 	 */
 	public function update_paywall_individual_option( $paywall_id, $individual_data ) {
 		update_post_meta( $paywall_id, '_rg_individual_option', $individual_data );
+	}
+
+	/**
+	 * Update the order of purchase options in paywall..
+	 *
+	 * @param int   $paywall_id Paywall ID
+	 * @param array $order_data Purchase option data.
+	 */
+	public function update_paywall_option_order( $paywall_id, $order_data ) {
+		update_post_meta( $paywall_id, '_rg_options_order', $order_data );
 	}
 
 	/**
@@ -121,7 +131,9 @@ class Paywall extends Base {
 			$paywall_info['id']          = $pay_wall->ID;
 			$paywall_info['title']       = $pay_wall->post_title;
 			$paywall_info['description'] = $pay_wall->post_content;
-			$paywall_info['name'] = get_post_meta( $pay_wall->ID, '_rg_name', true );
+			$paywall_info['name']        = get_post_meta( $pay_wall->ID, '_rg_name', true );
+			$paywall_info['access_to']   = get_post_meta( $pay_wall->ID, '_rg_access_to', true );
+			$paywall_info['order']   =     get_post_meta( $pay_wall->ID, '_rg_options_order', true );
 		}
 
 		return $paywall_info;
