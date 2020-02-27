@@ -133,7 +133,7 @@ class Paywall extends Base {
 			$paywall_info['description'] = $pay_wall->post_content;
 			$paywall_info['name']        = get_post_meta( $pay_wall->ID, '_rg_name', true );
 			$paywall_info['access_to']   = get_post_meta( $pay_wall->ID, '_rg_access_to', true );
-			$paywall_info['order']   =     get_post_meta( $pay_wall->ID, '_rg_options_order', true );
+			$paywall_info['order']       = get_post_meta( $pay_wall->ID, '_rg_options_order', true );
 		}
 
 		return $paywall_info;
@@ -148,6 +148,24 @@ class Paywall extends Base {
 	 */
 	public function get_individual_purchase_option_data( $paywall_id ) {
 		return get_post_meta( $paywall_id, '_rg_individual_option', true );
+	}
+
+	/**
+	 * Remove purchase option data.
+	 *
+	 * @param $paywall_id
+	 */
+	public function remove_individual_purchase_option( $paywall_id ) {
+		if ( ! empty( $paywall_id ) ) {
+			$this->update_paywall_individual_option( $paywall_id, [] );
+
+			// Unset order if found.
+			$current_order = get_post_meta( $paywall_id, '_rg_options_order', true );
+			if ( isset( $current_order['individual'] ) ) {
+				unset( $current_order['individual'] );
+				update_post_meta( $paywall_id, '_rg_options_order', $current_order );
+			}
+		}
 	}
 
 }

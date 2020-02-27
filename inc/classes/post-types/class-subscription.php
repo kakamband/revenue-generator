@@ -110,15 +110,15 @@ class Subscription extends Base {
 
 		$post_meta = $this->formatted_post_meta( $post_meta );
 
-		$subscription                    = [];
+		$subscription                  = [];
 		$subscription['id']            = $post->ID;
-		$subscription['title']           = $post->post_title;
-		$subscription['description']     = $post->post_content;
-		$subscription['price']           = $post_meta['price'];
-		$subscription['revenue']         = $post_meta['revenue'];
-		$subscription['duration']        = $post_meta['duration'];
-		$subscription['period']          = $post_meta['period'];
-		$subscription['is_active']       = $is_active;
+		$subscription['title']         = $post->post_title;
+		$subscription['description']   = $post->post_content;
+		$subscription['price']         = $post_meta['price'];
+		$subscription['revenue']       = $post_meta['revenue'];
+		$subscription['duration']      = $post_meta['duration'];
+		$subscription['period']        = $post_meta['period'];
+		$subscription['is_active']     = $is_active;
 		$subscription['access_to']     = $post_meta['access_to'];
 		$subscription['access_entity'] = $post_meta['access_entity'];
 
@@ -126,7 +126,7 @@ class Subscription extends Base {
 	}
 
 	/**
-	 * Check post meta has a values.
+	 * Check if post meta has values.
 	 *
 	 * @param array $post_meta Post meta values fetched form database
 	 *
@@ -243,7 +243,7 @@ class Subscription extends Base {
 	 * @return array
 	 */
 	public function get_applicable_subscriptions() {
-		$subscriptions  = [];
+		$subscriptions     = [];
 		$all_subscriptions = $this->get_active_subscriptions();
 		foreach ( $all_subscriptions as $subscription ) {
 			$subscriptions[] = $subscription;
@@ -252,7 +252,42 @@ class Subscription extends Base {
 		return $subscriptions;
 	}
 
-	public static function remove_subscription_purchase_option() {
-		// remove the subscription purchase option.
+	/**
+	 * Delete subscription by ID.
+	 *
+	 * @param int $subscription_id Subscription ID.
+	 *
+	 * @return bool
+	 */
+	private function delete_subscription( $subscription_id ) {
+		$post = null;
+		if ( ! empty( $subscription_id ) ) {
+			$args = array(
+				'ID'          => $subscription_id,
+				'post_status' => 'draft',
+			);
+			$post = wp_update_post( $args );
+		}
+
+		return ( is_wp_error( $post ) || empty( $post ) ) ? false : true;
+	}
+
+	/**
+	 * Remove subscription.
+	 *
+	 * @param int $subscription_id Subscription ID.
+	 * @param int $paywall_id      Paywall ID.
+	 */
+	public function remove_subscription_purchase_option( $subscription_id, $paywall_id ) {
+		if ( $this->delete_subscription( $subscription_id ) ) {
+			if ( ! empty( $paywall_id ) ) {
+				// Unset order if found.
+				$current_order = get_post_meta( $paywall_id, '_rg_options_order', true );
+				if ( isset( $current_order[ 'sub_' . $subscription_id ] ) ) {
+					unset( $current_order[ 'sub_' . $subscription_id ] );
+					update_post_meta( $paywall_id, '_rg_options_order', $current_order );
+				}
+			}
+		}
 	}
 }

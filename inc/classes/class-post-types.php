@@ -381,36 +381,46 @@ class Post_Types {
 		$time_passes_purchase_option       = isset( $purchase_options['time_passes'] ) ? $purchase_options['time_passes'] : [];
 		$subscriptions_purchase_option     = isset( $purchase_options['subscriptions'] ) ? $purchase_options['subscriptions'] : [];
 
-		// Check if an order exists for the paywall..
+		// Check if an order exists for the paywall.
 		if ( isset( $final_purchase_options['paywall']['order'] ) ) {
-			// Set order for individual option.
-			$current_orders                      = $final_purchase_options['paywall']['order'];
-			$individual_purchase_option['order'] = $current_orders['individual'];
-			$individual_purchase_option['purchase_type']  = 'individual';
-			$options[]                           = $individual_purchase_option;
 
-			// Set order for time pass option.
-			foreach ( $time_passes_purchase_option as $time_pass ) {
-				$tlp_id             = 'tlp_' . $time_pass['id'];
-				$time_pass['order'] = $current_orders[ $tlp_id ];
-				$time_pass['purchase_type']  = 'timepass';
-				$options[]          = $time_pass;
-			}
+			if ( ! empty( $final_purchase_options ) ) {
+				$current_orders = $final_purchase_options['paywall']['order'];
 
-			// Set order for subscription option.
-			foreach ( $subscriptions_purchase_option as $subscription ) {
-				$sub_id                = 'sub_' . $subscription['id'];
-				$subscription['order'] = $current_orders[ $sub_id ];
-				$subscription['purchase_type']  = 'subscription';
-				$options[]             = $subscription;
+				if ( ! empty( $individual_purchase_option ) ) {
+					// Set order for individual option.
+					$individual_purchase_option['order']         = $current_orders['individual'];
+					$individual_purchase_option['purchase_type'] = 'individual';
+					$options[]                                   = $individual_purchase_option;
+				}
+
+				if ( ! empty( $time_passes_purchase_option ) ) {
+					// Set order for time pass option.
+					foreach ( $time_passes_purchase_option as $time_pass ) {
+						$tlp_id                     = 'tlp_' . $time_pass['id'];
+						$time_pass['order']         = $current_orders[ $tlp_id ];
+						$time_pass['purchase_type'] = 'timepass';
+						$options[]                  = $time_pass;
+					}
+				}
+
+				if ( ! empty( $subscriptions_purchase_option ) ) {
+					// Set order for subscription option.
+					foreach ( $subscriptions_purchase_option as $subscription ) {
+						$sub_id                        = 'sub_' . $subscription['id'];
+						$subscription['order']         = $current_orders[ $sub_id ];
+						$subscription['purchase_type'] = 'subscription';
+						$options[]                     = $subscription;
+					}
+				}
 			}
 		} else {
 			$order = 1;
 
 			// Add individual order.
 			if ( ! isset( $individual_purchase_option['order'] ) ) {
-				$individual_purchase_option['order'] = $order;
-				$individual_purchase_option['purchase_type']  = 'individual';
+				$individual_purchase_option['order']         = $order;
+				$individual_purchase_option['purchase_type'] = 'individual';
 			}
 			$options[] = $individual_purchase_option;
 
@@ -418,8 +428,8 @@ class Post_Types {
 			foreach ( $time_passes_purchase_option as $time_pass ) {
 				$order += 1;
 				if ( ! isset( $time_pass['order'] ) ) {
-					$time_pass['order'] = $order;
-					$time_pass['purchase_type']  = 'timepass';
+					$time_pass['order']         = $order;
+					$time_pass['purchase_type'] = 'timepass';
 				}
 				$options[] = $time_pass;
 			}
@@ -428,8 +438,8 @@ class Post_Types {
 			foreach ( $subscriptions_purchase_option as $subscription ) {
 				$order += 1;
 				if ( ! isset( $subscription['order'] ) ) {
-					$subscription['order'] = $order;
-					$subscription['purchase_type']  = 'subscription';
+					$subscription['order']         = $order;
+					$subscription['purchase_type'] = 'subscription';
 				}
 				$options[] = $subscription;
 			}
@@ -441,15 +451,6 @@ class Post_Types {
 		$final_purchase_options['options'] = $options;
 
 		return $final_purchase_options;
-	}
-
-	/**
-	 * Remove purchase option data.
-	 *
-	 * @param $paywall_id
-	 */
-	public static function remove_individual_purchase_option( $paywall_id ) {
-		// remove the individual purchase option.
 	}
 
 }

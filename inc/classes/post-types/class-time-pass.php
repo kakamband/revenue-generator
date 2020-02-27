@@ -125,7 +125,7 @@ class Time_Pass extends Base {
 	}
 
 	/**
-	 * Check post meta has a values.
+	 * Check if post meta has values.
 	 *
 	 * @param array $post_meta Post meta values fetched form database
 	 *
@@ -251,8 +251,43 @@ class Time_Pass extends Base {
 		return $timepasses;
 	}
 
-	public static function remove_time_pass_purchase_option() {
-		// remove the time pass purchase option.
+	/**
+	 * Delete time pass by ID.
+	 *
+	 * @param int $time_pass_id Time Pass ID.
+	 *
+	 * @return bool
+	 */
+	private function delete_time_pass( $time_pass_id ) {
+		$post = null;
+		if ( ! empty( $time_pass_id ) ) {
+			$args = array(
+				'ID'          => $time_pass_id,
+				'post_status' => 'draft',
+			);
+			$post = wp_update_post( $args );
+		}
+
+		return ( is_wp_error( $post ) || empty( $post ) ) ? false : true;
+	}
+
+	/**
+	 * Remove the time pass.
+	 *
+	 * @param int $time_pass_id Time Pass ID.
+	 * @param int $paywall_id   Paywall ID.
+	 */
+	public function remove_time_pass_purchase_option( $time_pass_id, $paywall_id ) {
+		if ( $this->delete_time_pass( $time_pass_id ) ) {
+			if ( ! empty( $paywall_id ) ) {
+				// Unset order if found.
+				$current_order = get_post_meta( $paywall_id, '_rg_options_order', true );
+				if ( isset( $current_order[ 'tlp_' . $time_pass_id ] ) ) {
+					unset( $current_order[ 'tlp_' . $time_pass_id ] );
+					update_post_meta( $paywall_id, '_rg_options_order', $current_order );
+				}
+			}
+		}
 	}
 
 }

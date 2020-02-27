@@ -29,7 +29,7 @@ import '../utils';
 				postContent       : $('#rg_js_postPreviewContent'),
 
 				// Overlay elements.
-				purchaseOverlay           : $('#rg_js_purchaseOverlay'),
+				purchaseOverlay          : $('#rg_js_purchaseOverlay'),
 				purchaseOptionItems      : '.rg-purchase-overlay-purchase-options',
 				purchaseOptionItem       : '.rg-purchase-overlay-purchase-options-item',
 				purchaseOptionItemInfo   : '.rg-purchase-overlay-purchase-options-item-info',
@@ -55,6 +55,7 @@ import '../utils';
 				durationWrapper           : '.rg-purchase-overlay-option-manager-duration',
 				periodCountSelection      : '.rg-purchase-overlay-option-manager-duration-count',
 				periodSelection           : '.rg-purchase-overlay-option-manager-duration-period',
+				entitySelection           : '.rg-purchase-overlay-option-manager-entity',
 
 				// Paywall publish actions.
 				activatePaywall     : $('#rg_js_activatePaywall'),
@@ -66,11 +67,19 @@ import '../utils';
 				paywallDesc         : '.rg-purchase-overlay-description',
 				paywallAppliesTo    : '.rev-gen-preview-main-paywall-applies-to',
 
-				// Currency overlay.
+				// Currency modal.
 				currencyOverlay   : '.rev-gen-preview-main-currency-modal',
 				currencyRadio     : '.rev-gen-preview-main-currency-modal-inputs-currency',
 				currencyButton    : '.rev-gen-preview-main-currency-modal-button',
 				currencyModalClose: '.rev-gen-preview-main-currency-modal-cross',
+
+				// Purchase options warning modal.
+				purchaseOptionWarningWrapper: '.rev-gen-preview-main-option-update',
+				purchaseOperationContinue   : '#rg_js_continueOperation',
+				purchaseOperationCancel     : '#rg_js_cancelOperation',
+
+				// Purchase options info modal.
+				purchaseOptionInfo: '.rg-purchase-overlay-option-info',
 
 				snackBar: $('#rg_js_SnackBar'),
 			};
@@ -146,13 +155,23 @@ import '../utils';
 				 * Handle purchase option edit operations.
 				 */
 				$o.body.on('click', $o.editOption, function () {
-
 					const optionItem = $(this).parents('.rg-purchase-overlay-purchase-options-item');
 					let actionManager = optionItem.find('.rg-purchase-overlay-option-manager');
 
+					// Get all purchase options.
+					const allPurchaseOptions = $($o.purchaseOptionItems);
+					let doesIndividualOptionExist = false;
+
+					// Check if an individual option exist.
+					allPurchaseOptions.children($o.purchaseOptionItem).each(function () {
+						if ('individual' === $(this).attr('data-purchase-type')) {
+							doesIndividualOptionExist = true;
+						}
+					});
+
 					if (!actionManager.length) {
 
-						const entityType = optionItem.data('purchase-type');
+						const entityType = optionItem.attr('data-purchase-type');
 
 						// Send the data to our new template function, get the HTML markup back.
 						const data = {
@@ -168,6 +187,7 @@ import '../utils';
 						optionItem.prepend(actionMarkup);
 
 						actionManager = optionItem.find('.rg-purchase-overlay-option-manager');
+						const pricingManager = actionManager.find('.rg-purchase-overlay-option-manager-entity');
 
 						// Duration selection.
 						const periodSelection = actionManager.find($o.durationWrapper);
@@ -178,9 +198,14 @@ import '../utils';
 							dynamicPricing.hide();
 
 							// show period selection if not individual.
-							periodSelection.find($o.periodSelection).val(optionItem.data('expiry-duration'));
-							periodSelection.find($o.periodCountSelection).val(optionItem.data('expiry-period'));
+							periodSelection.find($o.periodSelection).val(optionItem.attr('data-expiry-duration'));
+							periodSelection.find($o.periodCountSelection).val(optionItem.attr('data-expiry-period'));
 							periodSelection.show();
+
+							if (doesIndividualOptionExist) {
+								const individualOption = pricingManager.find('option').filter('[value=individual]');
+								individualOption.attr('disabled', true);
+							}
 						} else {
 							periodSelection.hide();
 						}
@@ -191,7 +216,7 @@ import '../utils';
 						} else {
 							// Set revenue model for selected option.
 							const priceItem = optionItem.find($o.purchaseOptionItemPrice);
-							const revenueModel = priceItem.data('pay-model');
+							const revenueModel = priceItem.attr('data-pay-model');
 							if ('ppu' === revenueModel) {
 								revenueWrapper.find($o.purchaseRevenueSelection).prop('checked', true);
 							} else {
@@ -201,6 +226,11 @@ import '../utils';
 						}
 
 					} else {
+						if (doesIndividualOptionExist) {
+							const pricingManager = actionManager.find('.rg-purchase-overlay-option-manager-entity');
+							const individualOption = pricingManager.find('option').filter('[value=individual]');
+							individualOption.attr('disabled', true);
+						}
 						actionManager.show();
 					}
 				});
@@ -210,16 +240,30 @@ import '../utils';
 				 */
 				$o.body.on('click', $o.optionRemove, function () {
 					const purchaseItem = $(this).parents('.rg-purchase-overlay-purchase-options-item');
-					const type = purchaseItem.data('purchase-type');
-					if ( 'individual' === type ) {
-						const paywallId = $($o.purchaseOverlay).data('paywall-id');
-					} else if ( 'timepass' === type ) {
-						const timePassId = $($o.purchaseOverlay).data('tlp-id');
-					} else if ( 'subscription' === type ) {
-						const subscriptionId = $($o.purchaseOverlay).data('sub-id');
+					const type = purchaseItem.attr('data-purchase-type');
+					let entityId;
+					if ('individual' === type) {
+						entityId = purchaseItem.attr('data-paywall-id');
+					} else if ('timepass' === type) {
+						entityId = purchaseItem.attr('data-tlp-id');
+					} else if ('subscription' === type) {
+						entityId = purchaseItem.attr('data-sub-id');
 					}
-					purchaseItem.remove();
-					reorderPurchaseItems();
+
+					// if id exists remove item from DB after confirmation.
+					if (entityId) {
+						showPurchaseOptionUpdateWarning().then((confirmation) => {
+							if (true === confirmation) {
+								purchaseItem.remove();
+								reorderPurchaseItems();
+								removePurchaseOption(type, entityId);
+								$o.savePaywall.trigger('click')
+							}
+						});
+					} else {
+						purchaseItem.remove();
+						reorderPurchaseItems();
+					}
 				});
 
 				/**
@@ -275,10 +319,10 @@ import '../utils';
 					const purchaseManager = $(this).parents('.rg-purchase-overlay-option-manager');
 					const pricingSelection = purchaseManager.find($o.individualPricingSelection);
 					if (pricingSelection.prop('checked')) {
-						optionItem.data('pricing-type', 'dynamic');
+						optionItem.attr('data-pricing-type', 'dynamic');
 						pricingSelection.val(1);
 					} else {
-						optionItem.data('pricing-type', 'static');
+						optionItem.attr('data-pricing-type', 'static');
 						pricingSelection.val(0);
 					}
 				});
@@ -292,10 +336,10 @@ import '../utils';
 					const revenueSelection = purchaseManager.find($o.purchaseRevenueSelection);
 					const priceItem = optionItem.find($o.purchaseOptionItemPrice);
 					if (revenueSelection.prop('checked')) {
-						priceItem.data('pay-model', 'ppu');
+						priceItem.attr('data-pay-model', 'ppu');
 						revenueSelection.val(1);
 					} else {
-						priceItem.data('pay-model', 'sis');
+						priceItem.attr('data-pay-model', 'sis');
 						revenueSelection.val(0);
 					}
 				});
@@ -309,7 +353,7 @@ import '../utils';
 					const periodCountSelection = purchaseManager.find($o.periodCountSelection);
 					changeDurationOptions(periodSelection.val(), periodCountSelection);
 					const optionItem = $(this).parents($o.purchaseOptionItem);
-					optionItem.data('expiry-duration', periodSelection.val());
+					optionItem.attr('data-expiry-duration', periodSelection.val());
 				});
 
 				/**
@@ -319,7 +363,7 @@ import '../utils';
 					const purchaseManager = $(this).parents('.rg-purchase-overlay-option-manager');
 					const periodCountSelection = purchaseManager.find($o.periodCountSelection);
 					const optionItem = $(this).parents($o.purchaseOptionItem);
-					optionItem.data('expiry-period', periodCountSelection.val());
+					optionItem.attr('data-expiry-period', periodCountSelection.val());
 				});
 
 				/**
@@ -335,7 +379,7 @@ import '../utils';
 						showCurrencySelectionModal();
 					}
 
-					const validatedPrice = validatePrice(priceItem.text().trim(), 'subscription' === optionItem.data('purchase-type'));
+					const validatedPrice = validatePrice(priceItem.text().trim(), 'subscription' === optionItem.attr('data-purchase-type'));
 					priceItem.empty().text(validatedPrice);
 					validateRevenue(validatedPrice, optionItem);
 				}, 1500));
@@ -398,7 +442,8 @@ import '../utils';
 					$o.previewWrapper.find($o.currencyOverlay).remove();
 					$o.body.removeClass('modal-blur');
 					$o.purchaseOverlay.css({
-						filter: 'unset',
+						filter          : 'unset',
+						'pointer-events': 'unset',
 					});
 				});
 
@@ -434,10 +479,114 @@ import '../utils';
 					reorderPurchaseItems();
 				});
 
+				$o.body.on('click', $o.purchaseOptionInfo, function () {
+					const infoButton = $(this);
+					const type = infoButton.attr('data-info-for');
+				});
+
+				/**
+				 * Handle the change of entity type.
+				 */
+				$o.body.on('change', $o.entitySelection, function (e) {
+					const optionItem = $(this).parents($o.purchaseOptionItem);
+					const currentType = optionItem.attr('data-purchase-type');
+					const selectedEntityType = $(this).val();
+					let entityId;
+
+					if (currentType !== selectedEntityType) {
+
+						// Set the id based on current type.
+						if ('subscription' === currentType) {
+							entityId = optionItem.attr('data-sub-id');
+						} else if ('timepass' === currentType) {
+							entityId = optionItem.attr('data-tlp-id');
+						} else if ('individual' === currentType) {
+							entityId = optionItem.attr('data-paywall-id-id');
+						}
+
+						if (entityId.length) {
+							showPurchaseOptionUpdateWarning().then((confirmation) => {
+								// If merchant selects to continue, remove current option from DB.
+								if (true === confirmation) {
+									// Remove the data from DB.
+									removePurchaseOption(currentType, entityId, false);
+									$o.savePaywall.trigger('click');
+
+									// Remove all current attributes.
+									optionItem.removeAttr('data-purchase-type');
+									optionItem.removeAttr('data-expiry-duration');
+									optionItem.removeAttr('data-expiry-period');
+									optionItem.removeAttr('data-pricing-type');
+									optionItem.removeAttr('data-paywall-id');
+									optionItem.removeAttr('data-tlp-id');
+									optionItem.removeAttr('data-sub-id');
+									optionItem.removeAttr('data-uid');
+									optionItem.removeAttr('data-order');
+
+									// Add empty options for a fresh option.
+									optionItem.attr('data-order', '');
+									optionItem.attr('data-uid', '');
+									optionItem.attr('data-purchase-type', selectedEntityType);
+
+									// Add type specific options.
+									if ('individual' !== selectedEntityType) {
+										// Set default 1 Month period for changed option.
+
+										const optionPrice = optionItem.find($o.purchaseOptionItemPrice);
+										optionPrice.removeAttr('data-pay-model');
+
+										if ('timepass' === selectedEntityType) {
+											const timePassDefaultValues = revenueGeneratorGlobalOptions.defaultConfig.timepass;
+
+											// Default value for new time pass.
+											optionItem.attr('data-tlp-id', '');
+											optionItem.attr('data-expiry-duration', timePassDefaultValues.duration);
+											optionItem.attr('data-expiry-period', timePassDefaultValues.period);
+											optionPrice.attr('data-pay-model', timePassDefaultValues.revenue);
+											optionPrice.text(timePassDefaultValues.price);
+
+											// Set option item info.
+											optionItem.find($o.purchaseOptionItemTitle).text(timePassDefaultValues.title);
+											optionItem.find($o.purchaseOptionItemDesc).text(timePassDefaultValues.description);
+										} else if ('subscription' === selectedEntityType) {
+											const subscriptionDefaultValues = revenueGeneratorGlobalOptions.defaultConfig.subscription;
+
+											// Default value for new subscription.
+											optionItem.attr('data-sub-id', '');
+											optionItem.attr('data-expiry-duration', subscriptionDefaultValues.duration);
+											optionItem.attr('data-expiry-period', subscriptionDefaultValues.period);
+											optionPrice.attr('data-pay-model', subscriptionDefaultValues.revenue);
+											optionPrice.text(subscriptionDefaultValues.price);
+
+											// Set option item info.
+											optionItem.find($o.purchaseOptionItemTitle).text(subscriptionDefaultValues.title);
+											optionItem.find($o.purchaseOptionItemDesc).text(subscriptionDefaultValues.description);
+										}
+									} else {
+										// Set static pricing by default if individual.
+										optionItem.attr('data-pricing-type', 'static');
+										optionItem.attr('data-paywall-id', '');
+									}
+								} else {
+									optionItem.attr('data-purchase-type', currentType);
+									$(this).val(currentType);
+									return false;
+								}
+							});
+						} else {
+							optionItem.attr('data-purchase-type', selectedEntityType);
+							$(this).val(selectedEntityType);
+							return false;
+						}
+					}
+				});
+
 				/**
 				 * Save Paywall and its purchase options.
 				 */
 				$o.savePaywall.on('click', function () {
+
+					reorderPurchaseItems();
 
 					// Get all purchase options.
 					const purchaseOptions = $($o.purchaseOptionItems);
@@ -447,8 +596,11 @@ import '../utils';
 					 * so that created id can be added accordingly.
 					 */
 					purchaseOptions.children($o.purchaseOptionItem).each(function () {
-						// To add appropriate ids after saving.
-						$(this).data('uid', createUniqueID());
+						const uid = $(this).attr('data-uid');
+						if (!uid) {
+							// To add appropriate ids after saving.
+							$(this).attr('data-uid', createUniqueID());
+						}
 					});
 
 					// Store individual pricing.
@@ -463,9 +615,9 @@ import '../utils';
 							title  : individualOption.find($o.purchaseOptionItemTitle).text().trim(),
 							desc   : individualOption.find($o.purchaseOptionItemDesc).text().trim(),
 							price  : individualOption.find($o.purchaseOptionItemPrice).text().trim(),
-							revenue: individualOption.find($o.purchaseOptionItemPrice).data('pay-model'),
-							type   : individualOption.data('pricing-type'),
-							order  : individualOption.data('order')
+							revenue: individualOption.find($o.purchaseOptionItemPrice).attr('data-pay-model'),
+							type   : individualOption.attr('data-pricing-type'),
+							order  : individualOption.attr('data-order')
 						};
 					}
 
@@ -482,12 +634,12 @@ import '../utils';
 							title   : timePass.find($o.purchaseOptionItemTitle).text().trim(),
 							desc    : timePass.find($o.purchaseOptionItemDesc).text().trim(),
 							price   : timePass.find($o.purchaseOptionItemPrice).text().trim(),
-							revenue : $(timePass.find($o.purchaseOptionItemPrice)).data('pay-model'),
-							duration: $(timePass).data('expiry-duration'),
-							period  : $(timePass).data('expiry-period'),
-							tlp_id  : $(timePass).data('tlp-id'),
-							uid     : $(timePass).data('uid'),
-							order   : $(timePass).data('order')
+							revenue : $(timePass.find($o.purchaseOptionItemPrice)).attr('data-pay-model'),
+							duration: $(timePass).attr('data-expiry-duration'),
+							period  : $(timePass).attr('data-expiry-period'),
+							tlp_id  : $(timePass).attr('data-tlp-id'),
+							uid     : $(timePass).attr('data-uid'),
+							order   : $(timePass).attr('data-order')
 						};
 						timePasses.push(timePassObj)
 					});
@@ -505,12 +657,12 @@ import '../utils';
 							title   : subscription.find($o.purchaseOptionItemTitle).text().trim(),
 							desc    : subscription.find($o.purchaseOptionItemDesc).text().trim(),
 							price   : subscription.find($o.purchaseOptionItemPrice).text().trim(),
-							revenue : $(subscription.find($o.purchaseOptionItemPrice)).data('pay-model'),
-							duration: $(subscription).data('expiry-duration'),
-							period  : $(subscription).data('expiry-period'),
-							sub_id  : $(subscription).data('sub-id'),
-							uid     : $(subscription).data('uid'),
-							order   : $(subscription).data('order')
+							revenue : $(subscription.find($o.purchaseOptionItemPrice)).attr('data-pay-model'),
+							duration: $(subscription).attr('data-expiry-duration'),
+							period  : $(subscription).attr('data-expiry-period'),
+							sub_id  : $(subscription).attr('data-sub-id'),
+							uid     : $(subscription).attr('data-uid'),
+							order   : $(subscription).attr('data-order')
 						};
 						subscriptions.push(subscriptionObj)
 					});
@@ -519,7 +671,7 @@ import '../utils';
 					 * Paywall data.
 					 */
 					const paywall = {
-						id     : purchaseOptions.data('paywall-id'),
+						id     : purchaseOptions.attr('data-paywall-id'),
 						title  : $o.purchaseOverlay.find($o.paywallTitle).text().trim(),
 						desc   : $o.purchaseOverlay.find($o.paywallDesc).text().trim(),
 						name   : $o.paywallName.text().trim(),
@@ -530,38 +682,89 @@ import '../utils';
 					 * Final data of paywall.
 					 */
 					const data = {
-						action     : 'rg_update_paywall',
-						post_id    : $o.postPreviewWrapper.data('post-id'),
-						paywall,
-						individual : individualObj,
-						time_passes: timePasses,
-						subscriptions,
-						security   : revenueGeneratorGlobalOptions.rg_paywall_nonce,
+						action       : 'rg_update_paywall',
+						post_id      : $o.postPreviewWrapper.attr('data-post-id'),
+						paywall      : paywall,
+						individual   : individualObj,
+						time_passes  : timePasses,
+						subscriptions: subscriptions,
+						security     : revenueGeneratorGlobalOptions.rg_paywall_nonce,
 					};
 
 					// Update paywall data.
 					updatePaywall(revenueGeneratorGlobalOptions.ajaxUrl, data);
-
 				});
 			};
 
-			const removePurchaseOption = function( type, id ) {
+			const showPurchaseOptionUpdateWarning = async function () {
+				const confirm = await createConfirmation();
+				$o.previewWrapper.find($o.purchaseOptionWarningWrapper).remove();
+				$o.body.removeClass('modal-blur');
+				$o.purchaseOverlay.css({
+					filter          : 'unset',
+					'pointer-events': 'unset',
+				});
+				return confirm;
+			};
+
+			const createConfirmation = function () {
+				return new Promise((complete, failed) => {
+					$o.previewWrapper.find($o.purchaseOptionWarningWrapper).remove();
+
+					// Get the template for confirmation popup and add it.
+					const template = wp.template('revgen-purchase-option-update');
+					$o.previewWrapper.append(template);
+
+					$o.body.addClass('modal-blur');
+					$o.purchaseOverlay.css({
+						filter          : 'blur(5px)',
+						'pointer-events': 'none',
+					});
+
+					$($o.purchaseOperationContinue).off('click');
+					$($o.purchaseOperationCancel).off('click');
+
+					$($o.purchaseOperationContinue).on('click', () => {
+						$($o.purchaseOptionWarningWrapper).hide();
+						complete(true);
+					});
+					$($o.purchaseOperationCancel).on('click', () => {
+						$($o.purchaseOptionWarningWrapper).hide();
+						complete(false);
+					});
+				});
+			};
+
+			/**
+			 * Remove purchase option from DB.
+			 *
+			 * @param {string}  type        Type of purchase option being removed.
+			 * @param {number}  id          Id of the purchase option.
+			 * @param {boolean} showMessage Should the message be shown for removal..
+			 */
+			const removePurchaseOption = function (type, id, showMessage = true) {
+
+				const paywall = $($o.purchaseOptionItems);
+				const paywallId = paywall.attr('data-paywall-id');
+
+				// Create form data.
 				const formData = {
-					action: 'rg_remove_purchase_option',
-					type: type,
-					id: id,
-					security    : revenueGeneratorGlobalOptions.rg_paywall_nonce,
+					action    : 'rg_remove_purchase_option',
+					type      : type,
+					id        : id,
+					paywall_id: paywallId,
+					security  : revenueGeneratorGlobalOptions.rg_paywall_nonce,
 				};
 
+				// Delete the option.
 				$.ajax({
 					url     : revenueGeneratorGlobalOptions.ajaxUrl,
 					method  : 'POST',
 					data    : formData,
 					dataType: 'json',
 				}).done(function (r) {
-					$o.snackBar.showSnackbar(r.msg, 1500);
-					if ( r.success ) {
-						return true;
+					if (true === showMessage) {
+						$o.snackBar.showSnackbar(r.msg, 1500);
 					}
 				});
 			};
@@ -578,7 +781,7 @@ import '../utils';
 				 */
 				purchaseOptions.children($o.purchaseOptionItem).each(function (i) {
 					const order = i + 1;
-					$(this).data('order', order);
+					$(this).attr('data-order', order);
 				});
 			};
 
@@ -592,10 +795,10 @@ import '../utils';
 				const purchaseManager = $(purchaseItem).find('.rg-purchase-overlay-option-manager');
 				const revenueWrapper = purchaseManager.find($o.purchaseRevenueWrapper);
 				if (price > revenueGeneratorGlobalOptions.currency.sis_only_limit) {
-					$(purchaseItem).find($o.purchaseOptionItemPrice).data('pay-model', 'sis');
+					$(purchaseItem).find($o.purchaseOptionItemPrice).attr('data-pay-model', 'sis');
 					revenueWrapper.find($o.purchaseRevenueSelection).prop('checked', false);
 				} else if (price > revenueGeneratorGlobalOptions.currency.ppu_min && price < revenueGeneratorGlobalOptions.currency.sis_min) {
-					$(purchaseItem).find($o.purchaseOptionItemPrice).data('pay-model', 'ppu');
+					$(purchaseItem).find($o.purchaseOptionItemPrice).attr('data-pay-model', 'ppu');
 					revenueWrapper.find($o.purchaseRevenueSelection).prop('checked', true);
 				}
 			};
@@ -658,7 +861,8 @@ import '../utils';
 				$o.previewWrapper.append(template);
 				$o.body.addClass('modal-blur');
 				$o.purchaseOverlay.css({
-					filter: 'blur(5px)',
+					filter          : 'blur(5px)',
+					'pointer-events': 'none',
 				});
 			};
 
@@ -678,23 +882,31 @@ import '../utils';
 
 					const purchaseOptions = $($o.purchaseOptionItems);
 
-					purchaseOptions.data('paywall-id', r.paywall_id);
+					// Set main paywall id.
+					purchaseOptions.attr('data-paywall-id', r.paywall_id);
+
+					const individualOption = purchaseOptions.find("[data-purchase-type='individual']");
+					if (individualOption.length) {
+						individualOption.attr('data-paywall-id', r.paywall_id);
+					}
 
 					const timePassOptions = purchaseOptions.find("[data-purchase-type='timepass']");
-
-					// Add returned ids to appropriate purchase option.
-					timePassOptions.each(function () {
-						const timePassUID = $(this).data('uid');
-						$(this).data('tlp-id', r.time_passes[timePassUID]);
-					});
+					if (timePassOptions.length) {
+						// Add returned ids to appropriate purchase option.
+						timePassOptions.each(function () {
+							const timePassUID = $(this).attr('data-uid');
+							$(this).attr('data-tlp-id', r.time_passes[timePassUID]);
+						});
+					}
 
 					const subscriptionOptions = purchaseOptions.find("[data-purchase-type='subscription']");
-
-					// Add returned ids to appropriate purchase option.
-					subscriptionOptions.each(function () {
-						const subscriptionUID = $(this).data('uid');
-						$(this).data('sub-id', r.subscriptions[subscriptionUID]);
-					});
+					if (subscriptionOptions.length) {
+						// Add returned ids to appropriate purchase option.
+						subscriptionOptions.each(function () {
+							const subscriptionUID = $(this).attr('data-uid');
+							$(this).attr('data-sub-id', r.subscriptions[subscriptionUID]);
+						});
+					}
 				});
 			};
 

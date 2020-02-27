@@ -192,6 +192,11 @@ class Config {
 		];
 	}
 
+	/**
+	 * Default option data when new option is added.
+	 *
+	 * @return array
+	 */
 	public static function default_purchase_option() {
 		return [
 			'title'       => esc_html__( '1 Month Subscription', 'revenue-generator' ),

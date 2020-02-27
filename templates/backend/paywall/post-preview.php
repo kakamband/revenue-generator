@@ -18,7 +18,7 @@ $rg_teaser = empty( $rg_preview_post['excerpt'] ) ? $rg_preview_post['teaser'] :
 
 $paywall_data          = isset( $purchase_options_data['paywall'] ) ? $purchase_options_data['paywall'] : [];
 $paywall_id            = empty( $paywall_data['id'] ) ? '' : $paywall_data['id'];
-$paywall_access_to     = $paywall_data['access_to'];
+$paywall_access_to     = isset( $paywall_data['access_to'] ) ? $paywall_data['access_to'] : 'all';
 $purchase_option_items = $purchase_options_data['options'];
 ?>
 
@@ -121,7 +121,7 @@ $purchase_option_items = $purchase_options_data['options'];
 				<span class="slider round"></span>
 			</label>
 			<span><?php esc_html_e( 'Pay Later', 'revenue-generator' ); ?></span>
-			<button class="rg-purchase-overlay-option-info">
+			<button data-info-for="revenue" class="rg-purchase-overlay-option-info">
 				<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
 			</button>
 		</div>
@@ -132,7 +132,7 @@ $purchase_option_items = $purchase_options_data['options'];
 				<span class="slider round"></span>
 			</label>
 			<span><?php esc_html_e( 'Dynamic Pricing', 'revenue-generator' ); ?></span>
-			<button class="rg-purchase-overlay-option-info">
+			<button data-info-for="pricing" class="rg-purchase-overlay-option-info">
 				<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>"></button>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-duration">
@@ -192,6 +192,7 @@ $purchase_option_items = $purchase_options_data['options'];
 						data-expiry-period="<?php echo esc_attr( $purchase_option_period ); ?>"
 					<?php else: ?>
 						data-pricing-type="<?php echo esc_attr( $individual_type ); ?>"
+						data-paywall-id="<?php echo esc_attr( $paywall_id ); ?>"
 					<?php endif; ?>
 					<?php if ( 'timepass' === $purchase_option_type ): ?>
 						data-tlp-id="<?php echo esc_attr( $purchase_option_id ); ?>"
@@ -297,6 +298,26 @@ $purchase_option_items = $purchase_options_data['options'];
 			<span class="rg-purchase-overlay-purchase-options-item-price-span" data-pay-model="<?php echo esc_attr( $default_option_data['revenue'] ); ?>" contenteditable="true">
 				<?php echo esc_html( $default_option_data['price'] ); ?>
 			</span>
+		</div>
+	</div>
+</script>
+
+<script type="text/template" id="tmpl-revgen-purchase-option-update">
+	<div class="rev-gen-preview-main-option-update">
+		<h4 class="rev-gen-preview-main-option-update-title"><?php esc_html_e( 'This will affect all your paywalls.', 'revenue-generator' ); ?></h4>
+		<span class="rev-gen-preview-main-option-update-warning">!</span>
+		<p class="rev-gen-preview-main-option-update-message">
+			<?php
+			esc_html_e( 'The changes you have made will impact all the paywalls across your entire site.', 'revenue-generator' );
+			?>
+		</p>
+		<div class="rev-gen-preview-main-option-update-buttons">
+			<button id="rg_js_continueOperation" data-action="continue" class="rev-gen-preview-main-option-update-buttons-dark">
+				<?php esc_html_e( 'Continue', 'revenue-generator' ); ?>
+			</button>
+			<button id="rg_js_cancelOperation" data-action="cancel" class="rev-gen-preview-main-option-update-buttons-light">
+				<?php esc_html_e( 'Cancel', 'revenue-generator' ); ?>
+			</button>
 		</div>
 	</div>
 </script>
