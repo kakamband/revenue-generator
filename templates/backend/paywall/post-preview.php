@@ -321,3 +321,83 @@ $purchase_option_items = $purchase_options_data['options'];
 		</div>
 	</div>
 </script>
+
+<script type="text/template" id="tmpl-revgen-info-revenue">
+	<div class="rev-gen-preview-main-info-modal">
+		<span class="rev-gen-preview-main-info-modal-cross">X</span>
+		<h4 class="rev-gen-preview-main-info-modal-title"><?php esc_html_e( 'Pay Now v Pay Later?', 'revenue-generator' ); ?></h4>
+		<p class="rev-gen-preview-main-info-modal-message">
+			<?php
+			esc_html_e( 'Choose the pricing model that best suits your needs!', 'revenue-generator' );
+			?>
+		</p>
+		<p class="rev-gen-preview-main-info-modal-message">
+			<?php
+			printf(
+				wp_kses(
+				/* translators: 1: Link to WP admin new post page. */
+					__(
+						"<b>Pay Later</b> means users agree to pay for content or timed access later - once their tab reaches $5 or 5€. Think of it as ‘the internet’s running tab.’", 'revenue-generator' ),
+					array(
+						'b' => array(),
+					)
+				)
+			);
+			?>
+		</p>
+		<p class="rev-gen-preview-main-info-modal-message">
+			<?php
+			printf(
+				wp_kses(
+				/* translators: 1: Link to WP admin new post page. */
+					__(
+						'<b>Pay Now</b> is the traditional upfront payment method that everyone is familiar with. Recurring subscriptions automatically work on a pay now basis.', 'revenue-generator' ),
+					array(
+						'b' => array(),
+					)
+				)
+			);
+			?>
+		</p>
+	</div>
+</script>
+
+<script type="text/template" id="tmpl-revgen-info-pricing">
+	<div class="rev-gen-preview-main-info-modal">
+		<span class="rev-gen-preview-main-info-modal-cross">X</span>
+		<h4 class="rev-gen-preview-main-info-modal-title"><?php esc_html_e( 'Static Pricing and Dynamic Pricing', 'revenue-generator' ); ?></h4>
+		<p class="rev-gen-preview-main-info-modal-message">
+			<?php
+			esc_html_e( 'Revenue Generator allows you two ways to go about pricing content.', 'revenue-generator' );
+			?>
+		</p>
+		<p class="rev-gen-preview-main-info-modal-message">
+			<?php
+			printf(
+				wp_kses(
+				/* translators: 1: Link to WP admin new post page. */
+					__(
+						'Select <b>Static Pricing</b> to manually set the prices of individual articles based on your own pricing strategy. Charge as little - or as much - as you want.', 'revenue-generator' ),
+					array(
+						'b' => array(),
+					)
+				)
+			);
+			?>
+		</p>
+		<p class="rev-gen-preview-main-info-modal-message">
+			<?php
+			printf(
+				wp_kses(
+				/* translators: 1: Link to WP admin new post page. */
+					__(
+						'If you select <b>Dynamic Pricing</b>, LaterPay’s AI will “dynamically” adjust the price based on our own data, analytics and algorithms based on the length of each article.', 'revenue-generator' ),
+					array(
+						'b' => array(),
+					)
+				)
+			);
+			?>
+		</p>
+	</div>
+</script>

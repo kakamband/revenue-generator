@@ -297,6 +297,16 @@ body {
     width: 300px;
     background: #fff;
     font-weight: bold; }
+    .rg-purchase-overlay-option-manager:after {
+      content: '';
+      position: absolute;
+      right: -10px;
+      top: 40px;
+      width: 0;
+      height: 0;
+      border: 10px solid transparent;
+      border-left-color: #000000;
+      border-right: 0; }
     .rg-purchase-overlay-option-manager div {
       border: 0;
       border-color: #e3e4e6;
@@ -657,6 +667,38 @@ body {
     .rev-gen-preview-main-option-update-buttons-light {
       background-color: #fff;
       color: #000; }
+  .rev-gen-preview-main-info-modal {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    position: fixed;
+    left: 58%;
+    top: 20%;
+    overflow: hidden;
+    bottom: 20px;
+    height: 350px;
+    width: 300px;
+    margin: 0 0 0 -190px;
+    padding: 30px;
+    background-color: #fff;
+    color: #1e1e1e;
+    z-index: 999;
+    border-radius: 5px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    text-align: center; }
+    .rev-gen-preview-main-info-modal-title {
+      font-size: 14px; }
+    .rev-gen-preview-main-info-modal-message {
+      font-size: 14px;
+      font-weight: 500;
+      margin: 10px 0; }
+    .rev-gen-preview-main-info-modal-cross {
+      position: absolute;
+      right: 20px;
+      top: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer; }
 
 .modal-blur {
   background-color: darkgrey;

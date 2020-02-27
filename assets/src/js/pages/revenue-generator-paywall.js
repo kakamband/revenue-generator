@@ -79,7 +79,9 @@ import '../utils';
 				purchaseOperationCancel     : '#rg_js_cancelOperation',
 
 				// Purchase options info modal.
-				purchaseOptionInfo: '.rg-purchase-overlay-option-info',
+				purchaseOptionInfoButton: '.rg-purchase-overlay-option-info',
+				purchaseOptionInfoModal : '.rev-gen-preview-main-info-modal',
+				purchaseOptionInfoClose : '.rev-gen-preview-main-info-modal-cross',
 
 				snackBar: $('#rg_js_SnackBar'),
 			};
@@ -479,13 +481,36 @@ import '../utils';
 					reorderPurchaseItems();
 				});
 
-				$o.body.on('click', $o.purchaseOptionInfo, function () {
+				/**
+				 * Handle tooltip button events for info modals.
+				 */
+				$o.body.on('click', $o.purchaseOptionInfoButton, function () {
 					const infoButton = $(this);
-					const type = infoButton.attr('data-info-for');
+					const modalType = infoButton.attr('data-info-for');
+					$o.previewWrapper.find($o.purchaseOptionInfoModal).remove();
+					const template = wp.template(`revgen-info-${modalType}`);
+					$o.previewWrapper.append(template);
+					$o.body.addClass('modal-blur');
+					$o.purchaseOverlay.css({
+						filter          : 'blur(5px)',
+						'pointer-events': 'none',
+					});
 				});
 
 				/**
-				 * Handle the change of entity type.
+				 * Close info modal.
+				 */
+				$o.body.on('click', $o.purchaseOptionInfoClose, function () {
+					$o.previewWrapper.find($o.purchaseOptionInfoModal).remove();
+					$o.body.removeClass('modal-blur');
+					$o.purchaseOverlay.css({
+						filter          : 'unset',
+						'pointer-events': 'unset',
+					});
+				});
+
+				/**
+				 * Handle the change of entity type i.e Individual, TimePass, Subscription.
 				 */
 				$o.body.on('change', $o.entitySelection, function (e) {
 					const optionItem = $(this).parents($o.purchaseOptionItem);

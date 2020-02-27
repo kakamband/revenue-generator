@@ -120,6 +120,18 @@
     background: #fff;
     font-weight: bold;
 
+    &:after {
+      content: '';
+      position: absolute;
+      right: -10px;
+      top: 40px;
+      width: 0;
+      height: 0;
+      border: 10px solid transparent;
+      border-left-color: #000000;
+      border-right: 0;
+    }
+
     div {
       border: 0;
       border-color: #e3e4e6;
