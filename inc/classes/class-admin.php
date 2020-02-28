@@ -42,6 +42,7 @@ class Admin {
 		add_action( 'wp_ajax_rg_update_paywall', [ $this, 'update_paywall' ] );
 		add_action( 'wp_ajax_rg_update_currency_selection', [ $this, 'update_currency_selection' ] );
 		add_action( 'wp_ajax_rg_remove_purchase_option', [ $this, 'remove_purchase_option' ] );
+		add_action( 'wp_ajax_rg_remove_paywall', [ $this, 'remove_paywall' ] );
 	}
 
 	/**
@@ -175,11 +176,11 @@ class Admin {
 	 * @param $current_screen
 	 */
 	public function redirect_merchant( $current_screen ) {
+		$current_global_options = Config::get_global_options();
+		$admin_menus            = self::get_admin_menus();
+
 		$dashboard_pages = [ 'toplevel_page_revenue-generator', 'revenue-generator_page_revenue-generator-dashboard' ];
 		if ( in_array( $current_screen->id, $dashboard_pages ) ) {
-			$current_global_options = Config::get_global_options();
-			$admin_menus            = self::get_admin_menus();
-
 			// Check if tutorial is completed, and load page accordingly.
 			$is_welcome_setup_done = empty( $current_global_options['average_post_publish_count'] ) ? false : true;
 			$is_tutorial_completed = (bool) $current_global_options['is_tutorial_completed'];
@@ -227,15 +228,35 @@ class Admin {
 
 		$post_types = Post_Types::get_instance();
 
-		// Get latest post info for preview.
-		$latest_post_id      = $post_types->get_latest_post_for_preview();
-		$formatted_post_data = $post_types->get_formatted_post_data( $latest_post_id );
+		$current_paywall = filter_input( INPUT_GET, 'current_paywall', FILTER_SANITIZE_NUMBER_INT );
 
-		// Get paywall options data.
-		$purchase_options_data = $post_types->get_post_purchase_options( $latest_post_id, $formatted_post_data );
+		// Load paywall related content if found else load requested content for new paywall.
+		if ( ! empty( $current_paywall ) ) {
+			// Get selected post info from paywall.
+			$formatted_post_data = $post_types->get_post_post_content_by_paywall_id( $current_paywall );
+
+			// Get paywall options data.
+			$purchase_options_data = $post_types->get_post_purchase_options_by_paywall_id( $current_paywall );
+			$purchase_options      = $post_types->convert_to_purchase_options( $purchase_options_data );
+		} else {
+
+			// Get latest post info for preview.
+			$target_post_id      = $post_types->get_latest_post_for_preview();
+			$post_preview_id = filter_input( INPUT_GET, 'preview_post_id', FILTER_SANITIZE_NUMBER_INT );
+
+			if ( empty( $post_preview_id ) ) {
+				$target_post_id = $post_preview_id;
+			}
+
+			$formatted_post_data = $post_types->get_formatted_post_data( $target_post_id );
+
+			// Get paywall options data.
+			$purchase_options_data = $post_types->get_post_purchase_options_by_post_id( $target_post_id, $formatted_post_data );
+			$purchase_options      = $post_types->convert_to_purchase_options( $purchase_options_data );
+		}
+
+		// Set currency symbol.
 		$default_option_data   = $post_types->get_default_purchase_option();
-		$purchase_options      = $post_types->convert_to_purchase_options( $purchase_options_data );
-
 		$symbol = '';
 		if ( ! empty( $config_data['merchant_currency'] ) ) {
 			$symbol = 'USD' === $config_data['merchant_currency'] ? '$' : '€';
@@ -417,9 +438,20 @@ class Admin {
 
 		$paywall_instance->update_paywall_option_order( $paywall_id, $order_items );
 
+		// Set redirect for saved paywall.
+		$admin_menus = self::get_admin_menus();
+		$new_paywall_page = add_query_arg(
+			[
+				'page' => $admin_menus['paywall']['url'],
+				'current_paywall' => $paywall_id
+			],
+			admin_url( 'admin.php' )
+		);
+
 		// Send success message.
 		wp_send_json( [
 			'success'       => true,
+			'redirect_to'   => $new_paywall_page,
 			'msg'           => empty( $paywall_data['id'] ) ? __( 'Paywall updated successfully!', 'revenue-generator' ) : __( 'Paywall saved successfully!', 'revenue-generator' ),
 			'paywall_id'    => $paywall_id,
 			'time_passes'   => $time_pass_response,
@@ -487,11 +519,17 @@ class Admin {
 			$paywall_instance->remove_individual_purchase_option( $purchase_option_id );
 			$msg = __( 'Purchase option removed!', 'revenue-generator' );
 		} elseif ( 'subscription' === $purchase_option_type ) {
-			$subscription_instance->remove_subscription_purchase_option( $purchase_option_id, $paywall_id );
-			$msg = __( 'Subscription removed!', 'revenue-generator' );
+			if ( $subscription_instance->remove_subscription_purchase_option( $purchase_option_id, $paywall_id ) ) {
+				$msg = __( 'Subscription removed!', 'revenue-generator' );
+			} else {
+				$msg = __( 'Unable to remove Subscription, something went wrong!', 'revenue-generator' );
+			}
 		} elseif ( 'timepass' === $purchase_option_type ) {
-			$time_pass_instance->remove_time_pass_purchase_option( $purchase_option_id, $paywall_id );
-			$msg = __( 'Time Pass removed!', 'revenue-generator' );
+			if ( $time_pass_instance->remove_time_pass_purchase_option( $purchase_option_id, $paywall_id ) ) {
+				$msg = __( 'Time Pass removed!', 'revenue-generator' );
+			} else {
+				$msg = __( 'Unable to remove Time Pass, something went wrong!', 'revenue-generator' );
+			}
 		}
 
 		// Send success message.
@@ -499,6 +537,34 @@ class Admin {
 			'success' => true,
 			'msg'     => $msg
 		] );
+
+	}
+
+	/**
+	 * Update the global currency config.
+	 */
+	public function remove_paywall() {
+
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Get all data and sanitize it.
+		$paywall_id = sanitize_text_field( filter_input( INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT ) );
+
+		$paywall_instance = Paywall::get_instance();
+		if ( $paywall_instance->remove_paywall( $paywall_id ) ) {
+			// Send success message.
+			wp_send_json( [
+				'success' => true,
+				'msg'     => __( 'Paywall removed!', 'revenue-generator' )
+			] );
+		} else {
+			// Send success message.
+			wp_send_json( [
+				'success' => false,
+				'msg'     => __( 'Unable to remove Paywall, something went wrong!', 'revenue-generator' )
+			] );
+		}
 
 	}
 }

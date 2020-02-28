@@ -244,7 +244,7 @@ class Subscription extends Base {
 	 */
 	public function get_applicable_subscriptions() {
 		$subscriptions     = [];
-		$all_subscriptions = $this->get_active_subscriptions();
+		$all_subscriptions = $this->get_subscriptions_by_criteria( true );
 		foreach ( $all_subscriptions as $subscription ) {
 			$subscriptions[] = $subscription;
 		}
@@ -277,6 +277,8 @@ class Subscription extends Base {
 	 *
 	 * @param int $subscription_id Subscription ID.
 	 * @param int $paywall_id      Paywall ID.
+	 *
+	 * @return boolean
 	 */
 	public function remove_subscription_purchase_option( $subscription_id, $paywall_id ) {
 		if ( $this->delete_subscription( $subscription_id ) ) {
@@ -288,6 +290,10 @@ class Subscription extends Base {
 					update_post_meta( $paywall_id, '_rg_options_order', $current_order );
 				}
 			}
+
+			return true;
+		} else {
+			return false;
 		}
 	}
 }

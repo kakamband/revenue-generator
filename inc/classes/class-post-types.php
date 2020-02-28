@@ -7,7 +7,7 @@
 
 namespace LaterPay\Revenue_Generator\Inc;
 
-use \LaterPay\Revenue_Generator\Inc\Traits\Singleton;
+use LaterPay\Revenue_Generator\Inc\Traits\Singleton;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Time_Pass;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Subscription;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Paywall;
@@ -165,9 +165,9 @@ class Post_Types {
 	 *
 	 * @return array
 	 */
-	public function get_post_purchase_options( $post_id, $post_data ) {
+	public function get_post_purchase_options_by_post_id( $post_id, $post_data ) {
 
-		$purchase_options = $this->get_current_post_purchase_options( $post_id );
+		$purchase_options = $this->get_current_post_purchase_options_by_post_id( $post_id );
 
 		if ( ! empty( $purchase_options ) ) {
 			return $purchase_options;
@@ -206,7 +206,7 @@ class Post_Types {
 				}
 			} elseif ( $current_purchase_options['time_pass'] > 0 && empty( $current_purchase_options['subscription'] ) ) {
 				$purchase_options['subscriptions'][] = $purchase_options_all['subscription'];
-				$purchase_options['time_passes']     = Time_Pass::get_instance()->get_time_passes_by_criteria();
+				$purchase_options['time_passes']     = Time_Pass::get_instance()->get_time_passes_by_criteria( true );
 			}
 
 			return $purchase_options;
@@ -220,7 +220,7 @@ class Post_Types {
 	 *
 	 * @return array
 	 */
-	public function get_current_post_purchase_options( $post_id ) {
+	public function get_current_post_purchase_options_by_post_id( $post_id ) {
 		$paywall_instance      = Paywall::get_instance();
 		$time_pass_instance    = Time_Pass::get_instance();
 		$subscription_instance = Subscription::get_instance();
@@ -228,7 +228,7 @@ class Post_Types {
 		// Get information on the post to create a pricing configuration.
 		$purchase_options = [];
 
-		$paywall_data = $paywall_instance->get_purchase_option_data( $post_id );
+		$paywall_data = $paywall_instance->get_purchase_option_data_by_post_id( $post_id );
 
 		// Get paywall data.
 		if ( ! empty( $paywall_data ) ) {
@@ -368,10 +368,22 @@ class Post_Types {
 		return $options_html;
 	}
 
+	/**
+	 * Get the default purchase option to be added for new options.
+	 *
+	 * @return array
+	 */
 	public function get_default_purchase_option() {
 		return Config::default_purchase_option();
 	}
 
+	/**
+	 * Convert recieved purchase options data into an ordered array for preview.
+	 *
+	 * @param array $purchase_options Raw un ordered options data.
+	 *
+	 * @return array
+	 */
 	public function convert_to_purchase_options( $purchase_options ) {
 		$final_purchase_options = [];
 		$options                = [];
@@ -451,6 +463,69 @@ class Post_Types {
 		$final_purchase_options['options'] = $options;
 
 		return $final_purchase_options;
+	}
+
+	/**
+	 * Get purchase options by Paywall ID.
+	 *
+	 * @param int $paywall_id Paywall ID.
+	 *
+	 * @return array
+	 */
+	public function get_post_purchase_options_by_paywall_id( $paywall_id ) {
+		$paywall_instance = Paywall::get_instance();
+		$time_pass_instance = Time_Pass::get_instance();
+		$subscription_instance = Subscription::get_instance();
+		$purchase_options = [];
+
+		$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
+
+		// Get paywall data.
+		if ( ! empty( $paywall_data ) ) {
+			$purchase_options['paywall'] = $paywall_data;
+
+			// Get individual purchase options data.
+			if ( ! empty( $purchase_options['paywall'] ) ) {
+				$purchase_options['individual'] = $paywall_instance->get_individual_purchase_option_data( $purchase_options['paywall']['id'] );
+			}
+
+			// @todo make the retrieval conditional to handle access based passes and subscription.
+			// Get time passes and subscriptions purchase options data.
+			$time_passes   = $time_pass_instance->get_applicable_time_passes();
+			$subscriptions = $subscription_instance->get_applicable_subscriptions();
+
+			if ( ! empty( $time_passes ) ) {
+				$purchase_options['time_passes'] = $time_passes;
+			}
+
+			if ( ! empty( $subscriptions ) ) {
+				$purchase_options['subscriptions'] = $subscriptions;
+			}
+		}
+
+		return $purchase_options;
+	}
+
+	/**
+	 * Get post content for preview associated in Paywall.
+	 *
+	 * @param int $paywall_id Paywall ID.
+	 *
+	 * @return array|string
+	 */
+	public function get_post_post_content_by_paywall_id( $paywall_id ) {
+		$paywall_instance = Paywall::get_instance();
+		$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
+
+		// Check paywall data.
+		if ( ! empty( $paywall_data ) ) {
+			$access_entity = $paywall_data['access_entity'];
+
+			if ( ! empty( $access_entity ) ) {
+				return $this->get_formatted_post_data( $access_entity );
+			}
+		}
+		return '';
 	}
 
 }

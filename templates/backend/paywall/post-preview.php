@@ -40,6 +40,9 @@ $purchase_option_items = $purchase_options_data['options'];
 				<?php echo wp_kses_post( $rg_preview_post['post_content'] ); ?>
 			</div>
 			<div class="rg-purchase-overlay" id="rg_js_purchaseOverlay">
+				<button class="rg-purchase-overlay-remove">
+					<img alt="<?php echo esc_attr( 'Paywall Remove', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['option_remove'] ); ?>" />
+				</button>
 			</div>
 		</div>
 		<div class="rev-gen-preview-main--paywall-actions">
@@ -75,7 +78,7 @@ $purchase_option_items = $purchase_options_data['options'];
 				<button id="rg_js_savePaywall" class="rev-gen-preview-main-paywall-actions-update-save">
 					<?php esc_html_e( 'Save', 'revenue-generator' ); ?>
 				</button>
-				<button id="rg_js_activatePaywall" class="rev-gen-preview-main--paywall-actions-update-publish">
+				<button id="rg_js_activatePaywall" disabled="disabled" class="rev-gen-preview-main--paywall-actions-update-publish">
 					<?php esc_html_e( 'Publish', 'revenue-generator' ); ?>
 				</button>
 			</div>
@@ -84,6 +87,7 @@ $purchase_option_items = $purchase_options_data['options'];
 	<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
 </div>
 
+<!-- Template for purchase option manager actions -->
 <script type="text/template" id="tmpl-revgen-purchase-overlay-actions">
 	<div class="rg-purchase-overlay-purchase-options-item-actions">
 		<button class="rg-purchase-overlay-option-edit">
@@ -102,6 +106,7 @@ $purchase_option_items = $purchase_options_data['options'];
 	</div>
 </script>
 
+<!-- Template for purchase option manager -->
 <script type="text/template" id="tmpl-revgen-purchase-overlay-item-manager">
 	<div class="rg-purchase-overlay-option-manager">
 		<div class="rg-purchase-overlay-option-manager-entity-selection">
@@ -254,6 +259,7 @@ $purchase_option_items = $purchase_options_data['options'];
 	<?php View::render_footer_backend(); ?>
 </script>
 
+<!-- Template for currency confirmation modal -->
 <script type="text/template" id="tmpl-revgen-purchase-currency-overlay">
 	<div class="rev-gen-preview-main-currency-modal">
 		<span class="rev-gen-preview-main-currency-modal-cross">X</span>
@@ -275,6 +281,7 @@ $purchase_option_items = $purchase_options_data['options'];
 	</div>
 </script>
 
+<!-- Template for option item -->
 <script type="text/template" id="tmpl-revgen-default-purchase-option-item">
 	<div
 		class="rg-purchase-overlay-purchase-options-item"
@@ -302,6 +309,7 @@ $purchase_option_items = $purchase_options_data['options'];
 	</div>
 </script>
 
+<!-- Template for option update warning modal -->
 <script type="text/template" id="tmpl-revgen-purchase-option-update">
 	<div class="rev-gen-preview-main-option-update">
 		<h4 class="rev-gen-preview-main-option-update-title"><?php esc_html_e( 'This will affect all your paywalls.', 'revenue-generator' ); ?></h4>
@@ -312,16 +320,17 @@ $purchase_option_items = $purchase_options_data['options'];
 			?>
 		</p>
 		<div class="rev-gen-preview-main-option-update-buttons">
-			<button id="rg_js_continueOperation" data-action="continue" class="rev-gen-preview-main-option-update-buttons-dark">
+			<button id="rg_js_continueOperation" class="rev-gen-preview-main-option-update-buttons-dark">
 				<?php esc_html_e( 'Continue', 'revenue-generator' ); ?>
 			</button>
-			<button id="rg_js_cancelOperation" data-action="cancel" class="rev-gen-preview-main-option-update-buttons-light">
+			<button id="rg_js_cancelOperation" class="rev-gen-preview-main-option-update-buttons-light">
 				<?php esc_html_e( 'Cancel', 'revenue-generator' ); ?>
 			</button>
 		</div>
 	</div>
 </script>
 
+<!-- Template for revenue info modal -->
 <script type="text/template" id="tmpl-revgen-info-revenue">
 	<div class="rev-gen-preview-main-info-modal">
 		<span class="rev-gen-preview-main-info-modal-cross">X</span>
@@ -362,6 +371,7 @@ $purchase_option_items = $purchase_options_data['options'];
 	</div>
 </script>
 
+<!-- Template for pricing info modal -->
 <script type="text/template" id="tmpl-revgen-info-pricing">
 	<div class="rev-gen-preview-main-info-modal">
 		<span class="rev-gen-preview-main-info-modal-cross">X</span>
@@ -399,5 +409,25 @@ $purchase_option_items = $purchase_options_data['options'];
 			);
 			?>
 		</p>
+	</div>
+</script>
+
+<!-- Template for paywall removal confirmation -->
+<script type="text/template" id="tmpl-revgen-remove-paywall">
+	<div class="rev-gen-preview-main-remove-paywall">
+		<h4 class="rev-gen-preview-main-remove-paywall-title"><?php esc_html_e( 'Are you sure you want to remove the paywall.', 'revenue-generator' ); ?></h4>
+		<p class="rev-gen-preview-main-remove-paywall-message">
+			<?php
+			esc_html_e( 'This content will be visible to all users.', 'revenue-generator' );
+			?>
+		</p>
+		<div class="rev-gen-preview-main-remove-paywall-buttons">
+			<button id="rg_js_removePaywall" class="rev-gen-preview-main-remove-paywall-buttons-dark">
+				<?php esc_html_e( 'Yes, remove Paywall', 'revenue-generator' ); ?>
+			</button>
+			<button id="rg_js_cancelPaywallRemoval" class="rev-gen-preview-main-remove-paywall-buttons-light">
+				<?php esc_html_e( 'No, keep Paywall', 'revenue-generator' ); ?>
+			</button>
+		</div>
 	</div>
 </script>

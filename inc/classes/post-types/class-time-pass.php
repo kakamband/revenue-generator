@@ -167,7 +167,7 @@ class Time_Pass extends Base {
 		];
 
 		$meta_query = array(
-			'relation' => 'OR',
+			'relation' => 'AND',
 			array(
 				'key'     => '_rg_access_to',
 				'value'   => 'all',
@@ -243,7 +243,7 @@ class Time_Pass extends Base {
 	 */
 	public function get_applicable_time_passes() {
 		$timepasses  = [];
-		$time_passes = $this->get_active_time_passes();
+		$time_passes = $this->get_time_passes_by_criteria( true );
 		foreach ( $time_passes as $time_pass ) {
 			$timepasses[] = $time_pass;
 		}
@@ -276,6 +276,8 @@ class Time_Pass extends Base {
 	 *
 	 * @param int $time_pass_id Time Pass ID.
 	 * @param int $paywall_id   Paywall ID.
+	 *
+	 * @return boolean
 	 */
 	public function remove_time_pass_purchase_option( $time_pass_id, $paywall_id ) {
 		if ( $this->delete_time_pass( $time_pass_id ) ) {
@@ -287,6 +289,10 @@ class Time_Pass extends Base {
 					update_post_meta( $paywall_id, '_rg_options_order', $current_order );
 				}
 			}
+
+			return true;
+		} else {
+			return false;
 		}
 	}
 

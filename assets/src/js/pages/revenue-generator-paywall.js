@@ -30,6 +30,7 @@ import '../utils';
 
 				// Overlay elements.
 				purchaseOverlay          : $('#rg_js_purchaseOverlay'),
+				purchaseOverlayRemove    : '.rg-purchase-overlay-remove',
 				purchaseOptionItems      : '.rg-purchase-overlay-purchase-options',
 				purchaseOptionItem       : '.rg-purchase-overlay-purchase-options-item',
 				purchaseOptionItemInfo   : '.rg-purchase-overlay-purchase-options-item-info',
@@ -83,6 +84,11 @@ import '../utils';
 				purchaseOptionInfoModal : '.rev-gen-preview-main-info-modal',
 				purchaseOptionInfoClose : '.rev-gen-preview-main-info-modal-cross',
 
+				// Paywall remove warning modal.
+				paywallRemovalModal: '.rev-gen-preview-main-remove-paywall',
+				paywallRemove   : '#rg_js_removePaywall',
+				paywallCancelRemove     : '#rg_js_cancelPaywallRemoval',
+
 				snackBar: $('#rg_js_SnackBar'),
 			};
 
@@ -97,6 +103,15 @@ import '../utils';
 				$(document).ready(function () {
 					$o.postPreviewWrapper.fadeIn('slow');
 					$($o.paywallAppliesTo).trigger('change');
+
+					// Get all purchase options.
+					const allPurchaseOptions = $($o.purchaseOptionItems);
+					const paywallId = allPurchaseOptions.attr('data-paywall-id');
+
+					// Enabled publish button if saved paywall.
+					if ( paywallId.length ) {
+						$o.activatePaywall.removeAttr('disabled');
+					}
 				});
 
 				/**
@@ -126,6 +141,10 @@ import '../utils';
 				 * Add action items on purchase item hover.
 				 */
 				$o.body.on('mouseenter', $o.purchaseOptionItem, function () {
+					// Hide the paywall border.
+					$o.purchaseOverlay.removeClass('overlay-border');
+					$($o.purchaseOverlayRemove).hide();
+
 					// Get the template for purchase overlay action.
 					const actionTemplate = wp.template('revgen-purchase-overlay-actions');
 
@@ -400,7 +419,7 @@ import '../utils';
 				 * Handle paywall applicable dropdown.
 				 */
 				$o.body.on('change', $o.paywallAppliesTo, function () {
-					if ('post' === $(this).val() || 'page' === $(this).val()) {
+					if ('all' === $(this).val()) {
 						$o.searchPaywallWrapper.hide();
 					} else {
 						$o.searchPaywallWrapper.show();
@@ -453,6 +472,10 @@ import '../utils';
 				 * Hide the purchase option add button.
 				 */
 				$o.body.on('mouseenter', $o.optionArea, function () {
+					// Hide the paywall border.
+					$o.purchaseOverlay.removeClass('overlay-border');
+					$($o.purchaseOverlayRemove).hide();
+
 					// Only show if total count limit doesn't exceed.
 					const currentOptionCount = $($o.purchaseOptionItems).find($o.purchaseOptionItem).length;
 					if (currentOptionCount < 5) {
@@ -506,6 +529,37 @@ import '../utils';
 					$o.purchaseOverlay.css({
 						filter          : 'unset',
 						'pointer-events': 'unset',
+					});
+				});
+
+				/**
+				 * Add paywall border if hovering over the saved paywall area.
+				 */
+				$o.purchaseOverlay.on('mouseenter', function (e) {
+					const paywall = $($o.purchaseOptionItems);
+					const paywallId = paywall.attr('data-paywall-id');
+					if ( paywallId.length ) {
+						$o.purchaseOverlay.addClass('overlay-border');
+						$($o.purchaseOverlayRemove).show();
+					}
+				});
+
+				/**
+				 * Hide the border and paywall remove button when not in focus.
+				 */
+				$o.purchaseOverlay.on('mouseleave', function () {
+					$o.purchaseOverlay.removeClass('overlay-border');
+					$($o.purchaseOverlayRemove).hide();
+				});
+
+				/**
+				 * Remove the paywall after merchant confirmation.
+				 */
+				$o.body.on('click', $o.purchaseOverlayRemove, function () {
+					showPaywallRemovalConfirmation().then((confirmation) => {
+						if (true === confirmation) {
+							removePaywall();
+						}
 					});
 				});
 
@@ -721,8 +775,83 @@ import '../utils';
 				});
 			};
 
+			/**
+			 * Remove paywall.
+			 */
+			const removePaywall = function () {
+
+				const paywall = $($o.purchaseOptionItems);
+				const paywallId = paywall.attr('data-paywall-id');
+
+				// Create form data.
+				const formData = {
+					action    : 'rg_remove_paywall',
+					id        : paywallId,
+					security  : revenueGeneratorGlobalOptions.rg_paywall_nonce,
+				};
+
+				// Delete the option.
+				$.ajax({
+					url     : revenueGeneratorGlobalOptions.ajaxUrl,
+					method  : 'POST',
+					data    : formData,
+					dataType: 'json',
+				}).done(function (r) {
+					$o.snackBar.showSnackbar(r.msg, 1500);
+					$o.purchaseOverlay.hide();
+				});
+			};
+
+			/**
+			 * Show the confirmation box for removing paywall.
+			 */
+			const showPaywallRemovalConfirmation = async function () {
+				const confirm = await createPaywallRemovalConfirmation();
+				$o.previewWrapper.find($o.paywallRemovalModal).remove();
+				$o.body.removeClass('modal-blur');
+				$o.purchaseOverlay.css({
+					filter          : 'unset',
+					'pointer-events': 'unset',
+				});
+				return confirm;
+			};
+
+			/**
+			 * Create a confirmation modal with warning before removing paywall.
+			 */
+			const createPaywallRemovalConfirmation = function () {
+				return new Promise((complete, failed) => {
+					$o.previewWrapper.find($o.paywallRemovalModal).remove();
+
+					// Get the template for confirmation popup and add it.
+					const template = wp.template('revgen-remove-paywall');
+					$o.previewWrapper.append(template);
+
+					$o.body.addClass('modal-blur');
+					$o.purchaseOverlay.css({
+						filter          : 'blur(5px)',
+						'pointer-events': 'none',
+					});
+
+					$($o.paywallRemove).off('click');
+					$($o.paywallCancelRemove).off('click');
+
+					$($o.paywallRemove).on('click', () => {
+						$($o.paywallRemovalModal).hide();
+						complete(true);
+					});
+					$($o.paywallCancelRemove).on('click', () => {
+						$($o.paywallRemovalModal).hide();
+						complete(false);
+					});
+				});
+			};
+
+			/**
+			 * Show the confirmation box for saved entity update.
+			 */
 			const showPurchaseOptionUpdateWarning = async function () {
-				const confirm = await createConfirmation();
+				const confirm = await createEntityUpdateConfirmation();
 				$o.previewWrapper.find($o.purchaseOptionWarningWrapper).remove();
 				$o.body.removeClass('modal-blur');
 				$o.purchaseOverlay.css({
@@ -732,7 +861,10 @@ import '../utils';
 				return confirm;
 			};
 
-			const createConfirmation = function () {
+			/**
+			 * Create a confirmation modal with warning before saved entity is updated.
+			 */
+			const createEntityUpdateConfirmation = function () {
 				return new Promise((complete, failed) => {
 					$o.previewWrapper.find($o.purchaseOptionWarningWrapper).remove();
 
@@ -907,6 +1039,10 @@ import '../utils';
 
 					const purchaseOptions = $($o.purchaseOptionItems);
 
+					if ( r.paywall_id.length ) {
+						$o.activatePaywall.removeAttr('disabled');
+					}
+
 					// Set main paywall id.
 					purchaseOptions.attr('data-paywall-id', r.paywall_id);
 
@@ -931,6 +1067,10 @@ import '../utils';
 							const subscriptionUID = $(this).attr('data-uid');
 							$(this).attr('data-sub-id', r.subscriptions[subscriptionUID]);
 						});
+					}
+
+					if ( r.redirect_to ) {
+						window.location.href = r.redirect_to;
 					}
 				});
 			};

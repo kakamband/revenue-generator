@@ -98,7 +98,7 @@ class Paywall extends Base {
 	 *
 	 * @return array
 	 */
-	public function get_purchase_option_data( $post_id ) {
+	public function get_purchase_option_data_by_post_id( $post_id ) {
 		$paywall_info = [];
 		$query_args   = [
 			'post_type'      => static::SLUG,
@@ -107,7 +107,7 @@ class Paywall extends Base {
 		];
 
 		$meta_query = array(
-			'relation' => 'AND',
+			'relation' => 'OR',
 			array(
 				'key'     => '_rg_access_entity',
 				'compare' => '=',
@@ -116,6 +116,11 @@ class Paywall extends Base {
 			array(
 				'key'     => '_rg_access_to',
 				'value'   => 'post',
+				'compare' => '=',
+			),
+			array(
+				'key'     => '_rg_access_to',
+				'value'   => 'all',
 				'compare' => '=',
 			)
 		);
@@ -133,6 +138,7 @@ class Paywall extends Base {
 			$paywall_info['description'] = $pay_wall->post_content;
 			$paywall_info['name']        = get_post_meta( $pay_wall->ID, '_rg_name', true );
 			$paywall_info['access_to']   = get_post_meta( $pay_wall->ID, '_rg_access_to', true );
+			$paywall_info['access_entity']   = get_post_meta( $pay_wall->ID, '_rg_access_entity', true );
 			$paywall_info['order']       = get_post_meta( $pay_wall->ID, '_rg_options_order', true );
 		}
 
@@ -167,5 +173,50 @@ class Paywall extends Base {
 			}
 		}
 	}
+
+	/**
+	 * Get related paywall information.
+	 *
+	 * @param int $paywall_id Paywall ID.
+	 *
+	 * @return array
+	 */
+	public function get_purchase_option_data_by_paywall_id( $paywall_id ) {
+		$paywall_info = [];
+		$paywall = get_post( $paywall_id );
+		if ( ! empty( $paywall ) ) {
+			$paywall_info['id']          = $paywall->ID;
+			$paywall_info['title']       = $paywall->post_title;
+			$paywall_info['description'] = $paywall->post_content;
+			$paywall_info['name']        = get_post_meta( $paywall->ID, '_rg_name', true );
+			$paywall_info['access_to']   = get_post_meta( $paywall->ID, '_rg_access_to', true );
+			$paywall_info['access_entity']   = get_post_meta( $paywall->ID, '_rg_access_entity', true );
+			$paywall_info['order']       = get_post_meta( $paywall->ID, '_rg_options_order', true );
+		}
+
+		return $paywall_info;
+	}
+
+	/**
+	 * Remove the paywall.
+	 *
+	 * @param int $paywall_id Paywall ID.
+	 *
+	 * @return bool
+	 */
+	public function remove_paywall( $paywall_id ) {
+		if ( ! empty( $paywall_id ) ) {
+			// Delete the paywall.
+			$result = wp_delete_post( $paywall_id, true );
+			if ( empty( $result ) ) {
+				return false;
+			} else {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 
 }

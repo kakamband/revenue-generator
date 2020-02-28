@@ -212,11 +212,14 @@ body {
   top: 40%;
   text-align: center;
   letter-spacing: 0;
-  margin: 25px 0;
+  margin: 0 15%;
+  padding: 5%;
   color: initial;
   line-height: initial;
-  width: 100%;
+  width: 60%;
   display: none; }
+  .rg-purchase-overlay-info {
+    margin-bottom: 10px; }
   .rg-purchase-overlay-title {
     font-size: 24px;
     line-height: 34px;
@@ -225,8 +228,7 @@ body {
     font-size: 16px;
     line-height: 25px;
     color: #2e2e2e;
-    opacity: .8;
-    margin-bottom: 25px; }
+    opacity: .8; }
   .rg-purchase-overlay-purchase-options {
     display: flex;
     flex-direction: column; }
@@ -242,7 +244,7 @@ body {
       margin: 5px 0;
       cursor: pointer;
       transition: opacity .2s;
-      width: 50%;
+      width: 80%;
       align-self: center;
       position: relative; }
       .rg-purchase-overlay-purchase-options-item-actions {
@@ -398,8 +400,6 @@ body {
     display: flex;
     justify-content: center;
     width: 100%; }
-    .rg-purchase-overlay-privacy p {
-      width: 50%; }
     .rg-purchase-overlay-privacy a {
       color: inherit;
       text-decoration: underline; }
@@ -436,6 +436,18 @@ body {
     font-size: 13px;
     line-height: 26px;
     margin: 0; }
+  .rg-purchase-overlay-remove {
+    display: none;
+    background: transparent;
+    border: 0;
+    position: absolute;
+    left: -40px;
+    top: -5px;
+    cursor: pointer; }
+
+.overlay-border {
+  border-radius: 5px;
+  border: 3px solid #000; }
 
 .rev-gen-preview-main {
   width: 100%;
@@ -551,6 +563,10 @@ body {
         font-weight: 600;
         font-size: 14px;
         border-radius: 3px; }
+        .rev-gen-preview-main--paywall-actions-update button:disabled {
+          background-color: darkgray;
+          border: 2px solid darkgray;
+          cursor: not-allowed; }
       .rev-gen-preview-main--paywall-actions-update-publish {
         background-color: #000;
         color: #ffffff; }
@@ -699,6 +715,45 @@ body {
       font-weight: 700;
       font-size: 15px;
       cursor: pointer; }
+  .rev-gen-preview-main-remove-paywall {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    position: fixed;
+    left: 58%;
+    top: 30%;
+    overflow: hidden;
+    bottom: 20px;
+    height: 350px;
+    width: 300px;
+    margin: 0 0 0 -190px;
+    padding: 30px 0 0;
+    background-color: #fff;
+    z-index: 999;
+    border-radius: 5px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    text-align: center; }
+    .rev-gen-preview-main-remove-paywall-title {
+      font-size: 14px; }
+    .rev-gen-preview-main-remove-paywall-message {
+      font-size: 14px;
+      font-weight: 500;
+      margin: 10px 0; }
+    .rev-gen-preview-main-remove-paywall-buttons button {
+      cursor: pointer;
+      width: 70%;
+      height: 35px;
+      border: 2px solid #000;
+      font-weight: 600;
+      font-size: 14px;
+      border-radius: 3px;
+      margin: 10px 0; }
+    .rev-gen-preview-main-remove-paywall-buttons-dark {
+      background-color: #000;
+      color: #ffffff; }
+    .rev-gen-preview-main-remove-paywall-buttons-light {
+      background-color: #fff;
+      color: #000; }
 
 .modal-blur {
   background-color: darkgrey;
