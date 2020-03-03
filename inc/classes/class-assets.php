@@ -43,10 +43,26 @@ class Assets {
 	 * Register the required scripts.
 	 */
 	public function register_scripts() {
+
+		// Register required library script for post/category selection.
+		wp_register_script(
+			'revenue-generator-select2',
+			REVENUE_GENERATOR_BUILD_URL . 'vendor/select2/select2.min.js',
+			[ 'jquery' ],
+			$this->get_asset_version( 'vendor/select2/select2.min.js' )
+		);
+
+		wp_register_style(
+			'revenue-generator-select2',
+			REVENUE_GENERATOR_BUILD_URL . 'vendor/select2/select2.min.css',
+			[],
+			$this->get_asset_version( 'vendor/select2/select2.min.css' )
+		);
+
 		wp_register_script(
 			'revenue-generator',
 			REVENUE_GENERATOR_BUILD_URL . 'revenue-generator-admin.js',
-			[ 'jquery', 'wp-util', 'jquery-ui-dialog' ],
+			[ 'jquery', 'wp-util', 'revenue-generator-select2' ],
 			$this->get_asset_version( 'revenue-generator-admin.js' )
 		);
 

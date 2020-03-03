@@ -51,6 +51,9 @@ const finalConfig = ( mode ) => {
 				new CopyPlugin([
 					{ from: './assets/src/img', to: 'img' },
 				]),
+				new CopyPlugin([
+					{ from: './assets/src/vendor', to: 'vendor' },
+				]),
 				new ImageMinimizePlugin(
 					{
 						disable: mode !== 'production',

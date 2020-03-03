@@ -9,6 +9,7 @@
  * Internal dependencies.
  */
 import '../utils';
+import {__} from '@wordpress/i18n';
 
 (function ($) {
 	$(function () {
@@ -17,14 +18,22 @@ import '../utils';
 			const $o = {
 				body: $('body'),
 
+				requestSent: false,
+
 				// Preview wrapper.
 				previewWrapper: $('.rev-gen-preview-main'),
+				layoutWrapper : $('.rev-gen-layout-wrapper'),
+				laterpayLoader: $('.laterpay-loader-wrapper'),
 
 				// Search elements.
-				searchContent: $('#rg_js_searchContent'),
+				searchContentWrapper: $('.rev-gen-preview-main--search'),
+				searchContent       : $('#rg_js_searchContent'),
+				searchResultWrapper : $('.rev-gen-preview-main--search-results'),
+				searchResultItem    : '.rev-gen-preview-main--search-results-item',
 
 				// Post elements.
 				postPreviewWrapper: $('#rg_js_postPreviewWrapper'),
+				postTitle         : '.rev-gen-preview-main--post--title',
 				postExcerpt       : $('#rg_js_postPreviewExcerpt'),
 				postContent       : $('#rg_js_postPreviewContent'),
 
@@ -86,8 +95,8 @@ import '../utils';
 
 				// Paywall remove warning modal.
 				paywallRemovalModal: '.rev-gen-preview-main-remove-paywall',
-				paywallRemove   : '#rg_js_removePaywall',
-				paywallCancelRemove     : '#rg_js_cancelPaywallRemoval',
+				paywallRemove      : '#rg_js_removePaywall',
+				paywallCancelRemove: '#rg_js_cancelPaywallRemoval',
 
 				snackBar: $('#rg_js_SnackBar'),
 			};
@@ -106,16 +115,41 @@ import '../utils';
 
 					// Get all purchase options.
 					const allPurchaseOptions = $($o.purchaseOptionItems);
-					const paywallId = allPurchaseOptions.attr('data-paywall-id');
+					if (allPurchaseOptions.length) {
+						const paywallId = allPurchaseOptions.attr('data-paywall-id');
 
-					// Enabled publish button if saved paywall.
-					if ( paywallId.length ) {
-						$o.activatePaywall.removeAttr('disabled');
+						// Enabled publish button if saved paywall.
+						if (paywallId.length) {
+							$o.activatePaywall.removeAttr('disabled');
+						}
 					}
 				});
 
 				/**
-				 * When merchant types in the search box blur out the rest of the area.
+				 * Hide the post content search if not in focus and revert back to original title.
+				 */
+				$o.postPreviewWrapper.on('click', function () {
+					// Hide result wrapper and revert search box text if no action was taken.
+					$o.searchResultWrapper.hide();
+					$o.searchContentWrapper.find('label').show();
+					const searchText = $o.searchContent.val().trim();
+					const postTitle = $($o.postTitle).text().trim();
+					if (searchText !== postTitle) {
+						$o.searchContent.val(postTitle);
+					}
+				});
+
+				/**
+				 * Handle the event when merchant has clicked a post for preview.
+				 */
+				$o.body.on('click', $o.searchResultItem, function () {
+					const searchItem = $(this);
+					const searchPostID = searchItem.attr('data-id');
+					showPreviewContent(searchPostID);
+				});
+
+				/**
+				 * When merchant starts to type in the search box blur out the rest of the area.
 				 */
 				$o.searchContent.on('focus', function () {
 					$o.postPreviewWrapper.addClass('blury');
@@ -135,6 +169,67 @@ import '../utils';
 						height  : 'auto',
 					});
 					$o.postPreviewWrapper.removeClass('blury');
+				});
+
+				/**
+				 * Handle preview content search input.
+				 */
+				$o.searchContent.on('input change', debounce(function () {
+					$o.searchContentWrapper.find('label').hide();
+					const searchPostTerm = $(this).val().trim();
+					const postTitle = $($o.postTitle).text().trim();
+					if (searchPostTerm.length && searchPostTerm !== postTitle) {
+						searchPreviewContent(searchPostTerm);
+					}
+				}, 1500));
+
+				$o.searchPaywallContent.select2({
+					ajax              : {
+						url           : revenueGeneratorGlobalOptions.ajaxUrl,
+						dataType      : 'json',
+						delay         : 500,
+						type          : 'POST',
+						data          : function (params) {
+							return {
+								term    : params.term,
+								action  : 'rg_search_term',
+								security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
+							};
+						},
+						processResults: function (data) {
+							let options = [];
+							if (data) {
+								$.each(data.categories, function (index) {
+									const term = data.categories[index];
+									options.push({
+										id  : term.term_id,
+										text: term.name
+									});
+								});
+							}
+							return {
+								results: options
+							};
+						},
+						cache         : true
+					},
+					placeholder       : __('search', 'revenue-generator'),
+					language          : {
+						inputTooShort: function () {
+							return __('Please enter 1 or more characters.', 'revenue-generator');
+						},
+						noResults    : function () {
+							return __('No results found.', 'revenue-generator');
+						}
+					},
+					minimumInputLength: 1
+				});
+
+				$o.searchPaywallContent.on('change', function () {
+					const categoryId = $(this).val();
+					if (categoryId) {
+						$o.postPreviewWrapper.attr('data-access-id', categoryId);
+					}
 				});
 
 				/**
@@ -419,10 +514,12 @@ import '../utils';
 				 * Handle paywall applicable dropdown.
 				 */
 				$o.body.on('change', $o.paywallAppliesTo, function () {
-					if ('all' === $(this).val()) {
-						$o.searchPaywallWrapper.hide();
-					} else {
+					if ('exclude_category' === $(this).val() || 'category' === $(this).val()) {
 						$o.searchPaywallWrapper.show();
+						$o.postPreviewWrapper.attr('data-access-id', $o.searchPaywallContent.val());
+					} else {
+						$o.searchPaywallWrapper.hide();
+						$o.postPreviewWrapper.attr('data-access-id', $o.postPreviewWrapper.attr('data-preview-id'));
 					}
 				});
 
@@ -538,7 +635,7 @@ import '../utils';
 				$o.purchaseOverlay.on('mouseenter', function (e) {
 					const paywall = $($o.purchaseOptionItems);
 					const paywallId = paywall.attr('data-paywall-id');
-					if ( paywallId.length ) {
+					if (paywallId.length) {
 						$o.purchaseOverlay.addClass('overlay-border');
 						$($o.purchaseOverlayRemove).show();
 					}
@@ -664,7 +761,7 @@ import '../utils';
 				 * Save Paywall and its purchase options.
 				 */
 				$o.savePaywall.on('click', function () {
-
+					showLoader();
 					reorderPurchaseItems();
 
 					// Get all purchase options.
@@ -750,11 +847,12 @@ import '../utils';
 					 * Paywall data.
 					 */
 					const paywall = {
-						id     : purchaseOptions.attr('data-paywall-id'),
-						title  : $o.purchaseOverlay.find($o.paywallTitle).text().trim(),
-						desc   : $o.purchaseOverlay.find($o.paywallDesc).text().trim(),
-						name   : $o.paywallName.text().trim(),
-						applies: $($o.paywallAppliesTo).val(),
+						id        : purchaseOptions.attr('data-paywall-id'),
+						title     : $o.purchaseOverlay.find($o.paywallTitle).text().trim(),
+						desc      : $o.purchaseOverlay.find($o.paywallDesc).text().trim(),
+						name      : $o.paywallName.text().trim(),
+						applies   : $($o.paywallAppliesTo).val(),
+						preview_id: $o.postPreviewWrapper.attr('data-preview-id'),
 					};
 
 					/**
@@ -762,7 +860,7 @@ import '../utils';
 					 */
 					const data = {
 						action       : 'rg_update_paywall',
-						post_id      : $o.postPreviewWrapper.attr('data-post-id'),
+						post_id      : $o.postPreviewWrapper.attr('data-access-id'),
 						paywall      : paywall,
 						individual   : individualObj,
 						time_passes  : timePasses,
@@ -776,6 +874,95 @@ import '../utils';
 			};
 
 			/**
+			 * Update the post preview based on selected preview content.
+			 *
+			 * @param {number} postId Post ID.
+			 */
+			const showPreviewContent = function (postId) {
+				// prevent duplicate requests.
+				if (!$o.requestSent) {
+					$o.requestSent = true;
+
+					// Create form data.
+					const formData = {
+						action         : 'rg_select_preview_content',
+						post_preview_id: postId,
+						security       : revenueGeneratorGlobalOptions.rg_paywall_nonce,
+					};
+
+					$.ajax({
+						url     : revenueGeneratorGlobalOptions.ajaxUrl,
+						method  : 'POST',
+						data    : formData,
+						dataType: 'json',
+					}).done(function (r) {
+						$o.requestSent = false;
+						if (r.redirect_to) {
+							window.location.href = r.redirect_to;
+						}
+					});
+				}
+			};
+
+			/**
+			 * Search post content for preview based on merchants search term.
+			 *
+			 * @param {string} searchTerm The part of title being searched for preview.
+			 */
+			const searchPreviewContent = function (searchTerm) {
+				if (searchTerm.length) {
+					// prevent duplicate requests.
+					if (!$o.requestSent) {
+						$o.requestSent = true;
+
+						// Create form data.
+						const formData = {
+							action     : 'rg_search_preview_content',
+							search_term: searchTerm,
+							security   : revenueGeneratorGlobalOptions.rg_paywall_nonce,
+						};
+
+						$.ajax({
+							url     : revenueGeneratorGlobalOptions.ajaxUrl,
+							method  : 'POST',
+							data    : formData,
+							dataType: 'json',
+						}).done(function (r) {
+							$o.requestSent = false;
+							if (true === r.success) {
+								$o.searchResultWrapper.empty();
+								const postPreviews = r.preview_posts;
+								postPreviews.forEach(function (item) {
+									const searchItem = $('<span/>', {
+										'data-id': item.id,
+										class    : 'rev-gen-preview-main--search-results-item',
+									}).text(item.title);
+									$o.searchResultWrapper.append(searchItem);
+									$o.searchResultWrapper.css({display: 'flex'});
+								})
+							} else {
+								$o.snackBar.showSnackbar(r.msg, 1500);
+							}
+						});
+					}
+				}
+			};
+
+			/**
+			 * Show the loader.
+			 */
+			const showLoader = function () {
+				$o.laterpayLoader.css({display: 'flex'});
+			};
+
+			/**
+			 * Hide the loader.
+			 */
+			const hideLoader = function () {
+				$o.laterpayLoader.hide();
+			};
+
+			/**
 			 * Remove paywall.
 			 */
 			const removePaywall = function () {
@@ -785,9 +972,9 @@ import '../utils';
 
 				// Create form data.
 				const formData = {
-					action    : 'rg_remove_paywall',
-					id        : paywallId,
-					security  : revenueGeneratorGlobalOptions.rg_paywall_nonce,
+					action  : 'rg_remove_paywall',
+					id      : paywallId,
+					security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
 				};
 
 				// Delete the option.
@@ -1035,11 +1222,12 @@ import '../utils';
 					data    : formData,
 					dataType: 'json',
 				}).done(function (r) {
+					hideLoader();
 					$o.snackBar.showSnackbar(r.msg, 1500);
 
 					const purchaseOptions = $($o.purchaseOptionItems);
 
-					if ( r.paywall_id.length ) {
+					if (r.paywall_id.length) {
 						$o.activatePaywall.removeAttr('disabled');
 					}
 
@@ -1069,7 +1257,7 @@ import '../utils';
 						});
 					}
 
-					if ( r.redirect_to ) {
+					if (r.redirect_to) {
 						window.location.href = r.redirect_to;
 					}
 				});

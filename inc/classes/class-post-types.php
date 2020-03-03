@@ -121,9 +121,16 @@ class Post_Types {
 		}
 
 		// Generate a teaser for the post, if excerpt is empty.
-		$post_content   = do_blocks( $post_data->post_content );
+		$post_content = do_blocks( $post_data->post_content );
+
+		// Remove all the tags.
+		$post_content = wp_strip_all_tags( $post_content );
+
+		// Remove shortcodes.
+		$post_content = strip_shortcodes( $post_content );
+
 		$teaser_content = Utility::truncate(
-			preg_replace( '/\s+/', ' ', strip_shortcodes( $post_content ) ),
+			preg_replace( '/\s+/', ' ', $post_content ),
 			Utility::determine_number_of_words( $post_content ),
 			[
 				'html'  => true,
@@ -207,6 +214,9 @@ class Post_Types {
 			} elseif ( $current_purchase_options['time_pass'] > 0 && empty( $current_purchase_options['subscription'] ) ) {
 				$purchase_options['subscriptions'][] = $purchase_options_all['subscription'];
 				$purchase_options['time_passes']     = Time_Pass::get_instance()->get_time_passes_by_criteria( true );
+			} else {
+				$purchase_options['time_passes']   = Time_Pass::get_instance()->get_time_passes_by_criteria( true );
+				$purchase_options['subscriptions'] = Subscription::get_instance()->get_subscriptions_by_criteria( true );
 			}
 
 			return $purchase_options;
@@ -238,18 +248,18 @@ class Post_Types {
 		// Get individual purchase options data.
 		if ( ! empty( $purchase_options['paywall'] ) ) {
 			$purchase_options['individual'] = $paywall_instance->get_individual_purchase_option_data( $purchase_options['paywall']['id'] );
-		}
 
-		// Get time passes and subscriptions purchase options data.
-		$time_passes   = $time_pass_instance->get_applicable_time_passes();
-		$subscriptions = $subscription_instance->get_applicable_subscriptions();
+			// Get time passes and subscriptions purchase options data.
+			$time_passes   = $time_pass_instance->get_applicable_time_passes();
+			$subscriptions = $subscription_instance->get_applicable_subscriptions();
 
-		if ( ! empty( $time_passes ) ) {
-			$purchase_options['time_passes'] = $time_passes;
-		}
+			if ( ! empty( $time_passes ) ) {
+				$purchase_options['time_passes'] = $time_passes;
+			}
 
-		if ( ! empty( $subscriptions ) ) {
-			$purchase_options['subscriptions'] = $subscriptions;
+			if ( ! empty( $subscriptions ) ) {
+				$purchase_options['subscriptions'] = $subscriptions;
+			}
 		}
 
 		return $purchase_options;
@@ -397,10 +407,17 @@ class Post_Types {
 		if ( isset( $final_purchase_options['paywall']['order'] ) ) {
 
 			if ( ! empty( $final_purchase_options ) ) {
-				$current_orders = $final_purchase_options['paywall']['order'];
+				$current_orders  = $final_purchase_options['paywall']['order'];
+				$new_order_count = count( $current_orders );
 
 				if ( ! empty( $individual_purchase_option ) ) {
 					// Set order for individual option.
+					if ( isset( $current_orders['individual'] ) ) {
+						$individual_purchase_option['order'] = $current_orders['individual'];
+					} else {
+						$new_order_count                     += 1;
+						$individual_purchase_option['order'] = $new_order_count;
+					}
 					$individual_purchase_option['order']         = $current_orders['individual'];
 					$individual_purchase_option['purchase_type'] = 'individual';
 					$options[]                                   = $individual_purchase_option;
@@ -410,9 +427,14 @@ class Post_Types {
 					// Set order for time pass option.
 					foreach ( $time_passes_purchase_option as $time_pass ) {
 						$tlp_id                     = 'tlp_' . $time_pass['id'];
-						$time_pass['order']         = $current_orders[ $tlp_id ];
 						$time_pass['purchase_type'] = 'timepass';
-						$options[]                  = $time_pass;
+						if ( isset( $current_orders[ $tlp_id ] ) ) {
+							$time_pass['order'] = $current_orders[ $tlp_id ];
+						} else {
+							$new_order_count    += 1;
+							$time_pass['order'] = $new_order_count;
+						}
+						$options[] = $time_pass;
 					}
 				}
 
@@ -420,9 +442,14 @@ class Post_Types {
 					// Set order for subscription option.
 					foreach ( $subscriptions_purchase_option as $subscription ) {
 						$sub_id                        = 'sub_' . $subscription['id'];
-						$subscription['order']         = $current_orders[ $sub_id ];
 						$subscription['purchase_type'] = 'subscription';
-						$options[]                     = $subscription;
+						if ( isset( $current_orders[ $sub_id ] ) ) {
+							$subscription['order'] = $current_orders[ $sub_id ];
+						} else {
+							$new_order_count       += 1;
+							$subscription['order'] = $new_order_count;
+						}
+						$options[] = $subscription;
 					}
 				}
 			}
@@ -473,10 +500,10 @@ class Post_Types {
 	 * @return array
 	 */
 	public function get_post_purchase_options_by_paywall_id( $paywall_id ) {
-		$paywall_instance = Paywall::get_instance();
-		$time_pass_instance = Time_Pass::get_instance();
+		$paywall_instance      = Paywall::get_instance();
+		$time_pass_instance    = Time_Pass::get_instance();
 		$subscription_instance = Subscription::get_instance();
-		$purchase_options = [];
+		$purchase_options      = [];
 
 		$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
 
@@ -515,17 +542,88 @@ class Post_Types {
 	 */
 	public function get_post_post_content_by_paywall_id( $paywall_id ) {
 		$paywall_instance = Paywall::get_instance();
-		$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
+		$paywall_data     = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
 
 		// Check paywall data.
 		if ( ! empty( $paywall_data ) ) {
 			$access_entity = $paywall_data['access_entity'];
+			$access_preview = $paywall_data['preview_id'];
 
-			if ( ! empty( $access_entity ) ) {
+			if ( ! empty( $access_preview ) ) {
+				return $this->get_formatted_post_data( $access_preview );
+			} else {
 				return $this->get_formatted_post_data( $access_entity );
 			}
 		}
+
 		return '';
+	}
+
+	/**
+	 * Filter to modify the search of preview content.
+	 *
+	 * @param string    $sql   SQL string.
+	 * @param \WP_Query $query Query object.
+	 *
+	 * @return string
+	 */
+	public function rg_preview_title_filter( $sql, $query ) {
+		global $wpdb;
+
+		// If our custom query var is set modify the query.
+		if ( ! empty( $query->query['rg_preview_title'] ) ) {
+			$term = $wpdb->esc_like( $query->query['rg_preview_title'] );
+			$like = "%{$term}%";
+			$sql  .= ' AND ' . $wpdb->posts . '.post_title LIKE \'%' . $term . '%\'';
+		}
+
+		return $sql;
+	}
+
+	/**
+	 * Get the posts to be displayed in suggestions based on searched term.
+	 *
+	 * @param string $search_term The post title part to search for.
+	 *
+	 * @return array
+	 */
+	public function get_preview_content_selection( $search_term ) {
+		// Query args for post preview search.
+		$query_args = [
+			'post_type'        => self::get_allowed_post_types(),
+			'post_status'      => 'publish',
+			'rg_preview_title' => $search_term,
+			'posts_per_page'   => 5,
+		];
+
+		// Add and remove our custom filter for LIKE based search by title.
+		add_filter( 'posts_where', [ $this, 'rg_preview_title_filter' ], 10, 2 );
+		$query         = new \WP_Query();
+		$current_posts = $query->query( $query_args );;
+		remove_filter( 'posts_where', [ $this, 'rg_preview_title_filter' ], 10 );
+
+		// Create formatted data for preview suggestions.
+		$preview_posts = [];
+		foreach ( $current_posts as $key => $preview_post ) {
+			$preview_posts[ $key ] = $this->formatted_post_for_preview( $preview_post );
+		}
+
+		return $preview_posts;
+	}
+
+	/**
+	 * Returns relevant fields for supported content of given WP_Post.
+	 *
+	 * @param \WP_Post $post Post to transform
+	 *
+	 * @return array
+	 */
+	private function formatted_post_for_preview( $post ) {
+		$rg_post          = [];
+		$rg_post['id']    = $post->ID;
+		$rg_post['title'] = $post->post_title;
+
+		return $rg_post;
 	}
 
 }

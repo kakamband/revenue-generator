@@ -37,9 +37,9 @@ class Utility {
 		$total_words    = count( explode( ' ', $content ) );
 
 		// Static values passed for creating the
-		$percent        = max( min( 10, 100 ), 1 );
-		$min            = 20;
-		$max            = 50;
+		$percent        = max( min( 5, 100 ), 1 );
+		$min            = 10;
+		$max            = 25;
 
 		$number_of_words = $total_words * ( $percent / 100 );
 		$number_of_words = max( min( $number_of_words, $max ), $min );

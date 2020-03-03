@@ -43,6 +43,9 @@ class Admin {
 		add_action( 'wp_ajax_rg_update_currency_selection', [ $this, 'update_currency_selection' ] );
 		add_action( 'wp_ajax_rg_remove_purchase_option', [ $this, 'remove_purchase_option' ] );
 		add_action( 'wp_ajax_rg_remove_paywall', [ $this, 'remove_paywall' ] );
+		add_action( 'wp_ajax_rg_search_preview_content', [ $this, 'search_preview_content' ] );
+		add_action( 'wp_ajax_rg_select_preview_content', [ $this, 'select_preview_content' ] );
+		add_action( 'wp_ajax_rg_search_term', [ $this, 'select_search_term' ] );
 	}
 
 	/**
@@ -100,6 +103,7 @@ class Admin {
 
 		wp_enqueue_script( 'revenue-generator' );
 		wp_enqueue_style( 'revenue-generator' );
+		wp_enqueue_style( 'revenue-generator-select2' );
 	}
 
 	/**
@@ -228,7 +232,8 @@ class Admin {
 
 		$post_types = Post_Types::get_instance();
 
-		$current_paywall = filter_input( INPUT_GET, 'current_paywall', FILTER_SANITIZE_NUMBER_INT );
+		$current_paywall  = filter_input( INPUT_GET, 'current_paywall', FILTER_SANITIZE_NUMBER_INT );
+		$rg_category_data = '';
 
 		// Load paywall related content if found else load requested content for new paywall.
 		if ( ! empty( $current_paywall ) ) {
@@ -238,13 +243,22 @@ class Admin {
 			// Get paywall options data.
 			$purchase_options_data = $post_types->get_post_purchase_options_by_paywall_id( $current_paywall );
 			$purchase_options      = $post_types->convert_to_purchase_options( $purchase_options_data );
+
+			$paywall_data = $purchase_options['paywall'];
+
+			if ( 'category' === $paywall_data['access_to'] || 'exclude_category' === $paywall_data['access_to'] ) {
+				$rg_category_id = $paywall_data['access_entity'];
+				if ( ! empty( $rg_category_id ) ) {
+					$rg_category_data = get_term( $rg_category_id, 'category' );
+				}
+			}
 		} else {
 
 			// Get latest post info for preview.
-			$target_post_id      = $post_types->get_latest_post_for_preview();
+			$target_post_id  = $post_types->get_latest_post_for_preview();
 			$post_preview_id = filter_input( INPUT_GET, 'preview_post_id', FILTER_SANITIZE_NUMBER_INT );
 
-			if ( empty( $post_preview_id ) ) {
+			if ( ! empty( $post_preview_id ) ) {
 				$target_post_id = $post_preview_id;
 			}
 
@@ -256,8 +270,8 @@ class Admin {
 		}
 
 		// Set currency symbol.
-		$default_option_data   = $post_types->get_default_purchase_option();
-		$symbol = '';
+		$default_option_data = $post_types->get_default_purchase_option();
+		$symbol              = '';
 		if ( ! empty( $config_data['merchant_currency'] ) ) {
 			$symbol = 'USD' === $config_data['merchant_currency'] ? '$' : '€';
 		}
@@ -268,7 +282,9 @@ class Admin {
 			'purchase_options_data' => $purchase_options,
 			'default_option_data'   => $default_option_data,
 			'merchant_symbol'       => $symbol,
+			'rg_category_data'      => $rg_category_data,
 			'action_icons'          => [
+				'lp_icon'            => Config::$plugin_defaults['img_dir'] . 'lp-logo-icon.svg',
 				'option_add'         => Config::$plugin_defaults['img_dir'] . 'add-option.svg',
 				'option_edit'        => Config::$plugin_defaults['img_dir'] . 'edit-option.svg',
 				'option_remove'      => Config::$plugin_defaults['img_dir'] . 'remove-option.svg',
@@ -371,6 +387,7 @@ class Admin {
 		$paywall['name']          = sanitize_text_field( wp_unslash( $paywall_data['name'] ) );
 		$paywall['id']            = sanitize_text_field( $paywall_data['id'] );
 		$paywall['access_to']     = sanitize_text_field( wp_unslash( $paywall_data['applies'] ) );
+		$paywall['preview_id']    = sanitize_text_field( wp_unslash( $paywall_data['preview_id'] ) );
 		$paywall['access_entity'] = $rg_post_id;
 
 		$order_items = [];
@@ -439,10 +456,10 @@ class Admin {
 		$paywall_instance->update_paywall_option_order( $paywall_id, $order_items );
 
 		// Set redirect for saved paywall.
-		$admin_menus = self::get_admin_menus();
+		$admin_menus      = self::get_admin_menus();
 		$new_paywall_page = add_query_arg(
 			[
-				'page' => $admin_menus['paywall']['url'],
+				'page'            => $admin_menus['paywall']['url'],
 				'current_paywall' => $paywall_id
 			],
 			admin_url( 'admin.php' )
@@ -566,5 +583,101 @@ class Admin {
 			] );
 		}
 
+	}
+
+	/**
+	 * Search content for post preview selection.
+	 */
+	public function search_preview_content() {
+
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Get all data and sanitize it.
+		$search_term = sanitize_text_field( filter_input( INPUT_POST, 'search_term', FILTER_SANITIZE_STRING ) );
+
+		$post_types_instance = Post_Types::get_instance();
+		$preview_posts       = $post_types_instance->get_preview_content_selection( $search_term );
+
+		if ( ! empty( $preview_posts ) ) {
+			wp_send_json( [
+				'success'       => true,
+				'preview_posts' => $preview_posts
+			] );
+		} else {
+			wp_send_json( [
+				'success'       => false,
+				'msg'           => __( 'No matching content found!', 'revenue-generator' ),
+				'preview_posts' => []
+			] );
+		}
+	}
+
+	/**
+	 * Select content for post preview.
+	 */
+	public function select_preview_content() {
+
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Get all data and sanitize it.
+		$post_preview_id = sanitize_text_field( filter_input( INPUT_POST, 'post_preview_id', FILTER_SANITIZE_NUMBER_INT ) );
+
+		if ( ! empty( $post_preview_id ) ) {
+
+			$admin_menus = self::get_admin_menus();
+
+			$paywall_instance = Paywall::get_instance();
+			$paywall_id       = $paywall_instance->get_connected_paywall( $post_preview_id );
+
+			// Preview page URL.
+			$preview_query_args = [
+				'page' => $admin_menus['paywall']['url'],
+			];
+
+			// If a paywall exists for the selected content redirect merchant accordingly.
+			if ( ! empty( $paywall_id ) ) {
+				$preview_query_args['current_paywall'] = $paywall_id;
+			} else {
+				$preview_query_args['preview_post_id'] = $post_preview_id;
+			}
+
+			// Create redirect URL.
+			$post_preview_page = add_query_arg(
+				$preview_query_args,
+				admin_url( 'admin.php' )
+			);
+
+			// Send success message.
+			wp_send_json( [
+				'success'     => true,
+				'redirect_to' => $post_preview_page,
+			] );
+
+		}
+	}
+
+	/**
+	 * Get categories to be added in a paywall.
+	 */
+	public function select_search_term() {
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Get all data and sanitize it.
+		$post_term = sanitize_text_field( filter_input( INPUT_POST, 'term', FILTER_SANITIZE_STRING ) );
+
+		$args = [];
+		if ( ! empty( $post_term ) ) {
+			$args['name__like'] = $post_term;
+		}
+
+		$category_instance = Categories::get_instance();
+
+		wp_send_json( [
+			'success'    => true,
+			'categories' => $category_instance->get_applicable_categories( $args )
+		] );
 	}
 }

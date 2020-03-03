@@ -18,11 +18,15 @@ $rg_teaser = empty( $rg_preview_post['excerpt'] ) ? $rg_preview_post['teaser'] :
 
 $paywall_data          = isset( $purchase_options_data['paywall'] ) ? $purchase_options_data['paywall'] : [];
 $paywall_id            = empty( $paywall_data['id'] ) ? '' : $paywall_data['id'];
+$paywall_preview_id    = empty( $paywall_data['preview_id'] ) ? '' : $paywall_data['preview_id'];
 $paywall_access_to     = isset( $paywall_data['access_to'] ) ? $paywall_data['access_to'] : 'all';
 $purchase_option_items = $purchase_options_data['options'];
 ?>
 
 <div class="rev-gen-layout-wrapper">
+	<div class="laterpay-loader-wrapper">
+		<img alt="<?php echo esc_attr( 'LaterPay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
+	</div>
 	<div class="rev-gen-preview-main">
 		<div class="rev-gen-preview-main--search">
 			<?php if ( ! empty( $rg_preview_post['title'] ) ) : ?>
@@ -30,8 +34,9 @@ $purchase_option_items = $purchase_options_data['options'];
 			<?php endif; ?>
 			<input type="text" id="rg_js_searchContent" placeholder="<?php esc_attr_e( 'search for the page or post you\'d like to preview here', 'revenue-generator' ); ?>" value="<?php echo esc_attr( $rg_preview_post['title'] ); ?>" />
 			<i class="dashicons dashicons-search"></i>
+			<div class="rev-gen-preview-main--search-results"></div>
 		</div>
-		<div id="rg_js_postPreviewWrapper" data-post-id="<?php echo esc_attr( $rg_preview_post['ID'] ); ?>" class="rev-gen-preview-main--post">
+		<div id="rg_js_postPreviewWrapper" data-preview-id="<?php echo esc_attr( $paywall_preview_id ); ?>" data-access-id="<?php echo esc_attr( $rg_preview_post['ID'] ); ?>" class="rev-gen-preview-main--post">
 			<h4 class="rev-gen-preview-main--post--title"><?php echo esc_html( $rg_preview_post['title'] ); ?></h4>
 			<?php if ( ! empty( $rg_teaser ) ) : ?>
 				<p id="rg_js_postPreviewExcerpt" class="rev-gen-preview-main--post--excerpt"><?php echo wp_kses_post( $rg_teaser ) ?></p>
@@ -65,13 +70,19 @@ $purchase_option_items = $purchase_options_data['options'];
 				</p>
 				<select class="rev-gen-preview-main-paywall-applies-to">
 					<option <?php selected( $paywall_access_to, 'all', true ); ?> value="all"><?php esc_html_e( 'all posts and pages', 'revenue-generator' ); ?></option>
+					<option <?php selected( $paywall_access_to, 'supported', true ); ?> value="supported"><?php esc_html_e( 'selected post or page', 'revenue-generator' ); ?></option>
 					<option <?php selected( $paywall_access_to, 'category', true ); ?> value="category"><?php esc_html_e( 'category', 'revenue-generator' ); ?></option>
-					<option <?php selected( $paywall_access_to, 'page', true ); ?> value="page"><?php esc_html_e( 'page', 'revenue-generator' ); ?></option>
-					<option <?php selected( $paywall_access_to, 'post', true ); ?> value="post"><?php esc_html_e( 'post', 'revenue-generator' ); ?></option>
+					<option <?php selected( $paywall_access_to, 'exclude_category', true ); ?> value="exclude_category"><?php esc_html_e( 'except for category', 'revenue-generator' ); ?></option>
 				</select>
 			</div>
 			<div class="rev-gen-preview-main--paywall-actions-search">
-				<input type="text" id="rg_js_searchPaywallContent" placeholder="<?php esc_attr_e( 'search', 'revenue-generator' ); ?>" />
+				<select id="rg_js_searchPaywallContent">
+					<?php if ( ! empty( $rg_category_data ) ): ?>
+						<option selected="selected" value="<?php echo esc_attr( $rg_category_data->term_id ); ?>">
+							<?php echo esc_html( $rg_category_data->name ); ?>
+						</option>
+					<?php endif; ?>
+				</select>
 				<i class="dashicons dashicons-search"></i>
 			</div>
 			<div class="rev-gen-preview-main--paywall-actions-update">

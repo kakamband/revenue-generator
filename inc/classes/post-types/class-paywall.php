@@ -53,6 +53,7 @@ class Paywall extends Base {
 					'_rg_name'          => $paywall_data['name'],
 					'_rg_access_to'     => $paywall_data['access_to'],
 					'_rg_access_entity' => $paywall_data['access_entity'],
+					'_rg_preview_id'    => $paywall_data['preview_id'],
 				],
 			] );
 		} else {
@@ -66,6 +67,7 @@ class Paywall extends Base {
 			update_post_meta( $paywall_id, '_rg_name', $paywall_data['name'] );
 			update_post_meta( $paywall_id, '_rg_access_to', $paywall_data['access_to'] );
 			update_post_meta( $paywall_id, '_rg_access_entity', $paywall_data['access_entity'] );
+			update_post_meta( $paywall_id, '_rg_preview_id', $paywall_data['preview_id'] );
 		}
 
 		return $paywall_id;
@@ -107,7 +109,7 @@ class Paywall extends Base {
 		];
 
 		$meta_query = array(
-			'relation' => 'OR',
+			'relation' => 'AND',
 			array(
 				'key'     => '_rg_access_entity',
 				'compare' => '=',
@@ -115,14 +117,9 @@ class Paywall extends Base {
 			),
 			array(
 				'key'     => '_rg_access_to',
-				'value'   => 'post',
+				'value'   => 'supported',
 				'compare' => '=',
 			),
-			array(
-				'key'     => '_rg_access_to',
-				'value'   => 'all',
-				'compare' => '=',
-			)
 		);
 
 		$query_args['meta_query'] = $meta_query;
@@ -132,14 +129,15 @@ class Paywall extends Base {
 		$current_post = $query->posts;
 
 		if ( ! empty( $current_post[0] ) ) {
-			$pay_wall                    = $current_post[0];
-			$paywall_info['id']          = $pay_wall->ID;
-			$paywall_info['title']       = $pay_wall->post_title;
-			$paywall_info['description'] = $pay_wall->post_content;
-			$paywall_info['name']        = get_post_meta( $pay_wall->ID, '_rg_name', true );
-			$paywall_info['access_to']   = get_post_meta( $pay_wall->ID, '_rg_access_to', true );
-			$paywall_info['access_entity']   = get_post_meta( $pay_wall->ID, '_rg_access_entity', true );
-			$paywall_info['order']       = get_post_meta( $pay_wall->ID, '_rg_options_order', true );
+			$pay_wall                      = $current_post[0];
+			$paywall_info['id']            = $pay_wall->ID;
+			$paywall_info['title']         = $pay_wall->post_title;
+			$paywall_info['description']   = $pay_wall->post_content;
+			$paywall_info['name']          = get_post_meta( $pay_wall->ID, '_rg_name', true );
+			$paywall_info['access_to']     = get_post_meta( $pay_wall->ID, '_rg_access_to', true );
+			$paywall_info['access_entity'] = get_post_meta( $pay_wall->ID, '_rg_access_entity', true );
+			$paywall_info['preview_id']    = get_post_meta( $pay_wall->ID, '_rg_preview_id', true );
+			$paywall_info['order']         = get_post_meta( $pay_wall->ID, '_rg_options_order', true );
 		}
 
 		return $paywall_info;
@@ -183,15 +181,16 @@ class Paywall extends Base {
 	 */
 	public function get_purchase_option_data_by_paywall_id( $paywall_id ) {
 		$paywall_info = [];
-		$paywall = get_post( $paywall_id );
+		$paywall      = get_post( $paywall_id );
 		if ( ! empty( $paywall ) ) {
-			$paywall_info['id']          = $paywall->ID;
-			$paywall_info['title']       = $paywall->post_title;
-			$paywall_info['description'] = $paywall->post_content;
-			$paywall_info['name']        = get_post_meta( $paywall->ID, '_rg_name', true );
-			$paywall_info['access_to']   = get_post_meta( $paywall->ID, '_rg_access_to', true );
-			$paywall_info['access_entity']   = get_post_meta( $paywall->ID, '_rg_access_entity', true );
-			$paywall_info['order']       = get_post_meta( $paywall->ID, '_rg_options_order', true );
+			$paywall_info['id']            = $paywall->ID;
+			$paywall_info['title']         = $paywall->post_title;
+			$paywall_info['description']   = $paywall->post_content;
+			$paywall_info['name']          = get_post_meta( $paywall->ID, '_rg_name', true );
+			$paywall_info['access_to']     = get_post_meta( $paywall->ID, '_rg_access_to', true );
+			$paywall_info['access_entity'] = get_post_meta( $paywall->ID, '_rg_access_entity', true );
+			$paywall_info['preview_id']    = get_post_meta( $paywall->ID, '_rg_preview_id', true );
+			$paywall_info['order']         = get_post_meta( $paywall->ID, '_rg_options_order', true );
 		}
 
 		return $paywall_info;
@@ -218,5 +217,13 @@ class Paywall extends Base {
 		return false;
 	}
 
+	public function get_connected_paywall( $post_id ) {
+		$paywall_info = $this->get_purchase_option_data_by_post_id( $post_id );
+		if ( empty( $paywall_info['id'] ) ) {
+			return false;
+		} else {
+			return $paywall_info['id'];
+		}
+	}
 
 }
