@@ -68,6 +68,8 @@ import {__} from '@wordpress/i18n';
 				entitySelection           : '.rg-purchase-overlay-option-manager-entity',
 
 				// Paywall publish actions.
+				addPaywall          : '#rj_js_addNewPaywall',
+				actionsWrapper      : $('.rev-gen-preview-main--paywall-actions'),
 				activatePaywall     : $('#rg_js_activatePaywall'),
 				savePaywall         : $('#rg_js_savePaywall'),
 				searchPaywallContent: $('#rg_js_searchPaywallContent'),
@@ -183,6 +185,9 @@ import {__} from '@wordpress/i18n';
 					}
 				}, 1500));
 
+				/**
+				 * Add combobox with search for categories.
+				 */
 				$o.searchPaywallContent.select2({
 					ajax              : {
 						url           : revenueGeneratorGlobalOptions.ajaxUrl,
@@ -225,13 +230,16 @@ import {__} from '@wordpress/i18n';
 					minimumInputLength: 1
 				});
 
+				/**
+				 * Handle change of current category to clear our meta data.
+				 */
 				$o.searchPaywallContent.on('change', function () {
 					const categoryId = $(this).val();
 					const currentCategoryId = $o.postPreviewWrapper.attr('data-access-id');
 
 					// Remove current meta.
-					if ( currentCategoryId ) {
-						removeCurrentCategoryMeta( currentCategoryId );
+					if (currentCategoryId) {
+						removeCurrentCategoryMeta(currentCategoryId);
 					}
 
 					if (categoryId) {
@@ -668,6 +676,16 @@ import {__} from '@wordpress/i18n';
 				});
 
 				/**
+				 * Add new paywall from paywall publish action.
+				 */
+				$o.body.on('click', $o.addPaywall, function () {
+					const postPreviewId = $($o.addPaywall).attr('data-preview-id');
+					if (postPreviewId) {
+						showPreviewContent(postPreviewId);
+					}
+				});
+
+				/**
 				 * Handle the change of entity type i.e Individual, TimePass, Subscription.
 				 */
 				$o.body.on('change', $o.entitySelection, function (e) {
@@ -885,16 +903,16 @@ import {__} from '@wordpress/i18n';
 			 *
 			 * @param categoryId
 			 */
-			const removeCurrentCategoryMeta = function ( categoryId ) {
+			const removeCurrentCategoryMeta = function (categoryId) {
 				// prevent duplicate requests.
 				if (!$o.requestSent) {
 					$o.requestSent = true;
 
 					// Create form data.
 					const formData = {
-						action         : 'rg_clear_category_meta',
+						action        : 'rg_clear_category_meta',
 						rg_category_id: categoryId,
-						security       : revenueGeneratorGlobalOptions.rg_paywall_nonce,
+						security      : revenueGeneratorGlobalOptions.rg_paywall_nonce,
 					};
 
 					$.ajax({
@@ -1019,8 +1037,21 @@ import {__} from '@wordpress/i18n';
 					data    : formData,
 					dataType: 'json',
 				}).done(function (r) {
+					// Show message and remove the overlay.
 					$o.snackBar.showSnackbar(r.msg, 1500);
-					$o.purchaseOverlay.hide();
+					$o.purchaseOverlay.remove();
+
+					// Update paywall actions bar with new button.
+					$o.actionsWrapper.css({width: '50%', 'background-color': '#eff0f0'});
+
+					// Get the template for confirmation popup and add it.
+					const template = wp.template('revgen-add-paywall');
+					$o.actionsWrapper.empty().append(template);
+
+					// Add preview url for new paywall.
+					if (r.preview_id) {
+						$($o.addPaywall).attr('data-preview-id', r.preview_id);
+					}
 				});
 			};
 

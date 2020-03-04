@@ -7,6 +7,9 @@
 
 namespace LaterPay\Revenue_Generator\Inc\Post_Types;
 
+use LaterPay\Revenue_Generator\Inc\Categories;
+use LaterPay\Revenue_Generator\Inc\Post_Types;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -72,7 +75,7 @@ class Paywall extends Base {
 
 		// If paywall is being added based on categories make sure to create meta to identify it.
 		if (
-		( ! empty( $paywall_data['access_to'] ) && ! empty( $paywall_data['access_entity'] ) ) &&
+			( ! empty( $paywall_data['access_to'] ) && ! empty( $paywall_data['access_entity'] ) ) &&
 			(
 				'category' === $paywall_data['access_to'] ||
 				'exclude_category' === $paywall_data['access_to']
@@ -212,20 +215,47 @@ class Paywall extends Base {
 	 *
 	 * @param int $paywall_id Paywall ID.
 	 *
-	 * @return bool
+	 * @return array
 	 */
 	public function remove_paywall( $paywall_id ) {
+		$post_types = Post_Types::get_instance();
 		if ( ! empty( $paywall_id ) ) {
+			$paywall_data = $this->get_purchase_option_data_by_paywall_id( $paywall_id );
+
+			$access_to     = $paywall_data['access_to'];
+			$access_entity = $paywall_data['access_entity'];
+
+			// Remove category meta.
+			if ( 'category' === $access_to || 'exclude_category' === $access_to ) {
+				$category_instance = Categories::get_instance();
+				$category_instance->clear_category_paywall_meta( $access_entity );
+			}
+
+			$preview_id = $paywall_data['preview_id'];
+
+			if ( empty( $preview_id ) ) {
+				$preview_id = $post_types->get_latest_post_for_preview();
+			}
+
 			// Delete the paywall.
 			$result = wp_delete_post( $paywall_id, true );
 			if ( empty( $result ) ) {
-				return false;
+				return [
+					'success'         => false,
+					'preview_post_id' => $preview_id
+				];
 			} else {
-				return true;
+				return [
+					'success'         => true,
+					'preview_post_id' => $preview_id
+				];
 			}
 		}
 
-		return false;
+		return [
+			'success'         => false,
+			'preview_post_id' => $post_types->get_latest_post_for_preview()
+		];
 	}
 
 	public function get_connected_paywall( $post_id ) {

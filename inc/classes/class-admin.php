@@ -570,11 +570,16 @@ class Admin {
 		$paywall_id = sanitize_text_field( filter_input( INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT ) );
 
 		$paywall_instance = Paywall::get_instance();
-		if ( $paywall_instance->remove_paywall( $paywall_id ) ) {
+		$removal_data     = $paywall_instance->remove_paywall( $paywall_id );
+		$removal_status   = $removal_data['success'];
+		$preview_id       = $removal_data['preview_post_id'];
+
+		if ( true === $removal_status ) {
 			// Send success message.
 			wp_send_json( [
-				'success' => true,
-				'msg'     => __( 'Paywall removed!', 'revenue-generator' )
+				'success'    => true,
+				'preview_id' => $preview_id,
+				'msg'        => __( 'Paywall removed!', 'revenue-generator' )
 			] );
 		} else {
 			// Send success message.

@@ -16,9 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Create data for view.
 $rg_teaser = empty( $rg_preview_post['excerpt'] ) ? $rg_preview_post['teaser'] : $rg_preview_post['excerpt'];
 
-$paywall_data          = isset( $purchase_options_data['paywall'] ) ? $purchase_options_data['paywall'] : [];
-$paywall_id            = empty( $paywall_data['id'] ) ? '' : $paywall_data['id'];
-$paywall_preview_id    = empty( $paywall_data['preview_id'] ) ? '' : $paywall_data['preview_id'];
+$paywall_data       = isset( $purchase_options_data['paywall'] ) ? $purchase_options_data['paywall'] : [];
+$paywall_id         = empty( $paywall_data['id'] ) ? '' : $paywall_data['id'];
+$paywall_preview_id = empty( $paywall_data['preview_id'] ) ? '' : $paywall_data['preview_id'];
 if ( empty( $paywall_data ) ) {
 	$paywall_preview_id = $rg_preview_post['ID'];
 }
@@ -358,7 +358,6 @@ $purchase_option_items = $purchase_options_data['options'];
 			<?php
 			printf(
 				wp_kses(
-				/* translators: 1: Link to WP admin new post page. */
 					__(
 						"<b>Pay Later</b> means users agree to pay for content or timed access later - once their tab reaches $5 or 5€. Think of it as ‘the internet’s running tab.’", 'revenue-generator' ),
 					array(
@@ -372,7 +371,6 @@ $purchase_option_items = $purchase_options_data['options'];
 			<?php
 			printf(
 				wp_kses(
-				/* translators: 1: Link to WP admin new post page. */
 					__(
 						'<b>Pay Now</b> is the traditional upfront payment method that everyone is familiar with. Recurring subscriptions automatically work on a pay now basis.', 'revenue-generator' ),
 					array(
@@ -399,7 +397,6 @@ $purchase_option_items = $purchase_options_data['options'];
 			<?php
 			printf(
 				wp_kses(
-				/* translators: 1: Link to WP admin new post page. */
 					__(
 						'Select <b>Static Pricing</b> to manually set the prices of individual articles based on your own pricing strategy. Charge as little - or as much - as you want.', 'revenue-generator' ),
 					array(
@@ -413,7 +410,6 @@ $purchase_option_items = $purchase_options_data['options'];
 			<?php
 			printf(
 				wp_kses(
-				/* translators: 1: Link to WP admin new post page. */
 					__(
 						'If you select <b>Dynamic Pricing</b>, LaterPay’s AI will “dynamically” adjust the price based on our own data, analytics and algorithms based on the length of each article.', 'revenue-generator' ),
 					array(
@@ -426,7 +422,7 @@ $purchase_option_items = $purchase_options_data['options'];
 	</div>
 </script>
 
-<!-- Template for paywall removal confirmation -->
+<!-- Template for paywall removal confirmation. -->
 <script type="text/template" id="tmpl-revgen-remove-paywall">
 	<div class="rev-gen-preview-main-remove-paywall">
 		<h4 class="rev-gen-preview-main-remove-paywall-title"><?php esc_html_e( 'Are you sure you want to remove the paywall.', 'revenue-generator' ); ?></h4>
@@ -443,5 +439,17 @@ $purchase_option_items = $purchase_options_data['options'];
 				<?php esc_html_e( 'No, keep Paywall', 'revenue-generator' ); ?>
 			</button>
 		</div>
+	</div>
+</script>
+
+<!-- Template for action to add paywall. -->
+<script type="text/template" id="tmpl-revgen-add-paywall">
+	<div class="rev-gen-preview-main--paywall-actions-add">
+		<p>
+			<?php esc_html_e( 'You don’t have a paywall on this page - all content will be publicly visible.', 'revenue-generator' ); ?>
+		</p>
+		<button id="rj_js_addNewPaywall" data-preview-id="">
+			<?php esc_html_e( 'Add Paywall', 'revenue-generator' ); ?>
+		</button>
 	</div>
 </script>
