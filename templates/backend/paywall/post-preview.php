@@ -19,6 +19,9 @@ $rg_teaser = empty( $rg_preview_post['excerpt'] ) ? $rg_preview_post['teaser'] :
 $paywall_data          = isset( $purchase_options_data['paywall'] ) ? $purchase_options_data['paywall'] : [];
 $paywall_id            = empty( $paywall_data['id'] ) ? '' : $paywall_data['id'];
 $paywall_preview_id    = empty( $paywall_data['preview_id'] ) ? '' : $paywall_data['preview_id'];
+if ( empty( $paywall_data ) ) {
+	$paywall_preview_id = $rg_preview_post['ID'];
+}
 $paywall_access_to     = isset( $paywall_data['access_to'] ) ? $paywall_data['access_to'] : 'all';
 $purchase_option_items = $purchase_options_data['options'];
 ?>

@@ -227,6 +227,13 @@ import {__} from '@wordpress/i18n';
 
 				$o.searchPaywallContent.on('change', function () {
 					const categoryId = $(this).val();
+					const currentCategoryId = $o.postPreviewWrapper.attr('data-access-id');
+
+					// Remove current meta.
+					if ( currentCategoryId ) {
+						removeCurrentCategoryMeta( currentCategoryId );
+					}
+
 					if (categoryId) {
 						$o.postPreviewWrapper.attr('data-access-id', categoryId);
 					}
@@ -871,6 +878,34 @@ import {__} from '@wordpress/i18n';
 					// Update paywall data.
 					updatePaywall(revenueGeneratorGlobalOptions.ajaxUrl, data);
 				});
+			};
+
+			/**
+			 * Clear category meta on change.
+			 *
+			 * @param categoryId
+			 */
+			const removeCurrentCategoryMeta = function ( categoryId ) {
+				// prevent duplicate requests.
+				if (!$o.requestSent) {
+					$o.requestSent = true;
+
+					// Create form data.
+					const formData = {
+						action         : 'rg_clear_category_meta',
+						rg_category_id: categoryId,
+						security       : revenueGeneratorGlobalOptions.rg_paywall_nonce,
+					};
+
+					$.ajax({
+						url     : revenueGeneratorGlobalOptions.ajaxUrl,
+						method  : 'POST',
+						data    : formData,
+						dataType: 'json',
+					}).done(function (r) {
+						$o.requestSent = false;
+					});
+				}
 			};
 
 			/**

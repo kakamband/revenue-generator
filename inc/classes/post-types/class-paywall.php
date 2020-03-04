@@ -70,6 +70,17 @@ class Paywall extends Base {
 			update_post_meta( $paywall_id, '_rg_preview_id', $paywall_data['preview_id'] );
 		}
 
+		// If paywall is being added based on categories make sure to create meta to identify it.
+		if (
+		( ! empty( $paywall_data['access_to'] ) && ! empty( $paywall_data['access_entity'] ) ) &&
+			(
+				'category' === $paywall_data['access_to'] ||
+				'exclude_category' === $paywall_data['access_to']
+			)
+		) {
+			update_term_meta( $paywall_data['access_entity'], '_rg_has_paywall', 'true' );
+		}
+
 		return $paywall_id;
 	}
 

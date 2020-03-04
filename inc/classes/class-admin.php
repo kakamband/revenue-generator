@@ -46,6 +46,7 @@ class Admin {
 		add_action( 'wp_ajax_rg_search_preview_content', [ $this, 'search_preview_content' ] );
 		add_action( 'wp_ajax_rg_select_preview_content', [ $this, 'select_preview_content' ] );
 		add_action( 'wp_ajax_rg_search_term', [ $this, 'select_search_term' ] );
+		add_action( 'wp_ajax_rg_clear_category_meta', [ $this, 'clear_category_meta' ] );
 	}
 
 	/**
@@ -679,5 +680,23 @@ class Admin {
 			'success'    => true,
 			'categories' => $category_instance->get_applicable_categories( $args )
 		] );
+	}
+
+	/**
+	 * Clear category meta data on new selection.
+	 */
+	public function clear_category_meta() {
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Get all data and sanitize it.
+		$rg_category_id    = sanitize_text_field( filter_input( INPUT_POST, 'rg_category_id', FILTER_SANITIZE_NUMBER_INT ) );
+		$category_instance = Categories::get_instance();
+
+		if ( $category_instance->clear_category_paywall_meta( $rg_category_id ) ) {
+			wp_send_json_success();
+		} else {
+			wp_send_json_error();
+		}
 	}
 }

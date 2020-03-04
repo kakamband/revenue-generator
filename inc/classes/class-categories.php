@@ -44,4 +44,15 @@ class Categories {
 		return $category_with_price->terms;
 	}
 
+	/**
+	 * Clear category meta if a new one has been added.
+	 *
+	 * @param int $rg_category_id Term ID to clear meta information.
+	 *
+	 * @return bool
+	 */
+	public function clear_category_paywall_meta( $rg_category_id ) {
+		return delete_term_meta( $rg_category_id, '_rg_has_paywall' );
+	}
+
 }
