@@ -120,6 +120,10 @@ class Post_Types {
 			return [];
 		}
 
+		if ( ! in_array( $post_data->post_type, self::get_allowed_post_types() ) ) {
+			return [];
+		}
+
 		// Generate a teaser for the post, if excerpt is empty.
 		$post_content = do_blocks( $post_data->post_content );
 

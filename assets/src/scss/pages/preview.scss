@@ -171,14 +171,12 @@
 				border-radius: 3px;
 
 				&:disabled {
-					background-color: darkgray;
-					border: 2px solid darkgray;
 					cursor: not-allowed;
 				}
 			}
 
 			&-publish {
-				background-color: #000;
+				background-color: #000 !important;
 				color: #ffffff;
 			}
 		}
@@ -228,7 +226,7 @@
 		position: fixed;
 		left: 54%;
 		overflow: hidden;
-		bottom: 20px;
+		bottom: 40%;
 		height: 330px;
 		width: 430px;
 		margin: 0 0 0 -190px;

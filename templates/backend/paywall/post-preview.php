@@ -13,93 +13,108 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+$rg_teaser = '';
+
 // Create data for view.
-$rg_teaser = empty( $rg_preview_post['excerpt'] ) ? $rg_preview_post['teaser'] : $rg_preview_post['excerpt'];
+if ( ! empty( $rg_preview_post['excerpt'] ) ) {
+	$rg_teaser = $rg_preview_post['excerpt'];
+} else if ( ! empty( $rg_preview_post['teaser'] ) ) {
+	$rg_teaser = $rg_preview_post['teaser'];
+}
 
 $paywall_data       = isset( $purchase_options_data['paywall'] ) ? $purchase_options_data['paywall'] : [];
 $paywall_id         = empty( $paywall_data['id'] ) ? '' : $paywall_data['id'];
 $paywall_preview_id = empty( $paywall_data['preview_id'] ) ? '' : $paywall_data['preview_id'];
-if ( empty( $paywall_data ) ) {
+if ( empty( $paywall_data ) && ! empty( $rg_preview_post['ID'] ) ) {
 	$paywall_preview_id = $rg_preview_post['ID'];
 }
 $paywall_access_to     = isset( $paywall_data['access_to'] ) ? $paywall_data['access_to'] : 'all';
 $purchase_option_items = $purchase_options_data['options'];
 ?>
 
-<div class="rev-gen-layout-wrapper">
-	<div class="laterpay-loader-wrapper">
-		<img alt="<?php echo esc_attr( 'LaterPay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
-	</div>
-	<div class="rev-gen-preview-main">
-		<div class="rev-gen-preview-main--search">
-			<?php if ( ! empty( $rg_preview_post['title'] ) ) : ?>
-				<label for="rg_js_searchContent"><?php esc_html_e( 'Previewing', 'revenue-generator' ); ?>:</label>
-			<?php endif; ?>
-			<input type="text" id="rg_js_searchContent" placeholder="<?php esc_attr_e( 'search for the page or post you\'d like to preview here', 'revenue-generator' ); ?>" value="<?php echo esc_attr( $rg_preview_post['title'] ); ?>" />
-			<i class="dashicons dashicons-search"></i>
-			<div class="rev-gen-preview-main--search-results"></div>
+<?php if ( ! empty( $rg_preview_post ) ) : ?>
+	<div class="rev-gen-layout-wrapper">
+		<div class="laterpay-loader-wrapper">
+			<img alt="<?php echo esc_attr( 'LaterPay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
 		</div>
-		<div id="rg_js_postPreviewWrapper" data-preview-id="<?php echo esc_attr( $paywall_preview_id ); ?>" data-access-id="<?php echo esc_attr( $rg_preview_post['ID'] ); ?>" class="rev-gen-preview-main--post">
-			<h4 class="rev-gen-preview-main--post--title"><?php echo esc_html( $rg_preview_post['title'] ); ?></h4>
-			<?php if ( ! empty( $rg_teaser ) ) : ?>
-				<p id="rg_js_postPreviewExcerpt" class="rev-gen-preview-main--post--excerpt"><?php echo wp_kses_post( $rg_teaser ) ?></p>
-			<?php endif; ?>
-			<div id="rg_js_postPreviewContent" class="rev-gen-preview-main--post--content">
-				<?php echo wp_kses_post( $rg_preview_post['post_content'] ); ?>
-			</div>
-			<div class="rg-purchase-overlay" id="rg_js_purchaseOverlay">
-				<button class="rg-purchase-overlay-remove">
-					<img alt="<?php echo esc_attr( 'Paywall Remove', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['option_remove'] ); ?>" />
-				</button>
-			</div>
-		</div>
-		<div class="rev-gen-preview-main--paywall-actions">
-			<div class="rev-gen-preview-main--paywall-actions-apply">
-				<p>
-					<?php
-					echo wp_kses(
-						sprintf(
-							__( 'Apply <span contenteditable="true" class="rev-gen-preview-main-paywall-name">%s</span> to', 'revenue-generator' ),
-							esc_html( 'Paywall 1' )
-						),
-						[
-							'span' => [
-								'class'           => [],
-								'contenteditable' => true,
-							]
-						]
-					);
-					?>
-				</p>
-				<select class="rev-gen-preview-main-paywall-applies-to">
-					<option <?php selected( $paywall_access_to, 'all', true ); ?> value="all"><?php esc_html_e( 'all posts and pages', 'revenue-generator' ); ?></option>
-					<option <?php selected( $paywall_access_to, 'supported', true ); ?> value="supported"><?php esc_html_e( 'selected post or page', 'revenue-generator' ); ?></option>
-					<option <?php selected( $paywall_access_to, 'category', true ); ?> value="category"><?php esc_html_e( 'category', 'revenue-generator' ); ?></option>
-					<option <?php selected( $paywall_access_to, 'exclude_category', true ); ?> value="exclude_category"><?php esc_html_e( 'except for category', 'revenue-generator' ); ?></option>
-				</select>
-			</div>
-			<div class="rev-gen-preview-main--paywall-actions-search">
-				<select id="rg_js_searchPaywallContent">
-					<?php if ( ! empty( $rg_category_data ) ): ?>
-						<option selected="selected" value="<?php echo esc_attr( $rg_category_data->term_id ); ?>">
-							<?php echo esc_html( $rg_category_data->name ); ?>
-						</option>
-					<?php endif; ?>
-				</select>
+		<div class="rev-gen-preview-main">
+			<div class="rev-gen-preview-main--search">
+				<?php if ( ! empty( $rg_preview_post['title'] ) ) : ?>
+					<label for="rg_js_searchContent"><?php esc_html_e( 'Previewing', 'revenue-generator' ); ?>:</label>
+				<?php endif; ?>
+				<input type="text" id="rg_js_searchContent" placeholder="<?php esc_attr_e( 'search for the page or post you\'d like to preview here', 'revenue-generator' ); ?>" value="<?php echo esc_attr( $rg_preview_post['title'] ); ?>" />
 				<i class="dashicons dashicons-search"></i>
+				<div class="rev-gen-preview-main--search-results"></div>
 			</div>
-			<div class="rev-gen-preview-main--paywall-actions-update">
-				<button id="rg_js_savePaywall" class="rev-gen-preview-main-paywall-actions-update-save">
-					<?php esc_html_e( 'Save', 'revenue-generator' ); ?>
-				</button>
-				<button id="rg_js_activatePaywall" disabled="disabled" class="rev-gen-preview-main--paywall-actions-update-publish">
-					<?php esc_html_e( 'Publish', 'revenue-generator' ); ?>
-				</button>
+			<div id="rg_js_postPreviewWrapper" data-preview-id="<?php echo esc_attr( $paywall_preview_id ); ?>" data-access-id="<?php echo esc_attr( $rg_preview_post['ID'] ); ?>" class="rev-gen-preview-main--post">
+				<h4 class="rev-gen-preview-main--post--title"><?php echo esc_html( $rg_preview_post['title'] ); ?></h4>
+				<?php if ( ! empty( $rg_teaser ) ) : ?>
+					<p id="rg_js_postPreviewExcerpt" class="rev-gen-preview-main--post--excerpt"><?php echo wp_kses_post( $rg_teaser ) ?></p>
+				<?php endif; ?>
+				<div id="rg_js_postPreviewContent" class="rev-gen-preview-main--post--content">
+					<?php echo wp_kses_post( $rg_preview_post['post_content'] ); ?>
+				</div>
+				<div class="rg-purchase-overlay" id="rg_js_purchaseOverlay">
+					<button class="rg-purchase-overlay-remove">
+						<img alt="<?php echo esc_attr( 'Paywall Remove', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['option_remove'] ); ?>" />
+					</button>
+				</div>
+			</div>
+			<div class="rev-gen-preview-main--paywall-actions">
+				<div class="rev-gen-preview-main--paywall-actions-apply">
+					<p>
+						<?php
+						echo wp_kses(
+							sprintf(
+								__( 'Apply <span contenteditable="true" class="rev-gen-preview-main-paywall-name">%s</span> to', 'revenue-generator' ),
+								esc_html( 'Paywall 1' )
+							),
+							[
+								'span' => [
+									'class'           => [],
+									'contenteditable' => true,
+								]
+							]
+						);
+						?>
+					</p>
+					<select class="rev-gen-preview-main-paywall-applies-to">
+						<option <?php selected( $paywall_access_to, 'all', true ); ?> value="all"><?php esc_html_e( 'all posts and pages', 'revenue-generator' ); ?></option>
+						<option <?php selected( $paywall_access_to, 'supported', true ); ?> value="supported"><?php esc_html_e( 'selected post or page', 'revenue-generator' ); ?></option>
+						<option <?php selected( $paywall_access_to, 'category', true ); ?> value="category"><?php esc_html_e( 'category', 'revenue-generator' ); ?></option>
+						<option <?php selected( $paywall_access_to, 'exclude_category', true ); ?> value="exclude_category"><?php esc_html_e( 'except for category', 'revenue-generator' ); ?></option>
+					</select>
+				</div>
+				<div class="rev-gen-preview-main--paywall-actions-search">
+					<select id="rg_js_searchPaywallContent">
+						<?php if ( ! empty( $rg_category_data ) ): ?>
+							<option selected="selected" value="<?php echo esc_attr( $rg_category_data->term_id ); ?>">
+								<?php echo esc_html( $rg_category_data->name ); ?>
+							</option>
+						<?php endif; ?>
+					</select>
+					<i class="dashicons dashicons-search"></i>
+				</div>
+				<div class="rev-gen-preview-main--paywall-actions-update">
+					<button id="rg_js_savePaywall" class="rev-gen-preview-main-paywall-actions-update-save">
+						<?php esc_html_e( 'Save', 'revenue-generator' ); ?>
+					</button>
+					<button id="rg_js_activatePaywall" disabled="disabled" class="rev-gen-preview-main--paywall-actions-update-publish">
+						<?php esc_html_e( 'Publish', 'revenue-generator' ); ?>
+					</button>
+				</div>
 			</div>
 		</div>
+		<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
 	</div>
-	<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
-</div>
+<?php else : ?>
+	<div class="rev-gen-no-data">
+		<p>
+			<?php esc_html_e( 'Invalid Paywall!', 'revenue-generator' ); ?>
+		</p>
+	</div>
+	<?php View::render_footer_backend(); ?>
+<?php endif; ?>
 
 <!-- Template for purchase option manager actions -->
 <script type="text/template" id="tmpl-revgen-purchase-overlay-actions">
@@ -199,12 +214,17 @@ $purchase_option_items = $purchase_options_data['options'];
 				$purchase_option_period   = $is_individual ? '' : $purchase_option['period'];
 				$purchase_option_order    = $purchase_option['order'];
 
+				$additional_class = '';
+				if ( 2 === $purchase_option_order ) {
+					$additional_class = 'option-item-second';
+				}
+
 				if ( $is_individual ) {
 					$individual_type = empty( $purchase_option['type'] ) ? 'static' : $purchase_option['type'];
 				}
 				?>
 				<div
-					class="rg-purchase-overlay-purchase-options-item"
+					class="rg-purchase-overlay-purchase-options-item <?php echo esc_attr( $additional_class ); ?>"
 					data-purchase-type="<?php echo esc_attr( $purchase_option_type ); ?>"
 					<?php if ( 'individual' !== $purchase_option_type ): ?>
 						data-expiry-duration="<?php echo esc_attr( $purchase_option_duration ); ?>"

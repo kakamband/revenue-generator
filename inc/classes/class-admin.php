@@ -47,6 +47,7 @@ class Admin {
 		add_action( 'wp_ajax_rg_select_preview_content', [ $this, 'select_preview_content' ] );
 		add_action( 'wp_ajax_rg_search_term', [ $this, 'select_search_term' ] );
 		add_action( 'wp_ajax_rg_clear_category_meta', [ $this, 'clear_category_meta' ] );
+		add_action( 'wp_ajax_rg_complete_tour', [ $this, 'complete_tour' ] );
 	}
 
 	/**
@@ -138,21 +139,23 @@ class Admin {
 
 		// Get all submenus and add it.
 		$menus = self::get_admin_menus();
-		foreach ( $menus as $key => $page_data ) {
-			$slug          = $page_data['url'];
-			$page_callback = (
-				'dashboard' === $page_data['method'] && false === $is_welcome_setup_done ) ?
-				'load_welcome_screen' :
-				'load_' . $page_data['method'];
+		if ( ! empty( $menus ) ) {
+			foreach ( $menus as $key => $page_data ) {
+				$slug          = $page_data['url'];
+				$page_callback = (
+					'dashboard' === $page_data['method'] && false === $is_welcome_setup_done ) ?
+					'load_welcome_screen' :
+					'load_' . $page_data['method'];
 
-			add_submenu_page(
-				'revenue-generator',
-				$page_data['title'] . ' | ' . __( 'Revenue Generator Settings', 'revenue-generator' ),
-				$page_data['title'],
-				$page_data['cap'],
-				$slug,
-				[ $this, $page_callback ]
-			);
+				add_submenu_page(
+					'revenue-generator',
+					$page_data['title'] . ' | ' . __( 'Revenue Generator Settings', 'revenue-generator' ),
+					$page_data['title'],
+					$page_data['cap'],
+					$slug,
+					[ $this, $page_callback ]
+				);
+			}
 		}
 	}
 
@@ -185,7 +188,7 @@ class Admin {
 		$admin_menus            = self::get_admin_menus();
 
 		$dashboard_pages = [ 'toplevel_page_revenue-generator', 'revenue-generator_page_revenue-generator-dashboard' ];
-		if ( in_array( $current_screen->id, $dashboard_pages ) ) {
+		if ( in_array( $current_screen->id, $dashboard_pages ) && ! empty( $admin_menus ) ) {
 			// Check if tutorial is completed, and load page accordingly.
 			$is_welcome_setup_done = empty( $current_global_options['average_post_publish_count'] ) ? false : true;
 			$is_tutorial_completed = (bool) $current_global_options['is_tutorial_completed'];
@@ -247,20 +250,32 @@ class Admin {
 
 			$paywall_data = $purchase_options['paywall'];
 
-			if ( 'category' === $paywall_data['access_to'] || 'exclude_category' === $paywall_data['access_to'] ) {
-				$rg_category_id = $paywall_data['access_entity'];
-				if ( ! empty( $rg_category_id ) ) {
-					$rg_category_data = get_term( $rg_category_id, 'category' );
+			if ( ! empty( $paywall_data ) ) {
+				if ( 'category' === $paywall_data['access_to'] || 'exclude_category' === $paywall_data['access_to'] ) {
+					$rg_category_id = $paywall_data['access_entity'];
+					if ( ! empty( $rg_category_id ) ) {
+						$rg_category_data = get_term( $rg_category_id, 'category' );
+					}
 				}
 			}
 		} else {
 
-			// Get latest post info for preview.
-			$target_post_id  = $post_types->get_latest_post_for_preview();
-			$post_preview_id = filter_input( INPUT_GET, 'preview_post_id', FILTER_SANITIZE_NUMBER_INT );
+			$post_preview_id     = filter_input( INPUT_GET, 'preview_post_id', FILTER_SANITIZE_NUMBER_INT );
+			$target_post_id      = 0;
+			$formatted_post_data = [];
 
 			if ( ! empty( $post_preview_id ) ) {
 				$target_post_id = $post_preview_id;
+			}
+
+			if ( ! empty( $target_post_id ) ) {
+				$formatted_post_data = $post_types->get_formatted_post_data( $target_post_id );
+			}
+
+			// Get formatted data again for latest post id.
+			if ( empty( $formatted_post_data ) ) {
+				// Get latest post info for preview.
+				$target_post_id = $post_types->get_latest_post_for_preview();;
 			}
 
 			$formatted_post_data = $post_types->get_formatted_post_data( $target_post_id );
@@ -349,19 +364,27 @@ class Admin {
 	 * @return array
 	 */
 	public static function get_admin_menus() {
-		$menus['dashboard'] = [
-			'url'    => 'revenue-generator-dashboard',
-			'title'  => __( 'Dashboard', 'revenue-generator' ),
-			'cap'    => 'manage_options',
-			'method' => 'dashboard'
-		];
+		$menus                  = [];
+		$current_global_options = Config::get_global_options();
 
-		$menus['paywall'] = [
-			'url'    => 'revenue-generator-paywall',
-			'title'  => __( 'New Paywall', 'revenue-generator' ),
-			'cap'    => 'manage_options',
-			'method' => 'paywall'
-		];
+		// Check if tutorial is completed, and load page accordingly.
+		$is_welcome_setup_done = empty( $current_global_options['average_post_publish_count'] ) ? false : true;
+
+		if ( $is_welcome_setup_done ) {
+			$menus['dashboard'] = [
+				'url'    => 'revenue-generator-dashboard',
+				'title'  => __( 'Dashboard', 'revenue-generator' ),
+				'cap'    => 'manage_options',
+				'method' => 'dashboard'
+			];
+
+			$menus['paywall'] = [
+				'url'    => 'revenue-generator-paywall',
+				'title'  => __( 'New Paywall', 'revenue-generator' ),
+				'cap'    => 'manage_options',
+				'method' => 'paywall'
+			];
+		}
 
 		return $menus;
 	}
@@ -703,5 +726,41 @@ class Admin {
 		} else {
 			wp_send_json_error();
 		}
+	}
+
+	/**
+	 * Complete the welcome tour.
+	 */
+	public function complete_tour() {
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Get all data and sanitize it.
+		$config_key   = sanitize_text_field( filter_input( INPUT_POST, 'config_key', FILTER_SANITIZE_STRING ) );
+		$config_value = sanitize_text_field( filter_input( INPUT_POST, 'config_value', FILTER_SANITIZE_STRING ) );
+
+		$rg_global_options = Config::get_global_options();
+
+		// Check if the option exists already.
+		if ( ! isset( $rg_global_options[ $config_key ] ) ) {
+			wp_send_json( [
+				'success' => false,
+				'msg'     => __( 'Invalid data passed!', 'revenue-generator' )
+			] );
+		}
+
+		// Check and verify updated option.
+		if ( ! empty( $config_value ) ) {
+			$rg_global_options[ $config_key ] = $config_value;
+		}
+
+		// Update the option value.
+		update_option( 'lp_rg_global_options', $rg_global_options );
+
+		// Send success message.
+		wp_send_json( [
+			'success' => true,
+			'msg'     => __( 'Selection stored successfully!', 'revenue-generator' )
+		] );
 	}
 }

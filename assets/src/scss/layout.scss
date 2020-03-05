@@ -1,3 +1,5 @@
+@import "vendor/shepherd.css";
+
 body {
 	background: #FFFFFF;
 
@@ -11,11 +13,83 @@ body {
 	color: #1D1D1D;
 	font-family: Helvetica Neue, serif;
 	min-height: 750px;
+
+	.shepherd-target {
+		background-color: #fff;
+	}
+}
+
+.rev-gen-no-data {
+	width: 100%;
+	color: #ec0b00;
+	font-family: Helvetica Neue, serif;
+	display: flex;
+	justify-content: center;
+	min-height: 550px;
+
+	p {
+		height: 20px;
+		font-size: 20px;
+	}
+}
+
+.rev-gen-tutorial-card {
+	width: 200px;
+	height: 120px;
+	background-color: #1e1e1e;
+	color: #fff;
+	padding: 10px;
+	border-radius: 5px;
+	z-index: 999;
+
+	.info-link {
+		color: #fff;
+		text-decoration: underline;
+	}
+
+	.shepherd-arrow {
+		color: black;
+	}
+
+	.shepherd-text {
+		padding: 5px;
+	}
+
+	.shepherd-button {
+		background: transparent;
+		color: #fff;
+		text-transform: uppercase;
+		border: 0;
+		cursor: pointer;
+		margin-right: 20px;
+		padding: 0;
+		margin-left: 5px;
+	}
+
+	.shepherd-footer {
+		position: absolute;
+		bottom: 20px;
+	}
+}
+
+.shepherd-content-add-space {
+
+	&-top {
+		top: 10px !important;
+	}
+
+	&-bottom {
+		bottom: 10px !important;
+	}
 }
 
 .rev-gen-powered-by-footer {
 	color: grey;
 	margin-left: 15px;
+}
+
+.shepherd-modal-overlay-container {
+	display: none;
 }
 
 #wpfooter {

@@ -50,7 +50,6 @@ class Config {
 					'average_post_publish_count' => '',
 					'merchant_currency'          => '',
 					'is_tutorial_completed'      => 0,
-					'current_tutorial_progress'  => ''
 				]
 			);
 		}

@@ -9,7 +9,8 @@
  * Internal dependencies.
  */
 import '../utils';
-import {__} from '@wordpress/i18n';
+import {__, sprintf} from '@wordpress/i18n';
+import Shepherd from "shepherd.js";
 
 (function ($) {
 	$(function () {
@@ -49,6 +50,7 @@ import {__} from '@wordpress/i18n';
 				purchaseOptionPriceSymbol: '.rg-purchase-overlay-purchase-options-item-price-symbol',
 				optionArea               : '.rg-purchase-overlay-option-area',
 				addOptionArea            : '.rg-purchase-overlay-option-area-add-option',
+				previewSecondItem        : '.rg-purchase-overlay-purchase-options .option-item-second',
 
 				// Action buttons
 				editOption    : '.rg-purchase-overlay-option-edit',
@@ -125,6 +127,36 @@ import {__} from '@wordpress/i18n';
 							$o.activatePaywall.removeAttr('disabled');
 						}
 					}
+
+					// // Start the welcome tour.
+					if (revenueGeneratorGlobalOptions.globalOptions.average_post_publish_count.length &&
+						0 === parseInt(revenueGeneratorGlobalOptions.globalOptions.is_tutorial_completed)
+					) {
+						const tour = initializeTour();
+						addTourSteps(tour);
+						startWelcomeTour(tour);
+					}
+				});
+
+				/**
+				 * Handle the next button events of the tour and update preview accordingly.
+				 */
+				$o.body.on('click', '.shepherd-button', function () {
+					const currentStep = Shepherd.activeTour.getCurrentStep();
+					const stepId = currentStep.id;
+					$($o.purchaseOptionItem).css({'background-color': 'darkgray'});
+
+					if ('rg-purchase-option-item' === stepId) {
+						$($o.previewSecondItem).trigger('mouseenter');
+						$($o.previewSecondItem).css({'background-color': '#fff'});
+					} else if ('rg-purchase-option-item-price' === stepId) {
+						$($o.optionArea).trigger('mouseenter');
+						$($o.previewSecondItem).trigger('mouseleave');
+					} else if ('rg-purchase-option-paywall-name' === stepId) {
+						$($o.paywallAppliesTo).val('category');
+						$($o.paywallAppliesTo).trigger('change');
+						$($o.optionArea).trigger('mouseleave');
+					}
 				});
 
 				/**
@@ -190,19 +222,19 @@ import {__} from '@wordpress/i18n';
 				 */
 				$o.searchPaywallContent.select2({
 					ajax              : {
-						url           : revenueGeneratorGlobalOptions.ajaxUrl,
-						dataType      : 'json',
-						delay         : 500,
-						type          : 'POST',
-						data          : function (params) {
+						url     : revenueGeneratorGlobalOptions.ajaxUrl,
+						dataType: 'json',
+						delay   : 500,
+						type    : 'POST',
+						data(params) {
 							return {
 								term    : params.term,
 								action  : 'rg_search_term',
 								security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
 							};
 						},
-						processResults: function (data) {
-							let options = [];
+						processResults(data) {
+							const options = [];
 							if (data) {
 								$.each(data.categories, function (index) {
 									const term = data.categories[index];
@@ -216,14 +248,14 @@ import {__} from '@wordpress/i18n';
 								results: options
 							};
 						},
-						cache         : true
+						cache   : true
 					},
 					placeholder       : __('search', 'revenue-generator'),
 					language          : {
-						inputTooShort: function () {
+						inputTooShort() {
 							return __('Please enter 1 or more characters.', 'revenue-generator');
 						},
-						noResults    : function () {
+						noResults() {
 							return __('No results found.', 'revenue-generator');
 						}
 					},
@@ -647,7 +679,7 @@ import {__} from '@wordpress/i18n';
 				/**
 				 * Add paywall border if hovering over the saved paywall area.
 				 */
-				$o.purchaseOverlay.on('mouseenter', function (e) {
+				$o.purchaseOverlay.on('mouseenter', function () {
 					const paywall = $($o.purchaseOptionItems);
 					const paywallId = paywall.attr('data-paywall-id');
 					if (paywallId.length) {
@@ -688,7 +720,7 @@ import {__} from '@wordpress/i18n';
 				/**
 				 * Handle the change of entity type i.e Individual, TimePass, Subscription.
 				 */
-				$o.body.on('change', $o.entitySelection, function (e) {
+				$o.body.on('change', $o.entitySelection, function () {
 					const optionItem = $(this).parents($o.purchaseOptionItem);
 					const currentType = optionItem.attr('data-purchase-type');
 					const selectedEntityType = $(this).val();
@@ -884,13 +916,13 @@ import {__} from '@wordpress/i18n';
 					 * Final data of paywall.
 					 */
 					const data = {
-						action       : 'rg_update_paywall',
-						post_id      : $o.postPreviewWrapper.attr('data-access-id'),
-						paywall      : paywall,
-						individual   : individualObj,
-						time_passes  : timePasses,
-						subscriptions: subscriptions,
-						security     : revenueGeneratorGlobalOptions.rg_paywall_nonce,
+						action     : 'rg_update_paywall',
+						post_id    : $o.postPreviewWrapper.attr('data-access-id'),
+						paywall,
+						individual : individualObj,
+						time_passes: timePasses,
+						subscriptions,
+						security   : revenueGeneratorGlobalOptions.rg_paywall_nonce,
 					};
 
 					// Update paywall data.
@@ -899,9 +931,238 @@ import {__} from '@wordpress/i18n';
 			};
 
 			/**
+			 * Initialize the tour object.
+			 *
+			 * @return {Shepherd.Tour} Shepherd tour object.
+			 */
+			const initializeTour = function () {
+				return new Shepherd.Tour({
+					defaultStepOptions: {
+						classes : 'rev-gen-tutorial-card',
+						scrollTo: true,
+					}
+				});
+			};
+
+			/**
+			 * Add required info steps for the merchant.
+			 *
+			 * @param {Shepherd.Tour} tour Tour object.
+			 */
+			const addTourSteps = function (tour) {
+				const skipTourButton = {
+					text  : __('Skip Tour', 'revenue-generator'),
+					action: tour.complete
+				};
+
+				const nextButton = {
+					text  : __('Next >', 'revenue-generator'),
+					action: tour.next
+				};
+
+				// Add tutorial step for main search.
+				tour.addStep({
+					id      : 'rg-main-search-input',
+					text    : __('Search for the page or post you\'d like to preview with Revenue Generator here.', 'revenue-generator'),
+					attachTo: {
+						element: '.rev-gen-preview-main--search',
+						on     : 'bottom'
+					},
+					arrow   : true,
+					classes : 'shepherd-content-add-space-top',
+					buttons : [skipTourButton, nextButton]
+				});
+
+				// Add tutorial step for option item.
+				tour.addStep({
+					id      : 'rg-purchase-option-item',
+					text    : __('Hover over each element to see the available options.', 'revenue-generator'),
+					attachTo: {
+						element: '.rg-purchase-overlay-purchase-options .option-item-second',
+						on     : 'top'
+					},
+					arrow   : true,
+					classes : 'shepherd-content-add-space-bottom',
+					buttons : [nextButton]
+				});
+
+				// Add tutorial step for option item edit button.
+				tour.addStep({
+					id      : 'rg-purchase-option-item-edit',
+					text    : __('Click on the ‘more options’ icon to set the product type (single item purchase, time pass, or subscription).', 'revenue-generator'),
+					attachTo: {
+						element: '.rg-purchase-overlay-purchase-options .option-item-second .rg-purchase-overlay-option-edit',
+						on     : 'left'
+					},
+					arrow   : true,
+					buttons : [nextButton]
+				});
+
+				// Add tutorial step for option item title area.
+				tour.addStep({
+					id      : 'rg-purchase-option-item-title',
+					text    : __('Click on any text element to edit it.', 'revenue-generator'),
+					attachTo: {
+						element: '.rg-purchase-overlay-purchase-options .option-item-second .rg-purchase-overlay-purchase-options-item-info .rg-purchase-overlay-purchase-options-item-info-title',
+						on     : 'top'
+					},
+					arrow   : true,
+					classes : 'shepherd-content-add-space-bottom',
+					buttons : [nextButton]
+				});
+
+				// Add tutorial step for option item price area.
+				tour.addStep({
+					id      : 'rg-purchase-option-item-price',
+					text    : sprintf(
+						__(
+							'These are our recommended prices. Click to edit; prices lower than 5.00 will default to %spay later%s.',
+							'revenue-generator'
+						),
+						'<a class="info-link" href="https://www.laterpay.net/academy/getting-started-with-laterpay-the-difference-between-pay-now-pay-later" target="_blank" rel="noopener noreferrer">',
+						'</a>'
+					),
+					attachTo: {
+						element: '.rg-purchase-overlay-purchase-options .option-item-second .rg-purchase-overlay-purchase-options-item-price',
+						on     : 'top'
+					},
+					arrow   : true,
+					classes : 'shepherd-content-add-space-bottom',
+					buttons : [nextButton]
+				});
+
+				// Add tutorial step for option item add.
+				tour.addStep({
+					id      : 'rg-purchase-option-item-add',
+					text    : __('Hover below the paywall to get the option to add another purchase button.', 'revenue-generator'),
+					attachTo: {
+						element: '.rg-purchase-overlay-option-area-add-option',
+						on     : 'top'
+					},
+					arrow   : true,
+					classes : 'shepherd-content-add-space-bottom',
+					buttons : [nextButton]
+				});
+
+				// Add tutorial step for paywall name.
+				tour.addStep({
+					id      : 'rg-purchase-option-paywall-name',
+					text    : __('Click here to change the name of your paywall.', 'revenue-generator'),
+					attachTo: {
+						element: '.rev-gen-preview-main-paywall-name',
+						on     : 'bottom'
+					},
+					arrow   : true,
+					classes : 'shepherd-content-add-space-bottom',
+					buttons : [nextButton]
+				});
+
+				// Add tutorial step for paywall actions search.
+				tour.addStep({
+					id      : 'rg-purchase-option-paywall-actions-search',
+					text    : __('Select the content that  should display this paywall.', 'revenue-generator'),
+					attachTo: {
+						element: '.rev-gen-preview-main--paywall-actions .rev-gen-preview-main--paywall-actions-search',
+						on     : 'bottom'
+					},
+					arrow   : true,
+					classes : 'shepherd-content-add-space-bottom',
+					buttons : [nextButton]
+				});
+
+				// Add tutorial step for paywall actions publish.
+				tour.addStep({
+					id      : 'rg-purchase-option-paywall-publish',
+					text    : __('When you’re ready to activate your paywall, connect your LaterPay account.', 'revenue-generator'),
+					attachTo: {
+						element: '.rev-gen-preview-main--paywall-actions-update .rev-gen-preview-main--paywall-actions-update-publish',
+						on     : 'bottom'
+					},
+					arrow   : true,
+					classes : 'shepherd-content-add-space-bottom',
+					buttons : [
+						{
+							text  : __('Complete', 'revenue-generator'),
+							action: tour.next
+						}
+					]
+				});
+			};
+
+			/**
+			 * Handle the tour of the paywall elements.
+			 *
+			 * @param {Shepherd.Tour} tour Tour object.
+			 */
+			const startWelcomeTour = function (tour) {
+				// Blur out the wrapper and disable events, to highlight the tour elements.
+				$o.layoutWrapper.addClass('modal-blur');
+				$o.layoutWrapper.css({
+					'pointer-events': 'none',
+				});
+
+				const directionalKeys = ['ArrowUp', 'ArrowDown', 'ArrowRight', 'ArrowLeft'];
+				const disableArrowKeys = function (e) {
+					if (directionalKeys.includes(e.key)) {
+						e.preventDefault();
+						return false;
+					}
+				};
+
+				// Disable arrow events.
+				$(document).keydown(disableArrowKeys);
+
+				// Remove the blurry class and allow click events.
+				Shepherd.on('complete', function () {
+					// Revert to original state.
+					$o.layoutWrapper.removeClass('modal-blur');
+					$o.layoutWrapper.css({
+						'pointer-events': 'unset',
+					});
+
+					// Revert to original theme.
+					$($o.purchaseOptionItem).css({'background-color': '#fff'});
+
+					// Enable arow events.
+					$(document).unbind('keydown', disableArrowKeys);
+
+					// Complete the tour, and update plugin option.
+					completeTheTour();
+				});
+
+				// Start the tour.
+				tour.start();
+			};
+
+			/**
+			 * Complete the tour.
+			 */
+			const completeTheTour = function () {
+				// Create form data.
+				const formData = {
+					action      : 'rg_complete_tour',
+					config_key  : 'is_tutorial_completed',
+					config_value: 1,
+					security    : revenueGeneratorGlobalOptions.rg_paywall_nonce,
+				};
+
+				// Delete the option.
+				$.ajax({
+					url     : revenueGeneratorGlobalOptions.ajaxUrl,
+					method  : 'POST',
+					data    : formData,
+					dataType: 'json',
+				}).done(function (r) {
+					if (r.success) {
+						window.location.reload();
+					}
+				});
+			};
+
+			/**
 			 * Clear category meta on change.
 			 *
-			 * @param categoryId
+			 * @param {number} categoryId Category Id.
 			 */
 			const removeCurrentCategoryMeta = function (categoryId) {
 				// prevent duplicate requests.
@@ -920,7 +1181,7 @@ import {__} from '@wordpress/i18n';
 						method  : 'POST',
 						data    : formData,
 						dataType: 'json',
-					}).done(function (r) {
+					}).done(function () {
 						$o.requestSent = false;
 					});
 				}
@@ -1073,7 +1334,7 @@ import {__} from '@wordpress/i18n';
 			 * Create a confirmation modal with warning before removing paywall.
 			 */
 			const createPaywallRemovalConfirmation = function () {
-				return new Promise((complete, failed) => {
+				return new Promise((complete, failed) => { // eslint-disable-line no-unused-vars
 					$o.previewWrapper.find($o.paywallRemovalModal).remove();
 
 					// Get the template for confirmation popup and add it.
@@ -1118,7 +1379,7 @@ import {__} from '@wordpress/i18n';
 			 * Create a confirmation modal with warning before saved entity is updated.
 			 */
 			const createEntityUpdateConfirmation = function () {
-				return new Promise((complete, failed) => {
+				return new Promise((complete, failed) => { // eslint-disable-line no-unused-vars
 					$o.previewWrapper.find($o.purchaseOptionWarningWrapper).remove();
 
 					// Get the template for confirmation popup and add it.
@@ -1160,8 +1421,8 @@ import {__} from '@wordpress/i18n';
 				// Create form data.
 				const formData = {
 					action    : 'rg_remove_purchase_option',
-					type      : type,
-					id        : id,
+					type,
+					id,
 					paywall_id: paywallId,
 					security  : revenueGeneratorGlobalOptions.rg_paywall_nonce,
 				};
@@ -1218,7 +1479,8 @@ import {__} from '@wordpress/i18n';
 			 *
 			 * @param {string}  price                   Purchase option price.
 			 * @param {boolean} subscriptionValidation  Is current item subscription.
-			 * @returns {string}
+			 *
+			 * @return {string} return validated price.
 			 */
 			const validatePrice = function (price, subscriptionValidation) {
 				// strip non-number characters
@@ -1245,7 +1507,9 @@ import {__} from '@wordpress/i18n';
 					// correct prices outside the allowed range of 0.05 - 149.99
 					if (price > revenueGeneratorGlobalOptions.currency.sis_max) {
 						price = revenueGeneratorGlobalOptions.currency.sis_max;
-					} else if (price > 0 && price < revenueGeneratorGlobalOptions.currency.ppu_min) {
+					}
+
+					if (price > 0 && price < revenueGeneratorGlobalOptions.currency.ppu_min) {
 						price = revenueGeneratorGlobalOptions.currency.ppu_min;
 					}
 				}
@@ -1331,10 +1595,12 @@ import {__} from '@wordpress/i18n';
 
 			/**
 			 * Create a unique identifier.
+			 *
+			 * From https://stackoverflow.com/a/2117523/4368718 - uuidv4().
 			 */
 			const createUniqueID = function () {
 				return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-					const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+					const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8); // eslint-disable-line no-bitwise
 					return v.toString(16);
 				});
 			};
@@ -1346,7 +1612,8 @@ import {__} from '@wordpress/i18n';
 			 * @param {Object} $wrapper Select wrapper.
 			 */
 			const changeDurationOptions = function (period, $wrapper) {
-				let options = [], limit = 24;
+				const options = [];
+				let limit = 24;
 
 				// change duration options.
 				if (period === 'y') {
@@ -1370,7 +1637,6 @@ import {__} from '@wordpress/i18n';
 			 * Adds paywall.
 			 */
 			const addPaywall = function () {
-				const postExcerptExists = $o.postExcerpt.length ? true : false;
 				if ($o.postContent) {
 					// Blur the paid content out.
 					$o.postContent.addClass('blur-content');
@@ -1386,11 +1652,14 @@ import {__} from '@wordpress/i18n';
 
 			/**
 			 * Throttle the execution of a function by a given delay.
+			 *
+			 * @param {Function} fn    Callback function.
+			 * @param {number}   delay Time in ms to delay the operation.
 			 */
 			const debounce = function (fn, delay) {
-				var timer;
+				let timer;
 				return function () {
-					var context = this,
+					const context = this,
 						args = arguments;
 
 					clearTimeout(timer);

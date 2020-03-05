@@ -1,3 +1,37 @@
+
+.shepherd-arrow, .shepherd-arrow:before {
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	z-index: -1
+}
+
+.shepherd-arrow:before {
+	content: "";
+	transform: rotate(45deg);
+	background: #000;
+}
+
+.shepherd-element[data-popper-placement^=top] > .shepherd-arrow {
+	bottom: -8px
+}
+
+.shepherd-element[data-popper-placement^=bottom] > .shepherd-arrow {
+	top: -8px
+}
+
+.shepherd-element[data-popper-placement^=left] > .shepherd-arrow {
+	right: -8px
+}
+
+.shepherd-element[data-popper-placement^=right] > .shepherd-arrow {
+	left: -8px
+}
+
+.shepherd-element.shepherd-has-title[data-popper-placement^=bottom] > .shepherd-arrow:before {
+	background-color: #e6e6e6
+}
+
 body {
   background: #FFFFFF; }
   body #wpcontent {
@@ -8,10 +42,60 @@ body {
   color: #1D1D1D;
   font-family: Helvetica Neue, serif;
   min-height: 750px; }
+  .rev-gen-layout-wrapper .shepherd-target {
+    background-color: #fff; }
+
+.rev-gen-no-data {
+  width: 100%;
+  color: #ec0b00;
+  font-family: Helvetica Neue, serif;
+  display: flex;
+  justify-content: center;
+  min-height: 550px; }
+  .rev-gen-no-data p {
+    height: 20px;
+    font-size: 20px; }
+
+.rev-gen-tutorial-card {
+  width: 200px;
+  height: 120px;
+  background-color: #1e1e1e;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 999; }
+  .rev-gen-tutorial-card .info-link {
+    color: #fff;
+    text-decoration: underline; }
+  .rev-gen-tutorial-card .shepherd-arrow {
+    color: black; }
+  .rev-gen-tutorial-card .shepherd-text {
+    padding: 5px; }
+  .rev-gen-tutorial-card .shepherd-button {
+    background: transparent;
+    color: #fff;
+    text-transform: uppercase;
+    border: 0;
+    cursor: pointer;
+    margin-right: 20px;
+    padding: 0;
+    margin-left: 5px; }
+  .rev-gen-tutorial-card .shepherd-footer {
+    position: absolute;
+    bottom: 20px; }
+
+.shepherd-content-add-space-top {
+  top: 10px !important; }
+
+.shepherd-content-add-space-bottom {
+  bottom: 10px !important; }
 
 .rev-gen-powered-by-footer {
   color: grey;
   margin-left: 15px; }
+
+.shepherd-modal-overlay-container {
+  display: none; }
 
 #wpfooter {
   display: none; }
@@ -576,11 +660,9 @@ body {
         font-size: 14px;
         border-radius: 3px; }
         .rev-gen-preview-main--paywall-actions-update button:disabled {
-          background-color: darkgray;
-          border: 2px solid darkgray;
           cursor: not-allowed; }
       .rev-gen-preview-main--paywall-actions-update-publish {
-        background-color: #000;
+        background-color: #000 !important;
         color: #ffffff; }
     .rev-gen-preview-main--paywall-actions-add {
       display: flex;
@@ -617,7 +699,7 @@ body {
     position: fixed;
     left: 54%;
     overflow: hidden;
-    bottom: 20px;
+    bottom: 40%;
     height: 330px;
     width: 430px;
     margin: 0 0 0 -190px;
