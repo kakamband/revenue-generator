@@ -498,6 +498,38 @@ import Shepherd from "shepherd.js";
 					const purchaseManager = $(this).parents('.rg-purchase-overlay-option-manager');
 					const revenueSelection = purchaseManager.find($o.purchaseRevenueSelection);
 					const priceItem = optionItem.find($o.purchaseOptionItemPrice);
+					const currentRevenue = priceItem.attr('data-pay-model');
+					const currentValue = revenueSelection.val();
+					const optionType = optionItem.attr('data-purchase-type');
+					let entityId = '';
+
+					// Check if edited option is saved already.
+					if ('subscription' === optionType) {
+						entityId = optionItem.attr('data-sub-id');
+					} else if ('timepass' === optionType) {
+						entityId = optionItem.attr('data-tlp-id');
+					}
+
+					// If a saved option is being edited, get confirmation.
+					if (entityId) {
+						showPurchaseOptionUpdateWarning().then((confirmation) => {
+							if (true === confirmation) {
+								if (revenueSelection.prop('checked')) {
+									priceItem.attr('data-pay-model', 'ppu');
+									revenueSelection.val(1);
+								} else {
+									priceItem.attr('data-pay-model', 'sis');
+									revenueSelection.val(0);
+								}
+							} else {
+								priceItem.attr('data-pay-model', currentRevenue);
+								revenueSelection.val(currentValue);
+								revenueSelection.attr('checked', 1 === parseInt(currentValue));
+							}
+						});
+						return;
+					}
+
 					if (revenueSelection.prop('checked')) {
 						priceItem.attr('data-pay-model', 'ppu');
 						revenueSelection.val(1);
@@ -532,20 +564,50 @@ import Shepherd from "shepherd.js";
 				/**
 				 * Handle price input and change.
 				 */
-				$o.body.on('focus input', $o.purchaseOptionItemPrice, debounce(function () {
+				$o.body.on('focus', $o.purchaseOptionItemPrice, function () {
+					const currentPrice = $(this).text().trim();
+					$(this).attr('data-current-value', currentPrice);
+				}).on('input change', $o.purchaseOptionItemPrice, debounce(function () {
 					const optionItem = $(this).parents($o.purchaseOptionItem);
 					const priceItem = optionItem.find($o.purchaseOptionItemPrice);
+					const currentPrice = $(this).attr('data-current-value');
+					const newPrice = priceItem.text().trim();
 					const priceSymbol = optionItem.find($o.purchaseOptionPriceSymbol);
+					const optionType = optionItem.attr('data-purchase-type');
+					let entityId = '';
 
 					const symbol = priceSymbol.text().trim();
 					if (!symbol.length && !revenueGeneratorGlobalOptions.globalOptions.merchant_currency.length) {
 						showCurrencySelectionModal();
 					}
 
-					const validatedPrice = validatePrice(priceItem.text().trim(), 'subscription' === optionItem.attr('data-purchase-type'));
-					priceItem.empty().text(validatedPrice);
-					validateRevenue(validatedPrice, optionItem);
-				}, 1500));
+					// Check if edited option is saved already.
+					if ('subscription' === optionType) {
+						entityId = optionItem.attr('data-sub-id');
+					} else if ('timepass' === optionType) {
+						entityId = optionItem.attr('data-tlp-id');
+					}
+
+					// If a saved item is being updated, display warning.
+					if (entityId) {
+						showPurchaseOptionUpdateWarning().then((confirmation) => {
+							// If merchant selects to continue, remove current option from DB.
+							if (true === confirmation) {
+								const validatedPrice = validatePrice(newPrice, 'subscription' === optionType);
+								$(this).empty().text(validatedPrice);
+								validateRevenue(validatedPrice, optionItem);
+							} else {
+								const validatedPrice = validatePrice(currentPrice, 'subscription' === optionType);
+								$(this).empty().text(validatedPrice);
+								validateRevenue(validatedPrice, optionItem);
+							}
+						});
+					} else {
+						const validatedPrice = validatePrice(newPrice, 'subscription' === optionType);
+						$(this).empty().text(validatedPrice);
+						validateRevenue(validatedPrice, optionItem);
+					}
+				}, 1000));
 
 				/**
 				 * Handle currency selection.

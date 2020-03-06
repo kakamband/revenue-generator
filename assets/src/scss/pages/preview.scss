@@ -304,7 +304,7 @@
 		flex-direction: column;
 		position: fixed;
 		left: 58%;
-		top: 30%;
+		top: 20%;
 		overflow: hidden;
 		bottom: 20px;
 		height: 350px;
@@ -513,5 +513,21 @@
 		-webkit-transform: scale(0.9);
 		-ms-transform: scale(0.9);
 		transform: scale(0.9);
+	}
+}
+
+@media screen and (max-width: 782px) {
+	.rev-gen-preview-main {
+		&--paywall-actions {
+			width: 90%;
+		}
+	}
+}
+
+@media (max-width:1279px) {
+	.rev-gen-preview-main {
+		&--post {
+			width: 70%;
+		}
 	}
 }

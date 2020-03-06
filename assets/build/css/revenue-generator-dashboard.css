@@ -532,6 +532,16 @@ body {
   border-radius: 5px;
   border: 3px solid #000; }
 
+@media (max-width: 1279px) {
+  .rg-purchase-overlay-option-manager {
+    top: -40px;
+    left: -250px;
+    width: 205px; }
+    .rg-purchase-overlay-option-manager div {
+      font-size: 10px; }
+    .rg-purchase-overlay-option-manager-duration-count {
+      width: 45px; } }
+
 .rev-gen-preview-main {
   width: 100%;
   height: 100%;
@@ -755,7 +765,7 @@ body {
     flex-direction: column;
     position: fixed;
     left: 58%;
-    top: 30%;
+    top: 20%;
     overflow: hidden;
     bottom: 20px;
     height: 350px;
@@ -915,4 +925,12 @@ body {
     transform: scale(0.9); }
   100% {
     transform: scale(0.9); } }
+
+@media screen and (max-width: 782px) {
+  .rev-gen-preview-main--paywall-actions {
+    width: 90%; } }
+
+@media (max-width: 1279px) {
+  .rev-gen-preview-main--post {
+    width: 70%; } }
 

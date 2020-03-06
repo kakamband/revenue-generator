@@ -341,3 +341,24 @@
   border-radius: 5px;
   border: 3px solid #000;
 }
+
+@media (max-width:1279px) {
+  .rg-purchase-overlay {
+    &-option-manager {
+      top: -40px;
+      left: -250px;
+      width: 205px;
+
+      div {
+        font-size: 10px;
+      }
+
+      &-duration {
+
+        &-count {
+          width: 45px;
+        }
+      }
+    }
+  }
+}
