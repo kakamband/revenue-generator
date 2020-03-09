@@ -69,12 +69,12 @@ class Time_Pass extends Base {
 	 */
 	public function get_all_time_passes( $ignore_deleted = false ) {
 
-		$query_args = array(
+		$query_args = [
 			'post_type'      => static::SLUG,
 			'post_status'    => [ 'publish', 'draft' ],
 			'posts_per_page' => 100,
 			'no_found_rows'  => true,
-		);
+		];
 
 		// Don't include the deleted time passes.
 		if ( $ignore_deleted ) {
@@ -166,14 +166,14 @@ class Time_Pass extends Base {
 			'no_found_rows'  => true,
 		];
 
-		$meta_query = array(
+		$meta_query = [
 			'relation' => 'AND',
-			array(
+			[
 				'key'     => '_rg_access_to',
 				'value'   => 'all',
 				'compare' => '=',
-			),
-		);
+			],
+		];
 
 		if ( $ignore_deleted ) {
 			$query_args['post_status'] = 'publish';
@@ -261,10 +261,10 @@ class Time_Pass extends Base {
 	private function delete_time_pass( $time_pass_id ) {
 		$post = null;
 		if ( ! empty( $time_pass_id ) ) {
-			$args = array(
+			$args = [
 				'ID'          => $time_pass_id,
 				'post_status' => 'draft',
-			);
+			];
 			$post = wp_update_post( $args );
 		}
 

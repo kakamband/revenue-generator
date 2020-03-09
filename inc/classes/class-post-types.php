@@ -87,18 +87,34 @@ class Post_Types {
 	 * @return bool|int
 	 */
 	public function get_latest_post_for_preview() {
-		$supported_post_types = self::get_allowed_post_types();
+		// Check for latest post which doesn't have a paywall.
+		$query_args = [
+			'post_type'      => self::get_allowed_post_types(),
+			'post_status'    => [ 'publish' ],
+			'posts_per_page' => 1,
+			'no_found_rows'  => true,
+		];
 
-		foreach ( $supported_post_types as $post_type ) {
-			$latest_post = get_posts( [
-				'posts_per_page' => 1,
-				'post_type'      => $post_type,
-			] );
+		// Meta query to get posts without a paywall.
+		$meta_query = [
+			[
+				'key'     => '_rg_has_paywall',
+				'compare' => 'NOT EXISTS',
+			],
+		];
 
-			// Check if latest post has data, if yes return latest ID of supported type.
-			if ( ! empty( $latest_post ) && isset( $latest_post[0] ) ) {
-				return $latest_post[0]->ID;
-			}
+		// Meta query used to get posts without paywall.
+		$query_args['meta_query'] = $meta_query;
+
+		// Initialize WP_Query without args.
+		$post_preview_query = new \WP_Query();
+
+		// Get posts for requested args.
+		$latest_post = $post_preview_query->query( $query_args );
+
+		// Check if latest post has data, if yes return latest ID of supported type.
+		if ( ! empty( $latest_post ) && isset( $latest_post[0] ) ) {
+			return $latest_post[0]->ID;
 		}
 
 		return false;
@@ -112,6 +128,10 @@ class Post_Types {
 	 * @return array
 	 */
 	public function get_formatted_post_data( $post_id ) {
+
+		if ( empty( $post_id ) ) {
+			return [];
+		}
 
 		// Get all post data and return select fields for preview.
 		$post_data = get_post( $post_id );
@@ -188,7 +208,7 @@ class Post_Types {
 
 			// Get information on the post to create a pricing configuration.
 			$purchase_options     = [];
-			$post_tier            = $this->get_post_tier( $post_data['post_content'] );
+			$post_tier            = empty( $post_data['post_content'] ) ? 'tier_1' : $this->get_post_tier( $post_data['post_content'] );
 			$purchase_options_all = Config::get_pricing_defaults( $current_global_options['average_post_publish_count'] );
 
 			// Get individual article pricing based on post content word count, i.e "tier".
@@ -550,7 +570,7 @@ class Post_Types {
 
 		// Check paywall data.
 		if ( ! empty( $paywall_data ) ) {
-			$access_entity = $paywall_data['access_entity'];
+			$access_entity  = $paywall_data['access_entity'];
 			$access_preview = $paywall_data['preview_id'];
 
 			if ( ! empty( $access_preview ) ) {

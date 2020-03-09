@@ -27,12 +27,12 @@ class Categories {
 	 * @return array
 	 */
 	public function get_applicable_categories( $args ) {
-		$query = array(
+		$query = [
 			'taxonomy'     => 'category',
 			'hide_empty'   => false,
 			'meta_key'     => '_rg_has_paywall',
 			'meta_compare' => 'NOT EXISTS'
-		);
+		];
 
 		$args = wp_parse_args(
 			$args,

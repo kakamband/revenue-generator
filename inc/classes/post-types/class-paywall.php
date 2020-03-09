@@ -74,14 +74,12 @@ class Paywall extends Base {
 		}
 
 		// If paywall is being added based on categories make sure to create meta to identify it.
-		if (
-			( ! empty( $paywall_data['access_to'] ) && ! empty( $paywall_data['access_entity'] ) ) &&
-			(
-				'category' === $paywall_data['access_to'] ||
-				'exclude_category' === $paywall_data['access_to']
-			)
-		) {
-			update_term_meta( $paywall_data['access_entity'], '_rg_has_paywall', 'true' );
+		if ( ( ! empty( $paywall_data['access_to'] ) && ! empty( $paywall_data['access_entity'] ) ) ) {
+			if ( 'category' === $paywall_data['access_to'] || 'exclude_category' === $paywall_data['access_to'] ) {
+				update_term_meta( $paywall_data['access_entity'], '_rg_has_paywall', $paywall_data['access_to'] );
+			} elseif ( 'supported' === $paywall_data['access_to'] ) {
+				update_post_meta( $paywall_data['access_entity'], '_rg_has_paywall', 'true' );
+			}
 		}
 
 		return $paywall_id;
@@ -122,19 +120,19 @@ class Paywall extends Base {
 			'posts_per_page' => 1,
 		];
 
-		$meta_query = array(
+		$meta_query = [
 			'relation' => 'AND',
-			array(
+			[
 				'key'     => '_rg_access_entity',
 				'compare' => '=',
 				'value'   => $post_id
-			),
-			array(
+			],
+			[
 				'key'     => '_rg_access_to',
 				'value'   => 'supported',
 				'compare' => '=',
-			),
-		);
+			],
+		];
 
 		$query_args['meta_query'] = $meta_query;
 

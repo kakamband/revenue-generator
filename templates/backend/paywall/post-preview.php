@@ -30,22 +30,23 @@ if ( empty( $paywall_data ) && ! empty( $rg_preview_post['ID'] ) ) {
 }
 $paywall_access_to     = isset( $paywall_data['access_to'] ) ? $paywall_data['access_to'] : 'all';
 $purchase_option_items = $purchase_options_data['options'];
+$rg_preview_post_title = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_post['title'];
 ?>
 
-<?php if ( ! empty( $rg_preview_post ) ) : ?>
-	<div class="rev-gen-layout-wrapper">
-		<div class="laterpay-loader-wrapper">
-			<img alt="<?php echo esc_attr( 'LaterPay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
+<div class="rev-gen-layout-wrapper">
+	<div class="laterpay-loader-wrapper">
+		<img alt="<?php echo esc_attr( 'LaterPay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
+	</div>
+	<div class="rev-gen-preview-main">
+		<div class="rev-gen-preview-main--search">
+			<?php if ( ! empty( $rg_preview_post_title ) ) : ?>
+				<label for="rg_js_searchContent"><?php esc_html_e( 'Previewing', 'revenue-generator' ); ?>:</label>
+			<?php endif; ?>
+			<input type="text" id="rg_js_searchContent" placeholder="<?php esc_attr_e( 'search for the page or post you\'d like to preview here', 'revenue-generator' ); ?>" value="<?php echo esc_attr( $rg_preview_post_title ); ?>" />
+			<i class="dashicons dashicons-search"></i>
+			<div class="rev-gen-preview-main--search-results"></div>
 		</div>
-		<div class="rev-gen-preview-main">
-			<div class="rev-gen-preview-main--search">
-				<?php if ( ! empty( $rg_preview_post['title'] ) ) : ?>
-					<label for="rg_js_searchContent"><?php esc_html_e( 'Previewing', 'revenue-generator' ); ?>:</label>
-				<?php endif; ?>
-				<input type="text" id="rg_js_searchContent" placeholder="<?php esc_attr_e( 'search for the page or post you\'d like to preview here', 'revenue-generator' ); ?>" value="<?php echo esc_attr( $rg_preview_post['title'] ); ?>" />
-				<i class="dashicons dashicons-search"></i>
-				<div class="rev-gen-preview-main--search-results"></div>
-			</div>
+		<?php if ( ! empty( $rg_preview_post ) ) : ?>
 			<div id="rg_js_postPreviewWrapper" data-preview-id="<?php echo esc_attr( $paywall_preview_id ); ?>" data-access-id="<?php echo esc_attr( $rg_preview_post['ID'] ); ?>" class="rev-gen-preview-main--post">
 				<h4 class="rev-gen-preview-main--post--title"><?php echo esc_html( $rg_preview_post['title'] ); ?></h4>
 				<?php if ( ! empty( $rg_teaser ) ) : ?>
@@ -104,17 +105,10 @@ $purchase_option_items = $purchase_options_data['options'];
 					</button>
 				</div>
 			</div>
-		</div>
-		<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
+		<?php endif; ?>
 	</div>
-<?php else : ?>
-	<div class="rev-gen-no-data">
-		<p>
-			<?php esc_html_e( 'Invalid Paywall!', 'revenue-generator' ); ?>
-		</p>
-	</div>
-	<?php View::render_footer_backend(); ?>
-<?php endif; ?>
+	<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
+</div>
 
 <!-- Template for purchase option manager actions -->
 <script type="text/template" id="tmpl-revgen-purchase-overlay-actions">
@@ -171,20 +165,20 @@ $purchase_option_items = $purchase_options_data['options'];
 		</div>
 		<div class="rg-purchase-overlay-option-manager-duration">
 			<select class="rg-purchase-overlay-option-manager-duration-count">
-				<?php echo wp_kses( Post_Types::get_select_options( 'duration' ), array(
-					'option' => array(
-						'selected' => array(),
-						'value'    => array(),
-					)
-				) ); ?>
+				<?php echo wp_kses( Post_Types::get_select_options( 'duration' ), [
+					'option' => [
+						'selected' => [],
+						'value'    => [],
+					]
+				] ); ?>
 			</select>
 			<select class="rg-purchase-overlay-option-manager-duration-period">
-				<?php echo wp_kses( Post_Types::get_select_options( 'period' ), array(
-					'option' => array(
-						'selected' => array(),
-						'value'    => array(),
-					)
-				) ); ?>
+				<?php echo wp_kses( Post_Types::get_select_options( 'period' ), [
+					'option' => [
+						'selected' => [],
+						'value'    => [],
+					]
+				] ); ?>
 			</select>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-action">
@@ -380,9 +374,9 @@ $purchase_option_items = $purchase_options_data['options'];
 				wp_kses(
 					__(
 						"<b>Pay Later</b> means users agree to pay for content or timed access later - once their tab reaches $5 or 5€. Think of it as ‘the internet’s running tab.’", 'revenue-generator' ),
-					array(
-						'b' => array(),
-					)
+					[
+						'b' => [],
+					]
 				)
 			);
 			?>
@@ -393,9 +387,9 @@ $purchase_option_items = $purchase_options_data['options'];
 				wp_kses(
 					__(
 						'<b>Pay Now</b> is the traditional upfront payment method that everyone is familiar with. Recurring subscriptions automatically work on a pay now basis.', 'revenue-generator' ),
-					array(
-						'b' => array(),
-					)
+					[
+						'b' => [],
+					]
 				)
 			);
 			?>
@@ -419,9 +413,9 @@ $purchase_option_items = $purchase_options_data['options'];
 				wp_kses(
 					__(
 						'Select <b>Static Pricing</b> to manually set the prices of individual articles based on your own pricing strategy. Charge as little - or as much - as you want.', 'revenue-generator' ),
-					array(
-						'b' => array(),
-					)
+					[
+						'b' => [],
+					]
 				)
 			);
 			?>
@@ -432,9 +426,9 @@ $purchase_option_items = $purchase_options_data['options'];
 				wp_kses(
 					__(
 						'If you select <b>Dynamic Pricing</b>, LaterPay’s AI will “dynamically” adjust the price based on our own data, analytics and algorithms based on the length of each article.', 'revenue-generator' ),
-					array(
-						'b' => array(),
-					)
+					[
+						'b' => [],
+					]
 				)
 			);
 			?>

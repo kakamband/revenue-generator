@@ -14,8 +14,8 @@ class Utility {
 	/**
 	 * Get the first given number of words from a string.
 	 *
-	 * @param   string  $string
-	 * @param   int     $word_limit
+	 * @param string $string
+	 * @param int    $word_limit
 	 *
 	 * @return  string
 	 */
@@ -33,13 +33,13 @@ class Utility {
 	 * @return int $number_of_words
 	 */
 	public static function determine_number_of_words( $content ) {
-		$content        = preg_replace( '/\s+/', ' ', $content );
-		$total_words    = count( explode( ' ', $content ) );
+		$content     = preg_replace( '/\s+/', ' ', $content );
+		$total_words = count( explode( ' ', $content ) );
 
 		// Static values passed for creating the
-		$percent        = max( min( 5, 100 ), 1 );
-		$min            = 10;
-		$max            = 25;
+		$percent = max( min( 5, 100 ), 1 );
+		$min     = 10;
+		$max     = 25;
 
 		$number_of_words = $total_words * ( $percent / 100 );
 		$number_of_words = max( min( $number_of_words, $max ), $min );
@@ -67,13 +67,13 @@ class Utility {
 	 *
 	 * @link http://book.cakephp.org/2.0/en/core-libraries/helpers/text.html#TextHelper::truncate
 	 */
-	public static function truncate( $text, $length = 100, $options = array() ) {
-		$default = array(
-			'ellipsis'  => ' ...',
-			'exact'     => true,
-			'html'      => false,
-			'words'     => false,
-		);
+	public static function truncate( $text, $length = 100, $options = [] ) {
+		$default = [
+			'ellipsis' => ' ...',
+			'exact'    => true,
+			'html'     => false,
+			'words'    => false,
+		];
 		if ( isset( $options['ending'] ) ) {
 			$default['ellipsis'] = $options['ending'];
 		} elseif ( ! empty( $options['html'] ) ) {
@@ -98,9 +98,9 @@ class Utility {
 			if ( mb_strlen( preg_replace( '/<.*?>/', '', $text ) ) <= $length ) {
 				return $text;
 			}
-			$totalLength    = mb_strlen( wp_strip_all_tags( $ellipsis ) );
-			$openTags       = array();
-			$truncate       = '';
+			$totalLength = mb_strlen( wp_strip_all_tags( $ellipsis ) );
+			$openTags    = [];
+			$truncate    = '';
 
 			preg_match_all( '/(<\/?([\w+]+)[^>]*>)?([^<>]*)/', $text, $tags, PREG_SET_ORDER );
 			foreach ( $tags as $tag ) {
@@ -118,12 +118,12 @@ class Utility {
 
 				$contentLength = mb_strlen( preg_replace( '/&[0-9a-z]{2,8};|&#[0-9]{1,7};|&#x[0-9a-f]{1,6};/i', ' ', $tag[3] ) );
 				if ( $contentLength + $totalLength > $length ) {
-					$left = $length - $totalLength;
+					$left           = $length - $totalLength;
 					$entitiesLength = 0;
 					if ( preg_match_all( '/&[0-9a-z]{2,8};|&#[0-9]{1,7};|&#x[0-9a-f]{1,6};/i', $tag[3], $entities, PREG_OFFSET_CAPTURE ) ) {
 						foreach ( $entities[0] as $entity ) {
 							if ( $entity[1] + 1 - $entitiesLength <= $left ) {
-								$left--;
+								$left --;
 								$entitiesLength += mb_strlen( $entity[0] );
 							} else {
 								break;
@@ -134,7 +134,7 @@ class Utility {
 					$truncate .= mb_substr( $tag[3], 0, $left + $entitiesLength );
 					break;
 				} else {
-					$truncate .= $tag[3];
+					$truncate    .= $tag[3];
 					$totalLength += $contentLength;
 				}
 				if ( $totalLength >= $length ) {
@@ -153,12 +153,12 @@ class Utility {
 		if ( ! $exact ) {
 			$spacepos = mb_strrpos( $truncate, ' ' );
 			if ( $html ) {
-				$truncateCheck  = mb_substr( $truncate, 0, $spacepos );
-				$lastOpenTag    = mb_strrpos( $truncateCheck, '<' );
-				$lastCloseTag   = mb_strrpos( $truncateCheck, '>' );
+				$truncateCheck = mb_substr( $truncate, 0, $spacepos );
+				$lastOpenTag   = mb_strrpos( $truncateCheck, '<' );
+				$lastCloseTag  = mb_strrpos( $truncateCheck, '>' );
 				if ( $lastOpenTag > $lastCloseTag ) {
 					preg_match_all( '/<[\w]+[^>]*>/s', $truncate, $lastTagMatches );
-					$lastTag = array_pop( $lastTagMatches[0] );
+					$lastTag  = array_pop( $lastTagMatches[0] );
 					$spacepos = mb_strrpos( $truncate, $lastTag ) + mb_strlen( $lastTag );
 				}
 				$bits = mb_substr( $truncate, $spacepos );
@@ -198,8 +198,9 @@ class Utility {
 	 * @return int
 	 */
 	public static function get_word_count( $content ) {
-		$content        = trim( strip_tags( $content ) );
-		$total_words    = count( explode( ' ', $content ) );
+		$content     = trim( strip_tags( $content ) );
+		$total_words = count( explode( ' ', $content ) );
+
 		return $total_words;
 	}
 }

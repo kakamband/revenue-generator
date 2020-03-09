@@ -69,12 +69,12 @@ class Subscription extends Base {
 	 */
 	public function get_all_subscriptions( $ignore_deleted = false ) {
 
-		$query_args = array(
+		$query_args = [
 			'post_type'      => static::SLUG,
 			'post_status'    => [ 'publish', 'draft' ],
 			'posts_per_page' => 100,
 			'no_found_rows'  => true,
-		);
+		];
 
 		// Don't include the deleted subscriptions.
 		if ( $ignore_deleted ) {
@@ -168,14 +168,14 @@ class Subscription extends Base {
 			'no_found_rows'  => true,
 		];
 
-		$meta_query = array(
+		$meta_query = [
 			'relation' => 'OR',
-			array(
+			[
 				'key'     => '_rg_access_to',
 				'value'   => 'all',
 				'compare' => '=',
-			),
-		);
+			],
+		];
 
 		if ( $ignore_deleted ) {
 			$query_args['post_status'] = 'publish';
@@ -262,10 +262,10 @@ class Subscription extends Base {
 	private function delete_subscription( $subscription_id ) {
 		$post = null;
 		if ( ! empty( $subscription_id ) ) {
-			$args = array(
+			$args = [
 				'ID'          => $subscription_id,
 				'post_status' => 'draft',
-			);
+			];
 			$post = wp_update_post( $args );
 		}
 

@@ -480,19 +480,13 @@ class Admin {
 		$paywall_instance->update_paywall_option_order( $paywall_id, $order_items );
 
 		// Set redirect for saved paywall.
-		$admin_menus      = self::get_admin_menus();
-		$new_paywall_page = add_query_arg(
-			[
-				'page'            => $admin_menus['paywall']['url'],
-				'current_paywall' => $paywall_id
-			],
-			admin_url( 'admin.php' )
-		);
+		$admin_menus   = self::get_admin_menus();
+		$dashboard_url = add_query_arg( [ 'page' => $admin_menus['dashboard']['url'] ], admin_url( 'admin.php' ) );
 
 		// Send success message.
 		wp_send_json( [
 			'success'       => true,
-			'redirect_to'   => $new_paywall_page,
+			'redirect_to'   => $dashboard_url,
 			'msg'           => empty( $paywall_data['id'] ) ? __( 'Paywall updated successfully!', 'revenue-generator' ) : __( 'Paywall saved successfully!', 'revenue-generator' ),
 			'paywall_id'    => $paywall_id,
 			'time_passes'   => $time_pass_response,
