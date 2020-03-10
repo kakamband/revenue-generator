@@ -650,4 +650,15 @@ class Post_Types {
 		return $rg_post;
 	}
 
+	/**
+	 * Clear post metadata on paywall removal.
+	 *
+	 * @param int $rg_post_id Post ID to clear meta information from.
+	 *
+	 * @return bool
+	 */
+	public function clear_post_paywall_meta( $rg_post_id ) {
+		return delete_post_meta( $rg_post_id, '_rg_has_paywall' );
+	}
+
 }

@@ -229,6 +229,9 @@ class Paywall extends Base {
 			if ( 'category' === $access_to || 'exclude_category' === $access_to ) {
 				$category_instance = Categories::get_instance();
 				$category_instance->clear_category_paywall_meta( $access_entity );
+			} elseif ( 'supported' === $access_to ) {
+				$paywall_instance = Post_Types::get_instance();
+				$paywall_instance->clear_post_paywall_meta( $access_entity );
 			}
 
 			$preview_id = $paywall_data['preview_id'];
