@@ -110,6 +110,17 @@
         span {
           text-align: center;
         }
+
+        &-icon {
+          display: none;
+          background: transparent;
+          border: 0;
+
+          &:focus {
+            box-shadow: none;
+            outline: unset;
+          }
+        }
       }
     }
   }

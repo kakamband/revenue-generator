@@ -212,7 +212,8 @@ class Post_Types {
 			$purchase_options_all = Config::get_pricing_defaults( $current_global_options['average_post_publish_count'] );
 
 			// Get individual article pricing based on post content word count, i.e "tier".
-			$purchase_options['individual'] = $purchase_options_all['single_article'][ $post_tier ];
+			$purchase_options['individual']         = $purchase_options_all['single_article'][ $post_tier ];
+			$purchase_options['individual']['type'] = 'dynamic';
 
 			// Check if we have existing time passes or subscriptions.
 			$current_purchase_options = $this->has_purchase_options_available();

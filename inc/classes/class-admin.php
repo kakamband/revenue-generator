@@ -313,6 +313,7 @@ class Admin {
 				'option_move_around' => Config::$plugin_defaults['img_dir'] . 'move-option.svg',
 				'option_warning'     => Config::$plugin_defaults['img_dir'] . 'option-warning.svg',
 				'option_info'        => Config::$plugin_defaults['img_dir'] . 'option-info.svg',
+				'option_dynamic'     => Config::$plugin_defaults['img_dir'] . 'option-dynamic.svg',
 			]
 		];
 

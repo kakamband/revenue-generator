@@ -46,6 +46,7 @@ import Shepherd from "shepherd.js";
 				purchaseOptionItemInfo   : '.rg-purchase-overlay-purchase-options-item-info',
 				purchaseOptionItemTitle  : '.rg-purchase-overlay-purchase-options-item-info-title',
 				purchaseOptionItemDesc   : '.rg-purchase-overlay-purchase-options-item-info-description',
+				purchaseItemPriceIcon    : '.rg-purchase-overlay-purchase-options-item-price-icon',
 				purchaseOptionItemPrice  : '.rg-purchase-overlay-purchase-options-item-price-span',
 				purchaseOptionPriceSymbol: '.rg-purchase-overlay-purchase-options-item-price-symbol',
 				optionArea               : '.rg-purchase-overlay-option-area',
@@ -110,8 +111,8 @@ import Shepherd from "shepherd.js";
 				activateAccount      : '#rg_js_verifyAccount',
 				accountActionsWrapper: '.rev-gen-preview-main-account-modal-action',
 				accountActionsFields : '.rev-gen-preview-main-account-modal-fields',
-				accountActionEmail : '.rev-gen-preview-main-account-modal-fields-email',
-				accountActionPassword : '.rev-gen-preview-main-account-modal-fields-password',
+				accountActionEmail   : '.rev-gen-preview-main-account-modal-fields-email',
+				accountActionPassword: '.rev-gen-preview-main-account-modal-fields-password',
 				activateSignup       : '#rg_js_activateSignup',
 
 				// Tour elements.
@@ -140,6 +141,13 @@ import Shepherd from "shepherd.js";
 						// Enabled publish button if saved paywall.
 						if (paywallId.length && revenueGeneratorGlobalOptions.globalOptions.merchant_currency.length) {
 							$o.activatePaywall.removeAttr('disabled');
+						}
+
+						// Store individual pricing.
+						const individualOption = allPurchaseOptions.find("[data-purchase-type='individual']");
+						const pricingType = individualOption.attr('data-pricing-type');
+						if ('dynamic' === pricingType) {
+							individualOption.find($o.purchaseItemPriceIcon).show();
 						}
 					}
 
@@ -178,7 +186,7 @@ import Shepherd from "shepherd.js";
 				 * Complete the tour when exit tour is clicked.
 				 */
 				$o.body.on('click', $o.exitTour, function () {
-					if ( typeof Shepherd !== 'undefined' && typeof Shepherd.activeTour !== 'undefined' ) {
+					if (typeof Shepherd !== 'undefined' && typeof Shepherd.activeTour !== 'undefined') {
 						Shepherd.activeTour.complete();
 					}
 				});
@@ -395,6 +403,14 @@ import Shepherd from "shepherd.js";
 							}
 						} else {
 							periodSelection.hide();
+							// Set pricing model for selected option.
+							const pricingType = optionItem.attr('data-pricing-type');
+							const pricingWrapper = actionManager.find($o.individualPricingWrapper);
+							if ('dynamic' === pricingType) {
+								pricingWrapper.find($o.individualPricingSelection).prop('checked', true);
+							} else {
+								pricingWrapper.find($o.individualPricingSelection).prop('checked', false);
+							}
 						}
 
 						const revenueWrapper = actionManager.find($o.purchaseRevenueWrapper);
@@ -507,9 +523,11 @@ import Shepherd from "shepherd.js";
 					const pricingSelection = purchaseManager.find($o.individualPricingSelection);
 					if (pricingSelection.prop('checked')) {
 						optionItem.attr('data-pricing-type', 'dynamic');
+						optionItem.find($o.purchaseItemPriceIcon).show();
 						pricingSelection.val(1);
 					} else {
 						optionItem.attr('data-pricing-type', 'static');
+						optionItem.find($o.purchaseItemPriceIcon).hide();
 						pricingSelection.val(0);
 					}
 				});
@@ -684,11 +702,16 @@ import Shepherd from "shepherd.js";
 							priceSymbol.empty().text(symbol);
 						});
 
-						const paywallId = allPurchaseOptions.attr('data-paywall-id');
+						// Get all purchase options.
+						const allPurchaseOptions = $($o.purchaseOptionItems);
 
-						// Enabled publish button if saved paywall.
-						if (paywallId.length) {
-							$o.activatePaywall.removeAttr('disabled');
+						if (allPurchaseOptions.length) {
+							const paywallId = allPurchaseOptions.attr('data-paywall-id');
+
+							// Enabled publish button if saved paywall.
+							if (paywallId.length) {
+								$o.activatePaywall.removeAttr('disabled');
+							}
 						}
 					});
 				});
@@ -1089,7 +1112,7 @@ import Shepherd from "shepherd.js";
 					const activationModal = $o.previewWrapper.find($o.activationModal);
 					const emailField = activationModal.find($o.accountActionEmail).val().trim();
 					const passwordField = activationModal.find($o.accountActionPassword).val().trim();
-					if ( emailField.length && passwordField.length ) {
+					if (emailField.length && passwordField.length) {
 						$($o.activateAccount).removeAttr('disabled');
 					}
 				});
@@ -1101,7 +1124,7 @@ import Shepherd from "shepherd.js";
 					const activationModal = $o.previewWrapper.find($o.activationModal);
 					const emailField = activationModal.find($o.accountActionEmail).val().trim();
 					const passwordField = activationModal.find($o.accountActionPassword).val().trim();
-					if ( emailField.length && passwordField.length ) {
+					if (emailField.length && passwordField.length) {
 						$($o.activateAccount).removeAttr('disabled');
 					}
 				});
@@ -1311,7 +1334,7 @@ import Shepherd from "shepherd.js";
 			const startWelcomeTour = function (tour) {
 
 				// Show exit tour button.
-				$($o.exitTour).css({visibility:'visible','pointer-events': 'all',cursor: 'pointer'});
+				$($o.exitTour).css({visibility: 'visible', 'pointer-events': 'all', cursor: 'pointer'});
 
 				// Blur out the wrapper and disable events, to highlight the tour elements.
 				$o.layoutWrapper.addClass('modal-blur');

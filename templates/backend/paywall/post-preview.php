@@ -215,7 +215,7 @@ $rg_preview_post_title = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_p
 				}
 
 				if ( $is_individual ) {
-					$individual_type = empty( $purchase_option['type'] ) ? 'static' : $purchase_option['type'];
+					$individual_type = empty( $purchase_option['type'] ) ? 'dynamic' : $purchase_option['type'];
 				}
 				?>
 				<div
@@ -249,6 +249,11 @@ $rg_preview_post_title = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_p
 						<span class="rg-purchase-overlay-purchase-options-item-price-symbol"><?php echo esc_html( $merchant_symbol ); ?></span>
 						<span class="rg-purchase-overlay-purchase-options-item-price-span" data-pay-model="<?php echo esc_attr( $purchase_option_revenue ); ?>" contenteditable="true">
 						<?php echo esc_html( $purchase_option_price ); ?>
+							<?php if ( ! empty( $individual_type ) ) : ?>
+								<button class="rg-purchase-overlay-purchase-options-item-price-icon">
+									<img alt="<?php echo esc_attr( 'Dynamic Option', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['option_dynamic'] ); ?>" />
+								</button>
+							<?php endif; ?>
 					</span>
 					</div>
 				</div>

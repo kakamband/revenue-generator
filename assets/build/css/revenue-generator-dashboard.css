@@ -374,6 +374,13 @@ body {
         justify-content: center; }
         .rg-purchase-overlay-purchase-options-item-price span {
           text-align: center; }
+        .rg-purchase-overlay-purchase-options-item-price-icon {
+          display: none;
+          background: transparent;
+          border: 0; }
+          .rg-purchase-overlay-purchase-options-item-price-icon:focus {
+            box-shadow: none;
+            outline: unset; }
   .rg-purchase-overlay-option-manager {
     position: absolute;
     top: -15px;
@@ -709,7 +716,7 @@ body {
     position: fixed;
     left: 54%;
     overflow: hidden;
-    bottom: 40%;
+    top: 30%;
     height: 330px;
     width: 430px;
     margin: 0 0 0 -190px;
