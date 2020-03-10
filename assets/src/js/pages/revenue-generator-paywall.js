@@ -114,6 +114,9 @@ import Shepherd from "shepherd.js";
 				accountActionPassword : '.rev-gen-preview-main-account-modal-fields-password',
 				activateSignup       : '#rg_js_activateSignup',
 
+				// Tour elements.
+				exitTour: '.rev-gen-exit-tour',
+
 				snackBar: $('#rg_js_SnackBar'),
 			};
 
@@ -168,6 +171,15 @@ import Shepherd from "shepherd.js";
 						$($o.paywallAppliesTo).val('category');
 						$($o.paywallAppliesTo).trigger('change');
 						$($o.optionArea).trigger('mouseleave');
+					}
+				});
+
+				/**
+				 * Complete the tour when exit tour is clicked.
+				 */
+				$o.body.on('click', $o.exitTour, function () {
+					if ( typeof Shepherd !== 'undefined' && typeof Shepherd.activeTour !== 'undefined' ) {
+						Shepherd.activeTour.complete();
 					}
 				});
 
@@ -1297,6 +1309,10 @@ import Shepherd from "shepherd.js";
 			 * @param {Shepherd.Tour} tour Tour object.
 			 */
 			const startWelcomeTour = function (tour) {
+
+				// Show exit tour button.
+				$($o.exitTour).css({visibility:'visible','pointer-events': 'all',cursor: 'pointer'});
+
 				// Blur out the wrapper and disable events, to highlight the tour elements.
 				$o.layoutWrapper.addClass('modal-blur');
 				$o.layoutWrapper.css({
@@ -1324,6 +1340,9 @@ import Shepherd from "shepherd.js";
 
 					// Revert to original theme.
 					$($o.purchaseOptionItem).css({'background-color': '#fff'});
+
+					// Hide exit tour button.
+					$($o.exitTour).remove();
 
 					// Enable arow events.
 					$(document).unbind('keydown', disableArrowKeys);

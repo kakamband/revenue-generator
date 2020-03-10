@@ -108,6 +108,7 @@ $rg_preview_post_title = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_p
 		<?php endif; ?>
 	</div>
 	<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
+	<div class="rev-gen-exit-tour"><?php esc_html_e( 'Exit Tour', 'revenue-generator' ); ?></div>
 </div>
 
 <!-- Template for purchase option manager actions -->
