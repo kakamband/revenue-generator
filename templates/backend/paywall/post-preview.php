@@ -467,3 +467,21 @@ $rg_preview_post_title = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_p
 		</button>
 	</div>
 </script>
+
+<!-- Template for account activation modal. -->
+<script type="text/template" id="tmpl-revgen-account-activation-modal">
+	<div class="rev-gen-preview-main-account-modal">
+		<span class="rev-gen-preview-main-account-modal-cross">X</span>
+		<h4 class="rev-gen-preview-main-account-modal-title"><?php esc_html_e( 'You’re almost done!', 'revenue-generator' ); ?></h4>
+		<span class="rev-gen-preview-main-account-modal-info"><?php esc_html_e( 'To make sure you get your revenues, we need you to connect your LaterPay account.', 'revenue-generator' ); ?></span>
+		<div class="rev-gen-preview-main-account-modal-actions">
+			<button id="rg_js_connectAccount" class="rev-gen-preview-main-account-modal-actions-dark">
+				<?php esc_html_e( 'Connect Account', 'revenue-generator' ); ?>
+			</button>
+			<button id="rg_js_signUp" class="rev-gen-preview-main-account-modal-actions-light">
+				<?php esc_html_e( 'Signup', 'revenue-generator' ); ?>
+			</button>
+			<a href="https://support.laterpay.net/what-is-laterpay/" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Learn more', 'revenue-generator' ); ?></a>
+		</div>
+	</div>
+</script>

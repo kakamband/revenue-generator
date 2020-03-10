@@ -102,6 +102,12 @@ import Shepherd from "shepherd.js";
 				paywallRemove      : '#rg_js_removePaywall',
 				paywallCancelRemove: '#rg_js_cancelPaywallRemoval',
 
+				// Account activation modal.
+				activationModal     : '.rev-gen-preview-main-account-modal',
+				activationModalClose: '.rev-gen-preview-main-account-modal-cross',
+				connectAccount      : '#rg_js_connectAccount',
+				accountSignup       : '#rg_js_signUp',
+
 				snackBar: $('#rg_js_SnackBar'),
 			};
 
@@ -128,7 +134,7 @@ import Shepherd from "shepherd.js";
 						}
 					}
 
-					// // Start the welcome tour.
+					// Start the welcome tour.
 					if (revenueGeneratorGlobalOptions.globalOptions.average_post_publish_count.length &&
 						0 === parseInt(revenueGeneratorGlobalOptions.globalOptions.is_tutorial_completed)
 					) {
@@ -989,6 +995,54 @@ import Shepherd from "shepherd.js";
 
 					// Update paywall data.
 					updatePaywall(revenueGeneratorGlobalOptions.ajaxUrl, data);
+				});
+
+				/**
+				 * Handle paywall activation.
+				 */
+				$o.activatePaywall.on('click', function () {
+					if (0 === parseInt(revenueGeneratorGlobalOptions.globalOptions.is_merchant_verified)) {
+						showAccountActivationModal();
+					}
+				});
+
+				$o.body.on('click', $o.connectAccount, function () {
+					// @todo Handle account activation flow.
+				});
+
+				$o.body.on('click', $o.accountSignup, function () {
+					// @todo Handle the account signup flow.
+				});
+
+				/**
+				 * Close account activation modal.
+				 */
+				$o.body.on('click', $o.activationModalClose, function () {
+					//Blur out the body and disable events.
+					$o.previewWrapper.find($o.activationModal).remove();
+					$o.body.removeClass('modal-blur');
+					$o.purchaseOverlay.css({
+						filter          : 'unset',
+						'pointer-events': 'unset',
+					});
+				});
+			};
+
+			/**
+			 * Display account acitvation modal for new merchant.
+			 */
+			const showAccountActivationModal = function () {
+				$o.previewWrapper.find($o.activationModal).remove();
+
+				// Get the template for account verification.
+				const template = wp.template('revgen-account-activation-modal');
+				$o.previewWrapper.append(template);
+
+				// Blur out the background.
+				$o.body.addClass('modal-blur');
+				$o.purchaseOverlay.css({
+					filter          : 'blur(5px)',
+					'pointer-events': 'none',
 				});
 			};
 
