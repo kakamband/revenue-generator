@@ -49,6 +49,7 @@ class Config {
 				[
 					'average_post_publish_count' => '',
 					'merchant_currency'          => '',
+					'merchant_region'            => '',
 					'is_tutorial_completed'      => 0,
 					'is_merchant_verified'       => 0,
 				]

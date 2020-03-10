@@ -864,13 +864,31 @@ body {
       font-size: 15px;
       color: darkgray;
       cursor: pointer; }
-    .rev-gen-preview-main-account-modal-title {
-      font-size: 20px; }
-    .rev-gen-preview-main-account-modal-info {
-      font-size: 14px;
-      width: 50%;
-      padding: 15px;
-      text-align: center; }
+    .rev-gen-preview-main-account-modal-action {
+      display: flex;
+      align-items: center;
+      flex-direction: column; }
+      .rev-gen-preview-main-account-modal-action-title {
+        font-size: 20px; }
+      .rev-gen-preview-main-account-modal-action-info {
+        font-size: 14px;
+        width: 50%;
+        padding: 15px;
+        text-align: center; }
+    .rev-gen-preview-main-account-modal-fields {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center; }
+      .rev-gen-preview-main-account-modal-fields-title {
+        font-size: 14px;
+        width: 80%;
+        text-align: center; }
+      .rev-gen-preview-main-account-modal-fields input {
+        border: 0;
+        border-bottom: 2px solid #333333;
+        border-radius: 0;
+        margin-bottom: 20px; }
     .rev-gen-preview-main-account-modal-actions {
       display: flex;
       flex-direction: column;
@@ -882,6 +900,9 @@ body {
         text-align: center;
         margin-top: 10px;
         color: #333333; }
+        .rev-gen-preview-main-account-modal-actions a:focus {
+          box-shadow: none;
+          outline: unset; }
       .rev-gen-preview-main-account-modal-actions button {
         cursor: pointer;
         width: 80%;
@@ -892,6 +913,11 @@ body {
         font-size: 14px;
         border-radius: 3px;
         margin: 5px 0; }
+        .rev-gen-preview-main-account-modal-actions button:disabled {
+          background-color: #eeeeee;
+          color: #ffffff;
+          border: 1px solid #c3c3c3;
+          cursor: not-allowed; }
       .rev-gen-preview-main-account-modal-actions-dark {
         background-color: #000;
         color: #ffffff; }

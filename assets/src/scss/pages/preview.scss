@@ -432,15 +432,41 @@
 			cursor: pointer;
 		}
 
-		&-title {
-			font-size: 20px;
+		&-action {
+			display: flex;
+			align-items: center;
+			flex-direction: column;
+
+			&-title {
+				font-size: 20px;
+			}
+
+			&-info {
+				font-size: 14px;
+				width: 50%;
+				padding: 15px;
+				text-align: center;
+			}
 		}
 
-		&-info {
-			font-size: 14px;
-			width: 50%;
-			padding: 15px;
-			text-align: center;
+		&-fields {
+			display: none;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+
+			&-title {
+				font-size: 14px;
+				width: 80%;
+				text-align: center;
+			}
+
+			input {
+				border: 0;
+				border-bottom: 2px solid #333333;
+				border-radius: 0;
+				margin-bottom: 20px;
+			}
 		}
 
 		&-actions {
@@ -455,6 +481,11 @@
 				text-align: center;
 				margin-top: 10px;
 				color: #333333;
+
+				&:focus {
+					box-shadow: none;
+					outline: unset;
+				}
 			}
 
 			button {
@@ -467,6 +498,13 @@
 				font-size: 14px;
 				border-radius: 3px;
 				margin: 5px 0;
+
+				&:disabled {
+					background-color: #eeeeee;
+					color: #ffffff;
+					border: 1px solid #c3c3c3;
+					cursor: not-allowed;
+				}
 			}
 
 			&-dark {
@@ -600,7 +638,7 @@
 	}
 }
 
-@media (max-width:1279px) {
+@media (max-width: 1279px) {
 	.rev-gen-preview-main {
 		&--post {
 			width: 70%;

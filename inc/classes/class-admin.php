@@ -74,6 +74,10 @@ class Admin {
 			'rg_paywall_nonce' => wp_create_nonce( 'rg_paywall_nonce' ),
 			'currency'         => $merchant_currency,
 			'locale'           => get_locale(),
+			'signupURL'        => [
+				'US' => 'https://web.uselaterpay.com/dialog/entry/?redirect_to=/merchant/add/#/signup',
+				'EU' => 'https://web.laterpay.net/dialog/entry/?redirect_to=/merchant/add/#/signup',
+			],
 			'defaultConfig'    => [
 				'timepass'     => [
 					'title'       => esc_html__( '24 Hour Pass', 'revenue-generator' ),
@@ -518,7 +522,9 @@ class Admin {
 
 		// Check and verify updated option.
 		if ( ! empty( $config_value ) ) {
-			$rg_global_options[ $config_key ] = $config_value;
+			$rg_global_options[ $config_key ]     = $config_value;
+			$region                               = 'USD' === $config_value ? 'US' : 'EU';
+			$rg_global_options['merchant_region'] = $region;
 		}
 
 		// Update the option value.

@@ -103,10 +103,16 @@ import Shepherd from "shepherd.js";
 				paywallCancelRemove: '#rg_js_cancelPaywallRemoval',
 
 				// Account activation modal.
-				activationModal     : '.rev-gen-preview-main-account-modal',
-				activationModalClose: '.rev-gen-preview-main-account-modal-cross',
-				connectAccount      : '#rg_js_connectAccount',
-				accountSignup       : '#rg_js_signUp',
+				activationModal      : '.rev-gen-preview-main-account-modal',
+				activationModalClose : '.rev-gen-preview-main-account-modal-cross',
+				connectAccount       : '#rg_js_connectAccount',
+				accountSignup        : '#rg_js_signUp',
+				activateAccount      : '#rg_js_verifyAccount',
+				accountActionsWrapper: '.rev-gen-preview-main-account-modal-action',
+				accountActionsFields : '.rev-gen-preview-main-account-modal-fields',
+				accountActionEmail : '.rev-gen-preview-main-account-modal-fields-email',
+				accountActionPassword : '.rev-gen-preview-main-account-modal-fields-password',
+				activateSignup       : '#rg_js_activateSignup',
 
 				snackBar: $('#rg_js_SnackBar'),
 			};
@@ -129,7 +135,7 @@ import Shepherd from "shepherd.js";
 						const paywallId = allPurchaseOptions.attr('data-paywall-id');
 
 						// Enabled publish button if saved paywall.
-						if (paywallId.length) {
+						if (paywallId.length && revenueGeneratorGlobalOptions.globalOptions.merchant_currency.length) {
 							$o.activatePaywall.removeAttr('disabled');
 						}
 					}
@@ -665,6 +671,13 @@ import Shepherd from "shepherd.js";
 							const symbol = 'USD' === formData.config_value ? '$' : '€';
 							priceSymbol.empty().text(symbol);
 						});
+
+						const paywallId = allPurchaseOptions.attr('data-paywall-id');
+
+						// Enabled publish button if saved paywall.
+						if (paywallId.length) {
+							$o.activatePaywall.removeAttr('disabled');
+						}
 					});
 				});
 
@@ -1006,12 +1019,42 @@ import Shepherd from "shepherd.js";
 					}
 				});
 
+				/**
+				 * Handle Connect Account button handler.
+				 */
 				$o.body.on('click', $o.connectAccount, function () {
-					// @todo Handle account activation flow.
+					showAccountVerificationFields();
 				});
 
+				/**
+				 * Handle initial account signup button click event and show account fields.
+				 */
 				$o.body.on('click', $o.accountSignup, function () {
-					// @todo Handle the account signup flow.
+					if (revenueGeneratorGlobalOptions.globalOptions.merchant_region.length) {
+						const currentRegion = revenueGeneratorGlobalOptions.globalOptions.merchant_region;
+						const signUpURL = revenueGeneratorGlobalOptions.signupURL;
+						if ('US' === currentRegion) {
+							window.open(signUpURL.US, '_blank');
+						} else {
+							window.open(signUpURL.EU, '_blank');
+						}
+						showAccountVerificationFields();
+					}
+				});
+
+				/**
+				 * Handle signup link event for activate signup button.
+				 */
+				$o.body.on('click', $o.activateSignup, function () {
+					if (revenueGeneratorGlobalOptions.globalOptions.merchant_region.length) {
+						const currentRegion = revenueGeneratorGlobalOptions.globalOptions.merchant_region;
+						const signUpURL = revenueGeneratorGlobalOptions.signupURL;
+						if ('US' === currentRegion) {
+							window.open(signUpURL.US, '_blank');
+						} else {
+							window.open(signUpURL.EU, '_blank');
+						}
+					}
 				});
 
 				/**
@@ -1026,10 +1069,53 @@ import Shepherd from "shepherd.js";
 						'pointer-events': 'unset',
 					});
 				});
+
+				/**
+				 * Handle email input.
+				 */
+				$o.body.on('input change', $o.accountActionEmail, function () {
+					const activationModal = $o.previewWrapper.find($o.activationModal);
+					const emailField = activationModal.find($o.accountActionEmail).val().trim();
+					const passwordField = activationModal.find($o.accountActionPassword).val().trim();
+					if ( emailField.length && passwordField.length ) {
+						$($o.activateAccount).removeAttr('disabled');
+					}
+				});
+
+				/**
+				 * Handle password input.
+				 */
+				$o.body.on('input change', $o.accountActionPassword, function () {
+					const activationModal = $o.previewWrapper.find($o.activationModal);
+					const emailField = activationModal.find($o.accountActionEmail).val().trim();
+					const passwordField = activationModal.find($o.accountActionPassword).val().trim();
+					if ( emailField.length && passwordField.length ) {
+						$($o.activateAccount).removeAttr('disabled');
+					}
+				});
+
+				/**
+				 * Verify the account details.
+				 */
+				$o.body.on('click', $o.activateAccount, function () {
+					console.log('checking account');
+					const activationModal = $o.previewWrapper.find($o.activationModal);
+					const emailField = activationModal.find($o.accountActionEmail).val().trim();
+					const passwordField = activationModal.find($o.accountActionPassword).val().trim();
+				});
 			};
 
 			/**
-			 * Display account acitvation modal for new merchant.
+			 * Display account verification fields.
+			 */
+			const showAccountVerificationFields = function () {
+				const activationModal = $o.previewWrapper.find($o.activationModal);
+				activationModal.find($o.accountActionsWrapper).hide();
+				activationModal.find($o.accountActionsFields).css({display: 'flex'});
+			};
+
+			/**
+			 * Display account activation modal for new merchant.
 			 */
 			const showAccountActivationModal = function () {
 				$o.previewWrapper.find($o.activationModal).remove();
@@ -1673,7 +1759,7 @@ import Shepherd from "shepherd.js";
 
 					const purchaseOptions = $($o.purchaseOptionItems);
 
-					if (r.paywall_id.length) {
+					if (r.paywall_id.length && revenueGeneratorGlobalOptions.globalOptions.merchant_currency.length) {
 						$o.activatePaywall.removeAttr('disabled');
 					}
 
