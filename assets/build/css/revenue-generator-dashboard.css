@@ -153,6 +153,54 @@ body {
     bottom: 0;
     opacity: 0; } }
 
+.tippy-box {
+  font-size: 14px;
+  background: #000;
+  color: #fff;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  padding: 15px; }
+
+.tippy-box[data-placement^='top'] > .tippy-svg-arrow {
+  bottom: 0; }
+  .tippy-box[data-placement^='top'] > .tippy-svg-arrow::after,
+  .tippy-box[data-placement^='top'] > .tippy-svg-arrow > svg {
+    top: 16px;
+    transform: rotate(180deg); }
+
+.tippy-box[data-placement^='bottom'] > .tippy-svg-arrow {
+  top: 0; }
+  .tippy-box[data-placement^='bottom'] > .tippy-svg-arrow > svg {
+    bottom: 16px; }
+
+.tippy-box[data-placement^='left'] > .tippy-svg-arrow {
+  right: 0; }
+  .tippy-box[data-placement^='left'] > .tippy-svg-arrow::after,
+  .tippy-box[data-placement^='left'] > .tippy-svg-arrow > svg {
+    transform: rotate(90deg);
+    top: calc(50% - 4px);
+    left: 11px; }
+
+.tippy-box[data-placement^='right'] > .tippy-svg-arrow {
+  left: 0; }
+  .tippy-box[data-placement^='right'] > .tippy-svg-arrow::after,
+  .tippy-box[data-placement^='right'] > .tippy-svg-arrow > svg {
+    transform: rotate(-90deg);
+    top: calc(50% - 4px);
+    right: 11px; }
+
+.tippy-box[data-interactive] > .tippy-svg-arrow path {
+  pointer-events: auto; }
+
+.tippy-svg-arrow {
+  position: absolute;
+  width: 17px;
+  height: 17px;
+  fill: #333;
+  pointer-events: none; }
+  .tippy-svg-arrow > svg {
+    position: absolute; }
+
 .rg-card {
   border-radius: 4px;
   background-color: #ffffff;
@@ -377,7 +425,8 @@ body {
         .rg-purchase-overlay-purchase-options-item-price-icon {
           display: none;
           background: transparent;
-          border: 0; }
+          border: 0;
+          cursor: pointer; }
           .rg-purchase-overlay-purchase-options-item-price-icon:focus {
             box-shadow: none;
             outline: unset; }

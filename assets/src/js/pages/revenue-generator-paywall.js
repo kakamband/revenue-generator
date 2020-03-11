@@ -11,6 +11,7 @@
 import '../utils';
 import {__, sprintf} from '@wordpress/i18n';
 import Shepherd from "shepherd.js";
+import tippy, {roundArrow} from 'tippy.js';
 
 (function ($) {
 	$(function () {
@@ -148,6 +149,8 @@ import Shepherd from "shepherd.js";
 						const pricingType = individualOption.attr('data-pricing-type');
 						if ('dynamic' === pricingType) {
 							individualOption.find($o.purchaseItemPriceIcon).show();
+							// Initialize tooltip for element.
+							initializeTooltip( '.rg-purchase-overlay-purchase-options-item-price-icon' );
 						}
 					}
 
@@ -1138,6 +1141,15 @@ import Shepherd from "shepherd.js";
 					const emailField = activationModal.find($o.accountActionEmail).val().trim();
 					const passwordField = activationModal.find($o.accountActionPassword).val().trim();
 				});
+			};
+
+			/**
+			 * Initialized the tooltip on given element.
+			 *
+			 * @param elementIdentifier Selector matching elements on the document
+			 */
+			const initializeTooltip = function( elementIdentifier ) {
+				tippy( elementIdentifier, { arrow: roundArrow });
 			};
 
 			/**

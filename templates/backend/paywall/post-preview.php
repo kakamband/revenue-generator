@@ -250,7 +250,10 @@ $rg_preview_post_title = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_p
 						<span class="rg-purchase-overlay-purchase-options-item-price-span" data-pay-model="<?php echo esc_attr( $purchase_option_revenue ); ?>" contenteditable="true">
 						<?php echo esc_html( $purchase_option_price ); ?>
 							<?php if ( ! empty( $individual_type ) ) : ?>
-								<button class="rg-purchase-overlay-purchase-options-item-price-icon">
+								<button
+									data-tippy-content="<?php esc_attr_e( 'You’re using Dynamic Pricing. The revenue generator automatically assigns a price to each article this paywall is applied to based on the amount of content the article contains. The price for this specific article is shown here.', 'revenue-generator' ); ?>"
+									class="rg-purchase-overlay-purchase-options-item-price-icon"
+								>
 									<img alt="<?php echo esc_attr( 'Dynamic Option', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['option_dynamic'] ); ?>" />
 								</button>
 							<?php endif; ?>
