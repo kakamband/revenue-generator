@@ -105,16 +105,26 @@ import tippy, {roundArrow} from 'tippy.js';
 				paywallCancelRemove: '#rg_js_cancelPaywallRemoval',
 
 				// Account activation modal.
-				activationModal      : '.rev-gen-preview-main-account-modal',
-				activationModalClose : '.rev-gen-preview-main-account-modal-cross',
-				connectAccount       : '#rg_js_connectAccount',
-				accountSignup        : '#rg_js_signUp',
-				activateAccount      : '#rg_js_verifyAccount',
-				accountActionsWrapper: '.rev-gen-preview-main-account-modal-action',
-				accountActionsFields : '.rev-gen-preview-main-account-modal-fields',
-				accountActionEmail   : '.rev-gen-preview-main-account-modal-fields-email',
-				accountActionPassword: '.rev-gen-preview-main-account-modal-fields-password',
-				activateSignup       : '#rg_js_activateSignup',
+				activationModal              : '.rev-gen-preview-main-account-modal',
+				activationModalClose         : '.rev-gen-preview-main-account-modal-cross',
+				connectAccount               : '#rg_js_connectAccount',
+				accountSignup                : '#rg_js_signUp',
+				activateAccount              : '#rg_js_verifyAccount',
+				accountActionsWrapper        : '.rev-gen-preview-main-account-modal-action',
+				accountActionsFields         : '.rev-gen-preview-main-account-modal-fields',
+				accountActionId              : '.rev-gen-preview-main-account-modal-fields-merchant-id',
+				accountActionKey             : '.rev-gen-preview-main-account-modal-fields-merchant-key',
+				accountActionTitle           : '.rev-gen-preview-main-account-modal-fields-title',
+				accountActions               : '.rev-gen-preview-main-account-modal-actions',
+				accountVerificationLoader    : '.rev-gen-preview-main-account-modal-fields-loader',
+				activationModalError         : '.rev-gen-preview-main-account-modal-error',
+				activationModalSuccess       : '.rev-gen-preview-main-account-modal-success',
+				activationModalSuccessTitle  : '.rev-gen-preview-main-account-modal-success-title',
+				activationModalSuccessMessage: '.rev-gen-preview-main-account-modal-success-message',
+				activateSignup               : '#rg_js_activateSignup',
+				warningSignup                : '#rg_js_warningSignup',
+				viewPost                     : '#rg_js_viewPost',
+				disablePaywall               : '#rg_js_disablePaywall',
 
 				// Tour elements.
 				exitTour: '.rev-gen-exit-tour',
@@ -150,7 +160,7 @@ import tippy, {roundArrow} from 'tippy.js';
 						if ('dynamic' === pricingType) {
 							individualOption.find($o.purchaseItemPriceIcon).show();
 							// Initialize tooltip for element.
-							initializeTooltip( '.rg-purchase-overlay-purchase-options-item-price-icon' );
+							initializeTooltip('.rg-purchase-overlay-purchase-options-item-price-icon');
 						}
 					}
 
@@ -311,6 +321,8 @@ import tippy, {roundArrow} from 'tippy.js';
 
 					if (categoryId) {
 						$o.postPreviewWrapper.attr('data-access-id', categoryId);
+						$o.savePaywall.removeAttr('disabled');
+						$o.activatePaywall.removeAttr('disabled');
 					}
 				});
 
@@ -670,6 +682,8 @@ import tippy, {roundArrow} from 'tippy.js';
 				$o.body.on('change', $o.paywallAppliesTo, function () {
 					if ('exclude_category' === $(this).val() || 'category' === $(this).val()) {
 						$o.searchPaywallWrapper.show();
+						$o.savePaywall.attr('disabled', true);
+						$o.activatePaywall.attr('disabled', true);
 						$o.postPreviewWrapper.attr('data-access-id', $o.searchPaywallContent.val());
 					} else {
 						$o.searchPaywallWrapper.hide();
@@ -1054,6 +1068,8 @@ import tippy, {roundArrow} from 'tippy.js';
 				$o.activatePaywall.on('click', function () {
 					if (0 === parseInt(revenueGeneratorGlobalOptions.globalOptions.is_merchant_verified)) {
 						showAccountActivationModal();
+					} else {
+						publishPaywall();
 					}
 				});
 
@@ -1096,6 +1112,21 @@ import tippy, {roundArrow} from 'tippy.js';
 				});
 
 				/**
+				 * Handle signup link event for warning signup button.
+				 */
+				$o.body.on('click', $o.warningSignup, function () {
+					if (revenueGeneratorGlobalOptions.globalOptions.merchant_region.length) {
+						const currentRegion = revenueGeneratorGlobalOptions.globalOptions.merchant_region;
+						const signUpURL = revenueGeneratorGlobalOptions.signupURL;
+						if ('US' === currentRegion) {
+							window.open(signUpURL.US, '_blank');
+						} else {
+							window.open(signUpURL.EU, '_blank');
+						}
+					}
+				});
+
+				/**
 				 * Close account activation modal.
 				 */
 				$o.body.on('click', $o.activationModalClose, function () {
@@ -1109,25 +1140,25 @@ import tippy, {roundArrow} from 'tippy.js';
 				});
 
 				/**
-				 * Handle email input.
+				 * Handle merchant id input.
 				 */
-				$o.body.on('input change', $o.accountActionEmail, function () {
+				$o.body.on('input change', $o.accountActionId, function () {
 					const activationModal = $o.previewWrapper.find($o.activationModal);
-					const emailField = activationModal.find($o.accountActionEmail).val().trim();
-					const passwordField = activationModal.find($o.accountActionPassword).val().trim();
-					if (emailField.length && passwordField.length) {
+					const merchantId = activationModal.find($o.accountActionId).val().trim();
+					const merchantKey = activationModal.find($o.accountActionKey).val().trim();
+					if (merchantId.length && merchantKey.length) {
 						$($o.activateAccount).removeAttr('disabled');
 					}
 				});
 
 				/**
-				 * Handle password input.
+				 * Handle merchant key input.
 				 */
-				$o.body.on('input change', $o.accountActionPassword, function () {
+				$o.body.on('input change', $o.accountActionKey, function () {
 					const activationModal = $o.previewWrapper.find($o.activationModal);
-					const emailField = activationModal.find($o.accountActionEmail).val().trim();
-					const passwordField = activationModal.find($o.accountActionPassword).val().trim();
-					if (emailField.length && passwordField.length) {
+					const merchantId = activationModal.find($o.accountActionId).val().trim();
+					const merchantKey = activationModal.find($o.accountActionKey).val().trim();
+					if (merchantId.length && merchantKey.length) {
 						$($o.activateAccount).removeAttr('disabled');
 					}
 				});
@@ -1136,11 +1167,192 @@ import tippy, {roundArrow} from 'tippy.js';
 				 * Verify the account details.
 				 */
 				$o.body.on('click', $o.activateAccount, function () {
-					console.log('checking account');
 					const activationModal = $o.previewWrapper.find($o.activationModal);
-					const emailField = activationModal.find($o.accountActionEmail).val().trim();
-					const passwordField = activationModal.find($o.accountActionPassword).val().trim();
+					const merchantId = activationModal.find($o.accountActionId).val().trim();
+					const merchantKey = activationModal.find($o.accountActionKey).val().trim();
+					verifyAccountCredentials(merchantId, merchantKey);
 				});
+
+				/**
+				 * Open paywall target post.
+				 */
+				$o.body.on('click', $o.viewPost, function () {
+					const targetPostId = $(this).attr('data-target-id');
+					if (targetPostId) {
+						viewPost(targetPostId);
+					}
+				});
+
+				/**
+				 * Disable paywall.
+				 */
+				$o.body.on('click', $o.disablePaywall, function () {
+					const paywallId = $(this).attr('data-paywall-id');
+					if (paywallId) {
+						disablePaywall(paywallId);
+					}
+				});
+			};
+
+			/**
+			 * Get permalink for preview post id and take merchant to the post.
+			 *
+			 * @param {number} previewPostId Post Preview ID.
+			 */
+			const viewPost = function (previewPostId) {
+				// Create form data.
+				const formData = {
+					action         : 'rg_post_permalink',
+					preview_post_id: previewPostId,
+					security       : revenueGeneratorGlobalOptions.rg_paywall_nonce,
+				};
+
+				// Delete the option.
+				$.ajax({
+					url     : revenueGeneratorGlobalOptions.ajaxUrl,
+					method  : 'POST',
+					data    : formData,
+					dataType: 'json',
+				}).done(function (r) {
+					if (r.redirect_to) {
+						window.open(r.redirect_to, '_blank');
+					}
+				});
+			};
+
+			/**
+			 * Disable the paywall.
+			 *
+			 * @param {number} paywallId Paywall Id.
+			 */
+			const disablePaywall = function (paywallId) {
+				// Create form data.
+				const formData = {
+					action    : 'rg_disable_paywall',
+					paywall_id: paywallId,
+					security  : revenueGeneratorGlobalOptions.rg_paywall_nonce,
+				};
+
+				// Delete the option.
+				$.ajax({
+					url     : revenueGeneratorGlobalOptions.ajaxUrl,
+					method  : 'POST',
+					data    : formData,
+					dataType: 'json',
+				}).done(function (r) {
+					$($o.activationModalClose).trigger('click');
+					$o.snackBar.showSnackbar(r.msg, 1000);
+				});
+			};
+
+			/**
+			 * Publish the paywall.
+			 */
+			const publishPaywall = function () {
+				if (1 === parseInt(revenueGeneratorGlobalOptions.globalOptions.is_merchant_verified)) {
+					$o.previewWrapper.find($o.activationModal).remove();
+
+					// Get the template for account verification.
+					const template = wp.template('revgen-account-activation-modal');
+					$o.previewWrapper.append(template);
+
+					// Blur out the background.
+					$o.body.addClass('modal-blur');
+					$o.purchaseOverlay.css({
+						filter          : 'blur(5px)',
+						'pointer-events': 'none',
+					});
+				}
+
+				// Get required info for success message.
+				const purchaseOptions = $($o.purchaseOptionItems);
+				const paywallId = purchaseOptions.attr('data-paywall-id');
+				const postPreviewId = $o.postPreviewWrapper.attr('data-preview-id');
+				const paywallName = $o.paywallName.text().trim();
+				const appliedTo = $($o.paywallAppliesTo).val();
+				let publishMessage = '';
+
+				// Compose message based on paywall attributes.
+				if ('category' === appliedTo || 'exclude_category' === appliedTo) {
+					const categoryName = $o.searchPaywallContent.text().trim();
+					if ('category' === appliedTo) {
+						publishMessage = sprintf(
+							__('Has been published to <b>all posts</b> in category <b>%s</b>.', 'revenue-generator'),
+							categoryName
+						);
+					} else {
+						publishMessage = sprintf(
+							__('Has been published to <b>all posts, except posts under</b> in category <b>%s</b>.', 'revenue-generator'),
+							categoryName
+						);
+					}
+				} else if ('supported' === appliedTo) {
+					publishMessage = sprintf(
+						__('Has been published on <b>%s</b>.', 'revenue-generator'),
+						$o.purchaseOverlay.find($o.paywallTitle).text().trim()
+					);
+				} else {
+					publishMessage = sprintf(
+						__('Has been published on <b>all posts</b>.', 'revenue-generator'),
+						$o.purchaseOverlay.find($o.paywallTitle).text().trim()
+					);
+				}
+
+				// Remove undeded markup form modal and show success message.
+				const activationModal = $o.previewWrapper.find($o.activationModal);
+				const activationSuccess = activationModal.find($o.activationModalSuccess);
+				activationSuccess.find($o.activationModalSuccessTitle).text(paywallName);
+				activationSuccess.find($o.activationModalSuccessMessage).append($('<p/>').html(publishMessage));
+				activationSuccess.find($o.viewPost).attr('data-target-id', postPreviewId);
+				activationSuccess.find($o.disablePaywall).attr('data-paywall-id', paywallId);
+				activationModal.find($o.activationModalError).remove();
+				activationModal.find($o.accountActionsWrapper).remove();
+				activationModal.find($o.accountActionsFields).remove();
+				activationSuccess.css({display: 'flex'});
+			};
+
+			/**
+			 * Verify merchant credentials and allow paywall publishing.
+			 *
+			 * @param {string}  merchantId  Merchant ID.
+			 * @param {string}  merchantKey Merchant Key.
+			 */
+			const verifyAccountCredentials = function (merchantId, merchantKey) {
+				if (!$o.requestSent) {
+					$o.requestSent = true;
+
+					// Create form data.
+					const formData = {
+						action      : 'rg_verify_account_credentials',
+						merchant_id : merchantId,
+						merchant_key: merchantKey,
+						security    : revenueGeneratorGlobalOptions.rg_paywall_nonce,
+					};
+
+					// Remove merchant credential fields and show the loader.
+					const activationModal = $o.previewWrapper.find($o.activationModal);
+					activationModal.find($o.accountActionTitle).text(__('Just a second...', 'revenue-generator'));
+					activationModal.find($o.accountActionId).remove();
+					activationModal.find($o.accountActionKey).remove();
+					activationModal.find($o.accountActions).remove();
+					activationModal.find($o.accountVerificationLoader).show();
+
+					// Validate merchant details.
+					$.ajax({
+						url     : revenueGeneratorGlobalOptions.ajaxUrl,
+						method  : 'POST',
+						data    : formData,
+						dataType: 'json',
+					}).done(function (r) {
+						$o.requestSent = false;
+						activationModal.find($o.accountActionsFields).hide();
+						if (true === r.success) {
+							publishPaywall();
+						} else {
+							activationModal.find($o.activationModalError).css({display: 'flex'});
+						}
+					});
+				}
 			};
 
 			/**
@@ -1148,8 +1360,8 @@ import tippy, {roundArrow} from 'tippy.js';
 			 *
 			 * @param elementIdentifier Selector matching elements on the document
 			 */
-			const initializeTooltip = function( elementIdentifier ) {
-				tippy( elementIdentifier, { arrow: roundArrow });
+			const initializeTooltip = function (elementIdentifier) {
+				tippy(elementIdentifier, {arrow: roundArrow});
 			};
 
 			/**

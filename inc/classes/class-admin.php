@@ -48,6 +48,9 @@ class Admin {
 		add_action( 'wp_ajax_rg_search_term', [ $this, 'select_search_term' ] );
 		add_action( 'wp_ajax_rg_clear_category_meta', [ $this, 'clear_category_meta' ] );
 		add_action( 'wp_ajax_rg_complete_tour', [ $this, 'complete_tour' ] );
+		add_action( 'wp_ajax_rg_verify_account_credentials', [ $this, 'verify_account_credentials' ] );
+		add_action( 'wp_ajax_rg_post_permalink', [ $this, 'get_post_permalink' ] );
+		add_action( 'wp_ajax_rg_disable_paywall', [ $this, 'disable_paywall' ] );
 	}
 
 	/**
@@ -296,6 +299,14 @@ class Admin {
 			$symbol = 'USD' === $config_data['merchant_currency'] ? '$' : '€';
 		}
 
+		// Set merchant verification status.
+		$is_merchant_verified = false;
+		if ( 1 === absint( $config_data['is_merchant_verified'] ) ) {
+			$is_merchant_verified = true;
+		}
+
+		$admin_menus = self::get_admin_menus();
+
 		// Paywall purchase options data.
 		$post_preview_data = [
 			'rg_preview_post'       => $formatted_post_data,
@@ -303,6 +314,8 @@ class Admin {
 			'default_option_data'   => $default_option_data,
 			'merchant_symbol'       => $symbol,
 			'rg_category_data'      => $rg_category_data,
+			'is_merchant_verified'  => $is_merchant_verified,
+			'dashboard_url'         => add_query_arg( [ 'page' => $admin_menus['dashboard']['url'] ], admin_url( 'admin.php' ) ),
 			'action_icons'          => [
 				'lp_icon'            => Config::$plugin_defaults['img_dir'] . 'lp-logo-icon.svg',
 				'option_add'         => Config::$plugin_defaults['img_dir'] . 'add-option.svg',
@@ -763,5 +776,81 @@ class Admin {
 			'success' => true,
 			'msg'     => __( 'Selection stored successfully!', 'revenue-generator' )
 		] );
+	}
+
+	/**
+	 * Verify account credentials and do a test purchase.
+	 */
+	public function verify_account_credentials() {
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Get all data and sanitize it.
+		$merchant_id  = sanitize_text_field( filter_input( INPUT_POST, 'merchant_id', FILTER_SANITIZE_STRING ) );
+		$merchant_key = sanitize_text_field( filter_input( INPUT_POST, 'merchant_key', FILTER_SANITIZE_STRING ) );
+
+		$client_account_instance = Client_Account::get_instance();
+		$rg_merchant_credentials = $client_account_instance->get_merchant_credentials();
+
+		// Check and verify merchant id data.
+		if ( ! empty( $merchant_id ) ) {
+			$rg_merchant_credentials['merchant_id'] = $merchant_id;
+		}
+
+		// Check and verify merchant id data.
+		if ( ! empty( $merchant_key ) ) {
+			$rg_merchant_credentials['merchant_key'] = $merchant_key;
+		}
+
+		// Update the option value.
+		update_option( 'lp_rg_merchant_credentials', $rg_merchant_credentials );
+
+		$is_valid = $client_account_instance->validate_merchant_account();
+
+		// Send success message.
+		wp_send_json( [
+			'success' => true,
+			'msg'     => __( 'Something went wrong!', 'revenue-generator' )
+		] );
+	}
+
+	/**
+	 * Get post permalink for requested post.
+	 */
+	public function get_post_permalink() {
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Get all data and sanitize it.
+		$preview_post_id = sanitize_text_field( filter_input( INPUT_POST, 'preview_post_id', FILTER_SANITIZE_NUMBER_INT ) );
+
+		// Check and verify data exits.
+		if ( ! empty( $preview_post_id ) ) {
+			wp_send_json( [
+				'success'     => true,
+				'redirect_to' => get_permalink( $preview_post_id )
+			] );
+		}
+	}
+
+	/**
+	 * Disable paywall.
+	 */
+	public function disable_paywall() {
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Get all data and sanitize it.
+		$paywall_id = sanitize_text_field( filter_input( INPUT_POST, 'paywall_id', FILTER_SANITIZE_NUMBER_INT ) );
+
+		// Check and verify data exits.
+		if ( ! empty( $paywall_id ) ) {
+			$paywall_instance = Paywall::get_instance();
+			$result           = (bool) $paywall_instance->disable_paywall( $paywall_id );
+			wp_send_json( [
+				'success' => $result,
+				'msg'     => $result ? __( 'Paywall Disabled!', 'revenue-generator' ) : __( 'Something went wrong!', 'revenue-generator' )
+			] );
+		}
 	}
 }

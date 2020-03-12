@@ -261,6 +261,13 @@ class Paywall extends Base {
 		];
 	}
 
+	/**
+	 * Get paywall related to the post id.
+	 *
+	 * @param int $post_id Post ID.
+	 *
+	 * @return bool|mixed
+	 */
 	public function get_connected_paywall( $post_id ) {
 		$paywall_info = $this->get_purchase_option_data_by_post_id( $post_id );
 		if ( empty( $paywall_info['id'] ) ) {
@@ -268,6 +275,21 @@ class Paywall extends Base {
 		} else {
 			return $paywall_info['id'];
 		}
+	}
+
+	/**
+	 * Disable the paywall and update activation meta.
+	 *
+	 * @param int $paywall_id Paywall Id.
+	 *
+	 * @return bool|int
+	 */
+	public function disable_paywall( $paywall_id ) {
+		if ( ! empty( $paywall_id ) ) {
+			return update_post_meta( $paywall_id, '_rg_is_active', 0 );
+		}
+
+		return false;
 	}
 
 }

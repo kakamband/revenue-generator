@@ -24,12 +24,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</select>
 			</div>
 			<div class="rev-gen-dashboard-bar--item rev-gen-dashboard-bar--search">
-				<input placeholder="<?php esc_attr_e( 'Search Paywalls', 'revenue-generator' );?>" type="text" id="rg_js_searchPaywall">
+				<input placeholder="<?php esc_attr_e( 'Search Paywalls', 'revenue-generator' ); ?>" type="text" id="rg_js_searchPaywall">
 				<i class="dashicons dashicons-search"></i>
 			</div>
 			<div class="rev-gen-dashboard-bar--item rev-gen-dashboard-bar--actions">
 				<a href="<?php echo esc_url( $new_paywall_url ); ?>" id="rg_js_newPaywall" class="rg-button"><?php esc_html_e( 'New Paywall', 'revenue-generator' ); ?></a>
 			</div>
+		</div>
+		<div class="reve-gen-dashboard-content">
+			<p style="color: red;text-align: center;font-size: 25px;">Work in Progress...</p>
 		</div>
 	</div>
 	<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>

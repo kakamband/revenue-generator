@@ -45,6 +45,7 @@ class Config {
 
 		// Fresh install.
 		if ( false === get_option( 'lp_rg_global_options' ) ) {
+			// Set default global options.
 			update_option( 'lp_rg_global_options',
 				[
 					'average_post_publish_count' => '',

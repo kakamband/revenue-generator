@@ -481,31 +481,69 @@ $rg_preview_post_title = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_p
 <script type="text/template" id="tmpl-revgen-account-activation-modal">
 	<div class="rev-gen-preview-main-account-modal">
 		<span class="rev-gen-preview-main-account-modal-cross">X</span>
-		<div class="rev-gen-preview-main-account-modal-action">
-			<h4 class="rev-gen-preview-main-account-modal-action-title"><?php esc_html_e( 'You’re almost done!', 'revenue-generator' ); ?></h4>
-			<span class="rev-gen-preview-main-account-modal-action-info"><?php esc_html_e( 'To make sure you get your revenues, we need you to connect your LaterPay account.', 'revenue-generator' ); ?></span>
-			<div class="rev-gen-preview-main-account-modal-actions">
-				<button id="rg_js_connectAccount" class="rev-gen-preview-main-account-modal-actions-dark">
-					<?php esc_html_e( 'Connect Account', 'revenue-generator' ); ?>
-				</button>
-				<button id="rg_js_signUp" class="rev-gen-preview-main-account-modal-actions-light">
-					<?php esc_html_e( 'Signup', 'revenue-generator' ); ?>
-				</button>
-				<a href="https://support.laterpay.net/what-is-laterpay/" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Learn more', 'revenue-generator' ); ?></a>
+		<?php if ( false === $is_merchant_verified ) : ?>
+			<div class="rev-gen-preview-main-account-modal-action">
+				<h4 class="rev-gen-preview-main-account-modal-action-title"><?php esc_html_e( 'You’re almost done!', 'revenue-generator' ); ?></h4>
+				<span class="rev-gen-preview-main-account-modal-action-info"><?php esc_html_e( 'To make sure you get your revenues, we need you to connect your LaterPay account.', 'revenue-generator' ); ?></span>
+				<div class="rev-gen-preview-main-account-modal-actions">
+					<button id="rg_js_connectAccount" class="rev-gen-preview-main-account-modal-actions-dark">
+						<?php esc_html_e( 'Connect Account', 'revenue-generator' ); ?>
+					</button>
+					<button id="rg_js_signUp" class="rev-gen-preview-main-account-modal-actions-light">
+						<?php esc_html_e( 'Signup', 'revenue-generator' ); ?>
+					</button>
+					<a href="https://support.laterpay.net/what-is-laterpay/" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Learn more', 'revenue-generator' ); ?></a>
+				</div>
 			</div>
-		</div>
-		<div class="rev-gen-preview-main-account-modal-fields">
-			<h5 class="rev-gen-preview-main-account-modal-fields-title"><?php esc_html_e( 'Connect your account to activate paywall', 'revenue-generator' ); ?></h5>
-			<input class="rev-gen-preview-main-account-modal-fields-email" type="email" placeholder="<?php esc_attr_e( 'Email', 'revenue-generator' ); ?>" />
-			<input class="rev-gen-preview-main-account-modal-fields-password" type="password" placeholder="<?php esc_attr_e( 'Password', 'revenue-generator' ); ?>" />
-			<div class="rev-gen-preview-main-account-modal-actions">
-				<button disabled="disabled" id="rg_js_verifyAccount" class="rev-gen-preview-main-account-modal-actions-dark">
-					<?php esc_html_e( 'Connect Account', 'revenue-generator' ); ?>
+			<div class="rev-gen-preview-main-account-modal-fields">
+				<h5 class="rev-gen-preview-main-account-modal-fields-title"><?php esc_html_e( 'Connect your account to activate paywall', 'revenue-generator' ); ?></h5>
+				<input class="rev-gen-preview-main-account-modal-fields-merchant-id" type="text" placeholder="<?php esc_attr_e( 'Merchant ID', 'revenue-generator' ); ?>" maxlength="22" />
+				<input class="rev-gen-preview-main-account-modal-fields-merchant-key" type="text" placeholder="<?php esc_attr_e( 'API Key', 'revenue-generator' ); ?>" maxlength="32" />
+				<div class="rev-gen-preview-main-account-modal-actions">
+					<button disabled="disabled" id="rg_js_verifyAccount" class="rev-gen-preview-main-account-modal-actions-dark">
+						<?php esc_html_e( 'Connect Account', 'revenue-generator' ); ?>
+					</button>
+					<p>
+						<?php esc_html_e( 'Don’t have an account?', 'revenue-generator' ); ?>
+						<a id="rg_js_activateSignup" href="#"><?php esc_html_e( 'Signup', 'revenue-generator' ); ?></a>
+					</p>
+				</div>
+				<span class="rev-gen-preview-main-account-modal-fields-loader"></span>
+			</div>
+			<div class="rev-gen-preview-main-account-modal-error">
+				<h4 class="rev-gen-preview-main-account-modal-error-title"><?php esc_html_e( 'Sorry, something went wrong.', 'revenue-generator' ); ?></h4>
+				<span class="rev-gen-preview-main-account-modal-error-warning">!</span>
+				<div class="rev-gen-preview-main-account-modal-error-message">
+					<?php
+					echo wp_kses(
+						sprintf(
+							__(
+								'It looks like you need to create a LaterPay account. Please <a id="%s" href="#">sign up here,</a> or contact <a href="mailto:integration@laterpay.net">integration@laterpay.net</a> if you’re still experiencing difficulties.'
+							),
+							'rg_js_warningSignup'
+						),
+						[
+							'a' => [
+								'id'   => [],
+								'href' => [],
+							]
+						]
+					);
+					?>
+				</div>
+			</div>
+		<?php endif; ?>
+		<div class="rev-gen-preview-main-account-modal-success">
+			<h4 class="rev-gen-preview-main-account-modal-success-title"></h4>
+			<div class="rev-gen-preview-main-account-modal-success-message"></div>
+			<div class="rev-gen-preview-main-account-modal-success-actions">
+				<button id="rg_js_viewPost" data-target-id="" class="rev-gen-preview-main-account-modal-actions-dark">
+					<?php esc_html_e( 'View on live post', 'revenue-generator' ); ?>
 				</button>
-				<p>
-					<?php esc_html_e( 'Don’t have an account?', 'revenue-generator' ); ?>
-					<a id="rg_js_activateSignup" href="#"><?php esc_html_e( 'Signup', 'revenue-generator' ); ?></a>
-				</p>
+				<button id="rg_js_disablePaywall" data-paywall-id="" class="rev-gen-preview-main-account-modal-actions-light">
+					<?php esc_html_e( 'Disable paywall', 'revenue-generator' ); ?>
+				</button>
+				<a href="<?php echo esc_url( $dashboard_url ); ?>"><?php esc_html_e( 'Go to the Paywall Dashboard', 'revenue-generator' ); ?></a>
 			</div>
 		</div>
 	</div>
