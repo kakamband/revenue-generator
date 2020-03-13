@@ -50,6 +50,7 @@ class Admin {
 		add_action( 'wp_ajax_rg_complete_tour', [ $this, 'complete_tour' ] );
 		add_action( 'wp_ajax_rg_verify_account_credentials', [ $this, 'verify_account_credentials' ] );
 		add_action( 'wp_ajax_rg_post_permalink', [ $this, 'get_post_permalink' ] );
+		add_action( 'wp_ajax_rg_activate_paywall', [ $this, 'activate_paywall' ] );
 		add_action( 'wp_ajax_rg_disable_paywall', [ $this, 'disable_paywall' ] );
 	}
 
@@ -830,6 +831,24 @@ class Admin {
 				'success'     => true,
 				'redirect_to' => get_permalink( $preview_post_id )
 			] );
+		}
+	}
+
+	/**
+	 * Activate paywall.
+	 */
+	public function activate_paywall() {
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Get all data and sanitize it.
+		$paywall_id = sanitize_text_field( filter_input( INPUT_POST, 'paywall_id', FILTER_SANITIZE_NUMBER_INT ) );
+
+		// Check and verify data exits.
+		if ( ! empty( $paywall_id ) ) {
+			$paywall_instance = Paywall::get_instance();
+			$paywall_instance->activate_paywall( $paywall_id );
+			wp_send_json_success();
 		}
 	}
 

@@ -1069,7 +1069,8 @@ import tippy, {roundArrow} from 'tippy.js';
 					if (0 === parseInt(revenueGeneratorGlobalOptions.globalOptions.is_merchant_verified)) {
 						showAccountActivationModal();
 					} else {
-						publishPaywall();
+						const paywallId = $(this).attr('data-paywall-id');
+						publishPaywall(paywallId);
 					}
 				});
 
@@ -1248,7 +1249,7 @@ import tippy, {roundArrow} from 'tippy.js';
 			/**
 			 * Publish the paywall.
 			 */
-			const publishPaywall = function () {
+			const publishPaywall = function (paywallId) {
 				if (1 === parseInt(revenueGeneratorGlobalOptions.globalOptions.is_merchant_verified)) {
 					$o.previewWrapper.find($o.activationModal).remove();
 
@@ -1264,51 +1265,74 @@ import tippy, {roundArrow} from 'tippy.js';
 					});
 				}
 
-				// Get required info for success message.
-				const purchaseOptions = $($o.purchaseOptionItems);
-				const paywallId = purchaseOptions.attr('data-paywall-id');
-				const postPreviewId = $o.postPreviewWrapper.attr('data-preview-id');
-				const paywallName = $o.paywallName.text().trim();
-				const appliedTo = $($o.paywallAppliesTo).val();
-				let publishMessage = '';
+				if (!$o.requestSent) {
+					$o.requestSent = true;
+					showLoader();
 
-				// Compose message based on paywall attributes.
-				if ('category' === appliedTo || 'exclude_category' === appliedTo) {
-					const categoryName = $o.searchPaywallContent.text().trim();
-					if ('category' === appliedTo) {
-						publishMessage = sprintf(
-							__('Has been published to <b>all posts</b> in category <b>%s</b>.', 'revenue-generator'),
-							categoryName
-						);
-					} else {
-						publishMessage = sprintf(
-							__('Has been published to <b>all posts, except posts under</b> in category <b>%s</b>.', 'revenue-generator'),
-							categoryName
-						);
-					}
-				} else if ('supported' === appliedTo) {
-					publishMessage = sprintf(
-						__('Has been published on <b>%s</b>.', 'revenue-generator'),
-						$o.purchaseOverlay.find($o.paywallTitle).text().trim()
-					);
-				} else {
-					publishMessage = sprintf(
-						__('Has been published on <b>all posts</b>.', 'revenue-generator'),
-						$o.purchaseOverlay.find($o.paywallTitle).text().trim()
-					);
+					// Create form data for activating paywall.
+					const formData = {
+						action    : 'rg_activate_paywall',
+						paywall_id: paywallId,
+						security  : revenueGeneratorGlobalOptions.rg_paywall_nonce,
+					};
+
+					// Delete the option.
+					$.ajax({
+						url     : revenueGeneratorGlobalOptions.ajaxUrl,
+						method  : 'POST',
+						data    : formData,
+						dataType: 'json',
+					}).done(function (r) {
+						$o.requestSent = false;
+						hideLoader();
+
+						// Get required info for success message.
+						const purchaseOptions = $($o.purchaseOptionItems);
+						const paywallId = purchaseOptions.attr('data-paywall-id');
+						const postPreviewId = $o.postPreviewWrapper.attr('data-preview-id');
+						const paywallName = $o.paywallName.text().trim();
+						const appliedTo = $($o.paywallAppliesTo).val();
+						let publishMessage = '';
+
+						// Compose message based on paywall attributes.
+						if ('category' === appliedTo || 'exclude_category' === appliedTo) {
+							const categoryName = $o.searchPaywallContent.text().trim();
+							if ('category' === appliedTo) {
+								publishMessage = sprintf(
+									__('Has been published to <b>all posts</b> in category <b>%s</b>.', 'revenue-generator'),
+									categoryName
+								);
+							} else {
+								publishMessage = sprintf(
+									__('Has been published to <b>all posts, except posts under</b> in category <b>%s</b>.', 'revenue-generator'),
+									categoryName
+								);
+							}
+						} else if ('supported' === appliedTo) {
+							publishMessage = sprintf(
+								__('Has been published on <b>%s</b>.', 'revenue-generator'),
+								$o.purchaseOverlay.find($o.paywallTitle).text().trim()
+							);
+						} else {
+							publishMessage = sprintf(
+								__('Has been published on <b>all posts</b>.', 'revenue-generator'),
+								$o.purchaseOverlay.find($o.paywallTitle).text().trim()
+							);
+						}
+
+						// Remove undeded markup form modal and show success message.
+						const activationModal = $o.previewWrapper.find($o.activationModal);
+						const activationSuccess = activationModal.find($o.activationModalSuccess);
+						activationSuccess.find($o.activationModalSuccessTitle).text(paywallName);
+						activationSuccess.find($o.activationModalSuccessMessage).append($('<p/>').html(publishMessage));
+						activationSuccess.find($o.viewPost).attr('data-target-id', postPreviewId);
+						activationSuccess.find($o.disablePaywall).attr('data-paywall-id', paywallId);
+						activationModal.find($o.activationModalError).remove();
+						activationModal.find($o.accountActionsWrapper).remove();
+						activationModal.find($o.accountActionsFields).remove();
+						activationSuccess.css({display: 'flex'});
+					});
 				}
-
-				// Remove undeded markup form modal and show success message.
-				const activationModal = $o.previewWrapper.find($o.activationModal);
-				const activationSuccess = activationModal.find($o.activationModalSuccess);
-				activationSuccess.find($o.activationModalSuccessTitle).text(paywallName);
-				activationSuccess.find($o.activationModalSuccessMessage).append($('<p/>').html(publishMessage));
-				activationSuccess.find($o.viewPost).attr('data-target-id', postPreviewId);
-				activationSuccess.find($o.disablePaywall).attr('data-paywall-id', paywallId);
-				activationModal.find($o.activationModalError).remove();
-				activationModal.find($o.accountActionsWrapper).remove();
-				activationModal.find($o.accountActionsFields).remove();
-				activationSuccess.css({display: 'flex'});
 			};
 
 			/**
@@ -1347,7 +1371,8 @@ import tippy, {roundArrow} from 'tippy.js';
 						$o.requestSent = false;
 						activationModal.find($o.accountActionsFields).hide();
 						if (true === r.success) {
-							publishPaywall();
+							const paywallId = $(this).attr('data-paywall-id');
+							publishPaywall(paywallId);
 						} else {
 							activationModal.find($o.activationModalError).css({display: 'flex'});
 						}

@@ -292,4 +292,15 @@ class Paywall extends Base {
 		return false;
 	}
 
+	/**
+	 * Activate the paywall and update activation meta.
+	 *
+	 * @param int $paywall_id Paywall Id.
+	 */
+	public function activate_paywall( $paywall_id ) {
+		if ( ! empty( $paywall_id ) ) {
+			update_post_meta( $paywall_id, '_rg_is_active', 1 );
+		}
+	}
+
 }
