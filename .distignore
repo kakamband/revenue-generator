@@ -11,7 +11,12 @@ tests
 composer.json
 composer.lock
 package.json
-package.lock
+.*
+postcss.config.js
+webpack.config.js
+eslintrc.json
+LICENSE
+package-lock.json
 phpcs.xml
 phpunit.xml
 README.md
