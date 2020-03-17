@@ -1069,8 +1069,7 @@ import tippy, {roundArrow} from 'tippy.js';
 					if (0 === parseInt(revenueGeneratorGlobalOptions.globalOptions.is_merchant_verified)) {
 						showAccountActivationModal();
 					} else {
-						const paywallId = $(this).attr('data-paywall-id');
-						publishPaywall(paywallId);
+						publishPaywall();
 					}
 				});
 
@@ -1249,7 +1248,7 @@ import tippy, {roundArrow} from 'tippy.js';
 			/**
 			 * Publish the paywall.
 			 */
-			const publishPaywall = function (paywallId) {
+			const publishPaywall = function () {
 				if (1 === parseInt(revenueGeneratorGlobalOptions.globalOptions.is_merchant_verified)) {
 					$o.previewWrapper.find($o.activationModal).remove();
 
@@ -1268,6 +1267,10 @@ import tippy, {roundArrow} from 'tippy.js';
 				if (!$o.requestSent) {
 					$o.requestSent = true;
 					showLoader();
+
+					// Get paywall id.
+					const paywall = $($o.purchaseOptionItems);
+					const paywallId = paywall.attr('data-paywall-id');
 
 					// Create form data for activating paywall.
 					const formData = {
@@ -1371,8 +1374,7 @@ import tippy, {roundArrow} from 'tippy.js';
 						$o.requestSent = false;
 						activationModal.find($o.accountActionsFields).hide();
 						if (true === r.success) {
-							const paywallId = $(this).attr('data-paywall-id');
-							publishPaywall(paywallId);
+							publishPaywall();
 						} else {
 							activationModal.find($o.activationModalError).css({display: 'flex'});
 						}

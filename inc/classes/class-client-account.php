@@ -47,26 +47,18 @@ class Client_Account {
 	protected $merchant_region;
 
 	/**
-	 * Algorithm used to sign the key.
-	 *
-	 * @var string
-	 */
-	protected $secret_algo = 'sha224';
-
-
-	/**
 	 * Store common values used in the plugin.
 	 *
 	 * @var array Common values used for api related info throughout the plugin.
 	 */
-	public static $api_endpoints = [
+	public static $connector_endpoints = [
 		'EU' => [
-			'sandbox' => 'https://web.sandbox.laterpaytest.net',
-			'live'    => 'https://web.laterpay.net',
+			'sandbox' => 'https://connector.sandbox.laterpaytest.net',
+			'live'    => 'https://connector.laterpay.net',
 		],
 		'US' => [
-			'sandbox' => 'https://web.sandbox.uselaterpaytest.com',
-			'live'    => 'https://web.uselaterpay.com',
+			'sandbox' => 'https://connector.sandbox.uselaterpaytest.com',
+			'live'    => 'https://connector.uselaterpay.com',
 		],
 	];
 
@@ -118,7 +110,7 @@ class Client_Account {
 
 		// Setup web root for API Call.
 		$this->merchant_region = $region;
-		$region_endpoints      = self::$api_endpoints[ $region ];
+		$region_endpoints      = self::$connector_endpoints[ $region ];
 		$this->web_root        = $region_endpoints['sandbox']; // @todo make it live after testing.
 
 		// Setup merchant credentials.
@@ -135,69 +127,52 @@ class Client_Account {
 	}
 
 	/**
-	 * Handle test purchase.
+	 * Handle account verification.
 	 *
 	 * @return bool
 	 */
 	private function test_sample_purchase() {
-		$purchase_url    = $this->build_test_purchase_url();
-		$response        = wp_remote_get( $purchase_url );
-		$response_body   = wp_remote_retrieve_body( $response );
-		$response_status = wp_remote_retrieve_response_code( $response );
-		if ( ! empty( $response_status ) && 200 === $response_status ) {
-			preg_match( '/purchaseURL:(.*),/m', $response_body, $matches, PREG_OFFSET_CAPTURE, 0 );
-			if ( ! empty( $matches[1] ) ) {
-				$api_purchase_data = $matches[1];
-				$api_purchase_url  = $api_purchase_data[0];
-				preg_match( '/\/api\/([a-z0-9]+)\//m', $api_purchase_url, $api_matches, PREG_OFFSET_CAPTURE, 0 );
+		// Request to fetch endpoint, and add home url as origin.
+		$purchase_url = $this->build_test_purchase_url();
+		$home_url     = get_home_url();
+		$response     = wp_remote_get( $purchase_url, [
+			'timeout' => 60,
+			'headers' => [
+				'Origin' => $home_url
+			]
+		] );
 
-				if ( ! empty( $api_matches[1] ) ) {
-					$api_string_data = $api_matches[1];
-					$api_string      = $api_string_data[0];
-					$api_request_url = $this->web_root . '/api/' . $api_string;
-					$api_response    = wp_remote_post( $api_request_url, [
-						'body' => '{}',
-					] );
-					// @todo verify purchase.
-				}
+		// Check and verify allowed origin matches merchant domain.
+		$allowed_origin_header = wp_remote_retrieve_header( $response, 'access-control-allow-origin' );
 
-				return true;
-			}
+		if ( ! empty( $allowed_origin_header ) && $allowed_origin_header === $home_url ) {
+			return true;
+		} else {
+			return false;
 		}
-
-		return false;
 	}
 
 	/**
-	 * Create test purchase url for test progress.
+	 * Create url for test whitelisting of account.
 	 *
 	 * @return string
 	 */
 	private function build_test_purchase_url() {
-		$pricing             = 'US' === $this->merchant_region ? 'USD' : 'EUR';
-		$purchase_url_params = build_query( array(
-			'article_id' => 'wordpress_plugin_account_verification',
-			'cp'         => $this->merchant_id,
-			'pricing'    => $pricing . '0',
-			'renewable'  => '0',
-			'title'      => rawurlencode( 'Account Verification Purchase' ),
-			'ts'         => time(),
-			'url'        => rawurlencode( get_home_url() )
-		) );
+		// Demo params to verify merchant domain.
+		$purchase_url_params = build_query( [
+			'article_title' => rawurlencode( 'Revenue Generator Demo Page' ),
+			'article_url'   => rawurlencode( get_home_url() )
+		] );
 
-		$encoded_params = urlencode( $purchase_url_params );
-		$message        = 'GET&' . urlencode( $this->get_dialog_add_url() ) . '&' . $encoded_params;
-		$hmac           = hash_hmac( $this->secret_algo, $message, $this->merchant_api_key );
-
-		return $this->get_dialog_add_url() . '?' . $purchase_url_params . '&hmac=' . $hmac;
+		return $this->get_api_fetch_url() . '?' . $purchase_url_params;
 	}
 
 	/**
-	 * Get dialog add URL.
+	 * Get API fetch URL to verify whitelisted merchant domain.
 	 *
 	 * @return string
 	 */
-	private function get_dialog_add_url() {
-		return $this->web_root . '/dialog/add';
+	private function get_api_fetch_url() {
+		return $this->web_root . '/api/v2/fetch';
 	}
 }

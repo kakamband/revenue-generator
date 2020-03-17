@@ -808,10 +808,16 @@ class Admin {
 
 		$is_valid = $client_account_instance->validate_merchant_account();
 
+		// Set merchant status to verified.
+		if ( true === $is_valid ) {
+			$rg_global_options                         = Config::get_global_options();
+			$rg_global_options['is_merchant_verified'] = '1';
+			update_option( 'lp_rg_global_options', $rg_global_options );
+		}
+
 		// Send success message.
 		wp_send_json( [
-			'success' => true,
-			'msg'     => __( 'Something went wrong!', 'revenue-generator' )
+			'success' => $is_valid,
 		] );
 	}
 
