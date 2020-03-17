@@ -30,8 +30,6 @@ class Categories {
 		$query = [
 			'taxonomy'     => 'category',
 			'hide_empty'   => false,
-			'meta_key'     => '_rg_has_paywall',
-			'meta_compare' => 'NOT EXISTS'
 		];
 
 		$args = wp_parse_args(

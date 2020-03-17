@@ -204,6 +204,7 @@ class Paywall extends Base {
 				$paywall_info['access_entity'] = get_post_meta( $paywall->ID, '_rg_access_entity', true );
 				$paywall_info['preview_id']    = get_post_meta( $paywall->ID, '_rg_preview_id', true );
 				$paywall_info['order']         = get_post_meta( $paywall->ID, '_rg_options_order', true );
+				$paywall_info['is_active']     = get_post_meta( $paywall->ID, '_rg_is_active', true );
 			}
 		}
 
@@ -379,4 +380,124 @@ class Paywall extends Base {
 
 		return '';
 	}
+
+	/**
+	 * Get all paywalls.
+	 */
+	public function get_all_paywalls() {
+
+		$query_args = [
+			'post_type'      => static::SLUG,
+			'post_status'    => [ 'publish' ],
+			'posts_per_page' => 100,
+			'no_found_rows'  => true,
+		];
+
+		// Initialize WP_Query without args.
+		$get_paywalls_query = new \WP_Query();
+
+		// Get posts for requested args.
+		$posts    = $get_paywalls_query->query( $query_args );
+		$paywalls = [];
+
+		foreach ( $posts as $key => $post ) {
+			$paywalls[ $key ] = $this->formatted_paywall( $post );
+		}
+
+		return $paywalls;
+	}
+
+	/**
+	 * Returns relevant fields for paywalls of given WP_Post
+	 *
+	 * @param \WP_Post $post Post to transform
+	 *
+	 * @return array Time Pass instance as array
+	 */
+	private function formatted_paywall( $post ) {
+
+		$post_meta         = get_post_meta( $post->ID );
+		$post_meta         = $this->formatted_post_meta( $post_meta );
+		$post_updated_info = sprintf(
+			__( 'Last updated on %s at %s by %s' ),
+			get_the_modified_date( '', $post->ID ),
+			get_the_modified_time( '', $post->ID ),
+			get_the_author_meta( 'display_name', $post->post_author )
+		);
+
+		$pay_wall                  = [];
+		$pay_wall['id']            = $post->ID;
+		$pay_wall['title']         = $post->post_title;
+		$pay_wall['description']   = $post->post_content;
+		$pay_wall['name']          = $post_meta['name'];
+		$pay_wall['access_to']     = $post_meta['access_to'];
+		$pay_wall['access_entity'] = $post_meta['access_entity'];
+		$pay_wall['is_active']     = $post_meta['is_active'];
+		$pay_wall['updated']       = $post_updated_info;
+
+		// Compose message based on paywall attributes.
+		if ( 'category' === $pay_wall['access_to'] || 'exclude_category' === $pay_wall['access_to'] ) {
+			$category_id     = $pay_wall['access_entity'];
+			$category_object = get_category( $category_id );
+			if ( 'category' === $pay_wall['access_to'] ) {
+				$published_on = sprintf(
+					__( '%1$sPublished%2$s on %1$sall posts%2$s in the category %3$s', 'revenue-generator' ),
+					'<b>',
+					'</b>',
+					sprintf( '<b>%s</b>', $category_object->name )
+				);
+			} else {
+				$published_on = sprintf(
+					__( '%1$sPublished%2$s on %1$sall posts%2$s except the category %3$s', 'revenue-generator' ),
+					'<b>',
+					'</b>',
+					sprintf( '<b>%s</b>', $category_object->name )
+				);
+			}
+		} else if ( 'supported' === $pay_wall['access_to'] ) {
+			$rg_post_object = get_post( $pay_wall['access_entity'] );
+			$published_on   = sprintf(
+				__( '%1$sPublished%2$s on %1$spost%2$s %3$s', 'revenue-generator' ),
+				'<b>',
+				'</b>',
+				sprintf( '<b>%s</b>', $rg_post_object->post_title )
+			);
+		} else {
+			$published_on = sprintf(
+				__( '%1$sPublished%2$s on %1$sall posts%2$s', 'revenue-generator' ),
+				'<b>',
+				'</b>'
+
+			);
+		}
+
+		$pay_wall['published_on'] = $published_on;
+
+		return $pay_wall;
+	}
+
+	/**
+	 * Check if post meta has values.
+	 *
+	 * @param array $post_meta Post meta values fetched form database
+	 *
+	 * @return array
+	 */
+	private function formatted_post_meta( $post_meta ) {
+		$post_meta_data = [];
+
+		/**
+		 * _rg_name - store the paywall name.
+		 * _rg_access_to - store the content to which the time pass will allow access, can be category / all.
+		 * _rg_access_entity - store the entity id.
+		 * _rg_is_active - store paywall status.
+		 */
+		$post_meta_data['name']          = ( isset( $post_meta['_rg_name'][0] ) ) ? $post_meta['_rg_name'][0] : '';
+		$post_meta_data['access_to']     = ( isset( $post_meta['_rg_access_to'][0] ) ) ? $post_meta['_rg_access_to'][0] : '';
+		$post_meta_data['access_entity'] = ( isset( $post_meta['_rg_access_entity'][0] ) ) ? $post_meta['_rg_access_entity'][0] : '';
+		$post_meta_data['is_active']     = ( isset( $post_meta['_rg_is_active'][0] ) ) ? $post_meta['_rg_is_active'][0] : '';
+
+		return $post_meta_data;
+	}
+
 }

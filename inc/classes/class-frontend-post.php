@@ -97,37 +97,41 @@ class Frontend_Post {
 	public function add_connector_config() {
 		if ( is_singular( Post_Types::get_allowed_post_types() ) ) {
 			$post_payload_data = $this->get_post_payload();
-			?>
-			<script type="text/javascript">
-				function revenueGeneratorHideTeaserContent() {
-					document.querySelector('.lp-hide-me').style.display = 'none';
-				}
-			</script>
-
-			<!-- LaterPay Connector In-Page Configuration -->
-			<script type="application/json" id="laterpay-connector">
-				{
-					"callbacks": {
-						"onUserHasAccess": "revenueGeneratorHideTeaserContent"
-					}
-				}
-			</script>
-			<script type="application/json" id="laterpay-connector">
-				<?php
-				/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- added json string is secure and escaped.*/
-				echo $post_payload_data['payload'];
+			if ( ! empty( $post_payload_data ) ) {
 				?>
-			</script>
-			<meta property="laterpay:connector:config_token" content="
+				<script type="text/javascript">
+					function revenueGeneratorHideTeaserContent() {
+						document.querySelector('.lp-hide-me').style.display = 'none';
+					}
+				</script>
+				<!-- LaterPay Connector In-Page Configuration -->
+				<script type="application/json" id="laterpay-connector">
+					{
+						"callbacks": {
+							"onUserHasAccess": "revenueGeneratorHideTeaserContent"
+						}
+					}
+				</script>
+				<script type="application/json" id="laterpay-connector"><?php
+					/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- added json string is secure and escaped.*/
+					echo $post_payload_data['payload'];
+					?></script>
+				<meta property="laterpay:connector:config_token" content="
 			<?php
-			/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- added token string is secure and escaped. */
-			echo $post_payload_data['token'];
-			?>"
-			/>
-			<?php
+				/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- added token string is secure and escaped. */
+				echo $post_payload_data['token'];
+				?>"
+				/>
+				<?php
+			} else {
+				wp_dequeue_script( 'revenue-generator-classic-connector' );
+			}
 		}
 	}
 
+	/**
+	 * Enqueue the connector script required for paywall.
+	 */
 	public function register_connector_assets() {
 		if ( empty( $this->merchant_region ) ) {
 			return;
@@ -150,6 +154,13 @@ class Frontend_Post {
 		}
 	}
 
+	/**
+	 * Add revenue generator wrapper to add paywall attributes.
+	 *
+	 * @param string $post_content Post content.
+	 *
+	 * @return string
+	 */
 	public function revenue_generator_post_content( $post_content ) {
 		// Bail early, if unsupported post type.
 		if ( ! is_singular( Post_Types::get_allowed_post_types() ) ) {
@@ -162,6 +173,15 @@ class Frontend_Post {
 		return sprintf( $revenue_generator_paid_wrapper, $post_content );
 	}
 
+	/**
+	 * Convert purchase option data to connector config.
+	 *
+	 * @param array  $purchase_option Purchase option data.
+	 * @param string $type            Option type.
+	 * @param int    $entity_id       Entity id.
+	 *
+	 * @return array
+	 */
 	private function covert_to_connector_purchase_option( $purchase_option, $type, $entity_id ) {
 		$purchase_option_revenue = 'ppu' === $purchase_option['revenue'] ? 'pay_later' : 'pay_now';
 		$merchant_currency       = $this->merchant_currency;
@@ -214,11 +234,18 @@ class Frontend_Post {
 		}
 	}
 
+	/**
+	 * Create final config for supported post.
+	 *
+	 * @return array
+	 */
 	private function get_post_payload() {
-		$rg_post          = get_post();
-		$paywall_instance = Paywall::get_instance();
-		$paywall_id       = $paywall_instance->get_connected_paywall_by_post( $rg_post->ID );
-		$purchase_options = [];
+		$rg_post             = get_post();
+		$paywall_instance    = Paywall::get_instance();
+		$paywall_id          = $paywall_instance->get_connected_paywall_by_post( $rg_post->ID );
+		$purchase_options    = [];
+		$paywall_title       = esc_html__( 'Keep Reading', 'revenue-generator' );
+		$paywall_description = esc_html( sprintf( 'Support %s to get access to this content and more.', esc_url( get_home_url() ) ) );
 
 		// If post doesn't have an individual paywall, check for paywall on categories.
 		if ( empty( $paywall_id ) ) {
@@ -226,61 +253,72 @@ class Frontend_Post {
 			if ( ! empty( $post_terms ) ) {
 				$paywall_id = $paywall_instance->get_connected_paywall_by_categories( $post_terms );
 			}
-		} else {
-			$purchase_options_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
-			if ( ! empty( $purchase_options_data ) ) {
-				$paywall_title         = $purchase_options_data['title'];
-				$paywall_description   = $purchase_options_data['description'];
-				$paywall_options_order = $purchase_options_data['order'];
-				if ( ! empty( $paywall_options_order ) ) {
-					if ( ! empty( $paywall_options_order['individual'] ) ) {
-						$order                      = $paywall_options_order['individual'];
-						$individual_purchase_option = $paywall_instance->get_individual_purchase_option_data( $paywall_id );
-						if ( ! empty( $individual_purchase_option ) ) {
-							$individual_option              = $this->covert_to_connector_purchase_option( $individual_purchase_option, 'individual', $rg_post->ID );
-							$purchase_options[ $order - 1 ] = $individual_option;
-						}
-					}
+		}
 
-					$time_pass_instance = Time_Pass::get_instance();
-					$time_pass_ids      = $time_pass_instance->get_time_pass_ids( array_keys( $paywall_options_order ) );
-					if ( ! empty( $time_pass_ids ) ) {
-						foreach ( $time_pass_ids as $time_pass_id ) {
-							$order                          = $paywall_options_order[ 'tlp_' . $time_pass_id ];
-							$timepass_purchase_option       = $time_pass_instance->get_time_pass_by_id( $time_pass_id );
-							$timepass_option                = $this->covert_to_connector_purchase_option( $timepass_purchase_option, 'timepass', $time_pass_id );
-							$purchase_options[ $order - 1 ] = $timepass_option;
-						}
+		// Setup purchase options.
+		$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
+		if ( ! empty( $paywall_data ) && 1 === absint( $paywall_data['is_active'] ) ) {
+			$paywall_title         = $paywall_data['title'];
+			$paywall_description   = $paywall_data['description'];
+			$paywall_options_order = $paywall_data['order'];
+			if ( ! empty( $paywall_options_order ) ) {
+				if ( ! empty( $paywall_options_order['individual'] ) ) {
+					$order                      = $paywall_options_order['individual'] - 1;
+					$individual_purchase_option = $paywall_instance->get_individual_purchase_option_data( $paywall_id );
+					if ( ! empty( $individual_purchase_option ) ) {
+						$individual_option          = $this->covert_to_connector_purchase_option( $individual_purchase_option, 'individual', $rg_post->ID );
+						$purchase_options[ $order ] = $individual_option;
 					}
+				}
 
-					$subscription_instance = Subscription::get_instance();
-					$subscription_ids      = $subscription_instance->get_subscription_ids( array_keys( $paywall_options_order ) );
-					if ( ! empty( $subscription_ids ) ) {
-						foreach ( $subscription_ids as $subscription_id ) {
-							$order                          = $paywall_options_order[ 'sub_' . $subscription_id ];
-							$subscription_purchase_option   = $subscription_instance->get_subscription_by_id( $subscription_id );
-							$subscription_option            = $this->covert_to_connector_purchase_option( $subscription_purchase_option, 'subscription', $subscription_id );
-							$purchase_options[ $order - 1 ] = $subscription_option;
-						}
+				$time_pass_instance = Time_Pass::get_instance();
+				$time_pass_ids      = $time_pass_instance->get_time_pass_ids( array_keys( $paywall_options_order ) );
+				if ( ! empty( $time_pass_ids ) ) {
+					foreach ( $time_pass_ids as $time_pass_id ) {
+						$order                      = $paywall_options_order[ 'tlp_' . $time_pass_id ] - 1;
+						$timepass_purchase_option   = $time_pass_instance->get_time_pass_by_id( $time_pass_id );
+						$timepass_option            = $this->covert_to_connector_purchase_option( $timepass_purchase_option, 'timepass', $time_pass_id );
+						$purchase_options[ $order ] = $timepass_option;
+					}
+				}
+
+				$subscription_instance = Subscription::get_instance();
+				$subscription_ids      = $subscription_instance->get_subscription_ids( array_keys( $paywall_options_order ) );
+				if ( ! empty( $subscription_ids ) ) {
+					foreach ( $subscription_ids as $subscription_id ) {
+						$order                        = $paywall_options_order[ 'sub_' . $subscription_id ] - 1;
+						$subscription_purchase_option = $subscription_instance->get_subscription_by_id( $subscription_id );
+						$subscription_option          = $this->covert_to_connector_purchase_option( $subscription_purchase_option, 'subscription', $subscription_id );
+						$purchase_options[ $order ]   = $subscription_option;
 					}
 				}
 			}
 		}
 
-		$payload = wp_json_encode( [
-			'purchase_options' => $purchase_options,
-			'appearance'       => [
-				'purchaseOverlay' => [
-					'variant' => 'raw-white'
-				]
-			],
-		] );
+		// Setup overlay configurations.
+		if ( ! empty( $purchase_options ) ) {
+			$payload = wp_json_encode( [
+				'purchase_options'                 => $purchase_options,
+				'appearance'                       => [
+					'purchaseOverlay' => [
+						'heading'            => $paywall_title,
+						'header_description' => $paywall_description,
+						'variant'            => 'raw-white',
+					]
+				],
+				'ignore_database_single_purchases' => true,
+				'ignore_database_subscriptions'    => true,
+				'ignore_database_timepasses'       => true,
+			] );
 
 
-		return [
-			'payload' => $payload,
-			'token'   => $this->get_signed_token( $payload )
-		];
+			return [
+				'payload' => $payload,
+				'token'   => $this->get_signed_token( $payload )
+			];
+		}
+
+		return [];
 	}
 
 	/**

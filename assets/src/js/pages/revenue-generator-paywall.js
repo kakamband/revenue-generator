@@ -682,8 +682,10 @@ import tippy, {roundArrow} from 'tippy.js';
 				$o.body.on('change', $o.paywallAppliesTo, function () {
 					if ('exclude_category' === $(this).val() || 'category' === $(this).val()) {
 						$o.searchPaywallWrapper.show();
-						$o.savePaywall.attr('disabled', true);
-						$o.activatePaywall.attr('disabled', true);
+						if ($o.searchPaywallContent.length) {
+							$o.savePaywall.attr('disabled', true);
+							$o.activatePaywall.attr('disabled', true);
+						}
 						$o.postPreviewWrapper.attr('data-access-id', $o.searchPaywallContent.val());
 					} else {
 						$o.searchPaywallWrapper.hide();
