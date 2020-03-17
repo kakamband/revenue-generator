@@ -74,7 +74,7 @@ class Post_Types {
 	 *
 	 * @return array List of slugs.
 	 */
-	protected static function get_allowed_post_types() {
+	public static function get_allowed_post_types() {
 		return [
 			'post',
 			'page'
@@ -482,7 +482,7 @@ class Post_Types {
 			$order = 1;
 
 			// Add individual order.
-			if ( ! isset( $individual_purchase_option['order'] ) ) {
+			if ( ! empty( $individual_purchase_option ) && ! isset( $individual_purchase_option['order'] ) ) {
 				$individual_purchase_option['order']         = $order;
 				$individual_purchase_option['purchase_type'] = 'individual';
 			}
@@ -509,10 +509,14 @@ class Post_Types {
 			}
 		}
 
-		// Sort by order.
-		$keys = array_column( $options, 'order' );
-		array_multisort( $keys, SORT_ASC, $options );
-		$final_purchase_options['options'] = $options;
+		if ( ! empty( $options ) ) {
+			// Sort by order.
+			$keys = array_column( $options, 'order' );
+			if ( ! empty( $keys ) ) {
+				array_multisort( $keys, SORT_ASC, $options );
+				$final_purchase_options['options'] = $options;
+			}
+		}
 
 		return $final_purchase_options;
 	}

@@ -96,7 +96,7 @@ class Paywall extends Base {
 	}
 
 	/**
-	 * Update the order of purchase options in paywall..
+	 * Update the order of purchase options in paywall.
 	 *
 	 * @param int   $paywall_id Paywall ID
 	 * @param array $order_data Purchase option data.
@@ -268,7 +268,7 @@ class Paywall extends Base {
 	 *
 	 * @return bool|mixed
 	 */
-	public function get_connected_paywall( $post_id ) {
+	public function get_connected_paywall_by_post( $post_id ) {
 		$paywall_info = $this->get_purchase_option_data_by_post_id( $post_id );
 		if ( empty( $paywall_info['id'] ) ) {
 			return false;
@@ -303,4 +303,80 @@ class Paywall extends Base {
 		}
 	}
 
+	/**
+	 * Get paywall related to the category data.
+	 *
+	 * @param array $categories Categories Data.
+	 *
+	 * @return bool|mixed
+	 */
+	public function get_connected_paywall_by_categories( $categories ) {
+		$paywall_id = '';
+		foreach ( $categories as $category_id ) {
+			$paywall_id = $this->get_purchase_option_data_by_category_id( $category_id );
+
+			// If no paywall found check for paywall in parent category.
+			if ( empty( $paywall_id ) ) {
+				$parent_id       = false;
+				$category_object = get_category( $category_id );
+
+				// Verify the category exists before accessing the parent info.
+				if ( ! is_wp_error( $category_object ) && ! empty( $category_object ) && isset( $category_object->parent ) ) {
+					$parent_id = $category_object->parent;
+				}
+
+				while ( $parent_id ) {
+					$paywall_id = $this->get_purchase_option_data_by_category_id( $parent_id );
+					if ( empty( $paywall_id ) ) {
+						$parent_id = get_category( $parent_id )->parent;
+						continue;
+					}
+					break;
+				}
+			}
+		}
+
+		return $paywall_id;
+	}
+
+	/**
+	 * Get related Paywall ID.
+	 *
+	 * @param int $category_id Post ID.
+	 *
+	 * @return string|int
+	 */
+	public function get_purchase_option_data_by_category_id( $category_id ) {
+		$query_args = [
+			'post_type'      => static::SLUG,
+			'post_status'    => [ 'publish' ],
+			'posts_per_page' => 1,
+		];
+
+		$meta_query = [
+			'relation' => 'AND',
+			[
+				'key'     => '_rg_access_entity',
+				'compare' => '=',
+				'value'   => $category_id
+			],
+			[
+				'key'     => '_rg_access_to',
+				'value'   => 'category',
+				'compare' => '=',
+			],
+		];
+
+		$query_args['meta_query'] = $meta_query;
+
+		$query = new \WP_Query( $query_args );
+
+		$current_post = $query->posts;
+
+		if ( ! empty( $current_post[0] ) ) {
+			return $current_post[0]->ID;
+		}
+
+		return '';
+	}
 }

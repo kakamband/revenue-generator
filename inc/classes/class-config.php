@@ -45,12 +45,13 @@ class Config {
 
 		// Fresh install.
 		if ( false === get_option( 'lp_rg_global_options' ) ) {
+			// @todo, make region and currency empty and let the merchant choose, once EU is ready on upstream.
 			// Set default global options.
 			update_option( 'lp_rg_global_options',
 				[
 					'average_post_publish_count' => '',
-					'merchant_currency'          => '',
-					'merchant_region'            => '',
+					'merchant_currency'          => 'USD',
+					'merchant_region'            => 'US',
 					'is_tutorial_completed'      => 0,
 					'is_merchant_verified'       => 0,
 				]
@@ -162,10 +163,10 @@ class Config {
 	 *
 	 * @param float|int $price Price of the purchase option.
 	 *
-	 * @return float|int
+	 * @return string
 	 */
-	protected static function get_connector_price( $price ) {
-		return $price * 100;
+	public static function get_connector_price( $price ) {
+		return number_format( $price * 100, 0 );
 	}
 
 	/**

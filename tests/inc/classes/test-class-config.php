@@ -119,6 +119,6 @@ class Test_Config extends \WP_UnitTestCase {
 	 */
 	public function test_get_connector_price() {
 		$price = Utility::invoke_method( $this->_instance, 'get_connector_price', [ 1.49 ] );
-		$this->assertEquals( $price, 149 );
+		$this->assertEquals( $price, '149' );
 	}
 }

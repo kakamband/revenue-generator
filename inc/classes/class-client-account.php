@@ -110,26 +110,28 @@ class Client_Account {
 	public function validate_merchant_account() {
 		$global_options = Config::get_global_options();
 		$region         = $global_options['merchant_region'];
-		if ( ! empty( $region ) ) {
-			// Setup web root for API Call.
-			$this->merchant_region = $region;
-			$region_endpoints      = self::$api_endpoints[ $region ];
-			$this->web_root        = $region_endpoints['sandbox']; // @todo make it live after testing.
 
-			// Setup merchant credentials.
-			$merchant_credentials = self::get_merchant_credentials();
-			if ( ! empty( $merchant_credentials['merchant_id'] ) ) {
-				$this->merchant_id = $merchant_credentials['merchant_id'];
-			}
-
-			if ( ! empty( $merchant_credentials['merchant_key'] ) ) {
-				$this->merchant_api_key = $merchant_credentials['merchant_key'];
-			}
-
-			return $this->test_sample_purchase();
+		// Bail early, if no region set.
+		if ( empty( $region ) ) {
+			return false;
 		}
 
-		return false;
+		// Setup web root for API Call.
+		$this->merchant_region = $region;
+		$region_endpoints      = self::$api_endpoints[ $region ];
+		$this->web_root        = $region_endpoints['sandbox']; // @todo make it live after testing.
+
+		// Setup merchant credentials.
+		$merchant_credentials = self::get_merchant_credentials();
+		if ( ! empty( $merchant_credentials['merchant_id'] ) ) {
+			$this->merchant_id = $merchant_credentials['merchant_id'];
+		}
+
+		if ( ! empty( $merchant_credentials['merchant_key'] ) ) {
+			$this->merchant_api_key = $merchant_credentials['merchant_key'];
+		}
+
+		return $this->test_sample_purchase();
 	}
 
 	/**

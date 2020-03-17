@@ -296,4 +296,42 @@ class Subscription extends Base {
 			return false;
 		}
 	}
+
+	/**
+	 * Get requested subscription by id.
+	 *
+	 * @param int $subscription_id Subscription ID.
+	 *
+	 * @return array time pass data.
+	 */
+	public function get_subscription_by_id( $subscription_id ) {
+		return $this->formatted_subscription( get_post( $subscription_id ) );
+	}
+
+
+	/**
+	 * Get subscription ids in a paywall.
+	 *
+	 * @param array $paywall_options Paywall order data.
+	 *
+	 * @return array
+	 */
+	public function get_subscription_ids( $paywall_options ) {
+		if ( ! empty( $paywall_options ) ) {
+			$subscription_ids = array_map( function ( $paywall_option ) {
+				if ( false !== strpos( $paywall_option, 'sub_' ) ) {
+					$subscription_data = explode( 'sub_', $paywall_option );
+					if ( ! empty( $subscription_data[1] ) ) {
+						return absint( $subscription_data[1] );
+					}
+				}
+
+				return '';
+			}, $paywall_options );
+
+			return array_filter( $subscription_ids, 'strlen' );
+		}
+
+		return [];
+	}
 }

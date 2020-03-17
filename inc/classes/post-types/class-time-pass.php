@@ -296,4 +296,41 @@ class Time_Pass extends Base {
 		}
 	}
 
+	/**
+	 * Get requested time pass by id.
+	 *
+	 * @param int $time_pass_id Time Pass ID.
+	 *
+	 * @return array time pass data.
+	 */
+	public function get_time_pass_by_id( $time_pass_id ) {
+		return $this->formatted_time_pass( get_post( $time_pass_id ) );
+	}
+
+	/**
+	 * Get time pass ids in a paywall.
+	 *
+	 * @param array $paywall_options Paywall order data.
+	 *
+	 * @return array
+	 */
+	public function get_time_pass_ids( $paywall_options ) {
+		if ( ! empty( $paywall_options ) ) {
+			$time_pass_ids = array_map( function ( $paywall_option ) {
+				if ( false !== strpos( $paywall_option, 'tlp_' ) ) {
+					$time_pass_data = explode( 'tlp_', $paywall_option );
+					if ( ! empty( $time_pass_data[1] ) ) {
+						return absint( $time_pass_data[1] );
+					}
+				}
+
+				return '';
+			}, $paywall_options );
+
+			return array_filter( $time_pass_ids, 'strlen' );
+		}
+
+		return [];
+	}
+
 }

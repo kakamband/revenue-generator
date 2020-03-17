@@ -673,7 +673,7 @@ class Admin {
 			$admin_menus = self::get_admin_menus();
 
 			$paywall_instance = Paywall::get_instance();
-			$paywall_id       = $paywall_instance->get_connected_paywall( $post_preview_id );
+			$paywall_id       = $paywall_instance->get_connected_paywall_by_post( $post_preview_id );
 
 			// Preview page URL.
 			$preview_query_args = [

@@ -29,7 +29,7 @@ if ( empty( $paywall_data ) && ! empty( $rg_preview_post['ID'] ) ) {
 	$paywall_preview_id = $rg_preview_post['ID'];
 }
 $paywall_access_to     = isset( $paywall_data['access_to'] ) ? $paywall_data['access_to'] : 'all';
-$purchase_option_items = $purchase_options_data['options'];
+$purchase_option_items = empty( $purchase_options_data['options'] ) ? [] : $purchase_options_data['options'];
 $rg_preview_post_title = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_post['title'];
 ?>
 

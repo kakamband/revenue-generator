@@ -37,6 +37,12 @@ class Plugin {
 		// Initialize admin backend class.
 		Admin::get_instance();
 
+		// Initialize account class.
+		Client_Account::get_instance();
+
+		// Initialize frontend post class.
+		Frontend_Post::get_instance();
+
 		// Setup required hooks.
 		$this->setup_hooks();
 	}
