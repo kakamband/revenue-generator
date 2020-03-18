@@ -101,7 +101,7 @@ class Frontend_Post {
 				?>
 				<script type="text/javascript">
 					function revenueGeneratorHideTeaserContent() {
-						document.querySelector('.lp-hide-me').style.display = 'none';
+						document.querySelector('.lp-teaser-content').style.display = 'none';
 					}
 				</script>
 				<!-- LaterPay Connector In-Page Configuration -->
@@ -167,10 +167,34 @@ class Frontend_Post {
 			return $post_content;
 		}
 
-		$teaser                         = '<div class="lp-hide-me" data-lp-replacement-content>%s</div>';
-		$revenue_generator_paid_wrapper = '<div  data-lp-show-on-access>%s</div>';
+		$teaser_tempalte = '<div class="lp-teaser-content" data-lp-replacement-content>%s</div>';
+		$teaser          = '';
+		$rg_post         = get_post();
 
-		return sprintf( $revenue_generator_paid_wrapper, $post_content );
+		if ( ! empty( $rg_post ) ) {
+			if ( ! empty( $rg_post->post_excerpt ) ) {
+				$teaser = sprintf( $teaser_tempalte, $rg_post->post_excerpt );
+			} else {
+				$teaser_content = Utility::truncate(
+					preg_replace( '/\s+/', ' ', $post_content ),
+					Utility::determine_number_of_words( $post_content ),
+					[
+						'html'  => true,
+						'words' => true,
+					]
+				);
+				$teaser         = sprintf( $teaser_tempalte, $teaser_content );
+			}
+		}
+
+		$post_content = sprintf( '<div class="lp-main-content" data-lp-show-on-access>%s</div>', $post_content );
+		if ( ! empty( $teaser ) ) {
+			$rg_post_content = $teaser . $post_content;
+		} else {
+			$rg_post_content = $post_content;
+		}
+
+		return $rg_post_content;
 	}
 
 	/**
@@ -243,21 +267,35 @@ class Frontend_Post {
 		$rg_post             = get_post();
 		$paywall_instance    = Paywall::get_instance();
 		$paywall_id          = $paywall_instance->get_connected_paywall_by_post( $rg_post->ID );
+		$paywall_data        = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
 		$purchase_options    = [];
 		$paywall_title       = esc_html__( 'Keep Reading', 'revenue-generator' );
 		$paywall_description = esc_html( sprintf( 'Support %s to get access to this content and more.', esc_url( get_home_url() ) ) );
 
 		// If post doesn't have an individual paywall, check for paywall on categories.
-		if ( empty( $paywall_id ) ) {
+		if ( ! $this->is_paywall_active( $paywall_data ) ) {
+			// Check if paywall is found on post categories.
 			$post_terms = wp_get_post_categories( $rg_post->ID );
 			if ( ! empty( $post_terms ) ) {
-				$paywall_id = $paywall_instance->get_connected_paywall_by_categories( $post_terms );
+				$paywall_id   = $paywall_instance->get_connected_paywall_by_categories( $post_terms );
+				$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
+
+				// If paywall is no found on post categories, check for paywalls on excluded categories.
+				if ( ! $this->is_paywall_active( $paywall_data ) ) {
+					$paywall_id   = $paywall_instance->get_connected_paywall_in_excluded_categories( $post_terms );
+					$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
+				}
 			}
+		}
+
+		// If no paywall found in categories and individual post, check for paywall applied on all posts as last resort.
+		if ( ! $this->is_paywall_active( $paywall_data ) ) {
+			$paywall_id = $paywall_instance->get_paywall_for_all_posts();
 		}
 
 		// Setup purchase options.
 		$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
-		if ( ! empty( $paywall_data ) && 1 === absint( $paywall_data['is_active'] ) ) {
+		if ( $this->is_paywall_active( $paywall_data ) ) {
 			$paywall_title         = $paywall_data['title'];
 			$paywall_description   = $paywall_data['description'];
 			$paywall_options_order = $paywall_data['order'];
@@ -356,6 +394,17 @@ class Frontend_Post {
 
 		// Remove padding character from the end of line and return the Base64URL result
 		return rtrim( $url, '=' );
+	}
+
+	/**
+	 * Check if a paywall is active or not.
+	 *
+	 * @param array $paywall_data Paywall data.
+	 *
+	 * @return bool
+	 */
+	private function is_paywall_active( $paywall_data ) {
+		return ( ! empty( $paywall_data ) && 1 === absint( $paywall_data['is_active'] ) ) ? true : false;
 	}
 
 }

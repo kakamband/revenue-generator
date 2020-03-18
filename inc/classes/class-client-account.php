@@ -136,6 +136,7 @@ class Client_Account {
 		$purchase_url = $this->build_test_purchase_url();
 		$home_url     = get_home_url();
 		$response     = wp_remote_get( $purchase_url, [
+			// phpcs:ignore WordPressVIPMinimum.Performance.RemoteRequestTimeout.timeout_timeout -- Request done only once during initial setup.
 			'timeout' => 60,
 			'headers' => [
 				'Origin' => $home_url

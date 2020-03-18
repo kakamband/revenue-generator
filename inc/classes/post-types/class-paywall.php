@@ -309,7 +309,7 @@ class Paywall extends Base {
 	 *
 	 * @param array $categories Categories Data.
 	 *
-	 * @return bool|mixed
+	 * @return string|\WP_Post
 	 */
 	public function get_connected_paywall_by_categories( $categories ) {
 		$paywall_id = '';
@@ -341,9 +341,94 @@ class Paywall extends Base {
 	}
 
 	/**
-	 * Get related Paywall ID.
+	 * Get related Paywall ID for excluded categories.
 	 *
-	 * @param int $category_id Post ID.
+	 * @param array $categories Categories array.
+	 *
+	 * @return string|\WP_Post
+	 */
+	public function get_connected_paywall_in_excluded_categories( $categories ) {
+		$query_args = [
+			'post_type'      => static::SLUG,
+			'post_status'    => [ 'publish' ],
+			'posts_per_page' => 1,
+		];
+
+		$meta_query = [
+			'relation' => 'AND',
+			[
+				'key'     => '_rg_access_entity',
+				'compare' => 'NOT IN',
+				'value'   => $categories
+			],
+			[
+				'key'     => '_rg_access_to',
+				'value'   => 'exclude_category',
+				'compare' => '=',
+			],
+			[
+				'key'     => '_rg_is_active',
+				'value'   => '1',
+				'compare' => '=',
+			],
+		];
+
+		$query_args['meta_query'] = $meta_query;
+
+		$query = new \WP_Query( $query_args );
+
+		$current_post = $query->posts;
+
+		if ( ! empty( $current_post[0] ) ) {
+			return $current_post[0]->ID;
+		}
+
+		return '';
+	}
+
+	/**
+	 * Get related Paywall ID for all posts.
+	 *
+	 * @return string|\WP_Post
+	 */
+	public function get_paywall_for_all_posts() {
+		$query_args = [
+			'post_type'      => static::SLUG,
+			'post_status'    => [ 'publish' ],
+			'posts_per_page' => 1,
+		];
+
+		$meta_query = [
+			'relation' => 'AND',
+			[
+				'key'     => '_rg_access_to',
+				'value'   => 'all',
+				'compare' => '=',
+			],
+			[
+				'key'     => '_rg_is_active',
+				'value'   => '1',
+				'compare' => '=',
+			],
+		];
+
+		$query_args['meta_query'] = $meta_query;
+
+		$query = new \WP_Query( $query_args );
+
+		$current_post = $query->posts;
+
+		if ( ! empty( $current_post[0] ) ) {
+			return $current_post[0]->ID;
+		}
+
+		return '';
+	}
+
+	/**
+	 * Get related Paywall ID for category.
+	 *
+	 * @param int $category_id Category ID.
 	 *
 	 * @return string|int
 	 */
@@ -364,6 +449,11 @@ class Paywall extends Base {
 			[
 				'key'     => '_rg_access_to',
 				'value'   => 'category',
+				'compare' => '=',
+			],
+			[
+				'key'     => '_rg_is_active',
+				'value'   => '1',
 				'compare' => '=',
 			],
 		];
@@ -415,7 +505,6 @@ class Paywall extends Base {
 	 * @return array Time Pass instance as array
 	 */
 	private function formatted_paywall( $post ) {
-
 		$post_meta         = get_post_meta( $post->ID );
 		$post_meta         = $this->formatted_post_meta( $post_meta );
 		$post_updated_info = sprintf(

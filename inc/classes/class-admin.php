@@ -71,7 +71,8 @@ class Admin {
 			$merchant_currency = $currency_limits[ $current_global_options['merchant_currency'] ];
 		}
 
-		$admin_menus = self::get_admin_menus();
+		$admin_menus  = self::get_admin_menus();
+		$paywall_base = empty( $admin_menus['paywall'] ) ? '' : add_query_arg( [ 'page' => $admin_menus['paywall']['url'] ], admin_url( 'admin.php' ) );
 
 		// Script date required for operations.
 		$rg_script_data = [
@@ -80,7 +81,7 @@ class Admin {
 			'rg_paywall_nonce' => wp_create_nonce( 'rg_paywall_nonce' ),
 			'currency'         => $merchant_currency,
 			'locale'           => get_locale(),
-			'paywallPageBase'  => add_query_arg( [ 'page' => $admin_menus['paywall']['url'] ], admin_url( 'admin.php' ) ),
+			'paywallPageBase'  => $paywall_base,
 			'signupURL'        => [
 				'US' => 'https://web.uselaterpay.com/dialog/entry/?redirect_to=/merchant/add/#/signup',
 				'EU' => 'https://web.laterpay.net/dialog/entry/?redirect_to=/merchant/add/#/signup',

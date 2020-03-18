@@ -682,7 +682,7 @@ import tippy, {roundArrow} from 'tippy.js';
 				$o.body.on('change', $o.paywallAppliesTo, function () {
 					if ('exclude_category' === $(this).val() || 'category' === $(this).val()) {
 						$o.searchPaywallWrapper.show();
-						if ($o.searchPaywallContent.length) {
+						if ($o.searchPaywallContent.length && null === $o.searchPaywallContent.val()) {
 							$o.savePaywall.attr('disabled', true);
 							$o.activatePaywall.attr('disabled', true);
 						}

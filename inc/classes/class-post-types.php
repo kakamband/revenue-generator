@@ -602,7 +602,6 @@ class Post_Types {
 		// If our custom query var is set modify the query.
 		if ( ! empty( $query->query['rg_preview_title'] ) ) {
 			$term = $wpdb->esc_like( $query->query['rg_preview_title'] );
-			$like = "%{$term}%";
 			$sql  .= ' AND ' . $wpdb->posts . '.post_title LIKE \'%' . $term . '%\'';
 		}
 

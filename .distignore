@@ -3,9 +3,8 @@ Thumbs.db
 .DS_Store
 *.zip
 .idea
-/vendor/
+assets/src
 .gitignore
-assets
 bin
 tests
 composer.json

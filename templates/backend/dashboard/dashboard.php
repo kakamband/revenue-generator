@@ -43,7 +43,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<div class="rev-gen-dashboard-content-paywall-preview" data-paywall-id="<?php echo esc_attr( $paywall_id ); ?>">
 						</div>
 						<div class="rev-gen-dashboard-content-paywall-info">
-							<b><?php echo esc_html( $paywall_title ); ?></b>
+							<span><?php echo esc_html( $paywall_title ); ?></span>
 							<p><?php echo esc_html( $paywall_updated ); ?></p>
 							<?php echo wp_kses_post( $paywall_published ); ?>
 						</div>

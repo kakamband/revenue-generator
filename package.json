@@ -14,7 +14,7 @@
 		"build": "NODE_ENV=production webpack --mode=production",
 		"language:make-po": "wp i18n make-pot . --exclude=\"build\" languages/revenue-generator.po",
 		"language": "run-s \"language:*\"",
-		"zip": "wp dist-archive . revenue-generator.zip"
+		"zip": "composer install --no-dev --optimize-autoloader && wp dist-archive . revenue-generator.zip"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.4.3",
