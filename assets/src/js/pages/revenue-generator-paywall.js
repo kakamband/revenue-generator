@@ -91,6 +91,7 @@ import tippy, {roundArrow} from 'tippy.js';
 
 				// Purchase options warning modal.
 				purchaseOptionWarningWrapper: '.rev-gen-preview-main-option-update',
+				purchaseOptionWarningMessage: '.rev-gen-preview-main-option-update-message',
 				purchaseOperationContinue   : '#rg_js_continueOperation',
 				purchaseOperationCancel     : '#rg_js_cancelOperation',
 
@@ -470,7 +471,7 @@ import tippy, {roundArrow} from 'tippy.js';
 
 					// if id exists remove item from DB after confirmation.
 					if (entityId) {
-						showPurchaseOptionUpdateWarning().then((confirmation) => {
+						showPurchaseOptionUpdateWarning(type).then((confirmation) => {
 							if (true === confirmation) {
 								purchaseItem.remove();
 								reorderPurchaseItems();
@@ -569,7 +570,7 @@ import tippy, {roundArrow} from 'tippy.js';
 
 					// If a saved option is being edited, get confirmation.
 					if (entityId) {
-						showPurchaseOptionUpdateWarning().then((confirmation) => {
+						showPurchaseOptionUpdateWarning(optionType).then((confirmation) => {
 							if (true === confirmation) {
 								if (revenueSelection.prop('checked')) {
 									priceItem.attr('data-pay-model', 'ppu');
@@ -647,7 +648,7 @@ import tippy, {roundArrow} from 'tippy.js';
 
 					// If a saved item is being updated, display warning.
 					if (entityId) {
-						showPurchaseOptionUpdateWarning().then((confirmation) => {
+						showPurchaseOptionUpdateWarning(optionType).then((confirmation) => {
 							// If merchant selects to continue, remove current option from DB.
 							if (true === confirmation) {
 								const validatedPrice = validatePrice(newPrice, 'subscription' === optionType);
@@ -873,7 +874,7 @@ import tippy, {roundArrow} from 'tippy.js';
 						}
 
 						if (entityId.length) {
-							showPurchaseOptionUpdateWarning().then((confirmation) => {
+							showPurchaseOptionUpdateWarning(currentType).then((confirmation) => {
 								// If merchant selects to continue, remove current option from DB.
 								if (true === confirmation) {
 									// Remove the data from DB.
@@ -1797,7 +1798,11 @@ import tippy, {roundArrow} from 'tippy.js';
 					$o.purchaseOverlay.remove();
 
 					// Update paywall actions bar with new button.
-					$o.actionsWrapper.css({width: '50%', 'background-color': '#eff0f0'});
+					$o.actionsWrapper.css({
+						width             : '75%',
+						'background-color': 'rgba(239, 239, 239, 0.3)',
+						'backdrop-filter' : 'blur(10px)'
+					});
 
 					// Get the template for confirmation popup and add it.
 					const template = wp.template('revgen-add-paywall');
@@ -1857,9 +1862,11 @@ import tippy, {roundArrow} from 'tippy.js';
 
 			/**
 			 * Show the confirmation box for saved entity update.
+			 *
+			 * @param optionType Option type.
 			 */
-			const showPurchaseOptionUpdateWarning = async function () {
-				const confirm = await createEntityUpdateConfirmation();
+			const showPurchaseOptionUpdateWarning = async function (optionType) {
+				const confirm = await createEntityUpdateConfirmation(optionType);
 				$o.previewWrapper.find($o.purchaseOptionWarningWrapper).remove();
 				$o.body.removeClass('modal-blur');
 				$o.purchaseOverlay.css({
@@ -1871,14 +1878,24 @@ import tippy, {roundArrow} from 'tippy.js';
 
 			/**
 			 * Create a confirmation modal with warning before saved entity is updated.
+			 *
+			 * @param optionType Option type.
 			 */
-			const createEntityUpdateConfirmation = function () {
+			const createEntityUpdateConfirmation = function (optionType) {
 				return new Promise((complete, failed) => { // eslint-disable-line no-unused-vars
 					$o.previewWrapper.find($o.purchaseOptionWarningWrapper).remove();
 
 					// Get the template for confirmation popup and add it.
 					const template = wp.template('revgen-purchase-option-update');
 					$o.previewWrapper.append(template);
+					const updateWarning = $($o.purchaseOptionWarningWrapper).find($o.purchaseOptionWarningMessage);
+					if (updateWarning.length) {
+						if ('timepass' === optionType) {
+							updateWarning.empty().text(__('The changes you have made will impact this time pass offer on all paywalls across your entire site.', 'revenue-generator'));
+						} else {
+							updateWarning.empty().text(__('The changes you have made will impact this subscription offer on all paywalls across your entire site.', 'revenue-generator'));
+						}
+					}
 
 					$o.body.addClass('modal-blur');
 					$o.purchaseOverlay.css({

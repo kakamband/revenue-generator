@@ -353,7 +353,7 @@ $rg_preview_post_title = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_p
 		<span class="rev-gen-preview-main-option-update-warning">!</span>
 		<p class="rev-gen-preview-main-option-update-message">
 			<?php
-			esc_html_e( 'The changes you have made will impact all the paywalls across your entire site.', 'revenue-generator' );
+			esc_html_e( 'The changes you have made will impact this subscription offer on all paywalls across your entire site.', 'revenue-generator' );
 			?>
 		</p>
 		<div class="rev-gen-preview-main-option-update-buttons">
@@ -448,7 +448,7 @@ $rg_preview_post_title = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_p
 <!-- Template for paywall removal confirmation. -->
 <script type="text/template" id="tmpl-revgen-remove-paywall">
 	<div class="rev-gen-preview-main-remove-paywall">
-		<h4 class="rev-gen-preview-main-remove-paywall-title"><?php esc_html_e( 'Are you sure you want to remove the paywall.', 'revenue-generator' ); ?></h4>
+		<h4 class="rev-gen-preview-main-remove-paywall-title"><?php esc_html_e( 'Are you sure you want to remove the paywall?', 'revenue-generator' ); ?></h4>
 		<p class="rev-gen-preview-main-remove-paywall-message">
 			<?php
 			esc_html_e( 'This content will be visible to all users.', 'revenue-generator' );

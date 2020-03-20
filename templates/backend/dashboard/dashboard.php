@@ -19,8 +19,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<div class="rev-gen-dashboard-bar--item rev-gen-dashboard-bar--filter">
 				<label for="rg_js_filterPaywalls"><?php esc_html_e( 'Sort By', 'revenue-generator' ); ?></label>
 				<select id="rg_js_filterPaywalls">
-					<option value="asc"><?php esc_attr_e( 'Newest First' ); ?></option>
-					<option value="desc"><?php esc_attr_e( 'Oldest First' ); ?></option>
+					<option value="asc"><?php esc_attr_e( 'Newest First', 'revenue-generator' ); ?></option>
+					<option value="desc"><?php esc_attr_e( 'Oldest First', 'revenue-generator' ); ?></option>
+					<option value="desc"><?php esc_attr_e( 'Priority', 'revenue-generator' ); ?></option>
 				</select>
 			</div>
 			<div class="rev-gen-dashboard-bar--item rev-gen-dashboard-bar--search">
@@ -44,8 +45,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 						</div>
 						<div class="rev-gen-dashboard-content-paywall-info">
 							<span><?php echo esc_html( $paywall_title ); ?></span>
-							<p><?php echo esc_html( $paywall_updated ); ?></p>
-							<?php echo wp_kses_post( $paywall_published ); ?>
+							<p><?php echo wp_kses_post( $paywall_published ); ?></p>
+							<p class="rev-gen-dashboard-content-paywall-info-updated"><?php echo esc_html( $paywall_updated ); ?></p>
 						</div>
 					</div>
 				<?php } else: ?>
