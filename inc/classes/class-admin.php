@@ -52,6 +52,7 @@ class Admin {
 		add_action( 'wp_ajax_rg_post_permalink', [ $this, 'get_post_permalink' ] );
 		add_action( 'wp_ajax_rg_activate_paywall', [ $this, 'activate_paywall' ] );
 		add_action( 'wp_ajax_rg_disable_paywall', [ $this, 'disable_paywall' ] );
+		add_action( 'wp_ajax_rg_restart_tour', [ $this, 'restart_tour' ] );
 	}
 
 	/**
@@ -146,7 +147,7 @@ class Admin {
 			'revenue-generator',
 			[ $this, $dashboard_callback ],
 			'dashicons-laterpay-logo',
-			5
+			80
 		);
 
 		// Get all submenus and add it.
@@ -882,6 +883,26 @@ class Admin {
 				'success' => $result,
 				'msg'     => $result ? __( 'Paywall Disabled!', 'revenue-generator' ) : __( 'Something went wrong!', 'revenue-generator' )
 			] );
+		}
+	}
+
+	/**
+	 * Restart the tour.
+	 */
+	public function restart_tour() {
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Get all data and sanitize it.
+		$should_restart = filter_input( INPUT_POST, 'restart_tour', FILTER_SANITIZE_NUMBER_INT );
+
+		// Check and verify data exits.
+		if ( 1 === absint( $should_restart ) ) {
+			// Reset tutorial.
+			$rg_global_options                          = Config::get_global_options();
+			$rg_global_options['is_tutorial_completed'] = 0;
+			update_option( 'lp_rg_global_options', $rg_global_options );
+			wp_send_json_success();
 		}
 	}
 }
