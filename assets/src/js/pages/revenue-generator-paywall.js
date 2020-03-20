@@ -1316,13 +1316,10 @@ import tippy, {roundArrow} from 'tippy.js';
 						} else if ('supported' === appliedTo) {
 							publishMessage = sprintf(
 								__('Has been published on <b>%s</b>.', 'revenue-generator'),
-								$o.purchaseOverlay.find($o.paywallTitle).text().trim()
+								$($o.postTitle).text().trim()
 							);
 						} else {
-							publishMessage = sprintf(
-								__('Has been published on <b>all posts</b>.', 'revenue-generator'),
-								$o.purchaseOverlay.find($o.paywallTitle).text().trim()
-							);
+							publishMessage = __('Has been published on <b>all posts</b>.', 'revenue-generator');
 						}
 
 						// Remove undeded markup form modal and show success message.

@@ -190,10 +190,10 @@ $rg_preview_post_title = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_p
 
 <!-- Template for purchase overlay -->
 <script type="text/template" id="tmpl-revgen-purchase-overlay">
-	<div class="rg-purchase-overlay-title" contenteditable="true">
+	<div class="rg-purchase-overlay-title">
 		<?php echo empty( $paywall_data['title'] ) ? esc_html__( 'Keep Reading', 'revenue-generator' ) : esc_html( $paywall_data['title'] ); ?>
 	</div>
-	<div class="rg-purchase-overlay-description" contenteditable="true">
+	<div class="rg-purchase-overlay-description">
 		<?php echo empty( $paywall_data['description'] ) ? esc_html( sprintf( 'Support %s to get access to this content and more.', esc_url( get_home_url() ) ) ) : esc_html( $paywall_data['description'] ); ?>
 	</div>
 	<div class="rg-purchase-overlay-purchase-options" data-paywall-id="<?php echo esc_attr( $paywall_id ); ?>">
