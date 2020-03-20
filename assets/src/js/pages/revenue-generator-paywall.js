@@ -261,7 +261,7 @@ import tippy, {roundArrow} from 'tippy.js';
 					if (searchPostTerm.length && searchPostTerm !== postTitle) {
 						searchPreviewContent(searchPostTerm);
 					}
-				}, 1500));
+				}, 500));
 
 				/**
 				 * Add combobox with search for categories.

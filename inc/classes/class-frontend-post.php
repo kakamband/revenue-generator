@@ -333,22 +333,22 @@ class Frontend_Post {
 			}
 		}
 
+		// Sort purchase options based on new order.
+		ksort( $purchase_options );
+
 		// Setup overlay configurations.
 		if ( ! empty( $purchase_options ) ) {
 			$payload = wp_json_encode( [
 				'purchase_options'                 => $purchase_options,
 				'appearance'                       => [
 					'purchaseOverlay' => [
-						'heading'            => $paywall_title,
-						'header_description' => $paywall_description,
-						'variant'            => 'raw-white',
+						'variant' => 'raw-white',
 					]
 				],
 				'ignore_database_single_purchases' => true,
 				'ignore_database_subscriptions'    => true,
 				'ignore_database_timepasses'       => true,
 			] );
-
 
 			return [
 				'payload' => $payload,
