@@ -8,7 +8,9 @@
 namespace LaterPay\Revenue_Generator\Inc\Post_Types;
 
 use LaterPay\Revenue_Generator\Inc\Categories;
+use LaterPay\Revenue_Generator\Inc\Config;
 use LaterPay\Revenue_Generator\Inc\Post_Types;
+use LaterPay\Revenue_Generator\Inc\View;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -475,7 +477,6 @@ class Paywall extends Base {
 	 * Get all paywalls.
 	 */
 	public function get_all_paywalls() {
-
 		$query_args = [
 			'post_type'      => static::SLUG,
 			'post_status'    => [ 'publish' ],
@@ -498,6 +499,22 @@ class Paywall extends Base {
 	}
 
 	/**
+	 * Get user id of the user who last updated the paywall.
+	 *
+	 * @param int $post_id Post ID.
+	 *
+	 * @return string|int
+	 */
+	private function get_last_modified_author_id( $post_id ) {
+		$last_id = get_post_meta( $post_id, '_edit_last', true );
+		if ( $last_id ) {
+			return $last_id;
+		}
+
+		return '';
+	}
+
+	/**
 	 * Returns relevant fields for paywalls of given WP_Post
 	 *
 	 * @param \WP_Post $post Post to transform
@@ -505,13 +522,15 @@ class Paywall extends Base {
 	 * @return array Time Pass instance as array
 	 */
 	private function formatted_paywall( $post ) {
-		$post_meta         = get_post_meta( $post->ID );
-		$post_meta         = $this->formatted_post_meta( $post_meta );
-		$post_updated_info = sprintf(
+		$post_meta          = get_post_meta( $post->ID );
+		$post_meta          = $this->formatted_post_meta( $post_meta );
+		$last_modified_user = $this->get_last_modified_author_id( $post->ID );
+		$post_author        = empty( $last_modified_user ) ? $post->post_author : $last_modified_user;
+		$post_updated_info  = sprintf(
 			__( 'Last updated on %s at %s by %s' ),
 			get_the_modified_date( '', $post->ID ),
 			get_the_modified_time( '', $post->ID ),
-			get_the_author_meta( 'display_name', $post->post_author )
+			get_the_author_meta( 'display_name', $post_author )
 		);
 
 		$pay_wall                  = [];
@@ -587,6 +606,218 @@ class Paywall extends Base {
 		$post_meta_data['is_active']     = ( isset( $post_meta['_rg_is_active'][0] ) ) ? $post_meta['_rg_is_active'][0] : '';
 
 		return $post_meta_data;
+	}
+
+	/**
+	 * Convert received purchase options data into an ordered array for dashboard for preview.
+	 *
+	 * @param array $purchase_options Raw un ordered options data.
+	 *
+	 * @return array
+	 */
+	public static function convert_to_purchase_options_preview( $purchase_options ) {
+		$final_purchase_options = [];
+		$options                = [];
+
+		$final_purchase_options['paywall'] = isset( $purchase_options['paywall'] ) ? $purchase_options['paywall'] : [];
+		$individual_purchase_option        = isset( $purchase_options['individual'] ) ? $purchase_options['individual'] : [];
+		$time_passes_purchase_option       = isset( $purchase_options['time_passes'] ) ? $purchase_options['time_passes'] : [];
+		$subscriptions_purchase_option     = isset( $purchase_options['subscriptions'] ) ? $purchase_options['subscriptions'] : [];
+
+		// Remove data not required for preview.
+		unset(
+			$final_purchase_options['paywall']['name'],
+			$final_purchase_options['paywall']['access_to'],
+			$final_purchase_options['paywall']['access_entity'],
+			$final_purchase_options['paywall']['preview_id']
+		);
+
+		// Check if an order exists for the paywall.
+		if ( isset( $final_purchase_options['paywall']['order'] ) ) {
+
+			if ( ! empty( $final_purchase_options ) ) {
+				$current_orders  = $final_purchase_options['paywall']['order'];
+				$new_order_count = count( $current_orders );
+
+				if ( ! empty( $individual_purchase_option ) ) {
+					// Remove data not required for preview.
+					unset(
+						$individual_purchase_option['revenue'],
+						$individual_purchase_option['type'],
+						$individual_purchase_option['purchase_type']
+					);
+
+					// Set order for individual option.
+					if ( isset( $current_orders['individual'] ) ) {
+						$individual_purchase_option['order'] = $current_orders['individual'];
+					} else {
+						$new_order_count                     += 1;
+						$individual_purchase_option['order'] = $new_order_count;
+					}
+					$individual_purchase_option['order']         = $current_orders['individual'];
+					$individual_purchase_option['purchase_type'] = 'individual';
+					$options[]                                   = $individual_purchase_option;
+				}
+
+				if ( ! empty( $time_passes_purchase_option ) ) {
+					// Set order for time pass option.
+					foreach ( $time_passes_purchase_option as $time_pass ) {
+						$tlp_id                     = 'tlp_' . $time_pass['id'];
+						$time_pass['purchase_type'] = 'timepass';
+						if ( isset( $current_orders[ $tlp_id ] ) ) {
+							$time_pass['order'] = $current_orders[ $tlp_id ];
+						} else {
+							$new_order_count    += 1;
+							$time_pass['order'] = $new_order_count;
+						}
+
+						// Remove data not required for preview.
+						unset(
+							$time_pass['id'],
+							$time_pass['revenue'],
+							$time_pass['duration'],
+							$time_pass['period'],
+							$time_pass['is_active'],
+							$time_pass['access_to'],
+							$time_pass['purchase_type'],
+							$time_pass['access_entity']
+						);
+
+						$options[] = $time_pass;
+					}
+				}
+
+				if ( ! empty( $subscriptions_purchase_option ) ) {
+					// Set order for subscription option.
+					foreach ( $subscriptions_purchase_option as $subscription ) {
+						$sub_id                        = 'sub_' . $subscription['id'];
+						$subscription['purchase_type'] = 'subscription';
+						if ( isset( $current_orders[ $sub_id ] ) ) {
+							$subscription['order'] = $current_orders[ $sub_id ];
+						} else {
+							$new_order_count       += 1;
+							$subscription['order'] = $new_order_count;
+						}
+
+						// Remove data not required for preview.
+						unset(
+							$subscription['id'],
+							$subscription['revenue'],
+							$subscription['duration'],
+							$subscription['period'],
+							$subscription['is_active'],
+							$subscription['access_to'],
+							$subscription['purchase_type'],
+							$subscription['access_entity']
+						);
+
+						$options[] = $subscription;
+					}
+				}
+			}
+		} else {
+			$order = 1;
+
+			// Add individual order.
+			if ( ! empty( $individual_purchase_option ) && ! isset( $individual_purchase_option['order'] ) ) {
+				$individual_purchase_option['order'] = $order;
+
+				// Remove data not required for preview.
+				unset(
+					$individual_purchase_option['revenue'],
+					$individual_purchase_option['type']
+				);
+			}
+			$options[] = $individual_purchase_option;
+
+			// Add time pass options order.
+			foreach ( $time_passes_purchase_option as $time_pass ) {
+				$order += 1;
+				if ( ! isset( $time_pass['order'] ) ) {
+					$time_pass['order'] = $order;
+				}
+
+				// Remove data not required for preview.
+				unset(
+					$time_pass['id'],
+					$time_pass['revenue'],
+					$time_pass['duration'],
+					$time_pass['period'],
+					$time_pass['is_active'],
+					$time_pass['access_to'],
+					$time_pass['access_entity']
+				);
+
+				$options[] = $time_pass;
+			}
+
+			// Add subscription options order.
+			foreach ( $subscriptions_purchase_option as $subscription ) {
+				$order += 1;
+				if ( ! isset( $subscription['order'] ) ) {
+					$subscription['order'] = $order;
+				}
+
+				// Remove data not required for preview.
+				unset(
+					$subscription['id'],
+					$subscription['revenue'],
+					$subscription['duration'],
+					$subscription['period'],
+					$subscription['is_active'],
+					$subscription['access_to'],
+					$subscription['access_entity']
+				);
+
+				$options[] = $subscription;
+			}
+		}
+
+		if ( ! empty( $options ) ) {
+			// Sort by order.
+			$keys = array_column( $options, 'order' );
+			if ( ! empty( $keys ) ) {
+				array_multisort( $keys, SORT_ASC, $options );
+				$final_purchase_options['options'] = $options;
+			}
+		}
+
+		return $final_purchase_options;
+	}
+
+	/**
+	 * Create a mini preview of the paywall for dashboard.
+	 *
+	 * @param int $paywall_id Paywall ID.
+	 */
+	public static function generate_paywall_mini_preview( $paywall_id ) {
+		if ( ! empty( $paywall_id ) ) {
+
+			// Post Types instance
+			$post_types = Post_Types::get_instance();
+
+			// Get paywall options data.
+			$purchase_options_data = $post_types->get_post_purchase_options_by_paywall_id( $paywall_id );
+			$purchase_options      = self::convert_to_purchase_options_preview( $purchase_options_data );
+
+			// Set currency symbol.
+			$config_data = Config::get_global_options();
+			$symbol      = '';
+			if ( ! empty( $config_data['merchant_currency'] ) ) {
+				$symbol = 'USD' === $config_data['merchant_currency'] ? '$' : '€';
+			}
+
+			$paywall_preview_data = [
+				'paywall_id'            => $paywall_id,
+				'purchase_options_data' => $purchase_options,
+				'merchant_symbol'       => $symbol,
+			];
+
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
+			echo View::render_template( 'backend/dashboard/paywall-preview', $paywall_preview_data );
+		} else {
+			echo '';
+		}
 	}
 
 }

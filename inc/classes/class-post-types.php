@@ -413,7 +413,7 @@ class Post_Types {
 	}
 
 	/**
-	 * Convert recieved purchase options data into an ordered array for preview.
+	 * Convert received purchase options data into an ordered array for preview.
 	 *
 	 * @param array $purchase_options Raw un ordered options data.
 	 *

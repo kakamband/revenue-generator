@@ -5,6 +5,7 @@
  * @package revenue-generator
  */
 
+use LaterPay\Revenue_Generator\Inc\Post_Types\Paywall;
 use LaterPay\Revenue_Generator\Inc\View;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -41,8 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					$paywall_published = $paywall['published_on'];
 					?>
 					<div class="rev-gen-dashboard-content-paywall">
-						<div class="rev-gen-dashboard-content-paywall-preview" data-paywall-id="<?php echo esc_attr( $paywall_id ); ?>">
-						</div>
+						<?php Paywall::generate_paywall_mini_preview( $paywall_id ); ?>
 						<div class="rev-gen-dashboard-content-paywall-info">
 							<span><?php echo esc_html( $paywall_title ); ?></span>
 							<p><?php echo wp_kses_post( $paywall_published ); ?></p>
