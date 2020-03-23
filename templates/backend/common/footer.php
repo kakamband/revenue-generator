@@ -6,7 +6,7 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	// prevent direct access to this file
+	// prevent direct access to this file.
 	exit;
 }
 ?>

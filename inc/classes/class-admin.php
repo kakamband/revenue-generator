@@ -107,7 +107,7 @@ class Admin {
 			]
 		];
 
-		// If setup is not done
+		// If setup is not done.
 		if ( ! $is_welcome_setup_done ) {
 			$rg_script_data['rg_global_config_nonce'] = wp_create_nonce( 'rg_global_config_nonce' );
 		}
@@ -194,7 +194,7 @@ class Admin {
 	/**
 	 * If the tutorial is incomplete, redirect user to paywall page before dashboard.
 	 *
-	 * @param $current_screen
+	 * @param \WP_Screen $current_screen Current \WP_Screen object.
 	 */
 	public function redirect_merchant( $current_screen ) {
 		$current_global_options = Config::get_global_options();
@@ -418,7 +418,6 @@ class Admin {
 
 	/**
 	 * Update Paywall.
-	 *
 	 */
 	public function update_paywall() {
 
@@ -862,7 +861,11 @@ class Admin {
 		if ( ! empty( $paywall_id ) ) {
 			$paywall_instance = Paywall::get_instance();
 			$paywall_instance->activate_paywall( $paywall_id );
-			wp_send_json_success();
+
+			wp_send_json( [
+				'success'      => true,
+				'has_paywalls' => $paywall_instance->get_paywalls_count() > 1,
+			] );
 		}
 	}
 

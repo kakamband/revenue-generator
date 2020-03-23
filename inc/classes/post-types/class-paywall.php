@@ -90,7 +90,7 @@ class Paywall extends Base {
 	/**
 	 * Update individual purchase option for the paywall.
 	 *
-	 * @param int   $paywall_id      Paywall ID
+	 * @param int   $paywall_id      Paywall ID.
 	 * @param array $individual_data Individual option data.
 	 */
 	public function update_paywall_individual_option( $paywall_id, $individual_data ) {
@@ -100,7 +100,7 @@ class Paywall extends Base {
 	/**
 	 * Update the order of purchase options in paywall.
 	 *
-	 * @param int   $paywall_id Paywall ID
+	 * @param int   $paywall_id Paywall ID.
 	 * @param array $order_data Purchase option data.
 	 */
 	public function update_paywall_option_order( $paywall_id, $order_data ) {
@@ -171,7 +171,7 @@ class Paywall extends Base {
 	/**
 	 * Remove purchase option data.
 	 *
-	 * @param $paywall_id
+	 * @param int $paywall_id Paywall ID.
 	 */
 	public function remove_individual_purchase_option( $paywall_id ) {
 		if ( ! empty( $paywall_id ) ) {
@@ -517,7 +517,7 @@ class Paywall extends Base {
 	/**
 	 * Returns relevant fields for paywalls of given WP_Post
 	 *
-	 * @param \WP_Post $post Post to transform
+	 * @param \WP_Post $post Post to transform.
 	 *
 	 * @return array Time Pass instance as array
 	 */
@@ -587,7 +587,7 @@ class Paywall extends Base {
 	/**
 	 * Check if post meta has values.
 	 *
-	 * @param array $post_meta Post meta values fetched form database
+	 * @param array $post_meta Post meta values fetched form database.
 	 *
 	 * @return array
 	 */
@@ -793,7 +793,7 @@ class Paywall extends Base {
 	public static function generate_paywall_mini_preview( $paywall_id ) {
 		if ( ! empty( $paywall_id ) ) {
 
-			// Post Types instance
+			// Post Types instance.
 			$post_types = Post_Types::get_instance();
 
 			// Get paywall options data.
@@ -818,6 +818,18 @@ class Paywall extends Base {
 		} else {
 			echo '';
 		}
+	}
+
+	/**
+	 * Get count of existing paywalls.
+	 *
+	 * @return int number of defined paywalls.
+	 */
+	public function get_paywalls_count() {
+		$paywall_count = wp_count_posts( static::SLUG );
+		$result        = $paywall_count->publish;
+
+		return absint( $result );
 	}
 
 }

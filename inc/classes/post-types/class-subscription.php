@@ -63,7 +63,7 @@ class Subscription extends Base {
 	/**
 	 * Get all subscriptions.
 	 *
-	 * @param bool $ignore_deleted ignore deleted subscriptions
+	 * @param bool $ignore_deleted ignore deleted subscriptions.
 	 *
 	 * @return array list of subscriptions
 	 */
@@ -99,7 +99,7 @@ class Subscription extends Base {
 	/**
 	 * Returns relevant fields for subscription of given WP_Post
 	 *
-	 * @param \WP_Post $post Post to transform
+	 * @param \WP_Post $post Post to transform.
 	 *
 	 * @return array Subscription instance as array
 	 */
@@ -128,7 +128,7 @@ class Subscription extends Base {
 	/**
 	 * Check if post meta has values.
 	 *
-	 * @param array $post_meta Post meta values fetched form database
+	 * @param array $post_meta Post meta values fetched form database.
 	 *
 	 * @return array
 	 */
@@ -155,7 +155,7 @@ class Subscription extends Base {
 	/**
 	 * Get all subscriptions that apply to a given post.
 	 *
-	 * @param bool $ignore_deleted ignore deleted subscriptions
+	 * @param bool $ignore_deleted ignore deleted subscriptions.
 	 *
 	 * @return array $subscriptions list of subscriptions
 	 */

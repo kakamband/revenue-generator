@@ -9,13 +9,16 @@
 
 namespace LaterPay\Revenue_Generator\Inc;
 
+/**
+ * Class Utility
+ */
 class Utility {
 
 	/**
 	 * Get the first given number of words from a string.
 	 *
-	 * @param string $string
-	 * @param int    $word_limit
+	 * @param string $string     Actual string.
+	 * @param int    $word_limit Limit of words.
 	 *
 	 * @return  string
 	 */
@@ -28,7 +31,7 @@ class Utility {
 	/**
 	 * Determine the number of words to be shown for teaser/overlay.
 	 *
-	 * @param string $content
+	 * @param string $content Post content.
 	 *
 	 * @return int $number_of_words
 	 */
@@ -36,7 +39,7 @@ class Utility {
 		$content     = preg_replace( '/\s+/', ' ', $content );
 		$total_words = count( explode( ' ', $content ) );
 
-		// Static values passed for creating the
+		// Static values passed for creating the number of words.
 		$percent = max( min( 5, 100 ), 1 );
 		$min     = 10;
 		$max     = 25;
@@ -193,7 +196,7 @@ class Utility {
 	/**
 	 * Get post content in words excluding the markup in it.
 	 *
-	 * @param string $content
+	 * @param string $content Full post content.
 	 *
 	 * @return int
 	 */

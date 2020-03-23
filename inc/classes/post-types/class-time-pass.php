@@ -63,7 +63,7 @@ class Time_Pass extends Base {
 	/**
 	 * Get all time passes.
 	 *
-	 * @param bool $ignore_deleted ignore deleted time passes
+	 * @param bool $ignore_deleted ignore deleted time passes.
 	 *
 	 * @return array list of time passes
 	 */
@@ -98,7 +98,7 @@ class Time_Pass extends Base {
 	/**
 	 * Returns relevant fields for time pass of given WP_Post
 	 *
-	 * @param \WP_Post $post Post to transform
+	 * @param \WP_Post $post Post to transform.
 	 *
 	 * @return array Time Pass instance as array
 	 */
@@ -127,7 +127,7 @@ class Time_Pass extends Base {
 	/**
 	 * Check if post meta has values.
 	 *
-	 * @param array $post_meta Post meta values fetched form database
+	 * @param array $post_meta Post meta values fetched form database.
 	 *
 	 * @return array
 	 */
@@ -153,7 +153,7 @@ class Time_Pass extends Base {
 	/**
 	 * Get all time passes that apply to a given post.
 	 *
-	 * @param bool $ignore_deleted ignore deleted time passes
+	 * @param bool $ignore_deleted ignore deleted time passes.
 	 *
 	 * @return array $time_passes list of time passes
 	 */

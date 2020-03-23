@@ -22,7 +22,7 @@ class Categories {
 	/**
 	 * Get categories that don't have a paywall associated to them.
 	 *
-	 * @param $args
+	 * @param array $args Additional query args.
 	 *
 	 * @return array
 	 */

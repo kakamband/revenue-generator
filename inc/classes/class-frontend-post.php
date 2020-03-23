@@ -94,6 +94,9 @@ class Frontend_Post {
 		add_filter( 'the_content', [ $this, 'revenue_generator_post_content' ] );
 	}
 
+	/**
+	 * Add connector config required for adding paywall on the post.
+	 */
 	public function add_connector_config() {
 		if ( is_singular( Post_Types::get_allowed_post_types() ) ) {
 			$post_payload_data = $this->get_post_payload();
@@ -362,6 +365,8 @@ class Frontend_Post {
 	/**
 	 * Create signed token for in page connector configuration.
 	 *
+	 * @param array $payload Payload data array.
+	 *
 	 * @return string
 	 */
 	private function get_signed_token( $payload ) {
@@ -376,23 +381,23 @@ class Frontend_Post {
 	}
 
 	/**
-	 * From https://base64.guru/developers/php/examples/base64url
+	 * From https://base64.guru/developers/php/examples/base64url.
 	 *
-	 * @param $data
+	 * @param array $data Data to be encoded for connector.
 	 *
 	 * @return bool|string
 	 */
 	private function base64url_encode( $data ) {
-		// First of all you should encode $data to Base64 string
+		// First of all you should encode $data to Base64 string.
 		$b64 = base64_encode( $data );
-		// Make sure you get a valid result, otherwise, return FALSE, as the base64_encode() function do
+		// Make sure you get a valid result, otherwise, return FALSE, as the base64_encode() function do.
 		if ( $b64 === false ) {
 			return false;
 		}
-		// Convert Base64 to Base64URL by replacing “+” with “-” and “/” with “_”
+		// Convert Base64 to Base64URL by replacing “+” with “-” and “/” with “_”.
 		$url = strtr( $b64, '+/', '-_' );
 
-		// Remove padding character from the end of line and return the Base64URL result
+		// Remove padding character from the end of line and return the Base64URL result.
 		return rtrim( $url, '=' );
 	}
 

@@ -123,7 +123,7 @@ class Post_Types {
 	/**
 	 * Return a structured data for preview in paywall creation.
 	 *
-	 * @param int $post_id Post ID
+	 * @param int $post_id Post ID.
 	 *
 	 * @return array
 	 */
@@ -350,12 +350,9 @@ class Post_Types {
 	/**
 	 * Get valid periods.
 	 *
-	 * @param null $key option name
-	 * @param bool $pluralized
-	 *
 	 * @return array array of options
 	 */
-	public static function get_period_options( $key = null ) {
+	public static function get_period_options() {
 		// singular periods.
 		$periods = [
 			'h' => __( 'Hour', 'revenue-generator' ),
@@ -371,7 +368,7 @@ class Post_Types {
 	/**
 	 * Get time pass select options by type.
 	 *
-	 * @param string $type type of select
+	 * @param string $type type of select.
 	 *
 	 * @return string of options
 	 */
@@ -642,7 +639,7 @@ class Post_Types {
 	/**
 	 * Returns relevant fields for supported content of given WP_Post.
 	 *
-	 * @param \WP_Post $post Post to transform
+	 * @param \WP_Post $post Post to transform.
 	 *
 	 * @return array
 	 */

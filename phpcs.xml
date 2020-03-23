@@ -13,6 +13,7 @@
 	<file>.</file>
 
 	<rule ref="WordPressVIPMinimum" />
+	<rule ref="WordPress-Docs" />
 
 	<exclude-pattern>*/build/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>

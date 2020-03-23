@@ -120,6 +120,7 @@
 
 				span.rev-gen-preview-main-paywall-name {
 					font-weight: 500;
+					border-bottom: 2px solid #000;
 				}
 			}
 
@@ -421,7 +422,7 @@
 		left: 60%;
 		overflow: hidden;
 		top: 25%;
-		height: 350px;
+		height: 360px;
 		width: 300px;
 		margin: 0 0 0 -190px;
 		padding: 30px 0 0;
@@ -552,6 +553,20 @@
 			}
 		}
 
+		&-warning-message {
+			display: none;
+			padding: 0 10px;
+			margin-bottom: 5px;
+			font-size: 12px;
+			font-weight: 500;
+			color: #de4c4c;
+			text-align: center;
+
+			a {
+				color: #de4c4c;
+			}
+		}
+
 		&-success {
 			display: none;
 			flex-direction: column;
@@ -561,13 +576,14 @@
 
 			&-title {
 				font-size: 16px;
+				margin: 10px 0;
 			}
 
 			&-message {
 				font-weight: 500;
 				display: flex;
 				text-align: center;
-				margin: 20px 0 0;
+				margin: 10px 0 0;
 				flex-direction: column;
 
 				a {

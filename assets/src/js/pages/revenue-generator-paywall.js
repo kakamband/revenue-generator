@@ -123,6 +123,7 @@ import tippy, {roundArrow} from 'tippy.js';
 				activationModalSuccess       : '.rev-gen-preview-main-account-modal-success',
 				activationModalSuccessTitle  : '.rev-gen-preview-main-account-modal-success-title',
 				activationModalSuccessMessage: '.rev-gen-preview-main-account-modal-success-message',
+				activationModalWarningMessage: '.rev-gen-preview-main-account-modal-warning-message',
 				activateSignup               : '#rg_js_activateSignup',
 				warningSignup                : '#rg_js_warningSignup',
 				viewPost                     : '#rg_js_viewPost',
@@ -1338,7 +1339,7 @@ import tippy, {roundArrow} from 'tippy.js';
 							publishMessage = __('Has been published on <b>all posts</b>.', 'revenue-generator');
 						}
 
-						// Remove undeded markup form modal and show success message.
+						// Remove unnecessary markup form modal and show success message.
 						const activationModal = $o.previewWrapper.find($o.activationModal);
 						const activationSuccess = activationModal.find($o.activationModalSuccess);
 						activationSuccess.find($o.activationModalSuccessTitle).text(paywallName);
@@ -1348,6 +1349,13 @@ import tippy, {roundArrow} from 'tippy.js';
 						activationModal.find($o.activationModalError).remove();
 						activationModal.find($o.accountActionsWrapper).remove();
 						activationModal.find($o.accountActionsFields).remove();
+
+						if ( true === r.has_paywalls ) {
+							activationSuccess.find($o.activationModalWarningMessage).show();
+						} else {
+							activationSuccess.find($o.activationModalWarningMessage).hide();
+						}
+
 						activationSuccess.css({display: 'flex'});
 					});
 				}
