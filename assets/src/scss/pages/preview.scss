@@ -716,6 +716,18 @@
 		}
 	}
 
+	&-no-result {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		img {
+			top: 30%;
+			max-width: 100%;
+			width: 200px;
+		}
+	}
+
 }
 
 .modal-blur {

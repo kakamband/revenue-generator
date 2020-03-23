@@ -325,6 +325,7 @@ class Admin {
 			'is_merchant_verified'  => $is_merchant_verified,
 			'dashboard_url'         => add_query_arg( [ 'page' => $admin_menus['dashboard']['url'] ], admin_url( 'admin.php' ) ),
 			'action_icons'          => [
+				'high_count_icon'    => Config::$plugin_defaults['img_dir'] . 'high-publish.svg',
 				'lp_icon'            => Config::$plugin_defaults['img_dir'] . 'lp-logo-icon.svg',
 				'option_add'         => Config::$plugin_defaults['img_dir'] . 'add-option.svg',
 				'option_edit'        => Config::$plugin_defaults['img_dir'] . 'edit-option.svg',

@@ -23,9 +23,10 @@ import tippy, {roundArrow} from 'tippy.js';
 				requestSent: false,
 
 				// Preview wrapper.
-				previewWrapper: $('.rev-gen-preview-main'),
-				layoutWrapper : $('.rev-gen-layout-wrapper'),
-				laterpayLoader: $('.laterpay-loader-wrapper'),
+				previewWrapper  : $('.rev-gen-preview-main'),
+				layoutWrapper   : $('.rev-gen-layout-wrapper'),
+				laterpayLoader  : $('.laterpay-loader-wrapper'),
+				noResultsWrapper: '.rev-gen-preview-main-no-result',
 
 				// Search elements.
 				searchContentWrapper: $('.rev-gen-preview-main--search'),
@@ -143,6 +144,20 @@ import tippy, {roundArrow} from 'tippy.js';
 				 */
 				$(document).ready(function () {
 					$o.postPreviewWrapper.fadeIn('slow');
+
+					// Highlight search bar and add tooltip, change background-color for wrapper.
+					if ($($o.noResultsWrapper).length) {
+						$o.layoutWrapper.css({'background-color': 'rgba(0, 0, 0, 0.5)', 'min-height': '800px'});
+						$o.searchContentWrapper.css({'background-color': '#fff'});
+						const tippyInstance = tippy(
+							document.querySelector('.rev-gen-preview-main--search'),
+							{
+								arrow: roundArrow
+							}
+						);
+						tippyInstance.show();
+					}
+
 					$($o.paywallAppliesTo).trigger('change');
 
 					// Get all purchase options.

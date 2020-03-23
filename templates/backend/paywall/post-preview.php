@@ -38,7 +38,7 @@ $rg_preview_post_title = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_p
 		<img alt="<?php echo esc_attr( 'LaterPay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
 	</div>
 	<div class="rev-gen-preview-main">
-		<div class="rev-gen-preview-main--search">
+		<div class="rev-gen-preview-main--search" data-tippy-content="<?php esc_attr_e( 'Search for the page or post you\'d like to preview with Revenue Generator here.', 'revenue-generator' ); ?>">
 			<?php if ( ! empty( $rg_preview_post_title ) ) : ?>
 				<label for="rg_js_searchContent"><?php esc_html_e( 'Previewing', 'revenue-generator' ); ?>:</label>
 			<?php endif; ?>
@@ -104,6 +104,10 @@ $rg_preview_post_title = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_p
 						<?php esc_html_e( 'Publish', 'revenue-generator' ); ?>
 					</button>
 				</div>
+			</div>
+		<?php else: ?>
+			<div class="rev-gen-preview-main-no-result">
+				<img class="rg-card--icon" alt="<?php esc_attr_e( 'More posts icon', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['high_count_icon'] ); ?>">
 			</div>
 		<?php endif; ?>
 	</div>
