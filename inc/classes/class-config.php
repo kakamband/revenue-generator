@@ -102,7 +102,7 @@ class Config {
 						'revenue' => 'sis',
 					],
 					'tier_3' => [ // 501+ content length.
-						'price'   => 4.00,
+						'price'   => 3.49,
 						'revenue' => 'sis',
 					]
 				],
