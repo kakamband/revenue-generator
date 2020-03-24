@@ -542,6 +542,8 @@ class Paywall extends Base {
 		$pay_wall['access_entity'] = $post_meta['access_entity'];
 		$pay_wall['is_active']     = $post_meta['is_active'];
 		$pay_wall['updated']       = $post_updated_info;
+		$is_active                 = 1 === absint( $pay_wall['is_active'] ) ? true : false;
+		$saved_message             = $is_active ? __( 'Published', 'revenue-generator' ) : __( 'Saved', 'revenue-generator' );
 
 		// Compose message based on paywall attributes.
 		if ( 'category' === $pay_wall['access_to'] || 'exclude_category' === $pay_wall['access_to'] ) {
@@ -549,33 +551,28 @@ class Paywall extends Base {
 			$category_object = get_category( $category_id );
 			if ( 'category' === $pay_wall['access_to'] ) {
 				$published_on = sprintf(
-					__( '%1$sPublished%2$s on %1$sall posts%2$s in the category %3$s', 'revenue-generator' ),
-					'<b>',
-					'</b>',
-					sprintf( '<b>%s</b>', $category_object->name )
+					__( '<b>%s</b> on <b>all posts</b> in the category <b>%s</b>', 'revenue-generator' ),
+					$saved_message,
+					$category_object->name
 				);
 			} else {
 				$published_on = sprintf(
-					__( '%1$sPublished%2$s on %1$sall posts%2$s except the category %3$s', 'revenue-generator' ),
-					'<b>',
-					'</b>',
-					sprintf( '<b>%s</b>', $category_object->name )
+					__( '<b>%s</b> on <b>all posts</b> except the category <b>%s</b>', 'revenue-generator' ),
+					$saved_message,
+					$category_object->name
 				);
 			}
-		} else if ( 'supported' === $pay_wall['access_to'] ) {
+		} elseif ( 'supported' === $pay_wall['access_to'] ) {
 			$rg_post_object = get_post( $pay_wall['access_entity'] );
 			$published_on   = sprintf(
-				__( '%1$sPublished%2$s on %1$spost%2$s %3$s', 'revenue-generator' ),
-				'<b>',
-				'</b>',
-				sprintf( '<b>%s</b>', $rg_post_object->post_title )
+				__( '<b>%s</b> on <b>post</b> <b>%s</b>', 'revenue-generator' ),
+				$saved_message,
+				$rg_post_object->post_title
 			);
 		} else {
 			$published_on = sprintf(
-				__( '%1$sPublished%2$s on %1$sall posts%2$s', 'revenue-generator' ),
-				'<b>',
-				'</b>'
-
+				__( '<b>%s</b> on <b>all posts</b>', 'revenue-generator' ),
+				$saved_message
 			);
 		}
 

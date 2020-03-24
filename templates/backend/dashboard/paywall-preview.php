@@ -12,9 +12,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $paywall_data          = isset( $purchase_options_data['paywall'] ) ? $purchase_options_data['paywall'] : [];
 $purchase_option_items = empty( $purchase_options_data['options'] ) ? [] : $purchase_options_data['options'];
+$rg_is_paywall_active  = 1 === absint( $paywall_data['is_active'] ) ? true : false;
 ?>
 
-<div class="rev-gen-dashboard-content-paywall-preview" data-paywall-id="<?php echo esc_attr( $paywall_id ); ?>">
+<div class="rev-gen-dashboard-content-paywall-preview <?php echo ! $rg_is_paywall_active ? 'is-disabled' : ''; ?>" data-paywall-id="<?php echo esc_attr( $paywall_id ); ?>">
 	<div class="rev-gen-dashboard-content-paywall-preview-title"><?php echo esc_html( $paywall_data['title'] ); ?></div>
 	<div class="rev-gen-dashboard-content-paywall-preview-description"><?php echo esc_html( $paywall_data['description'] ); ?></div>
 	<div class="rev-gen-dashboard-content-paywall-preview-purchase-options">

@@ -18,7 +18,7 @@ $rg_teaser = '';
 // Create data for view.
 if ( ! empty( $rg_preview_post['excerpt'] ) ) {
 	$rg_teaser = $rg_preview_post['excerpt'];
-} else if ( ! empty( $rg_preview_post['teaser'] ) ) {
+} elseif ( ! empty( $rg_preview_post['teaser'] ) ) {
 	$rg_teaser = $rg_preview_post['teaser'];
 }
 
