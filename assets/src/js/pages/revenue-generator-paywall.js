@@ -908,7 +908,7 @@ import tippy, {roundArrow} from 'tippy.js';
 							entityId = optionItem.attr('data-paywall-id-id');
 						}
 
-						if (entityId.length) {
+						if (typeof entityId !== 'undefined' && entityId.length) {
 							showPurchaseOptionUpdateWarning(currentType).then((confirmation) => {
 								// If merchant selects to continue, remove current option from DB.
 								if (true === confirmation) {
