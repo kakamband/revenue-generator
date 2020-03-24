@@ -21,6 +21,7 @@ import tippy, {roundArrow} from 'tippy.js';
 				body: $('body'),
 
 				requestSent: false,
+				isPublish: false,
 
 				// Preview wrapper.
 				previewWrapper  : $('.rev-gen-preview-main'),
@@ -339,7 +340,13 @@ import tippy, {roundArrow} from 'tippy.js';
 					if (categoryId) {
 						$o.postPreviewWrapper.attr('data-access-id', categoryId);
 						$o.savePaywall.removeAttr('disabled');
-						$o.activatePaywall.removeAttr('disabled');
+
+						// Get all purchase options and check paywall id.
+						const allPurchaseOptions = $($o.purchaseOptionItems);
+						const paywallId = allPurchaseOptions.attr('data-paywall-id');
+						if (paywallId.length && revenueGeneratorGlobalOptions.globalOptions.merchant_currency.length) {
+							$o.activatePaywall.removeAttr('disabled');
+						}
 					}
 				});
 
@@ -712,6 +719,7 @@ import tippy, {roundArrow} from 'tippy.js';
 						}
 						$o.postPreviewWrapper.attr('data-access-id', $o.searchPaywallContent.val());
 					} else {
+						$o.savePaywall.removeAttr('disabled');
 						$o.searchPaywallWrapper.hide();
 						$o.postPreviewWrapper.attr('data-access-id', $o.postPreviewWrapper.attr('data-preview-id'));
 					}
@@ -1290,6 +1298,11 @@ import tippy, {roundArrow} from 'tippy.js';
 					});
 				}
 
+				// Save the paywall as well, so that we don't miss any new changes if merchant as done any.
+				$o.isPublish = true;
+				$o.savePaywall.trigger('click');
+				$o.isPublish = true;
+
 				if (!$o.requestSent) {
 					$o.requestSent = true;
 					showLoader();
@@ -1316,8 +1329,6 @@ import tippy, {roundArrow} from 'tippy.js';
 						hideLoader();
 
 						// Get required info for success message.
-						const purchaseOptions = $($o.purchaseOptionItems);
-						const paywallId = purchaseOptions.attr('data-paywall-id');
 						const postPreviewId = $o.postPreviewWrapper.attr('data-preview-id');
 						const paywallName = $o.paywallName.text().trim();
 						const appliedTo = $($o.paywallAppliesTo).val();
@@ -1416,7 +1427,7 @@ import tippy, {roundArrow} from 'tippy.js';
 			/**
 			 * Initialized the tooltip on given element.
 			 *
-			 * @param elementIdentifier Selector matching elements on the document
+			 * @param {string} elementIdentifier Selector matching elements on the document
 			 */
 			const initializeTooltip = function (elementIdentifier) {
 				tippy(elementIdentifier, {arrow: roundArrow});
@@ -1894,7 +1905,7 @@ import tippy, {roundArrow} from 'tippy.js';
 			/**
 			 * Show the confirmation box for saved entity update.
 			 *
-			 * @param optionType Option type.
+			 * @param {string} optionType Option type.
 			 */
 			const showPurchaseOptionUpdateWarning = async function (optionType) {
 				const confirm = await createEntityUpdateConfirmation(optionType);
@@ -1910,7 +1921,7 @@ import tippy, {roundArrow} from 'tippy.js';
 			/**
 			 * Create a confirmation modal with warning before saved entity is updated.
 			 *
-			 * @param optionType Option type.
+			 * @param {string} optionType Option type.
 			 */
 			const createEntityUpdateConfirmation = function (optionType) {
 				return new Promise((complete, failed) => { // eslint-disable-line no-unused-vars
@@ -2031,11 +2042,9 @@ import tippy, {roundArrow} from 'tippy.js';
 			 * Validate the purchase item revenue model on revenue change.
 			 *
 			 * @param {Object} purchaseItem  Purchase option.
-			 * @param {Boolean} revenueType  Purchase option revenue type.
+			 * @param {boolean} revenueType  Purchase option revenue type.
 			 */
 			const validatePricingRevenue = function (purchaseItem, revenueType) {
-				const purchaseManager = $(purchaseItem).find('.rg-purchase-overlay-option-manager');
-				const revenueWrapper = purchaseManager.find($o.purchaseRevenueWrapper);
 				const priceItem = $(purchaseItem).find($o.purchaseOptionItemPrice);
 				const price = parseFloat(priceItem.text().trim());
 				const optionType = $(purchaseItem).attr('data-purchase-type');
@@ -2181,7 +2190,7 @@ import tippy, {roundArrow} from 'tippy.js';
 						});
 					}
 
-					if (r.redirect_to) {
+					if (r.redirect_to && false === $o.isPublish) {
 						window.location.href = r.redirect_to;
 					}
 				});
