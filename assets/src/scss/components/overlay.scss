@@ -375,3 +375,11 @@
     }
   }
 }
+
+@media (max-width:1440px) {
+  .rg-purchase-overlay {
+    &-option-manager {
+      top: -40px;
+    }
+  }
+}

@@ -203,6 +203,7 @@ import tippy, {roundArrow} from 'tippy.js';
 					if ('rg-purchase-option-item' === stepId) {
 						$($o.previewSecondItem).trigger('mouseenter');
 						$($o.previewSecondItem).css({'background-color': '#fff'});
+						$($o.purchaseOptionItemInfo).css({'border-right': '1px solid #e3e4e6'});
 					} else if ('rg-purchase-option-item-price' === stepId) {
 						$($o.optionArea).trigger('mouseenter');
 						$($o.previewSecondItem).trigger('mouseleave');
@@ -210,6 +211,9 @@ import tippy, {roundArrow} from 'tippy.js';
 						$($o.paywallAppliesTo).val('category');
 						$($o.paywallAppliesTo).trigger('change');
 						$($o.optionArea).trigger('mouseleave');
+						// Hack to get tooltip on expected place.
+						Shepherd.activeTour.next();
+						Shepherd.activeTour.back();
 					}
 				});
 
@@ -1546,9 +1550,10 @@ import tippy, {roundArrow} from 'tippy.js';
 					id      : 'rg-purchase-option-item-price',
 					text    : sprintf(
 						__(
-							'These are our recommended prices. Click to edit; prices lower than 5.00 will default to %spay later%s.',
+							'These are our recommended prices. %1$s %1$sClick to edit; prices lower than 5.00 will default to %2$spay later%3$s.',
 							'revenue-generator'
 						),
+						'<br/>',
 						'<a class="info-link" href="https://www.laterpay.net/academy/getting-started-with-laterpay-the-difference-between-pay-now-pay-later" target="_blank" rel="noopener noreferrer">',
 						'</a>'
 					),
@@ -1634,6 +1639,8 @@ import tippy, {roundArrow} from 'tippy.js';
 				$o.layoutWrapper.css({
 					'pointer-events': 'none',
 				});
+				$($o.purchaseOptionItem).css({'background-color': 'darkgray'});
+				$($o.purchaseOptionItemInfo).css({'border-right': '1px solid darkgray'});
 
 				const directionalKeys = ['ArrowUp', 'ArrowDown', 'ArrowRight', 'ArrowLeft'];
 				const disableArrowKeys = function (e) {
@@ -1656,11 +1663,12 @@ import tippy, {roundArrow} from 'tippy.js';
 
 					// Revert to original theme.
 					$($o.purchaseOptionItem).css({'background-color': '#fff'});
+					$($o.purchaseOptionItemInfo).css({'border-right': '1px solid #e3e4e6'});
 
 					// Hide exit tour button.
 					$($o.exitTour).remove();
 
-					// Enable arow events.
+					// Enable arrow events.
 					$(document).unbind('keydown', disableArrowKeys);
 
 					// Complete the tour, and update plugin option.
