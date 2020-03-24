@@ -591,14 +591,17 @@ import tippy, {roundArrow} from 'tippy.js';
 								if (revenueSelection.prop('checked')) {
 									priceItem.attr('data-pay-model', 'ppu');
 									revenueSelection.val(1);
+									validatePricingRevenue(optionItem, true);
 								} else {
 									priceItem.attr('data-pay-model', 'sis');
 									revenueSelection.val(0);
+									validatePricingRevenue(optionItem, false);
 								}
 							} else {
 								priceItem.attr('data-pay-model', currentRevenue);
 								revenueSelection.val(currentValue);
 								revenueSelection.attr('checked', 1 === parseInt(currentValue));
+								validatePricingRevenue(optionItem, 1 === parseInt(currentValue));
 							}
 						});
 						return;
@@ -607,9 +610,11 @@ import tippy, {roundArrow} from 'tippy.js';
 					if (revenueSelection.prop('checked')) {
 						priceItem.attr('data-pay-model', 'ppu');
 						revenueSelection.val(1);
+						validatePricingRevenue(optionItem, true);
 					} else {
 						priceItem.attr('data-pay-model', 'sis');
 						revenueSelection.val(0);
+						validatePricingRevenue(optionItem, false);
 					}
 				});
 
@@ -679,7 +684,7 @@ import tippy, {roundArrow} from 'tippy.js';
 					} else {
 						const validatedPrice = validatePrice(newPrice, 'subscription' === optionType);
 						const dynamicStar = $(this).children();
-						dynamicStar.css({'display':'none'});
+						dynamicStar.css({'display': 'none'});
 						$(this).text(validatedPrice).append(dynamicStar);
 						validateRevenue(validatedPrice, optionItem);
 					}
@@ -2002,19 +2007,62 @@ import tippy, {roundArrow} from 'tippy.js';
 			const validateRevenue = function (price, purchaseItem) {
 				const purchaseManager = $(purchaseItem).find('.rg-purchase-overlay-option-manager');
 				const revenueWrapper = purchaseManager.find($o.purchaseRevenueWrapper);
+				const pricingTypeWrapper = purchaseManager.find($o.individualPricingWrapper);
+
+				// Set pricing type to static for manual change of price.
+				$(purchaseItem).attr('data-pricing-type', 'static');
+				pricingTypeWrapper.find($o.individualPricingSelection).prop('checked', false);
+
+				// Set pricing type based on value, and update manager UI accordingly.
 				if (price > revenueGeneratorGlobalOptions.currency.sis_only_limit) {
 					$(purchaseItem).find($o.purchaseOptionItemPrice).attr('data-pay-model', 'sis');
 					revenueWrapper.find($o.purchaseRevenueSelection).prop('checked', false);
+					$(purchaseItem).trigger('mouseenter');
+					$(purchaseItem).find($o.editOption).trigger('click');
 				} else if (price > revenueGeneratorGlobalOptions.currency.ppu_min && price < revenueGeneratorGlobalOptions.currency.sis_min) {
 					$(purchaseItem).find($o.purchaseOptionItemPrice).attr('data-pay-model', 'ppu');
 					revenueWrapper.find($o.purchaseRevenueSelection).prop('checked', true);
+					$(purchaseItem).trigger('mouseenter');
+					$(purchaseItem).find($o.editOption).trigger('click');
 				}
+			};
 
-				// Set pricing type to static, and update manager UI accordingly.
-				$(purchaseItem).attr('data-pricing-type', 'static');
-				const pricingTypeWrapper = purchaseManager.find($o.individualPricingWrapper);
-				pricingTypeWrapper.find($o.individualPricingSelection).prop('checked', false);
-				pricingTypeWrapper.find($o.individualPricingSelection).trigger('change');
+			/**
+			 * Validate the purchase item revenue model on revenue change.
+			 *
+			 * @param {Object} purchaseItem  Purchase option.
+			 * @param {Boolean} revenueType  Purchase option revenue type.
+			 */
+			const validatePricingRevenue = function (purchaseItem, revenueType) {
+				const purchaseManager = $(purchaseItem).find('.rg-purchase-overlay-option-manager');
+				const revenueWrapper = purchaseManager.find($o.purchaseRevenueWrapper);
+				const priceItem = $(purchaseItem).find($o.purchaseOptionItemPrice);
+				const price = parseFloat(priceItem.text().trim());
+				const optionType = $(purchaseItem).attr('data-purchase-type');
+				const currencyLimits = revenueGeneratorGlobalOptions.currency;
+				let validatedPrice = '';
+
+				if ('individual' === optionType) {
+					const dynamicStar = priceItem.children();
+					dynamicStar.css({'display': 'none'});
+					if (price > parseFloat(currencyLimits.sis_only_limit) && true === revenueType) {
+						validatedPrice = validatePrice(currencyLimits.ppu_only_limit);
+					} else if (price > parseFloat(currencyLimits.ppu_min) && price < parseFloat(currencyLimits.sis_min) && false === revenueType) {
+						validatedPrice = validatePrice(currencyLimits.sis_min);
+					} else {
+						validatedPrice = validatePrice(currencyLimits.sis_min);
+					}
+					priceItem.text(validatedPrice).append(dynamicStar);
+				} else {
+					if (price > parseFloat(currencyLimits.sis_only_limit) && true === revenueType) {
+						validatedPrice = validatePrice(currencyLimits.ppu_only_limit, 'subscription' === optionType);
+					} else if (price > currencyLimits.ppu_min && price < currencyLimits.sis_min && false === revenueType) {
+						validatedPrice = validatePrice(currencyLimits.sis_min, 'subscription' === optionType);
+					} else {
+						validatedPrice = validatePrice(currencyLimits.sis_min);
+					}
+					priceItem.empty().text(validatedPrice);
+				}
 			};
 
 			/**
@@ -2026,11 +2074,13 @@ import tippy, {roundArrow} from 'tippy.js';
 			 * @return {string} return validated price.
 			 */
 			const validatePrice = function (price, subscriptionValidation) {
-				// strip non-number characters
-				price = price.replace(/[^0-9\,\.]/g, '');
+				if (typeof price !== 'number') {
+					// strip non-number characters
+					price = price.replace(/[^0-9\,\.]/g, '');
 
-				// convert price to proper float value
-				price = parseFloat(price.replace(',', '.')).toFixed(2);
+					// convert price to proper float value
+					price = parseFloat(price.replace(',', '.')).toFixed(2);
+				}
 
 				// prevent non-number prices
 				if (isNaN(price)) {
@@ -2084,6 +2134,7 @@ import tippy, {roundArrow} from 'tippy.js';
 			};
 
 			/**
+			 * Update the paywall.
 			 *
 			 * @param {string} ajaxURL  AJAX URL.
 			 * @param {Object} formData Form data to be submitted.
