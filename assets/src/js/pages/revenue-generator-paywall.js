@@ -21,7 +21,7 @@ import tippy, {roundArrow} from 'tippy.js';
 				body: $('body'),
 
 				requestSent: false,
-				isPublish: false,
+				isPublish  : false,
 
 				// Preview wrapper.
 				previewWrapper  : $('.rev-gen-preview-main'),
@@ -2056,19 +2056,43 @@ import tippy, {roundArrow} from 'tippy.js';
 					dynamicStar.css({'display': 'none'});
 					if (price > parseFloat(currencyLimits.sis_only_limit) && true === revenueType) {
 						validatedPrice = validatePrice(currencyLimits.ppu_only_limit);
+						$o.snackBar.showSnackbar(
+							__('Pay Later is only available for prices set to $5 or less.', 'revenue-generator'),
+							2500
+						);
 					} else if (price > parseFloat(currencyLimits.ppu_min) && price < parseFloat(currencyLimits.sis_min) && false === revenueType) {
 						validatedPrice = validatePrice(currencyLimits.sis_min);
+						$o.snackBar.showSnackbar(
+							__('Pay Now is only available for prices set to $1.99 or higher.', 'revenue-generator'),
+							2500
+						);
 					} else {
 						validatedPrice = validatePrice(currencyLimits.sis_min);
+						$o.snackBar.showSnackbar(
+							__('Pay Now is only available for prices set to $1.99 or higher.', 'revenue-generator'),
+							2500
+						);
 					}
 					priceItem.text(validatedPrice).append(dynamicStar);
 				} else {
 					if (price > parseFloat(currencyLimits.sis_only_limit) && true === revenueType) {
 						validatedPrice = validatePrice(currencyLimits.ppu_only_limit, 'subscription' === optionType);
+						$o.snackBar.showSnackbar(
+							__('Pay Later is only available for prices set to $5 or less.', 'revenue-generator'),
+							2500
+						);
 					} else if (price > currencyLimits.ppu_min && price < currencyLimits.sis_min && false === revenueType) {
 						validatedPrice = validatePrice(currencyLimits.sis_min, 'subscription' === optionType);
+						$o.snackBar.showSnackbar(
+							__('Pay Now is only available for prices set to $1.99 or higher.', 'revenue-generator'),
+							2500
+						);
 					} else {
 						validatedPrice = validatePrice(currencyLimits.sis_min);
+						$o.snackBar.showSnackbar(
+							__('Pay Now is only available for prices set to $1.99 or higher.', 'revenue-generator'),
+							2500
+						);
 					}
 					priceItem.empty().text(validatedPrice);
 				}
