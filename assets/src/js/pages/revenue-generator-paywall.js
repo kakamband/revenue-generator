@@ -678,7 +678,9 @@ import tippy, {roundArrow} from 'tippy.js';
 						});
 					} else {
 						const validatedPrice = validatePrice(newPrice, 'subscription' === optionType);
-						$(this).empty().text(validatedPrice);
+						const dynamicStar = $(this).children();
+						dynamicStar.css({'display':'none'});
+						$(this).text(validatedPrice).append(dynamicStar);
 						validateRevenue(validatedPrice, optionItem);
 					}
 				}, 1000));
@@ -1350,7 +1352,8 @@ import tippy, {roundArrow} from 'tippy.js';
 						activationModal.find($o.accountActionsWrapper).remove();
 						activationModal.find($o.accountActionsFields).remove();
 
-						if ( true === r.has_paywalls ) {
+						// If merchant has more than one paywalls, add a warning.
+						if (true === r.has_paywalls) {
 							activationSuccess.find($o.activationModalWarningMessage).show();
 						} else {
 							activationSuccess.find($o.activationModalWarningMessage).hide();
@@ -2006,6 +2009,12 @@ import tippy, {roundArrow} from 'tippy.js';
 					$(purchaseItem).find($o.purchaseOptionItemPrice).attr('data-pay-model', 'ppu');
 					revenueWrapper.find($o.purchaseRevenueSelection).prop('checked', true);
 				}
+
+				// Set pricing type to static, and update manager UI accordingly.
+				$(purchaseItem).attr('data-pricing-type', 'static');
+				const pricingTypeWrapper = purchaseManager.find($o.individualPricingWrapper);
+				pricingTypeWrapper.find($o.individualPricingSelection).prop('checked', false);
+				pricingTypeWrapper.find($o.individualPricingSelection).trigger('change');
 			};
 
 			/**
