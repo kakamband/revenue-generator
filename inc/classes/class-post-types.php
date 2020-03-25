@@ -230,7 +230,7 @@ class Post_Types {
 					unset( $purchase_options['time_passes'] );
 				}
 			} elseif ( $current_purchase_options['subscription'] > 0 && empty( $current_purchase_options['time_pass'] ) ) {
-				$purchase_options['time_passes'][] = $purchase_options_all['time_passes'];
+				$purchase_options['time_passes'][] = $purchase_options_all['time_pass'];
 				$purchase_options['subscriptions'] = Subscription::get_instance()->get_subscriptions_by_criteria( true );
 
 				if ( 'low' === $current_global_options['average_post_publish_count'] ) {
