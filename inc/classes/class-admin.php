@@ -53,6 +53,7 @@ class Admin {
 		add_action( 'wp_ajax_rg_activate_paywall', [ $this, 'activate_paywall' ] );
 		add_action( 'wp_ajax_rg_disable_paywall', [ $this, 'disable_paywall' ] );
 		add_action( 'wp_ajax_rg_restart_tour', [ $this, 'restart_tour' ] );
+		add_action( 'wp_ajax_rg_set_paywall_order', [ $this, 'set_paywall_sort_order' ] );
 	}
 
 	/**
@@ -225,11 +226,30 @@ class Admin {
 	public function load_dashboard() {
 		self::load_assets();
 
-		$paywall_instance    = Paywall::get_instance();
-		$admin_menus         = self::get_admin_menus();
+		$paywall_instance = Paywall::get_instance();
+		$admin_menus      = self::get_admin_menus();
+
+		// Paywall sorting orders.
+		$allowed_sort_order  = [ 'ASC', 'DESC' ];
+		$sort_order          = filter_input( INPUT_GET, 'sort_by', FILTER_SANITIZE_STRING );
+		$paywall_filter_args = [
+			'order' => 'DESC',
+		];
+
+		// If no sort param is set default to DESC.
+		if ( empty( $sort_order ) ) {
+			$sort_order = 'DESC';
+		} else {
+			$sort_order = in_array( strtoupper( $sort_order ), $allowed_sort_order ) ? strtoupper( $sort_order ) : 'DESC';
+		}
+
+		$paywall_filter_args['order'] = $sort_order;
+		$dashboard_paywalls           = $paywall_instance->get_all_paywalls( $paywall_filter_args );
+
 		$dashboard_page_data = [
-			'new_paywall_url' => add_query_arg( [ 'page' => $admin_menus['paywall']['url'] ], admin_url( 'admin.php' ) ),
-			'paywalls'        => $paywall_instance->get_all_paywalls(),
+			'new_paywall_url'    => add_query_arg( [ 'page' => $admin_menus['paywall']['url'] ], admin_url( 'admin.php' ) ),
+			'current_sort_order' => $sort_order,
+			'paywalls'           => $dashboard_paywalls,
 		];
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
@@ -907,6 +927,37 @@ class Admin {
 			$rg_global_options['is_tutorial_completed'] = 0;
 			update_option( 'lp_rg_global_options', $rg_global_options );
 			wp_send_json_success();
+		}
+	}
+
+	/**
+	 * Set paywall sort order.
+	 */
+	public function set_paywall_sort_order() {
+
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Get all data and sanitize it.
+		$rg_sort_order    = sanitize_text_field( filter_input( INPUT_POST, 'rg_sort_order', FILTER_SANITIZE_STRING ) );
+		$rg_dashboard_url = sanitize_text_field( filter_input( INPUT_POST, 'rg_current_url', FILTER_SANITIZE_URL ) );
+
+		if ( ! empty( $rg_sort_order ) ) {
+
+			// Set sort by order.
+			$preview_query_args['sort_by'] = $rg_sort_order;
+
+			// Create redirect URL.
+			$dashboard_sort_url = add_query_arg(
+				$preview_query_args,
+				$rg_dashboard_url
+			);
+
+			// Send success message.
+			wp_send_json( [
+				'success'     => true,
+				'redirect_to' => $dashboard_sort_url,
+			] );
 		}
 	}
 }

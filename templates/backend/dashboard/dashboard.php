@@ -20,9 +20,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<div class="rev-gen-dashboard-bar--item rev-gen-dashboard-bar--filter">
 				<label for="rg_js_filterPaywalls"><?php esc_html_e( 'Sort By', 'revenue-generator' ); ?></label>
 				<select id="rg_js_filterPaywalls">
-					<option value="asc"><?php esc_attr_e( 'Newest First', 'revenue-generator' ); ?></option>
-					<option value="desc"><?php esc_attr_e( 'Oldest First', 'revenue-generator' ); ?></option>
-					<option value="desc"><?php esc_attr_e( 'Priority', 'revenue-generator' ); ?></option>
+					<option <?php selected( strtolower( $current_sort_order ), 'desc', true ); ?> value="desc"><?php esc_attr_e( 'Newest First', 'revenue-generator' ); ?></option>
+					<option <?php selected( strtolower( $current_sort_order ), 'asc', true ); ?> value="asc"><?php esc_attr_e( 'Oldest First', 'revenue-generator' ); ?></option>
 				</select>
 			</div>
 			<div class="rev-gen-dashboard-bar--item rev-gen-dashboard-bar--search">

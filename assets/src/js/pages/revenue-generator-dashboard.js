@@ -17,8 +17,11 @@ import '../utils';
 			const $o = {
 				body          : $('body'),
 				paywallPreview: '.rev-gen-dashboard-content-paywall-preview',
-				newPaywall    : $('#rg_js_newPaywall'),
 				restartTour   : $('#rg_js_RestartTutorial'),
+
+				// Dashboard bar action items.
+				newPaywall  : $('#rg_js_newPaywall'),
+				sortPaywalls: $('#rg_js_filterPaywalls'),
 
 				snackBar: $('#rg_js_SnackBar'),
 			};
@@ -57,6 +60,32 @@ import '../utils';
 					}).done(function (r) {
 						if (true === r.success) {
 							window.location = $o.newPaywall.attr('href');
+						}
+					});
+				});
+
+				/**
+				 * Handle paywall sorting dropdown.
+				 */
+				$o.sortPaywalls.on('change', function () {
+					const sortBy = $(this).val();
+					// Create form data.
+					const formData = {
+						action        : 'rg_set_paywall_order',
+						rg_current_url: window.location.href,
+						rg_sort_order : sortBy,
+						security      : revenueGeneratorGlobalOptions.rg_paywall_nonce,
+					};
+
+					// Delete the option.
+					$.ajax({
+						url     : revenueGeneratorGlobalOptions.ajaxUrl,
+						method  : 'POST',
+						data    : formData,
+						dataType: 'json',
+					}).done(function (r) {
+						if (true === r.success && r.redirect_to) {
+							window.location.href = r.redirect_to;
 						}
 					});
 				});

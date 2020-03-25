@@ -475,14 +475,21 @@ class Paywall extends Base {
 
 	/**
 	 * Get all paywalls.
+	 *
+	 * @param array $paywall_args Paywall search args.
+	 *
+	 * @return array
 	 */
-	public function get_all_paywalls() {
+	public function get_all_paywalls( $paywall_args ) {
 		$query_args = [
 			'post_type'      => static::SLUG,
 			'post_status'    => [ 'publish' ],
 			'posts_per_page' => 100,
 			'no_found_rows'  => true,
 		];
+
+		// Merge default params and extra args.
+		$query_args = array_merge( $query_args, $paywall_args );
 
 		// Initialize WP_Query without args.
 		$get_paywalls_query = new \WP_Query();
