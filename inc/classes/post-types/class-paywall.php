@@ -51,11 +51,11 @@ class Paywall extends Base {
 		if ( empty( $paywall_data['id'] ) ) {
 			$paywall_id = wp_insert_post( [
 				'post_content' => $paywall_data['description'],
-				'post_title'   => $paywall_data['title'],
+				'post_title'   => $paywall_data['name'],
 				'post_status'  => 'publish',
 				'post_type'    => static::SLUG,
 				'meta_input'   => [
-					'_rg_name'          => $paywall_data['name'],
+					'_rg_title'         => $paywall_data['title'],
 					'_rg_access_to'     => $paywall_data['access_to'],
 					'_rg_access_entity' => $paywall_data['access_entity'],
 					'_rg_preview_id'    => $paywall_data['preview_id'],
@@ -66,10 +66,10 @@ class Paywall extends Base {
 			wp_update_post( [
 				'ID'           => $paywall_id,
 				'post_content' => $paywall_data['description'],
-				'post_title'   => $paywall_data['title'],
+				'post_title'   => $paywall_data['name'],
 			] );
 
-			update_post_meta( $paywall_id, '_rg_name', $paywall_data['name'] );
+			update_post_meta( $paywall_id, '_rg_title', $paywall_data['title'] );
 			update_post_meta( $paywall_id, '_rg_access_to', $paywall_data['access_to'] );
 			update_post_meta( $paywall_id, '_rg_access_entity', $paywall_data['access_entity'] );
 			update_post_meta( $paywall_id, '_rg_preview_id', $paywall_data['preview_id'] );
@@ -145,9 +145,9 @@ class Paywall extends Base {
 		if ( ! empty( $current_post[0] ) ) {
 			$pay_wall                      = $current_post[0];
 			$paywall_info['id']            = $pay_wall->ID;
-			$paywall_info['title']         = $pay_wall->post_title;
+			$paywall_info['name']          = $pay_wall->post_title;
 			$paywall_info['description']   = $pay_wall->post_content;
-			$paywall_info['name']          = get_post_meta( $pay_wall->ID, '_rg_name', true );
+			$paywall_info['title']         = get_post_meta( $pay_wall->ID, '_rg_title', true );
 			$paywall_info['access_to']     = get_post_meta( $pay_wall->ID, '_rg_access_to', true );
 			$paywall_info['access_entity'] = get_post_meta( $pay_wall->ID, '_rg_access_entity', true );
 			$paywall_info['preview_id']    = get_post_meta( $pay_wall->ID, '_rg_preview_id', true );
@@ -199,9 +199,9 @@ class Paywall extends Base {
 		if ( ! empty( $paywall ) ) {
 			if ( static::SLUG === $paywall->post_type ) {
 				$paywall_info['id']            = $paywall->ID;
-				$paywall_info['title']         = $paywall->post_title;
+				$paywall_info['name']          = $paywall->post_title;
 				$paywall_info['description']   = $paywall->post_content;
-				$paywall_info['name']          = get_post_meta( $paywall->ID, '_rg_name', true );
+				$paywall_info['title']         = get_post_meta( $paywall->ID, '_rg_title', true );
 				$paywall_info['access_to']     = get_post_meta( $paywall->ID, '_rg_access_to', true );
 				$paywall_info['access_entity'] = get_post_meta( $paywall->ID, '_rg_access_entity', true );
 				$paywall_info['preview_id']    = get_post_meta( $paywall->ID, '_rg_preview_id', true );
@@ -544,9 +544,9 @@ class Paywall extends Base {
 
 		$pay_wall                      = [];
 		$pay_wall['id']                = $post->ID;
-		$pay_wall['title']             = $post->post_title;
+		$pay_wall['name']              = $post->post_title;
 		$pay_wall['description']       = $post->post_content;
-		$pay_wall['name']              = $post_meta['name'];
+		$pay_wall['title']             = $post_meta['title'];
 		$pay_wall['access_to']         = $post_meta['access_to'];
 		$pay_wall['access_entity']     = $post_meta['access_entity'];
 		$pay_wall['is_active']         = $post_meta['is_active'];
@@ -602,12 +602,12 @@ class Paywall extends Base {
 		$post_meta_data = [];
 
 		/**
-		 * _rg_name - store the paywall name.
+		 * _rg_title - store the paywall name.
 		 * _rg_access_to - store the content to which the time pass will allow access, can be category / all.
 		 * _rg_access_entity - store the entity id.
 		 * _rg_is_active - store paywall status.
 		 */
-		$post_meta_data['name']          = ( isset( $post_meta['_rg_name'][0] ) ) ? $post_meta['_rg_name'][0] : '';
+		$post_meta_data['title']         = ( isset( $post_meta['_rg_title'][0] ) ) ? $post_meta['_rg_title'][0] : '';
 		$post_meta_data['access_to']     = ( isset( $post_meta['_rg_access_to'][0] ) ) ? $post_meta['_rg_access_to'][0] : '';
 		$post_meta_data['access_entity'] = ( isset( $post_meta['_rg_access_entity'][0] ) ) ? $post_meta['_rg_access_entity'][0] : '';
 		$post_meta_data['is_active']     = ( isset( $post_meta['_rg_is_active'][0] ) ) ? $post_meta['_rg_is_active'][0] : '';
@@ -890,6 +890,57 @@ class Paywall extends Base {
 		}
 
 		return [];
+	}
+
+	/**
+	 * Get the paywall to be displayed in suggestions based on searched term.
+	 *
+	 * @param string $search_term The paywall name to search for.
+	 *
+	 * @return array
+	 */
+	public function get_paywall_by_name( $search_term ) {
+		// Query args for post preview search.
+		$query_args = [
+			'post_type'        => static::SLUG,
+			'post_status'      => 'publish',
+			'rg_paywall_title' => $search_term,
+			'posts_per_page'   => 5,
+		];
+
+		// Add and remove our custom filter for LIKE based search by title.
+		add_filter( 'posts_where', [ $this, 'rg_paywall_title_filter' ], 10, 2 );
+		$query         = new \WP_Query();
+		$current_posts = $query->query( $query_args );;
+		remove_filter( 'posts_where', [ $this, 'rg_paywall_title_filter' ], 10 );
+
+		// Create formatted data for preview suggestions.
+		$preview_posts = [];
+		foreach ( $current_posts as $key => $preview_post ) {
+			$preview_posts[ $key ] = $this->formatted_paywall( $preview_post );
+		}
+
+		return $preview_posts;
+	}
+
+	/**
+	 * Filter to modify the search of paywall data.
+	 *
+	 * @param string    $sql   SQL string.
+	 * @param \WP_Query $query Query object.
+	 *
+	 * @return string
+	 */
+	public function rg_paywall_title_filter( $sql, $query ) {
+		global $wpdb;
+
+		// If our custom query var is set modify the query.
+		if ( ! empty( $query->query['rg_paywall_title'] ) ) {
+			$term = $wpdb->esc_like( $query->query['rg_paywall_title'] );
+			$sql  .= ' AND ' . $wpdb->posts . '.post_title LIKE \'%' . $term . '%\'';
+		}
+
+		return $sql;
 	}
 
 }

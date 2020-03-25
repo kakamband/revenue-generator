@@ -69,6 +69,26 @@
 		i {
 			padding: 5px;
 		}
+
+		&-results {
+			display: none;
+			flex-direction: column;
+			background: #fff;
+			align-self: center;
+			width: 25%;
+			box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.55);
+			position: fixed;
+			top: 75px;
+			z-index: 5;
+			height: 100px;
+
+			span {
+				height: 20px;
+				cursor: pointer;
+				margin: 2px;
+				padding-left: 25px;
+			}
+		}
 	}
 
 	&--actions {

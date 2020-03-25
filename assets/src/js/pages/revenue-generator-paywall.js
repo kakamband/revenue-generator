@@ -9,6 +9,7 @@
  * Internal dependencies.
  */
 import '../utils';
+import { debounce } from '../helpers';
 import {__, sprintf} from '@wordpress/i18n';
 import Shepherd from "shepherd.js";
 import tippy, {roundArrow} from 'tippy.js';
@@ -2293,26 +2294,6 @@ import tippy, {roundArrow} from 'tippy.js';
 					$o.purchaseOverlay.append(template);
 					$o.purchaseOverlay.show();
 				}
-			};
-
-			/**
-			 * Throttle the execution of a function by a given delay.
-			 *
-			 * @param {Function} fn    Callback function.
-			 * @param {number}   delay Time in ms to delay the operation.
-			 */
-			const debounce = function (fn, delay) {
-				let timer;
-				return function () {
-					const context = this,
-						args = arguments;
-
-					clearTimeout(timer);
-
-					timer = setTimeout(function () {
-						fn.apply(context, args);
-					}, delay);
-				};
 			};
 
 			// Initialize all required events.

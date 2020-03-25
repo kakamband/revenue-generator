@@ -54,6 +54,7 @@ class Admin {
 		add_action( 'wp_ajax_rg_disable_paywall', [ $this, 'disable_paywall' ] );
 		add_action( 'wp_ajax_rg_restart_tour', [ $this, 'restart_tour' ] );
 		add_action( 'wp_ajax_rg_set_paywall_order', [ $this, 'set_paywall_sort_order' ] );
+		add_action( 'wp_ajax_rg_search_paywall', [ $this, 'search_paywall' ] );
 	}
 
 	/**
@@ -446,7 +447,6 @@ class Admin {
 	 * Update Paywall.
 	 */
 	public function update_paywall() {
-
 		// Verify authenticity.
 		check_ajax_referer( 'rg_paywall_nonce', 'security' );
 
@@ -458,9 +458,9 @@ class Admin {
 		$subscriptions   = filter_input( INPUT_POST, 'subscriptions', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 
 		$paywall_instance         = Paywall::get_instance();
-		$paywall['title']         = sanitize_text_field( wp_unslash( $paywall_data['title'] ) );
-		$paywall['description']   = sanitize_text_field( wp_unslash( $paywall_data['desc'] ) );
 		$paywall['name']          = sanitize_text_field( wp_unslash( $paywall_data['name'] ) );
+		$paywall['description']   = sanitize_text_field( wp_unslash( $paywall_data['desc'] ) );
+		$paywall['title']         = sanitize_text_field( wp_unslash( $paywall_data['title'] ) );
 		$paywall['id']            = sanitize_text_field( $paywall_data['id'] );
 		$paywall['access_to']     = sanitize_text_field( wp_unslash( $paywall_data['applies'] ) );
 		$paywall['preview_id']    = sanitize_text_field( wp_unslash( $paywall_data['preview_id'] ) );
@@ -666,7 +666,6 @@ class Admin {
 	 * Search content for post preview selection.
 	 */
 	public function search_preview_content() {
-
 		// Verify authenticity.
 		check_ajax_referer( 'rg_paywall_nonce', 'security' );
 
@@ -965,5 +964,52 @@ class Admin {
 				'redirect_to' => $dashboard_sort_url,
 			] );
 		}
+	}
+
+	/**
+	 * Search content for post preview selection.
+	 */
+	public function search_paywall() {
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Get all data and sanitize it.
+		$search_term = sanitize_text_field( filter_input( INPUT_POST, 'search_term', FILTER_SANITIZE_STRING ) );
+
+		$paywall_instance = Paywall::get_instance();
+		$paywall_results  = $paywall_instance->get_paywall_by_name( $search_term );
+
+		if ( ! empty( $paywall_results ) ) {
+			wp_send_json( [
+				'success'  => true,
+				'paywalls' => $paywall_results
+			] );
+		} else {
+			wp_send_json( [
+				'success'  => false,
+				'msg'      => __( 'No matching paywall found!', 'revenue-generator' ),
+				'paywalls' => []
+			] );
+		}
+	}
+
+	/**
+	 * Filter to modify the search of preview content.
+	 *
+	 * @param string    $sql   SQL string.
+	 * @param \WP_Query $query Query object.
+	 *
+	 * @return string
+	 */
+	public function rg_paywall_preview_name_filter( $sql, $query ) {
+		global $wpdb;
+
+		// If our custom query var is set modify the query.
+		if ( ! empty( $query->query['rg_preview_title'] ) ) {
+			$term = $wpdb->esc_like( $query->query['rg_preview_title'] );
+			$sql  .= ' AND ' . $wpdb->posts . '.post_title LIKE \'%' . $term . '%\'';
+		}
+
+		return $sql;
 	}
 }

@@ -28,6 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<div class="rev-gen-dashboard-bar--item rev-gen-dashboard-bar--search">
 				<input placeholder="<?php esc_attr_e( 'Search Paywalls', 'revenue-generator' ); ?>" type="text" id="rg_js_searchPaywall">
 				<i class="dashicons dashicons-search"></i>
+				<div class="rev-gen-dashboard-bar--search-results"></div>
 			</div>
 			<div class="rev-gen-dashboard-bar--item rev-gen-dashboard-bar--actions">
 				<a href="<?php echo esc_url( $new_paywall_url ); ?>" id="rg_js_newPaywall" class="rg-button"><?php esc_html_e( 'New Paywall', 'revenue-generator' ); ?></a>
