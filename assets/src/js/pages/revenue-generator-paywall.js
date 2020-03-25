@@ -1550,7 +1550,7 @@ import tippy, {roundArrow} from 'tippy.js';
 					id      : 'rg-purchase-option-item-price',
 					text    : sprintf(
 						__(
-							'These are our recommended prices. %1$s %1$sClick to edit; prices lower than 5.00 will default to %2$spay later%3$s.',
+							'These are our recommended prices. %1$s%1$sClick to edit; prices lower than 5.00 will default to %2$spay later%3$s.',
 							'revenue-generator'
 						),
 						'<br/>',
