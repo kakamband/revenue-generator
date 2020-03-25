@@ -533,24 +533,27 @@ class Paywall extends Base {
 		$post_meta          = $this->formatted_post_meta( $post_meta );
 		$last_modified_user = $this->get_last_modified_author_id( $post->ID );
 		$post_author        = empty( $last_modified_user ) ? $post->post_author : $last_modified_user;
+		$post_modified_date = get_the_modified_date( '', $post->ID );
+		$post_modified_time = get_the_modified_time( '', $post->ID );
 		$post_updated_info  = sprintf(
 			__( 'Last updated on %s at %s by %s' ),
-			get_the_modified_date( '', $post->ID ),
-			get_the_modified_time( '', $post->ID ),
+			$post_modified_date,
+			$post_modified_time,
 			get_the_author_meta( 'display_name', $post_author )
 		);
 
-		$pay_wall                  = [];
-		$pay_wall['id']            = $post->ID;
-		$pay_wall['title']         = $post->post_title;
-		$pay_wall['description']   = $post->post_content;
-		$pay_wall['name']          = $post_meta['name'];
-		$pay_wall['access_to']     = $post_meta['access_to'];
-		$pay_wall['access_entity'] = $post_meta['access_entity'];
-		$pay_wall['is_active']     = $post_meta['is_active'];
-		$pay_wall['updated']       = $post_updated_info;
-		$is_active                 = 1 === absint( $pay_wall['is_active'] ) ? true : false;
-		$saved_message             = $is_active ? __( 'Published', 'revenue-generator' ) : __( 'Saved', 'revenue-generator' );
+		$pay_wall                      = [];
+		$pay_wall['id']                = $post->ID;
+		$pay_wall['title']             = $post->post_title;
+		$pay_wall['description']       = $post->post_content;
+		$pay_wall['name']              = $post_meta['name'];
+		$pay_wall['access_to']         = $post_meta['access_to'];
+		$pay_wall['access_entity']     = $post_meta['access_entity'];
+		$pay_wall['is_active']         = $post_meta['is_active'];
+		$pay_wall['updated_timestamp'] = strtotime( "{$post_modified_date} $post_modified_time" );
+		$pay_wall['updated']           = $post_updated_info;
+		$is_active                     = 1 === absint( $pay_wall['is_active'] ) ? true : false;
+		$saved_message                 = $is_active ? __( 'Published', 'revenue-generator' ) : __( 'Saved', 'revenue-generator' );
 
 		// Compose message based on paywall attributes.
 		if ( 'category' === $pay_wall['access_to'] || 'exclude_category' === $pay_wall['access_to'] ) {
@@ -834,6 +837,59 @@ class Paywall extends Base {
 		$result        = $paywall_count->publish;
 
 		return absint( $result );
+	}
+
+	/**
+	 * Return a sorted list by priority if requested.
+	 *
+	 * Priority is defined as follows.
+	 *
+	 * 1 - Paywalls applied to Selected post or page (ordered by last_modified desc)
+	 * 2 - Paywalls applied to category (ordered by last_modified desc)
+	 * 3 - Paywalls applied to except for category (ordered by last_modified desc)
+	 * 4 - Paywalls applied to all posts and pages (ordered by last_modified desc)
+	 *
+	 * @param array $dashboard_paywalls array of existing paywalls.
+	 *
+	 * @return array
+	 */
+	public function sort_paywall_by_priority( $dashboard_paywalls ) {
+		if ( ! empty( $dashboard_paywalls ) ) {
+			$all_paywalls    = [
+				'supported'        => [],
+				'category'         => [],
+				'exclude_category' => [],
+				'all'              => [],
+			];
+			$sorted_paywalls = [];
+
+			// Store all paywall data in one place for easier udpates.
+			foreach ( $dashboard_paywalls as $paywall ) {
+				if ( ! empty( $paywall ) ) {
+					$all_paywalls[ $paywall['access_to'] ][] = $paywall;
+				}
+			}
+
+			// Loop through all paywalls, sort them internally by updated date and time first before adding them to final array.
+			foreach ( $all_paywalls as $paywall_subtype ) {
+				if ( ! empty( $paywall_subtype ) ) {
+					$paywall_time_keys = array_column( $paywall_subtype, 'updated_timestamp' );
+					array_multisort( $paywall_time_keys, SORT_DESC, $paywall_subtype );
+
+					foreach ( $paywall_subtype as $paywall ) {
+						$sorted_paywalls[] = $paywall;
+					}
+				}
+			}
+
+			if ( ! empty( $sorted_paywalls ) ) {
+				return $sorted_paywalls;
+			}
+
+			return $dashboard_paywalls;
+		}
+
+		return [];
 	}
 
 }

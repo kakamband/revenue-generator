@@ -238,13 +238,19 @@ class Admin {
 
 		// If no sort param is set default to DESC.
 		if ( empty( $sort_order ) ) {
-			$sort_order = 'DESC';
+			$new_sort_order = 'DESC';
+			$sort_order     = 'priority';
 		} else {
-			$sort_order = in_array( strtoupper( $sort_order ), $allowed_sort_order ) ? strtoupper( $sort_order ) : 'DESC';
+			$new_sort_order = in_array( strtoupper( $sort_order ), $allowed_sort_order ) ? strtoupper( $sort_order ) : 'DESC';
 		}
 
-		$paywall_filter_args['order'] = $sort_order;
+		$paywall_filter_args['order'] = $new_sort_order;
 		$dashboard_paywalls           = $paywall_instance->get_all_paywalls( $paywall_filter_args );
+
+		// Sort paywall by priority, more details in class `Paywall` function `sort_paywall_by_priority()`.
+		if ( 'priority' === $sort_order ) {
+			$dashboard_paywalls = $paywall_instance->sort_paywall_by_priority( $dashboard_paywalls );
+		}
 
 		$dashboard_page_data = [
 			'new_paywall_url'    => add_query_arg( [ 'page' => $admin_menus['paywall']['url'] ], admin_url( 'admin.php' ) ),
