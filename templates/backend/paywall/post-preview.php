@@ -101,7 +101,7 @@ $rg_preview_post_title = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_p
 					<button id="rg_js_savePaywall" class="rev-gen-preview-main-paywall-actions-update-save">
 						<?php esc_html_e( 'Save', 'revenue-generator' ); ?>
 					</button>
-					<button id="rg_js_activatePaywall" disabled="disabled" class="rev-gen-preview-main--paywall-actions-update-publish">
+					<button id="rg_js_activatePaywall" class="rev-gen-preview-main--paywall-actions-update-publish">
 						<?php esc_html_e( 'Publish', 'revenue-generator' ); ?>
 					</button>
 				</div>

@@ -9,7 +9,7 @@
  * Internal dependencies.
  */
 import '../utils';
-import { debounce } from '../helpers';
+import {debounce} from '../helpers';
 import {__, sprintf} from '@wordpress/i18n';
 import Shepherd from "shepherd.js";
 import tippy, {roundArrow} from 'tippy.js';
@@ -166,13 +166,6 @@ import tippy, {roundArrow} from 'tippy.js';
 					// Get all purchase options.
 					const allPurchaseOptions = $($o.purchaseOptionItems);
 					if (allPurchaseOptions.length) {
-						const paywallId = allPurchaseOptions.attr('data-paywall-id');
-
-						// Enabled publish button if saved paywall.
-						if (paywallId.length && revenueGeneratorGlobalOptions.globalOptions.merchant_currency.length) {
-							$o.activatePaywall.removeAttr('disabled');
-						}
-
 						// Store individual pricing.
 						const individualOption = allPurchaseOptions.find("[data-purchase-type='individual']");
 						const pricingType = individualOption.attr('data-pricing-type');
@@ -345,13 +338,6 @@ import tippy, {roundArrow} from 'tippy.js';
 					if (categoryId) {
 						$o.postPreviewWrapper.attr('data-access-id', categoryId);
 						$o.savePaywall.removeAttr('disabled');
-
-						// Get all purchase options and check paywall id.
-						const allPurchaseOptions = $($o.purchaseOptionItems);
-						const paywallId = allPurchaseOptions.attr('data-paywall-id');
-						if (paywallId.length && revenueGeneratorGlobalOptions.globalOptions.merchant_currency.length) {
-							$o.activatePaywall.removeAttr('disabled');
-						}
 					}
 				});
 
@@ -737,7 +723,6 @@ import tippy, {roundArrow} from 'tippy.js';
 						$o.searchPaywallWrapper.show();
 						if ($o.searchPaywallContent.length && null === $o.searchPaywallContent.val()) {
 							$o.savePaywall.attr('disabled', true);
-							$o.activatePaywall.attr('disabled', true);
 						}
 						$o.postPreviewWrapper.attr('data-access-id', $o.searchPaywallContent.val());
 					} else {
@@ -774,18 +759,6 @@ import tippy, {roundArrow} from 'tippy.js';
 							const symbol = 'USD' === formData.config_value ? '$' : '€';
 							priceSymbol.empty().text(symbol);
 						});
-
-						// Get all purchase options.
-						const allPurchaseOptions = $($o.purchaseOptionItems);
-
-						if (allPurchaseOptions.length) {
-							const paywallId = allPurchaseOptions.attr('data-paywall-id');
-
-							// Enabled publish button if saved paywall.
-							if (paywallId.length) {
-								$o.activatePaywall.removeAttr('disabled');
-							}
-						}
 					});
 				});
 
@@ -1125,7 +1098,26 @@ import tippy, {roundArrow} from 'tippy.js';
 					if (0 === parseInt(revenueGeneratorGlobalOptions.globalOptions.is_merchant_verified)) {
 						showAccountActivationModal();
 					} else {
-						publishPaywall();
+						// Get all purchase options and check paywall id.
+						const allPurchaseOptions = $($o.purchaseOptionItems);
+						const paywallId = allPurchaseOptions.attr('data-paywall-id');
+
+						/**
+						 * If paywall id exists, then publish directly, else wait and save paywall data to
+						 * get new paywall id and wait for some time to publish the paywall.
+						 */
+						if (paywallId.length) {
+							publishPaywall();
+						} else {
+							// Save the paywall as well, so that we don't miss any new changes if merchant as done any.
+							$o.isPublish = true;
+							$o.savePaywall.trigger('click');
+							showLoader();
+							setTimeout( function () {
+								publishPaywall();
+								hideLoader();
+							}, 2000 );
+						}
 					}
 				});
 
@@ -1320,11 +1312,6 @@ import tippy, {roundArrow} from 'tippy.js';
 					});
 				}
 
-				// Save the paywall as well, so that we don't miss any new changes if merchant as done any.
-				$o.isPublish = true;
-				$o.savePaywall.trigger('click');
-				$o.isPublish = true;
-
 				if (!$o.requestSent) {
 					$o.requestSent = true;
 					showLoader();
@@ -1438,7 +1425,28 @@ import tippy, {roundArrow} from 'tippy.js';
 						$o.requestSent = false;
 						activationModal.find($o.accountActionsFields).hide();
 						if (true === r.success) {
-							publishPaywall();
+							// Get all purchase options and check paywall id.
+							const allPurchaseOptions = $($o.purchaseOptionItems);
+							const paywallId = allPurchaseOptions.attr('data-paywall-id');
+
+							/**
+							 * If paywall id exists, then publish directly, else wait to save paywall data to
+							 * get new paywall id and wait for some time to publish the paywall.
+							 */
+							if (paywallId.length) {
+								publishPaywall();
+							} else {
+								// Save the paywall as well, so that we don't miss any new changes if merchant as done any.
+								$o.isPublish = true;
+								$o.savePaywall.trigger('click');
+								showLoader();
+								setTimeout( function () {
+									// Explicitly change loclized data.
+									revenueGeneratorGlobalOptions.globalOptions.is_merchant_verified = '1';
+									publishPaywall();
+									hideLoader();
+								}, 2000 );
+							}
 						} else {
 							activationModal.find($o.activationModalError).css({display: 'flex'});
 						}
@@ -2202,10 +2210,6 @@ import tippy, {roundArrow} from 'tippy.js';
 					$o.snackBar.showSnackbar(r.msg, 1500);
 
 					const purchaseOptions = $($o.purchaseOptionItems);
-
-					if (r.paywall_id.length && revenueGeneratorGlobalOptions.globalOptions.merchant_currency.length) {
-						$o.activatePaywall.removeAttr('disabled');
-					}
 
 					// Set main paywall id.
 					purchaseOptions.attr('data-paywall-id', r.paywall_id);

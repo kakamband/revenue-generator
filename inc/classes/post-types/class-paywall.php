@@ -855,13 +855,14 @@ class Paywall extends Base {
 	 */
 	public function sort_paywall_by_priority( $dashboard_paywalls ) {
 		if ( ! empty( $dashboard_paywalls ) ) {
-			$all_paywalls    = [
+			$all_paywalls       = [
 				'supported'        => [],
 				'category'         => [],
 				'exclude_category' => [],
 				'all'              => [],
 			];
-			$sorted_paywalls = [];
+			$published_paywalls = [];
+			$saved_paywalls     = [];
 
 			// Store all paywall data in one place for easier udpates.
 			foreach ( $dashboard_paywalls as $paywall ) {
@@ -877,10 +878,17 @@ class Paywall extends Base {
 					array_multisort( $paywall_time_keys, SORT_DESC, $paywall_subtype );
 
 					foreach ( $paywall_subtype as $paywall ) {
-						$sorted_paywalls[] = $paywall;
+						if ( 1 === absint( $paywall['is_active'] ) ) {
+							$published_paywalls[] = $paywall;
+						} else {
+							$saved_paywalls[] = $paywall;
+						}
 					}
 				}
 			}
+
+			// Merge published and saved paywalls to create final array of paywalls.
+			$sorted_paywalls = array_merge( $published_paywalls, $saved_paywalls );
 
 			if ( ! empty( $sorted_paywalls ) ) {
 				return $sorted_paywalls;
