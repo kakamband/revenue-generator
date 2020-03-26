@@ -28,7 +28,7 @@ import {debounce} from '../helpers';
 				sortPaywalls       : $('#rg_js_filterPaywalls'),
 				searchPaywall      : $('#rg_js_searchPaywall'),
 				searchResultWrapper: $('.rev-gen-dashboard-bar--search-results'),
-				searchResultItem   : '.rev-gen-dashboard-bar--search--results-item',
+				searchResultItem   : '.rev-gen-dashboard-bar--search-results-item',
 
 				// Dashboard footer area.
 				restartTour: $('#rg_js_RestartTutorial'),
@@ -109,6 +109,10 @@ import {debounce} from '../helpers';
 						overflow: 'hidden',
 						height  : '100%',
 					});
+					const searchPaywallTerm = $(this).val().trim();
+					if (searchPaywallTerm.length) {
+						$o.searchPaywall.trigger('change');
+					}
 				});
 
 				/**
@@ -120,6 +124,8 @@ import {debounce} from '../helpers';
 						height  : 'auto',
 					});
 					$($o.paywallContent).removeClass('blury');
+					$($o.searchResultWrapper).empty();
+					$($o.searchResultWrapper).css({display: 'none'});
 				});
 
 				/**
@@ -178,7 +184,7 @@ import {debounce} from '../helpers';
 										class    : 'rev-gen-dashboard-bar--search-results-item',
 									}).text(item.name);
 									$o.searchResultWrapper.append(searchItem);
-									$o.searchResultWrapper.css({display: 'flex'});
+									$o.searchResultWrapper.css({display: 'inline-flex'});
 								})
 							} else {
 								$o.snackBar.showSnackbar(r.msg, 1500);
