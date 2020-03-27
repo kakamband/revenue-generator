@@ -58,9 +58,7 @@ import tippy, {roundArrow} from 'tippy.js';
 				previewSecondItem        : '.rg-purchase-overlay-purchase-options .option-item-second',
 
 				// Action buttons
-				editOption    : '.rg-purchase-overlay-option-edit',
-				moveOptionUp  : '.rg-purchase-overlay-option-up',
-				moveOptionDown: '.rg-purchase-overlay-option-down',
+				editOption: '.rg-purchase-overlay-option-edit',
 
 				// Option manager.
 				optionRemove              : '.rg-purchase-overlay-option-remove',
@@ -490,6 +488,7 @@ import tippy, {roundArrow} from 'tippy.js';
 								purchaseItem.remove();
 								reorderPurchaseItems();
 								removePurchaseOption(type, entityId);
+								$o.isPublish = true;
 								$o.savePaywall.trigger('click')
 							}
 						});
@@ -497,24 +496,6 @@ import tippy, {roundArrow} from 'tippy.js';
 						purchaseItem.remove();
 						reorderPurchaseItems();
 					}
-				});
-
-				/**
-				 * Move purchase option one up.
-				 */
-				$o.body.on('click', $o.moveOptionUp, function () {
-					const purchaseOption = $(this).parents('.rg-purchase-overlay-purchase-options-item');
-					$(this).parents('.rg-purchase-overlay-purchase-options-item').prev().insertAfter(purchaseOption);
-					reorderPurchaseItems();
-				});
-
-				/**
-				 * Move purchase option one down.
-				 */
-				$o.body.on('click', $o.moveOptionDown, function () {
-					const purchaseOption = $(this).parents('.rg-purchase-overlay-purchase-options-item');
-					$(this).parents('.rg-purchase-overlay-purchase-options-item').next().insertBefore(purchaseOption);
-					reorderPurchaseItems();
 				});
 
 				/**
@@ -1098,26 +1079,16 @@ import tippy, {roundArrow} from 'tippy.js';
 					if (0 === parseInt(revenueGeneratorGlobalOptions.globalOptions.is_merchant_verified)) {
 						showAccountActivationModal();
 					} else {
-						// Get all purchase options and check paywall id.
-						const allPurchaseOptions = $($o.purchaseOptionItems);
-						const paywallId = allPurchaseOptions.attr('data-paywall-id');
-
 						/**
-						 * If paywall id exists, then publish directly, else wait and save paywall data to
-						 * get new paywall id and wait for some time to publish the paywall.
+						 * Save paywall data to get new paywall id and wait for some time to publish the paywall.
 						 */
-						if (paywallId.length) {
+						$o.isPublish = true;
+						$o.savePaywall.trigger('click');
+						showLoader();
+						setTimeout(function () {
 							publishPaywall();
-						} else {
-							// Save the paywall as well, so that we don't miss any new changes if merchant as done any.
-							$o.isPublish = true;
-							$o.savePaywall.trigger('click');
-							showLoader();
-							setTimeout( function () {
-								publishPaywall();
-								hideLoader();
-							}, 2000 );
-						}
+							hideLoader();
+						}, 2000);
 					}
 				});
 
@@ -1440,12 +1411,12 @@ import tippy, {roundArrow} from 'tippy.js';
 								$o.isPublish = true;
 								$o.savePaywall.trigger('click');
 								showLoader();
-								setTimeout( function () {
+								setTimeout(function () {
 									// Explicitly change loclized data.
 									revenueGeneratorGlobalOptions.globalOptions.is_merchant_verified = '1';
 									publishPaywall();
 									hideLoader();
-								}, 2000 );
+								}, 2000);
 							}
 						} else {
 							activationModal.find($o.activationModalError).css({display: 'flex'});

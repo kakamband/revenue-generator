@@ -122,16 +122,6 @@ $rg_preview_post_title = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_p
 		<button class="rg-purchase-overlay-option-edit">
 			<img alt="<?php echo esc_attr( 'Option edit', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['option_edit'] ); ?>" />
 		</button>
-		<# if ( data.showMoveUp ) { #>
-		<button class="rg-purchase-overlay-option-up">
-			<img alt="<?php echo esc_attr( 'Option move up', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['option_move_up'] ); ?>" />
-		</button>
-		<# } #>
-		<# if ( data.showMoveDown ) { #>
-		<button class="rg-purchase-overlay-option-down">
-			<img alt="<?php echo esc_attr( 'Option move down', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['option_move_down'] ); ?>" />
-		</button>
-		<# } #>
 	</div>
 </script>
 
