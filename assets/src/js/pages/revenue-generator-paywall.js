@@ -886,73 +886,71 @@ import tippy, {roundArrow} from 'tippy.js';
 								if (true === confirmation) {
 									// Remove the data from DB.
 									removePurchaseOption(currentType, entityId, false);
+									$o.isPublish = true;
 									$o.savePaywall.trigger('click');
-
-									// Remove all current attributes.
-									optionItem.removeAttr('data-purchase-type');
-									optionItem.removeAttr('data-expiry-duration');
-									optionItem.removeAttr('data-expiry-period');
-									optionItem.removeAttr('data-pricing-type');
-									optionItem.removeAttr('data-paywall-id');
-									optionItem.removeAttr('data-tlp-id');
-									optionItem.removeAttr('data-sub-id');
-									optionItem.removeAttr('data-uid');
-									optionItem.removeAttr('data-order');
-
-									// Add empty options for a fresh option.
-									optionItem.attr('data-order', '');
-									optionItem.attr('data-uid', '');
-									optionItem.attr('data-purchase-type', selectedEntityType);
-
-									// Add type specific options.
-									if ('individual' !== selectedEntityType) {
-										// Set default 1 Month period for changed option.
-
-										const optionPrice = optionItem.find($o.purchaseOptionItemPrice);
-										optionPrice.removeAttr('data-pay-model');
-
-										if ('timepass' === selectedEntityType) {
-											const timePassDefaultValues = revenueGeneratorGlobalOptions.defaultConfig.timepass;
-
-											// Default value for new time pass.
-											optionItem.attr('data-tlp-id', '');
-											optionItem.attr('data-expiry-duration', timePassDefaultValues.duration);
-											optionItem.attr('data-expiry-period', timePassDefaultValues.period);
-											optionPrice.attr('data-pay-model', timePassDefaultValues.revenue);
-											optionPrice.text(timePassDefaultValues.price);
-
-											// Set option item info.
-											optionItem.find($o.purchaseOptionItemTitle).text(timePassDefaultValues.title);
-											optionItem.find($o.purchaseOptionItemDesc).text(timePassDefaultValues.description);
-										} else if ('subscription' === selectedEntityType) {
-											const subscriptionDefaultValues = revenueGeneratorGlobalOptions.defaultConfig.subscription;
-
-											// Default value for new subscription.
-											optionItem.attr('data-sub-id', '');
-											optionItem.attr('data-expiry-duration', subscriptionDefaultValues.duration);
-											optionItem.attr('data-expiry-period', subscriptionDefaultValues.period);
-											optionPrice.attr('data-pay-model', subscriptionDefaultValues.revenue);
-											optionPrice.text(subscriptionDefaultValues.price);
-
-											// Set option item info.
-											optionItem.find($o.purchaseOptionItemTitle).text(subscriptionDefaultValues.title);
-											optionItem.find($o.purchaseOptionItemDesc).text(subscriptionDefaultValues.description);
-										}
-									} else {
-										// Set static pricing by default if individual.
-										optionItem.attr('data-pricing-type', 'static');
-										optionItem.attr('data-paywall-id', '');
-									}
 								} else {
 									optionItem.attr('data-purchase-type', currentType);
 									$(this).val(currentType);
 									return false;
 								}
 							});
+						}
+
+						// Remove all current attributes.
+						optionItem.removeAttr('data-purchase-type');
+						optionItem.removeAttr('data-expiry-duration');
+						optionItem.removeAttr('data-expiry-period');
+						optionItem.removeAttr('data-pricing-type');
+						optionItem.removeAttr('data-paywall-id');
+						optionItem.removeAttr('data-tlp-id');
+						optionItem.removeAttr('data-sub-id');
+						optionItem.removeAttr('data-uid');
+						optionItem.removeAttr('data-order');
+
+						// Add empty options for a fresh option.
+						optionItem.attr('data-order', '');
+						optionItem.attr('data-uid', '');
+						optionItem.attr('data-purchase-type', selectedEntityType);
+						$(this).val(selectedEntityType);
+
+						// Add type specific options.
+						if ('individual' !== selectedEntityType) {
+							// Set default 1 Month period for changed option.
+
+							const optionPrice = optionItem.find($o.purchaseOptionItemPrice);
+							optionPrice.removeAttr('data-pay-model');
+
+							if ('timepass' === selectedEntityType) {
+								const timePassDefaultValues = revenueGeneratorGlobalOptions.defaultConfig.timepass;
+
+								// Default value for new time pass.
+								optionItem.attr('data-tlp-id', '');
+								optionItem.attr('data-expiry-duration', timePassDefaultValues.duration);
+								optionItem.attr('data-expiry-period', timePassDefaultValues.period);
+								optionPrice.attr('data-pay-model', timePassDefaultValues.revenue);
+								optionPrice.text(timePassDefaultValues.price);
+
+								// Set option item info.
+								optionItem.find($o.purchaseOptionItemTitle).text(timePassDefaultValues.title);
+								optionItem.find($o.purchaseOptionItemDesc).text(timePassDefaultValues.description);
+							} else if ('subscription' === selectedEntityType) {
+								const subscriptionDefaultValues = revenueGeneratorGlobalOptions.defaultConfig.subscription;
+
+								// Default value for new subscription.
+								optionItem.attr('data-sub-id', '');
+								optionItem.attr('data-expiry-duration', subscriptionDefaultValues.duration);
+								optionItem.attr('data-expiry-period', subscriptionDefaultValues.period);
+								optionPrice.attr('data-pay-model', subscriptionDefaultValues.revenue);
+								optionPrice.text(subscriptionDefaultValues.price);
+
+								// Set option item info.
+								optionItem.find($o.purchaseOptionItemTitle).text(subscriptionDefaultValues.title);
+								optionItem.find($o.purchaseOptionItemDesc).text(subscriptionDefaultValues.description);
+							}
 						} else {
-							optionItem.attr('data-purchase-type', selectedEntityType);
-							$(this).val(selectedEntityType);
-							return false;
+							// Set static pricing by default if individual.
+							optionItem.attr('data-pricing-type', 'static');
+							optionItem.attr('data-paywall-id', '');
 						}
 					}
 				});
