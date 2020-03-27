@@ -22,6 +22,13 @@ class Time_Pass extends Base {
 	const SLUG = 'rg_pass';
 
 	/**
+	 * Token of post type.
+	 *
+	 * @var string
+	 */
+	const TOKEN = 'tlp';
+
+	/**
 	 * To get list of labels for time pass post type.
 	 *
 	 * @return array
@@ -58,6 +65,32 @@ class Time_Pass extends Base {
 	 */
 	public function get_active_time_passes() {
 		return $this->get_all_time_passes( true );
+	}
+
+	/**
+	 * Get all active time passes id.
+	 *
+	 * @return array of time passes.
+	 */
+	public function get_active_time_pass_tokenized_ids() {
+		$time_pass_ids      = [];
+		$active_time_passes = $this->get_active_time_passes();
+		foreach ( $active_time_passes as $time_pass ) {
+			$time_pass_ids[] = $this->tokenize_time_pass_id( $time_pass['id'] );
+		}
+
+		return $time_pass_ids;
+	}
+
+	/**
+	 * Get tokenized time pass id.
+	 *
+	 * @param int $id Time Pass ID.
+	 *
+	 * @return string
+	 */
+	private function tokenize_time_pass_id( $id ) {
+		return sprintf( '%s_%s', self::TOKEN, $id );
 	}
 
 	/**

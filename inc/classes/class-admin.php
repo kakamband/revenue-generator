@@ -327,6 +327,11 @@ class Admin {
 			$purchase_options      = $post_types->convert_to_purchase_options( $purchase_options_data );
 		}
 
+		// Get individual article pricing based on post content word count, i.e "tier".
+		$post_tier                 = empty( $formatted_post_data['post_content'] ) ? 'tier_1' : $post_types->get_post_tier( $formatted_post_data['post_content'] );
+		$purchase_options_all      = Config::get_pricing_defaults( $config_data['average_post_publish_count'] );
+		$post_dynamic_pricing_data = $purchase_options_all['single_article'][ $post_tier ];
+
 		// Set currency symbol.
 		$default_option_data = $post_types->get_default_purchase_option();
 		$symbol              = '';
@@ -347,6 +352,7 @@ class Admin {
 			'rg_preview_post'       => $formatted_post_data,
 			'purchase_options_data' => $purchase_options,
 			'default_option_data'   => $default_option_data,
+			'dynamic_pricing_data'  => $post_dynamic_pricing_data,
 			'merchant_symbol'       => $symbol,
 			'rg_category_data'      => $rg_category_data,
 			'is_merchant_verified'  => $is_merchant_verified,

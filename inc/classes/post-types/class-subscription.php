@@ -22,6 +22,13 @@ class Subscription extends Base {
 	const SLUG = 'rg_subscription';
 
 	/**
+	 * Token of post type.
+	 *
+	 * @var string
+	 */
+	const TOKEN = 'sub';
+
+	/**
 	 * To get list of labels for subscription post type.
 	 *
 	 * @return array
@@ -58,6 +65,32 @@ class Subscription extends Base {
 	 */
 	public function get_active_subscriptions() {
 		return $this->get_all_subscriptions( true );
+	}
+
+	/**
+	 * Get all active subscriptions id.
+	 *
+	 * @return array of subscriptions ids.
+	 */
+	public function get_active_subscription_tokenized_ids() {
+		$subscription_ids     = [];
+		$active_subscriptions = $this->get_active_subscriptions();
+		foreach ( $active_subscriptions as $subscription ) {
+			$subscription_ids[] = $this->tokenize_subscription_id( $subscription['id'] );
+		}
+
+		return $subscription_ids;
+	}
+
+	/**
+	 * Get tokenized subsription id.
+	 *
+	 * @param int $id Subscription ID.
+	 *
+	 * @return string
+	 */
+	private function tokenize_subscription_id( $id ) {
+		return sprintf( '%s_%s', self::TOKEN, $id );
 	}
 
 	/**
