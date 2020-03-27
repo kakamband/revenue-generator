@@ -4,17 +4,17 @@
  * @param {Function} fn    Callback function.
  * @param {number}   delay Time in ms to delay the operation.
  */
-const debounce = function (fn, delay) {
+const debounce = function( fn, delay ) {
 	let timer;
-	return function () {
+	return function() {
 		const context = this,
 			args = arguments;
 
-		clearTimeout(timer);
+		clearTimeout( timer );
 
-		timer = setTimeout(function () {
-			fn.apply(context, args);
-		}, delay);
+		timer = setTimeout( function() {
+			fn.apply( context, args );
+		}, delay );
 	};
 };
 
