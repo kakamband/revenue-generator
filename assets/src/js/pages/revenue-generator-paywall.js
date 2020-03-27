@@ -2490,8 +2490,7 @@ import tippy, { roundArrow } from 'tippy.js';
 			 * Create a confirmation modal with warning before removing paywall.
 			 */
 			const createPaywallRemovalConfirmation = function() {
-				return new Promise( ( complete, failed ) => { // eslint-disable-line no-unused-vars
-					// eslint-disable-line no-unused-vars
+				return new Promise( ( complete ) => {
 					$o.previewWrapper.find( $o.paywallRemovalModal ).remove();
 
 					// Get the template for confirmation popup and add it.
@@ -2546,8 +2545,7 @@ import tippy, { roundArrow } from 'tippy.js';
 			 * @param {string} optionType Option type.
 			 */
 			const createEntityUpdateConfirmation = function( optionType ) {
-				return new Promise( ( complete, failed ) => { // eslint-disable-line no-unused-vars
-					// eslint-disable-line no-unused-vars
+				return new Promise( ( complete ) => {
 					$o.previewWrapper
 						.find( $o.purchaseOptionWarningWrapper )
 						.remove();
@@ -2775,7 +2773,7 @@ import tippy, { roundArrow } from 'tippy.js';
 					);
 					$o.snackBar.showSnackbar(
 						__(
-							'Pay Later is only available for prices set to $5 or less.',
+							'Pay Later is only available for prices set less than $5.',
 							'revenue-generator'
 						),
 						2500

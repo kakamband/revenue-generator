@@ -179,7 +179,7 @@ class Config {
 			'EUR' => [
 				'ppu_min'        => 0.05,
 				'ppu_only_limit' => 1.48,
-				'ppu_max'        => 5.00,
+				'ppu_max'        => 4.99,
 				'sis_min'        => 1.49,
 				'sis_only_limit' => 5.00,
 				'sis_max'        => 1000.00
@@ -187,7 +187,7 @@ class Config {
 			'USD' => [
 				'ppu_min'        => 0.05,
 				'ppu_only_limit' => 1.98,
-				'ppu_max'        => 5.00,
+				'ppu_max'        => 4.99,
 				'sis_min'        => 1.99,
 				'sis_only_limit' => 5.00,
 				'sis_max'        => 1000.00

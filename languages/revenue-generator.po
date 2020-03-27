@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-03-27T13:54:48+05:30\n"
+"POT-Creation-Date: 2020-03-27T15:46:10+05:30\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: revenue-generator\n"
@@ -382,7 +382,7 @@ msgid "This will affect all your paywalls."
 msgstr ""
 
 #: templates/backend/paywall/post-preview.php:352
-#: assets/src/js/pages/revenue-generator-paywall.js:2577
+#: assets/src/js/pages/revenue-generator-paywall.js:2575
 msgid "The changes you have made will impact this subscription offer on all paywalls across your entire site."
 msgstr ""
 
@@ -562,12 +562,11 @@ msgid "No results found."
 msgstr ""
 
 #: assets/src/js/pages/revenue-generator-paywall.js:954
-#: assets/src/js/pages/revenue-generator-paywall.js:2754
+#: assets/src/js/pages/revenue-generator-paywall.js:2752
 msgid "Pay Now is only available for prices set to $1.99 or higher."
 msgstr ""
 
 #: assets/src/js/pages/revenue-generator-paywall.js:962
-#: assets/src/js/pages/revenue-generator-paywall.js:2777
 msgid "Pay Later is only available for prices set to $5 or less."
 msgstr ""
 
@@ -639,6 +638,10 @@ msgstr ""
 msgid "Complete"
 msgstr ""
 
-#: assets/src/js/pages/revenue-generator-paywall.js:2568
+#: assets/src/js/pages/revenue-generator-paywall.js:2566
 msgid "The changes you have made will impact this time pass offer on all paywalls across your entire site."
+msgstr ""
+
+#: assets/src/js/pages/revenue-generator-paywall.js:2775
+msgid "Pay Later is only available for prices set less than $5."
 msgstr ""
