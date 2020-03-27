@@ -1,30 +1,31 @@
 /**
  * Webpack configuration.
  */
-const path = require( 'path' );
-const MiniCssExtractPlugin = require( 'mini-css-extract-plugin' );
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ImageMinimizePlugin = require('imagemin-webpack-plugin').default;
 const CopyPlugin = require('copy-webpack-plugin');
-const WebpackBar = require( 'webpackbar' );
-
+const WebpackBar = require('webpackbar');
+const FileManagerPlugin = require('filemanager-webpack-plugin');
 
 // Build All files.
-const finalConfig = ( mode ) => {
+const finalConfig = (mode) => {
 	return [
 		{
-			entry: {
-				'revenue-generator-admin': [ './assets/src/js/revenue-generator-admin.js', './assets/src/scss/revenue-generator-admin.scss' ],
+			entry    : {
+				'revenue-generator-admin'    : ['./assets/src/js/revenue-generator-admin.js', './assets/src/scss/revenue-generator-admin.scss'],
 				'revenue-generator-dashboard': './assets/src/scss/revenue-generator-dashboard.scss',
+				'revenue-generator-frontend' : './assets/src/scss/revenue-generator-frontend.scss',
 			},
-			output: {
-				path: path.resolve( __dirname, 'assets/build' ),
+			output   : {
+				path: path.resolve(__dirname, 'assets/build'),
 			},
-			module: {
+			module   : {
 				rules: [
 					{
-						test: /\.scss$/,
+						test   : /\.scss$/,
 						exclude: /node_modules/,
-						use: [
+						use    : [
 							MiniCssExtractPlugin.loader,
 							'css-loader',
 							'postcss-loader',
@@ -32,7 +33,7 @@ const finalConfig = ( mode ) => {
 						],
 					},
 					{
-						test: /\.(png|woff|woff2|eot|ttf|svg)$/,
+						test  : /\.(png|woff|woff2|eot|ttf|svg)$/,
 						loader: 'url-loader?limit=100000'
 					}
 				],
@@ -40,14 +41,14 @@ const finalConfig = ( mode ) => {
 			externals: {
 				jquery: 'jQuery'
 			},
-			plugins: [
-				new MiniCssExtractPlugin( {
+			plugins  : [
+				new MiniCssExtractPlugin({
 					filename: 'css/[name].css',
-				} ),
-				new WebpackBar( {
-					name: 'Admin Assets',
+				}),
+				new WebpackBar({
+					name : 'Admin Assets',
 					color: '#0c6a22',
-				} ),
+				}),
 				new CopyPlugin([
 					{ from: './assets/src/img', to: 'img' },
 				]),
@@ -57,13 +58,21 @@ const finalConfig = ( mode ) => {
 				new ImageMinimizePlugin(
 					{
 						disable: mode !== 'production',
-						test: /\.(jpe?g|png|gif|svg)$/i
-					})
+						test   : /\.(jpe?g|png|gif|svg)$/i
+					}),
+				new FileManagerPlugin({
+					onEnd: {
+						delete : [
+							'./assets/build/revenue-generator-dashboard.js',
+							'./assets/build/revenue-generator-frontend.js',
+						],
+					}
+				})
 			],
 		}
 	]
 };
 
-module.exports = ( env, argv ) => {
-	return finalConfig( argv.mode );
+module.exports = (env, argv) => {
+	return finalConfig(argv.mode);
 };

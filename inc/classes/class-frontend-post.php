@@ -100,14 +100,19 @@ class Frontend_Post {
 	public function add_connector_config() {
 		if ( is_singular( Post_Types::get_allowed_post_types() ) ) {
 			$post_payload_data = $this->get_post_payload();
+			$appearance_config = $this->get_purchase_overlay_config();
 			if ( ! empty( $post_payload_data ) ) {
 				?>
+				<script type="application/json" id="laterpay-connector"><?php
+					/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- added json string is secure and escaped.*/
+					echo $appearance_config;
+					?></script>p
 				<script type="text/javascript">
 					function revenueGeneratorHideTeaserContent() {
 						document.querySelector('.lp-teaser-content').style.display = 'none';
 					}
 				</script>
-				<!-- LaterPay Connector In-Page Configuration -->
+				<!-- LaterPay Connector In-Page Configuration for callbacks -->
 				<script type="application/json" id="laterpay-connector">
 					{
 						"callbacks": {
@@ -115,16 +120,12 @@ class Frontend_Post {
 						}
 					}
 				</script>
+				<!-- LaterPay Connector In-Page Configuration for purchase options -->
 				<script type="application/json" id="laterpay-connector"><?php
 					/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- added json string is secure and escaped.*/
 					echo $post_payload_data['payload'];
 					?></script>
-				<meta property="laterpay:connector:config_token" content="
-			<?php
-				/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- added token string is secure and escaped. */
-				echo $post_payload_data['token'];
-				?>"
-				/>
+				<meta property="laterpay:connector:config_token" content="g<?php echo esc_attr( $post_payload_data['token'] ); ?>" />
 				<?php
 			} else {
 				wp_dequeue_script( 'revenue-generator-classic-connector' );
@@ -147,12 +148,23 @@ class Frontend_Post {
 		$connector_url = $region_connector_urls['us'];
 
 		if ( is_singular( Post_Types::get_allowed_post_types() ) ) {
+			$assets_instance = Assets::get_instance();
+
+			// Enqueue connector script based on region and environment.
 			wp_enqueue_script(
 				'revenue-generator-classic-connector',
 				$connector_url,
 				[],
 				false,
 				true
+			);
+
+			// Enqueue frontend styling for purchase overlay.
+			wp_enqueue_style(
+				'revenue-generator-frontend',
+				REVENUE_GENERATOR_BUILD_URL . 'css/revenue-generator-frontend.css',
+				[],
+				$assets_instance->get_asset_version( 'css/revenue-generator-frontend.css' )
 			);
 		}
 	}
@@ -259,18 +271,38 @@ class Frontend_Post {
 	}
 
 	/**
+	 * Create appearance configuration for the purchase overlay.
+	 *
+	 * @return false|string
+	 */
+	private function get_purchase_overlay_config() {
+		return wp_json_encode( [
+			'appearance' => [
+				'variant'             => 'raw-white',
+				'primaryColor'        => '#2e2e2e',
+				'secondaryColor'      => '#ebebeb',
+				'purchaseButtonColor' => '#2e2e2e',
+				'showPaymentMethods'  => false,
+			],
+		] );
+	}
+
+	/**
 	 * Create final config for supported post.
 	 *
 	 * @return array
 	 */
 	private function get_post_payload() {
-		$rg_post             = get_post();
-		$paywall_instance    = Paywall::get_instance();
-		$paywall_id          = $paywall_instance->get_connected_paywall_by_post( $rg_post->ID );
-		$paywall_data        = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
-		$purchase_options    = [];
-		$paywall_title       = esc_html__( 'Keep Reading', 'revenue-generator' );
-		$paywall_description = esc_html( sprintf( 'Support %s to get access to this content and more.', esc_url( get_home_url() ) ) );
+		$rg_post                = get_post();
+		$paywall_instance       = Paywall::get_instance();
+		$subscription_instance  = Subscription::get_instance();
+		$time_pass_instance     = Time_Pass::get_instance();
+		$paywall_id             = $paywall_instance->get_connected_paywall_by_post( $rg_post->ID );
+		$paywall_data           = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
+		$purchase_options       = [];
+		$final_purchase_options = [];
+		$paywall_title          = esc_html__( 'Keep Reading', 'revenue-generator' );
+		$paywall_description    = esc_html( sprintf( 'Support %s to get access to this content and more.', esc_url( get_home_url() ) ) );
 
 		// If post doesn't have an individual paywall, check for paywall on categories.
 		if ( ! $this->is_paywall_active( $paywall_data ) ) {
@@ -299,6 +331,25 @@ class Frontend_Post {
 			$paywall_title         = $paywall_data['title'];
 			$paywall_description   = $paywall_data['description'];
 			$paywall_options_order = $paywall_data['order'];
+
+			// Get global time passes and subscriptions.
+			$active_time_pass_ids    = $time_pass_instance->get_active_time_pass_tokenized_ids();
+			$active_subscription_ids = $subscription_instance->get_active_subscription_tokenized_ids();
+
+			// Loop through each active time passes and add to paywall if not set already.
+			foreach ( $active_time_pass_ids as $active_time_pass_id ) {
+				if ( ! isset( $paywall_options_order[ $active_time_pass_id ] ) ) {
+					$paywall_options_order[ $active_time_pass_id ] = end( $paywall_options_order ) + 1;
+				}
+			}
+
+			// Loop through each active subscriptions and add to paywall if not set already.
+			foreach ( $active_subscription_ids as $active_subscription_id ) {
+				if ( ! isset( $paywall_options_order[ $active_subscription_id ] ) ) {
+					$paywall_options_order[ $active_subscription_id ] = end( $paywall_options_order ) + 1;
+				}
+			}
+
 			if ( ! empty( $paywall_options_order ) ) {
 				if ( ! empty( $paywall_options_order['individual'] ) ) {
 					$order                      = $paywall_options_order['individual'] - 1;
@@ -309,25 +360,27 @@ class Frontend_Post {
 					}
 				}
 
-				$time_pass_instance = Time_Pass::get_instance();
-				$time_pass_ids      = $time_pass_instance->get_time_pass_ids( array_keys( $paywall_options_order ) );
+				$time_pass_ids = $time_pass_instance->get_time_pass_ids( array_keys( $paywall_options_order ) );
 				if ( ! empty( $time_pass_ids ) ) {
 					foreach ( $time_pass_ids as $time_pass_id ) {
-						$order                      = $paywall_options_order[ 'tlp_' . $time_pass_id ] - 1;
-						$timepass_purchase_option   = $time_pass_instance->get_time_pass_by_id( $time_pass_id );
-						$timepass_option            = $this->covert_to_connector_purchase_option( $timepass_purchase_option, 'timepass', $time_pass_id );
-						$purchase_options[ $order ] = $timepass_option;
+						$order                    = $paywall_options_order[ 'tlp_' . $time_pass_id ] - 1;
+						$timepass_purchase_option = $time_pass_instance->get_time_pass_by_id( $time_pass_id );
+						if ( ! empty( $timepass_purchase_option['is_active'] ) && 1 === absint( $timepass_purchase_option['is_active'] ) ) {
+							$timepass_option            = $this->covert_to_connector_purchase_option( $timepass_purchase_option, 'timepass', $time_pass_id );
+							$purchase_options[ $order ] = $timepass_option;
+						}
 					}
 				}
 
-				$subscription_instance = Subscription::get_instance();
-				$subscription_ids      = $subscription_instance->get_subscription_ids( array_keys( $paywall_options_order ) );
+				$subscription_ids = $subscription_instance->get_subscription_ids( array_keys( $paywall_options_order ) );
 				if ( ! empty( $subscription_ids ) ) {
 					foreach ( $subscription_ids as $subscription_id ) {
 						$order                        = $paywall_options_order[ 'sub_' . $subscription_id ] - 1;
 						$subscription_purchase_option = $subscription_instance->get_subscription_by_id( $subscription_id );
-						$subscription_option          = $this->covert_to_connector_purchase_option( $subscription_purchase_option, 'subscription', $subscription_id );
-						$purchase_options[ $order ]   = $subscription_option;
+						if ( ! empty( $subscription_purchase_option['is_active'] ) && 1 === absint( $subscription_purchase_option['is_active'] ) ) {
+							$subscription_option        = $this->covert_to_connector_purchase_option( $subscription_purchase_option, 'subscription', $subscription_id );
+							$purchase_options[ $order ] = $subscription_option;
+						}
 					}
 				}
 			}
@@ -336,15 +389,17 @@ class Frontend_Post {
 		// Sort purchase options based on new order.
 		ksort( $purchase_options );
 
-		// Setup overlay configurations.
+		// This is done to avoid a mismatch in oder of paywall items.
 		if ( ! empty( $purchase_options ) ) {
+			foreach ( $purchase_options as $purchase_option ) {
+				$final_purchase_options[] = $purchase_option;
+			}
+		}
+
+		// Setup overlay configurations.
+		if ( ! empty( $final_purchase_options ) ) {
 			$payload = wp_json_encode( [
-				'purchase_options'                 => $purchase_options,
-				'appearance'                       => [
-					'purchaseOverlay' => [
-						'variant' => 'raw-white',
-					]
-				],
+				'purchase_options'                 => $final_purchase_options,
 				'ignore_database_single_purchases' => true,
 				'ignore_database_subscriptions'    => true,
 				'ignore_database_timepasses'       => true,
