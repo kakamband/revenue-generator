@@ -2683,7 +2683,7 @@ import tippy, { roundArrow } from 'tippy.js';
 
 				// Set pricing type based on value, and update manager UI accordingly.
 				if (
-					price >
+					price >=
 					revenueGeneratorGlobalOptions.currency.sis_only_limit
 				) {
 					$( purchaseItem )
