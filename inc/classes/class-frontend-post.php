@@ -106,7 +106,7 @@ class Frontend_Post {
 				<script type="application/json" id="laterpay-connector"><?php
 					/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- added json string is secure and escaped.*/
 					echo $appearance_config;
-					?></script>p
+					?></script>
 				<script type="text/javascript">
 					function revenueGeneratorHideTeaserContent() {
 						document.querySelector('.lp-teaser-content').style.display = 'none';
