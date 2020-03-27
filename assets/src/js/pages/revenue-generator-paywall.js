@@ -1814,6 +1814,7 @@ import tippy, { roundArrow } from 'tippy.js';
 								.trim();
 							if ( 'category' === appliedTo ) {
 								publishMessage = sprintf(
+									/* translators: %s category name */
 									__(
 										'Has been published to <b>all posts</b> in category <b>%s</b>.',
 										'revenue-generator'
@@ -1822,6 +1823,7 @@ import tippy, { roundArrow } from 'tippy.js';
 								);
 							} else {
 								publishMessage = sprintf(
+									/* translators: %s category name */
 									__(
 										'Has been published to <b>all posts, except posts under</b> in category <b>%s</b>.',
 										'revenue-generator'
@@ -1831,6 +1833,7 @@ import tippy, { roundArrow } from 'tippy.js';
 							}
 						} else if ( 'supported' === appliedTo ) {
 							publishMessage = sprintf(
+								/* translators: %s post name */
 								__(
 									'Has been published on <b>%s</b>.',
 									'revenue-generator'
@@ -2113,6 +2116,7 @@ import tippy, { roundArrow } from 'tippy.js';
 				tour.addStep( {
 					id: 'rg-purchase-option-item-price',
 					text: sprintf(
+						/* translators: %1$s line break tag, %2$s laterpay.net info link opening,  %3$s laterpay.net info link closing */
 						__(
 							'These are our recommended prices. %1$s%1$sClick to edit; prices lower than 5.00 will default to %2$spay later%3$s.',
 							'revenue-generator'

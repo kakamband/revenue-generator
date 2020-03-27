@@ -68,6 +68,7 @@ $rg_preview_post_title = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_p
 						$paywall_name = ! empty( $paywall_data['name'] ) ? $paywall_data['name'] : esc_html__( 'Paywall 1', 'revenue-generator' );
 						echo wp_kses(
 							sprintf(
+							/* translators: %s Paywall name */
 								__( 'Apply <span contenteditable="true" class="rev-gen-preview-main-paywall-name">%s</span> to', 'revenue-generator' ),
 								$paywall_name
 							),
@@ -512,6 +513,7 @@ $rg_preview_post_title = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_p
 					<?php
 					echo wp_kses(
 						sprintf(
+						/* translators: %s static anchor id */
 							__(
 								'It looks like you need to create a LaterPay account. Please <a id="%s" href="#">sign up here,</a> or contact <a href="mailto:integration@laterpay.net">integration@laterpay.net</a> if you’re still experiencing difficulties.',
 								'revenue-generator'
