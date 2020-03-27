@@ -166,7 +166,7 @@ class Config {
 	 * @return string
 	 */
 	public static function get_connector_price( $price ) {
-		return number_format( $price * 100, 0 );
+		return number_format( $price * 100, 0, '', '' );
 	}
 
 	/**

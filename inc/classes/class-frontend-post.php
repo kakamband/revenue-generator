@@ -365,7 +365,7 @@ class Frontend_Post {
 	/**
 	 * Create signed token for in page connector configuration.
 	 *
-	 * @param array $payload Payload data array.
+	 * @param string $payload Payload data array.
 	 *
 	 * @return string
 	 */
@@ -383,7 +383,7 @@ class Frontend_Post {
 	/**
 	 * From https://base64.guru/developers/php/examples/base64url.
 	 *
-	 * @param array $data Data to be encoded for connector.
+	 * @param string $data Data to be encoded for connector.
 	 *
 	 * @return bool|string
 	 */
