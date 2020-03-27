@@ -143,9 +143,14 @@ class Client_Account {
 
 		$region_connector_endpoints = self::$connector_endpoints[ $region ];
 		$region_api_endpoints       = self::$api_endpoints[ $region ];
+		$this->connector_root       = $region_connector_endpoints['live'];
+		$this->api_root             = $region_api_endpoints['live'];
 
-		$this->connector_root = $region_connector_endpoints['sandbox']; // @todo make it live after testing.
-		$this->api_root       = $region_api_endpoints['sandbox']; // @todo make it live after testing.
+		// If development mode is enabled use snbox environment.
+		if ( defined( 'REVENUE_GENERATOR_ENABLE_SANDBOX' ) && true === REVENUE_GENERATOR_ENABLE_SANDBOX ) {
+			$this->connector_root = $region_connector_endpoints['sandbox'];
+			$this->api_root       = $region_api_endpoints['sandbox'];
+		}
 
 		// Setup merchant credentials.
 		$merchant_credentials = self::get_merchant_credentials();

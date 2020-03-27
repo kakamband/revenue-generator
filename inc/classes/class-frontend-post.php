@@ -142,7 +142,12 @@ class Frontend_Post {
 		}
 
 		$region_connectors     = self::$connector_scripts[ $this->merchant_region ];
-		$region_connector_urls = $region_connectors['sandbox']; // @todo make it live after testing.
+		$region_connector_urls = $region_connectors['live'];
+
+		// If development mode is enabled use snbox environment.
+		if ( defined( 'REVENUE_GENERATOR_ENABLE_SANDBOX' ) && true === REVENUE_GENERATOR_ENABLE_SANDBOX ) {
+			$region_connector_urls = $region_connectors['sandbox'];
+		}
 
 		// @todo make sure to select eu based on locale, once upstream LaterPay starts supporting them.
 		$connector_url = $region_connector_urls['us'];
