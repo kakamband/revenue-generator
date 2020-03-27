@@ -333,9 +333,13 @@ class Paywall extends Base {
 					if ( empty( $paywall_id ) ) {
 						$parent_id = get_category( $parent_id )->parent;
 						continue;
+					} else {
+						return $paywall_id;
 					}
 					break;
 				}
+			} else {
+				return $paywall_id;
 			}
 		}
 

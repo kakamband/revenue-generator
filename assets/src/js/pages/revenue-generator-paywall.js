@@ -960,7 +960,7 @@ import tippy, { roundArrow } from 'tippy.js';
 								} else {
 									$o.snackBar.showSnackbar(
 										__(
-											'Pay Later is only available for prices set to $5 or less.',
+											'Pay Later is only available for prices set less than $5.',
 											'revenue-generator'
 										),
 										2500

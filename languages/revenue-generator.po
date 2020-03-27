@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-03-27T15:46:10+05:30\n"
+"POT-Creation-Date: 2020-03-27T16:34:33+05:30\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: revenue-generator\n"
@@ -142,12 +142,12 @@ msgstr ""
 msgid "No matching paywall found!"
 msgstr ""
 
-#: inc/classes/class-frontend-post.php:227
+#: inc/classes/class-frontend-post.php:224
 #: templates/backend/paywall/post-preview.php:238
 msgid "Access Article Now"
 msgstr ""
 
-#: inc/classes/class-frontend-post.php:275
+#: inc/classes/class-frontend-post.php:272
 #: templates/backend/paywall/post-preview.php:190
 msgid "Keep Reading"
 msgstr ""
@@ -180,31 +180,31 @@ msgstr ""
 msgid "Paywall"
 msgstr ""
 
-#: inc/classes/post-types/class-paywall.php:556
+#: inc/classes/post-types/class-paywall.php:560
 msgid "Published"
 msgstr ""
 
-#: inc/classes/post-types/class-paywall.php:556
+#: inc/classes/post-types/class-paywall.php:560
 msgid "Saved"
 msgstr ""
 
 #. translators: %1$s static string PUBLISHED/SAVED, %2$s category name
-#: inc/classes/post-types/class-paywall.php:565
+#: inc/classes/post-types/class-paywall.php:569
 msgid "<b>%1$s</b> on <b>all posts</b> in the category <b>%2$s</b>"
 msgstr ""
 
 #. translators: %1$s static string PUBLISHED/SAVED, %2$s category name
-#: inc/classes/post-types/class-paywall.php:572
+#: inc/classes/post-types/class-paywall.php:576
 msgid "<b>%1$s</b> on <b>all posts</b> except the category <b>%2$s</b>"
 msgstr ""
 
 #. translators: %1$s static string PUBLISHED/SAVED, %2$s post name
-#: inc/classes/post-types/class-paywall.php:581
+#: inc/classes/post-types/class-paywall.php:585
 msgid "<b>%1$s</b> on <b>post</b> <b>%2$s</b>"
 msgstr ""
 
 #. translators: %s static string PUBLISHED/SAVED
-#: inc/classes/post-types/class-paywall.php:588
+#: inc/classes/post-types/class-paywall.php:592
 msgid "<b>%s</b> on <b>all posts</b>"
 msgstr ""
 
@@ -567,7 +567,8 @@ msgid "Pay Now is only available for prices set to $1.99 or higher."
 msgstr ""
 
 #: assets/src/js/pages/revenue-generator-paywall.js:962
-msgid "Pay Later is only available for prices set to $5 or less."
+#: assets/src/js/pages/revenue-generator-paywall.js:2775
+msgid "Pay Later is only available for prices set less than $5."
 msgstr ""
 
 #. translators: %s category name
@@ -640,8 +641,4 @@ msgstr ""
 
 #: assets/src/js/pages/revenue-generator-paywall.js:2566
 msgid "The changes you have made will impact this time pass offer on all paywalls across your entire site."
-msgstr ""
-
-#: assets/src/js/pages/revenue-generator-paywall.js:2775
-msgid "Pay Later is only available for prices set less than $5."
 msgstr ""

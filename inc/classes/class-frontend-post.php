@@ -212,9 +212,6 @@ class Frontend_Post {
 	private function covert_to_connector_purchase_option( $purchase_option, $type, $entity_id ) {
 		$purchase_option_revenue = 'ppu' === $purchase_option['revenue'] ? 'pay_later' : 'pay_now';
 		$merchant_currency       = $this->merchant_currency;
-		// 'description' => empty( $purchase_option['description'] ) ?
-		// esc_html__( 'You\'ll only be charged once you\'ve reached $5.', 'revenue-generator' ) :
-		// $purchase_option['description'],
 		if ( 'individual' === $type ) {
 			return [
 				'article_id'  => 'article_' . $entity_id,
