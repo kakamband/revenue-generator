@@ -59,8 +59,6 @@ import tippy, {roundArrow} from 'tippy.js';
 
 				// Action buttons
 				editOption    : '.rg-purchase-overlay-option-edit',
-				moveOptionUp  : '.rg-purchase-overlay-option-up',
-				moveOptionDown: '.rg-purchase-overlay-option-down',
 
 				// Option manager.
 				optionRemove              : '.rg-purchase-overlay-option-remove',
@@ -497,24 +495,6 @@ import tippy, {roundArrow} from 'tippy.js';
 						purchaseItem.remove();
 						reorderPurchaseItems();
 					}
-				});
-
-				/**
-				 * Move purchase option one up.
-				 */
-				$o.body.on('click', $o.moveOptionUp, function () {
-					const purchaseOption = $(this).parents('.rg-purchase-overlay-purchase-options-item');
-					$(this).parents('.rg-purchase-overlay-purchase-options-item').prev().insertAfter(purchaseOption);
-					reorderPurchaseItems();
-				});
-
-				/**
-				 * Move purchase option one down.
-				 */
-				$o.body.on('click', $o.moveOptionDown, function () {
-					const purchaseOption = $(this).parents('.rg-purchase-overlay-purchase-options-item');
-					$(this).parents('.rg-purchase-overlay-purchase-options-item').next().insertBefore(purchaseOption);
-					reorderPurchaseItems();
 				});
 
 				/**
