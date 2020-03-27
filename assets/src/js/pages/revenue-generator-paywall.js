@@ -705,6 +705,15 @@ import tippy, { roundArrow } from 'tippy.js';
 							$o.individualPricingSelection
 						);
 						if ( pricingSelection.prop( 'checked' ) ) {
+							const allPurchaseOptions = $($o.purchaseOptionItems);
+							const dynamicPrice = allPurchaseOptions.attr('data-dynamic-price');
+							const dynamicRevenue = allPurchaseOptions.attr('data-dynamic-revenue');
+							const priceItem = optionItem.find($o.purchaseOptionItemPrice);
+							priceItem.attr('data-pay-model', dynamicRevenue);
+							const dynamicStar = priceItem.children();
+							const validatedPrice = validatePrice(dynamicPrice);
+							dynamicStar.css({'display': 'none'});
+							priceItem.text(validatedPrice).append(dynamicStar);
 							optionItem.attr( 'data-pricing-type', 'dynamic' );
 							optionItem.find( $o.purchaseItemPriceIcon ).show();
 							pricingSelection.val( 1 );
@@ -1525,7 +1534,7 @@ import tippy, { roundArrow } from 'tippy.js';
 						setTimeout( function() {
 							publishPaywall();
 							hideLoader();
-						}, 2000 );
+						}, 1500 );
 					}
 				} );
 

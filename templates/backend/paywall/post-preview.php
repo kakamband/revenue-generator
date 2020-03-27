@@ -28,9 +28,11 @@ $paywall_preview_id = empty( $paywall_data['preview_id'] ) ? '' : $paywall_data[
 if ( empty( $paywall_data ) && ! empty( $rg_preview_post['ID'] ) ) {
 	$paywall_preview_id = $rg_preview_post['ID'];
 }
-$paywall_access_to     = isset( $paywall_data['access_to'] ) ? $paywall_data['access_to'] : 'all';
-$purchase_option_items = empty( $purchase_options_data['options'] ) ? [] : $purchase_options_data['options'];
-$rg_preview_post_title = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_post['title'];
+$paywall_access_to       = isset( $paywall_data['access_to'] ) ? $paywall_data['access_to'] : 'all';
+$purchase_option_items   = empty( $purchase_options_data['options'] ) ? [] : $purchase_options_data['options'];
+$rg_preview_post_title   = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_post['title'];
+$dynamic_pricing_price   = $dynamic_pricing_data['price'];
+$dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 ?>
 
 <div class="rev-gen-layout-wrapper">
@@ -192,7 +194,11 @@ $rg_preview_post_title = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_p
 	<div class="rg-purchase-overlay-description">
 		<?php echo empty( $paywall_data['description'] ) ? esc_html( sprintf( 'Support %s to get access to this content and more.', esc_url( get_home_url() ) ) ) : esc_html( $paywall_data['description'] ); ?>
 	</div>
-	<div class="rg-purchase-overlay-purchase-options" data-paywall-id="<?php echo esc_attr( $paywall_id ); ?>">
+	<div class="rg-purchase-overlay-purchase-options"
+		 data-paywall-id="<?php echo esc_attr( $paywall_id ); ?>"
+		 data-dynamic-price="<?php echo esc_attr( $dynamic_pricing_price ); ?>"
+		 data-dynamic-revenue="<?php echo esc_attr( $dynamic_pricing_revenue ); ?>"
+	>
 		<?php if ( ! empty( $purchase_option_items ) ) :
 			foreach ( $purchase_option_items as $purchase_option ) {
 				$purchase_option_id       = empty( $purchase_option['id'] ) ? '' : $purchase_option['id'];

@@ -125,7 +125,7 @@ class Frontend_Post {
 					/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- added json string is secure and escaped.*/
 					echo $post_payload_data['payload'];
 					?></script>
-				<meta property="laterpay:connector:config_token" content="g<?php echo esc_attr( $post_payload_data['token'] ); ?>" />
+				<meta property="laterpay:connector:config_token" content="<?php echo esc_attr( $post_payload_data['token'] ); ?>" />
 				<?php
 			} else {
 				wp_dequeue_script( 'revenue-generator-classic-connector' );
@@ -293,16 +293,29 @@ class Frontend_Post {
 	 * @return array
 	 */
 	private function get_post_payload() {
+		// Required class instances.
+		$config_data           = Config::get_global_options();
+		$post_types            = Post_Types::get_instance();
+		$paywall_instance      = Paywall::get_instance();
+		$subscription_instance = Subscription::get_instance();
+		$time_pass_instance    = Time_Pass::get_instance();
+
+		// Post and paywall data.
 		$rg_post                = get_post();
-		$paywall_instance       = Paywall::get_instance();
-		$subscription_instance  = Subscription::get_instance();
-		$time_pass_instance     = Time_Pass::get_instance();
 		$paywall_id             = $paywall_instance->get_connected_paywall_by_post( $rg_post->ID );
 		$paywall_data           = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
 		$purchase_options       = [];
 		$final_purchase_options = [];
-		$paywall_title          = esc_html__( 'Keep Reading', 'revenue-generator' );
-		$paywall_description    = esc_html( sprintf( 'Support %s to get access to this content and more.', esc_url( get_home_url() ) ) );
+
+		// @todo These are default options to be used when in page script is available for title and description.
+		$paywall_title       = esc_html__( 'Keep Reading', 'revenue-generator' );
+		$paywall_description = esc_html( sprintf( 'Support %s to get access to this content and more.', esc_url( get_home_url() ) ) );
+
+		// Get individual article pricing based on post content word count, i.e "tier" for dynamic pricing option.
+		$formatted_post_data       = $post_types->get_formatted_post_data( $rg_post->ID );
+		$post_tier                 = empty( $formatted_post_data['post_content'] ) ? 'tier_1' : $post_types->get_post_tier( $formatted_post_data['post_content'] );
+		$purchase_options_all      = Config::get_pricing_defaults( $config_data['average_post_publish_count'] );
+		$post_dynamic_pricing_data = $purchase_options_all['single_article'][ $post_tier ];
 
 		// If post doesn't have an individual paywall, check for paywall on categories.
 		if ( ! $this->is_paywall_active( $paywall_data ) ) {
@@ -355,6 +368,10 @@ class Frontend_Post {
 					$order                      = $paywall_options_order['individual'] - 1;
 					$individual_purchase_option = $paywall_instance->get_individual_purchase_option_data( $paywall_id );
 					if ( ! empty( $individual_purchase_option ) ) {
+						if ( 'dynamic' === $individual_purchase_option['type'] ) {
+							$individual_purchase_option['price']   = $post_dynamic_pricing_data['price'];
+							$individual_purchase_option['revenue'] = $post_dynamic_pricing_data['revenue'];
+						}
 						$individual_option          = $this->covert_to_connector_purchase_option( $individual_purchase_option, 'individual', $rg_post->ID );
 						$purchase_options[ $order ] = $individual_option;
 					}
