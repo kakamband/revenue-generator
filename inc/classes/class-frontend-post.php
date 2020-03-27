@@ -212,9 +212,6 @@ class Frontend_Post {
 	private function covert_to_connector_purchase_option( $purchase_option, $type, $entity_id ) {
 		$purchase_option_revenue = 'ppu' === $purchase_option['revenue'] ? 'pay_later' : 'pay_now';
 		$merchant_currency       = $this->merchant_currency;
-		// 'description' => empty( $purchase_option['description'] ) ?
-		// esc_html__( 'You\'ll only be charged once you\'ve reached $5.', 'revenue-generator' ) :
-		// $purchase_option['description'],
 		if ( 'individual' === $type ) {
 			return [
 				'article_id'  => 'article_' . $entity_id,
@@ -365,7 +362,7 @@ class Frontend_Post {
 	/**
 	 * Create signed token for in page connector configuration.
 	 *
-	 * @param array $payload Payload data array.
+	 * @param string $payload Payload data array.
 	 *
 	 * @return string
 	 */
@@ -383,7 +380,7 @@ class Frontend_Post {
 	/**
 	 * From https://base64.guru/developers/php/examples/base64url.
 	 *
-	 * @param array $data Data to be encoded for connector.
+	 * @param string $data Data to be encoded for connector.
 	 *
 	 * @return bool|string
 	 */

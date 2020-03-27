@@ -333,9 +333,13 @@ class Paywall extends Base {
 					if ( empty( $paywall_id ) ) {
 						$parent_id = get_category( $parent_id )->parent;
 						continue;
+					} else {
+						return $paywall_id;
 					}
 					break;
 				}
+			} else {
+				return $paywall_id;
 			}
 		}
 
@@ -561,13 +565,15 @@ class Paywall extends Base {
 			$category_object = get_category( $category_id );
 			if ( 'category' === $pay_wall['access_to'] ) {
 				$published_on = sprintf(
-					__( '<b>%s</b> on <b>all posts</b> in the category <b>%s</b>', 'revenue-generator' ),
+				/* translators: %1$s static string PUBLISHED/SAVED, %2$s category name */
+					__( '<b>%1$s</b> on <b>all posts</b> in the category <b>%2$s</b>', 'revenue-generator' ),
 					$saved_message,
 					$category_object->name
 				);
 			} else {
 				$published_on = sprintf(
-					__( '<b>%s</b> on <b>all posts</b> except the category <b>%s</b>', 'revenue-generator' ),
+				/* translators: %1$s static string PUBLISHED/SAVED, %2$s category name */
+					__( '<b>%1$s</b> on <b>all posts</b> except the category <b>%2$s</b>', 'revenue-generator' ),
 					$saved_message,
 					$category_object->name
 				);
@@ -575,12 +581,14 @@ class Paywall extends Base {
 		} elseif ( 'supported' === $pay_wall['access_to'] ) {
 			$rg_post_object = get_post( $pay_wall['access_entity'] );
 			$published_on   = sprintf(
-				__( '<b>%s</b> on <b>post</b> <b>%s</b>', 'revenue-generator' ),
+			/* translators: %1$s static string PUBLISHED/SAVED, %2$s post name */
+				__( '<b>%1$s</b> on <b>post</b> <b>%2$s</b>', 'revenue-generator' ),
 				$saved_message,
 				$rg_post_object->post_title
 			);
 		} else {
 			$published_on = sprintf(
+			/* translators: %s static string PUBLISHED/SAVED */
 				__( '<b>%s</b> on <b>all posts</b>', 'revenue-generator' ),
 				$saved_message
 			);
