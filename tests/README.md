@@ -10,11 +10,12 @@
 
 ##### Please run following commands from the root directory of this repository.
 
-1. Verify availability of `phpunit` executable in your path, e.g `phpunit --version`.
-2. Run `./bin/install-wp-tests.sh revenue_generator_test <db-name> <db-user> <db-pass> <db-host>` to setup testing environment on your machine.
-3. Run `phpunit` from repositories root directory to run all test suites.
-4. Run `phpunit tests/inc/classes/test-class-plugin.php` from repositories root directory to run test on given class.
-5. Add changes or create test classes appropriately based on code.
+- Verify availability of `phpunit` executable in your path, e.g `phpunit --version`.
+- Run `./bin/install-wp-tests.sh revenue_generator_test <db-name> <db-user> <db-password> [db-host] [wp-version] [skip-database-creation]` to setup testing environment on your machine.
+    - ##### Example: `./bin/install-wp-tests.sh revenue_generator_test root root localhost`
+- Run `phpunit` from repositories root directory to run all test suites.
+- Run `phpunit tests/inc/classes/test-class-plugin.php` from repositories root directory to run test on given class.
+- Add changes or create test classes appropriately based on code.
 
 ## Folder / File Structure
 

@@ -6,7 +6,7 @@
 	padding: 15px;
 }
 
-$namespace-prefix: 'tippy';
+$namespace-prefix: "tippy";
 
 .#{$namespace-prefix}-box {
 	&[data-placement^='top'] > .#{$namespace-prefix}-svg-arrow {

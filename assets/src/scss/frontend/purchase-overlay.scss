@@ -1,4 +1,10 @@
-div.lpc-s69, div.lpc-s68 {
+/*
+ * Overriding is necessary, as the upstream adds styles with !important,
+ * and we have to add more specificity to overcome that.
+ */
+/* stylelint-disable declaration-no-important */
+div.lpc-s69,
+div.lpc-s68 {
 	.lpc-s65 {
 		.lpc-s64 {
 			min-height: 730px !important;
@@ -32,7 +38,7 @@ div.lpc-s69, div.lpc-s68 {
 										width: 100% !important;
 										margin: 5px 0;
 										cursor: pointer !important;
-										background-color: #ffffff !important;
+										background-color: #fff !important;
 										border: 2px solid #2e2e2e !important;
 										border-radius: 5px !important;
 
@@ -61,3 +67,4 @@ div.lpc-s69, div.lpc-s68 {
 		}
 	}
 }
+/* stylelint-enable declaration-no-important */

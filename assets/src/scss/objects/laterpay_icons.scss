@@ -3,20 +3,22 @@
 	font-family: laterpay-wordpress-icons;
 	font-style: normal;
 	font-weight: normal;
-	src: url('../fonts/laterpay-wordpress-icons_v099.eot');
-	src: url('../fonts/laterpay-wordpress-icons_v099.eot?#iefix') format('embedded-opentype'),
-	url('../fonts/laterpay-wordpress-icons_v099.woff') format('woff'),
-	url('../fonts/laterpay-wordpress-icons_v099.ttf') format('truetype'),
-	url('../fonts/laterpay-wordpress-icons_v099.svg#laterpay-wordpress-icons') format('svg');
+	src: url(../fonts/laterpay-wordpress-icons_v099.eot);
+	src:
+		url(../fonts/laterpay-wordpress-icons_v099.eot?#iefix) format("embedded-opentype"),
+		url(../fonts/laterpay-wordpress-icons_v099.woff) format("woff"),
+		url(../fonts/laterpay-wordpress-icons_v099.ttf) format("truetype"),
+		url(../fonts/laterpay-wordpress-icons_v099.svg#laterpay-wordpress-icons) format("svg");
 }
 
 // render vector icons from icon font ----------------------------------------------------------------------------------
 // inject vector icon in pseudo element when 'data-icon' attribute is applied to an element
-[data-icon]:before {
+/* stylelint-disable declaration-no-important */
+[data-icon]::before {
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
 	content: attr(data-icon);
-	font-family: laterpay-wordpress-icons !important;
+	font-family: laterpay-wordpress-icons, serif !important;
 	font-style: normal !important;
 	font-variant: normal !important;
 	font-weight: normal !important;
@@ -27,6 +29,7 @@
 	text-transform: none !important;
 	top: 0.1em;
 }
+/* stylelint-enable declaration-no-important */
 
 // character mapping ---------------------------------------------------------------------------------------------------
 // LaterPay logo icons

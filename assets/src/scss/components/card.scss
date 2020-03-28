@@ -1,8 +1,8 @@
 // Welcome card styling.
 .rg-card {
 	border-radius: 4px;
-	background-color: #ffffff;
-	border: 2px solid #1D1D1D;
+	background-color: #fff;
+	border: 2px solid #1d1d1d;
 	box-sizing: border-box;
 	position: relative;
 	display: flex;
@@ -15,12 +15,12 @@
 	&--title {
 		position: absolute;
 		bottom: 10px;
-		font-family: Helvetica Neue, serif;
+		font-family: "Helvetica Neue", serif;
 		font-style: normal;
 		font-weight: bold;
 		font-size: 12px;
 		text-align: center;
-		color: #1D1D1D;
+		color: #1d1d1d;
 		margin: 0;
 	}
 

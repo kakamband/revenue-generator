@@ -46,7 +46,7 @@ const finalConfig = (mode) => {
 					filename: 'css/[name].css',
 				}),
 				new WebpackBar({
-					name : 'Admin Assets',
+					name : 'Build Plugin Assets',
 					color: '#0c6a22',
 				}),
 				new CopyPlugin([

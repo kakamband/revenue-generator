@@ -14,7 +14,7 @@
 	bottom: 30px;
 
 	&--show {
-		visibility: visible !important;
+		visibility: visible !important; /* stylelint-disable-line declaration-no-important */
 		animation: fadein 0.5s, fadeout 0.5s 2.5s;
 	}
 
