@@ -15,7 +15,7 @@
 - [Development Notes](#development-notes)
 - [Project Structure](#project-folder--file-structure)
 - [Terminology](#terminology)
-- [Screenshots](#screenshots)g
+- [Screenshots](#screenshots)
 - [Versioning](#versioning)
 - [Copyright](#copyright)
 
