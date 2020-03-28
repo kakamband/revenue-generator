@@ -13,9 +13,9 @@
 - [Installation and Getting Started](#installation)
 - [Contributing](#contributing)
 - [Development Notes](#development-notes)
-- [Usage](#usage)
 - [Project Structure](#project-folder--file-structure)
 - [Terminology](#terminology)
+- [Screenshots](#screenshots)g
 - [Versioning](#versioning)
 - [Copyright](#copyright)
 
