@@ -52,7 +52,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 			<div id="rg_js_postPreviewWrapper" data-preview-id="<?php echo esc_attr( $paywall_preview_id ); ?>" data-access-id="<?php echo esc_attr( $rg_preview_post['ID'] ); ?>" class="rev-gen-preview-main--post">
 				<h4 class="rev-gen-preview-main--post--title"><?php echo esc_html( $rg_preview_post['title'] ); ?></h4>
 				<?php if ( ! empty( $rg_teaser ) ) : ?>
-					<p id="rg_js_postPreviewExcerpt" class="rev-gen-preview-main--post--excerpt"><?php echo wp_kses_post( $rg_teaser ) ?></p>
+					<p id="rg_js_postPreviewExcerpt" class="rev-gen-preview-main--post--excerpt"><?php echo wp_kses_post( $rg_teaser ); ?></p>
 				<?php endif; ?>
 				<div id="rg_js_postPreviewContent" class="rev-gen-preview-main--post--content">
 					<?php echo wp_kses_post( $rg_preview_post['post_content'] ); ?>
@@ -70,7 +70,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 						$paywall_name = ! empty( $paywall_data['name'] ) ? $paywall_data['name'] : esc_html__( 'Paywall 1', 'revenue-generator' );
 						echo wp_kses(
 							sprintf(
-							/* translators: %s Paywall name */
+								/* translators: %s Paywall name */
 								__( 'Apply <span contenteditable="true" class="rev-gen-preview-main-paywall-name">%s</span> to', 'revenue-generator' ),
 								$paywall_name
 							),
@@ -78,7 +78,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 								'span' => [
 									'class'           => [],
 									'contenteditable' => true,
-								]
+								],
 							]
 						);
 						?>
@@ -92,7 +92,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 				</div>
 				<div class="rev-gen-preview-main--paywall-actions-search">
 					<select id="rg_js_searchPaywallContent">
-						<?php if ( ! empty( $rg_category_data ) ): ?>
+						<?php if ( ! empty( $rg_category_data ) ) : ?>
 							<option selected="selected" value="<?php echo esc_attr( $rg_category_data->term_id ); ?>">
 								<?php echo esc_html( $rg_category_data->name ); ?>
 							</option>
@@ -109,7 +109,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 					</button>
 				</div>
 			</div>
-		<?php else: ?>
+		<?php else : ?>
 			<div class="rev-gen-preview-main-no-result">
 				<img class="rg-card--icon" alt="<?php esc_attr_e( 'More posts icon', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['high_count_icon'] ); ?>">
 			</div>
@@ -164,20 +164,30 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 		</div>
 		<div class="rg-purchase-overlay-option-manager-duration">
 			<select class="rg-purchase-overlay-option-manager-duration-count">
-				<?php echo wp_kses( Post_Types::get_select_options( 'duration' ), [
-					'option' => [
-						'selected' => [],
-						'value'    => [],
+				<?php
+				echo wp_kses(
+					Post_Types::get_select_options( 'duration' ),
+					[
+						'option' => [
+							'selected' => [],
+							'value'    => [],
+						],
 					]
-				] ); ?>
+				);
+				?>
 			</select>
 			<select class="rg-purchase-overlay-option-manager-duration-period">
-				<?php echo wp_kses( Post_Types::get_select_options( 'period' ), [
-					'option' => [
-						'selected' => [],
-						'value'    => [],
+				<?php
+				echo wp_kses(
+					Post_Types::get_select_options( 'period' ),
+					[
+						'option' => [
+							'selected' => [],
+							'value'    => [],
+						],
 					]
-				] ); ?>
+				);
+				?>
 			</select>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-action">
@@ -199,7 +209,8 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 		 data-dynamic-price="<?php echo esc_attr( $dynamic_pricing_price ); ?>"
 		 data-dynamic-revenue="<?php echo esc_attr( $dynamic_pricing_revenue ); ?>"
 	>
-		<?php if ( ! empty( $purchase_option_items ) ) :
+		<?php
+		if ( ! empty( $purchase_option_items ) ) :
 			foreach ( $purchase_option_items as $purchase_option ) {
 				$purchase_option_id       = empty( $purchase_option['id'] ) ? '' : $purchase_option['id'];
 				$purchase_option_price    = number_format( $purchase_option['price'], 2 );
@@ -223,17 +234,19 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 				<div
 					class="rg-purchase-overlay-purchase-options-item <?php echo esc_attr( $additional_class ); ?>"
 					data-purchase-type="<?php echo esc_attr( $purchase_option_type ); ?>"
-					<?php if ( 'individual' !== $purchase_option_type ): ?>
+					<?php if ( 'individual' !== $purchase_option_type ) : ?>
 						data-expiry-duration="<?php echo esc_attr( $purchase_option_duration ); ?>"
 						data-expiry-period="<?php echo esc_attr( $purchase_option_period ); ?>"
-					<?php else: ?>
+					<?php else : ?>
 						data-pricing-type="<?php echo esc_attr( $individual_type ); ?>"
 						data-paywall-id="<?php echo esc_attr( $paywall_id ); ?>"
 					<?php endif; ?>
-					<?php if ( 'timepass' === $purchase_option_type ): ?>
+					<?php if ( 'timepass' === $purchase_option_type ) : ?>
 						data-tlp-id="<?php echo esc_attr( $purchase_option_id ); ?>"
-					<?php endif;
-					if ( 'subscription' === $purchase_option_type ): ?>
+						<?php
+					endif;
+					if ( 'subscription' === $purchase_option_type ) :
+						?>
 						data-sub-id="<?php echo esc_attr( $purchase_option_id ); ?>"
 					<?php endif; ?>
 					data-uid=""
@@ -281,14 +294,12 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 		<p>
 			<?php
 			echo wp_kses(
-				sprintf(
-					__(
-						'By selecting an option above, I am confirming that I have read and agree to LaterPay\'s <a href="%1$s">privacy policy</a> and <a href="%1$s">terms of service</a>.'
-					),
-					'#'
+				__(
+					'By selecting an option above, I am confirming that I have read and agree to LaterPay\'s <a href="#">privacy policy</a> and <a href="#">terms of service</a>.',
+					'revenue-generator'
 				),
 				[
-					'a' => []
+					'a' => [],
 				]
 			);
 			?>
@@ -384,7 +395,9 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 			printf(
 				wp_kses(
 					__(
-						"<b>Pay Later</b> means users agree to pay for content or timed access later - once their tab reaches $5 or 5€. Think of it as ‘the internet’s running tab.’", 'revenue-generator' ),
+						'<b>Pay Later</b> means users agree to pay for content or timed access later - once their tab reaches $5 or 5€. Think of it as ‘the internet’s running tab.’',
+						'revenue-generator'
+					),
 					[
 						'b' => [],
 					]
@@ -397,7 +410,9 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 			printf(
 				wp_kses(
 					__(
-						'<b>Pay Now</b> is the traditional upfront payment method that everyone is familiar with. Recurring subscriptions automatically work on a pay now basis.', 'revenue-generator' ),
+						'<b>Pay Now</b> is the traditional upfront payment method that everyone is familiar with. Recurring subscriptions automatically work on a pay now basis.',
+						'revenue-generator'
+					),
 					[
 						'b' => [],
 					]
@@ -423,7 +438,9 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 			printf(
 				wp_kses(
 					__(
-						'Select <b>Static Pricing</b> to manually set the prices of individual articles based on your own pricing strategy. Charge as little - or as much - as you want.', 'revenue-generator' ),
+						'Select <b>Static Pricing</b> to manually set the prices of individual articles based on your own pricing strategy. Charge as little - or as much - as you want.',
+						'revenue-generator'
+					),
 					[
 						'b' => [],
 					]
@@ -436,7 +453,9 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 			printf(
 				wp_kses(
 					__(
-						'If you select <b>Dynamic Pricing</b>, LaterPay’s AI will “dynamically” adjust the price based on our own data, analytics and algorithms based on the length of each article.', 'revenue-generator' ),
+						'If you select <b>Dynamic Pricing</b>, LaterPay’s AI will “dynamically” adjust the price based on our own data, analytics and algorithms based on the length of each article.',
+						'revenue-generator'
+					),
 					[
 						'b' => [],
 					]
@@ -519,7 +538,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 					<?php
 					echo wp_kses(
 						sprintf(
-						/* translators: %s static anchor id */
+							/* translators: %s static anchor id */
 							__(
 								'It looks like you need to create a LaterPay account. Please <a id="%s" href="#">sign up here,</a> or contact <a href="mailto:integration@laterpay.net">integration@laterpay.net</a> if you’re still experiencing difficulties.',
 								'revenue-generator'
@@ -530,7 +549,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 							'a' => [
 								'id'   => [],
 								'href' => [],
-							]
+							],
 						]
 					);
 					?>
@@ -550,7 +569,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 					[
 						'a' => [
 							'href' => [],
-						]
+						],
 					]
 				);
 				?>

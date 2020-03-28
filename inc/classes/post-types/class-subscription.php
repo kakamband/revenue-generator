@@ -53,7 +53,7 @@ class Subscription extends Base {
 
 		$subscriptions_count = wp_count_posts( static::SLUG );
 
-		$result = ( ( $ignore_deleted === true ) ? $subscriptions_count->publish : $subscriptions_count->publish + $subscriptions_count->draft );
+		$result = ( ( true === $ignore_deleted ) ? $subscriptions_count->publish : $subscriptions_count->publish + $subscriptions_count->draft );
 
 		return absint( $result );
 	}
@@ -139,7 +139,7 @@ class Subscription extends Base {
 	private function formatted_subscription( $post ) {
 
 		$post_meta = get_post_meta( $post->ID );
-		$is_active = ( $post->post_status === 'draft' ) ? 0 : 1;
+		$is_active = ( 'draft' === $post->post_status ) ? 0 : 1;
 
 		$post_meta = $this->formatted_post_meta( $post_meta );
 
@@ -240,26 +240,30 @@ class Subscription extends Base {
 	 */
 	public function update_subscription( $subscription_data ) {
 		if ( empty( $subscription_data['id'] ) ) {
-			$subscription_id = wp_insert_post( [
-				'post_content' => $subscription_data['description'],
-				'post_title'   => $subscription_data['title'],
-				'post_status'  => 'publish',
-				'post_type'    => static::SLUG,
-				'meta_input'   => [
-					'_rg_price'     => $subscription_data['price'],
-					'_rg_revenue'   => $subscription_data['revenue'],
-					'_rg_duration'  => $subscription_data['duration'],
-					'_rg_period'    => $subscription_data['period'],
-					'_rg_access_to' => $subscription_data['access_to'],
-				],
-			] );
+			$subscription_id = wp_insert_post(
+				[
+					'post_content' => $subscription_data['description'],
+					'post_title'   => $subscription_data['title'],
+					'post_status'  => 'publish',
+					'post_type'    => static::SLUG,
+					'meta_input'   => [
+						'_rg_price'     => $subscription_data['price'],
+						'_rg_revenue'   => $subscription_data['revenue'],
+						'_rg_duration'  => $subscription_data['duration'],
+						'_rg_period'    => $subscription_data['period'],
+						'_rg_access_to' => $subscription_data['access_to'],
+					],
+				]
+			);
 		} else {
 			$subscription_id = $subscription_data['id'];
-			wp_update_post( [
-				'ID'           => $subscription_id,
-				'post_content' => $subscription_data['description'],
-				'post_title'   => $subscription_data['title'],
-			] );
+			wp_update_post(
+				[
+					'ID'           => $subscription_id,
+					'post_content' => $subscription_data['description'],
+					'post_title'   => $subscription_data['title'],
+				]
+			);
 
 			update_post_meta( $subscription_id, '_rg_price', $subscription_data['price'] );
 			update_post_meta( $subscription_id, '_rg_revenue', $subscription_data['revenue'] );
@@ -351,16 +355,19 @@ class Subscription extends Base {
 	 */
 	public function get_subscription_ids( $paywall_options ) {
 		if ( ! empty( $paywall_options ) ) {
-			$subscription_ids = array_map( function ( $paywall_option ) {
-				if ( false !== strpos( $paywall_option, 'sub_' ) ) {
-					$subscription_data = explode( 'sub_', $paywall_option );
-					if ( ! empty( $subscription_data[1] ) ) {
-						return absint( $subscription_data[1] );
+			$subscription_ids = array_map(
+				function ( $paywall_option ) {
+					if ( false !== strpos( $paywall_option, 'sub_' ) ) {
+						  $subscription_data = explode( 'sub_', $paywall_option );
+						if ( ! empty( $subscription_data[1] ) ) {
+							return absint( $subscription_data[1] );
+						}
 					}
-				}
 
-				return '';
-			}, $paywall_options );
+					return '';
+				},
+				$paywall_options
+			);
 
 			return array_filter( $subscription_ids, 'strlen' );
 		}

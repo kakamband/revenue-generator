@@ -35,7 +35,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 		</div>
 		<div class="rev-gen-dashboard-content">
-			<?php if ( ! empty( $paywalls ) ) :
+			<?php
+			if ( ! empty( $paywalls ) ) :
 				foreach ( $paywalls as $paywall ) {
 					$paywall_id        = $paywall['id'];
 					$paywall_title     = $paywall['name'];
@@ -50,7 +51,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<p class="rev-gen-dashboard-content-paywall-info-updated"><?php echo esc_html( $paywall_updated ); ?></p>
 						</div>
 					</div>
-				<?php } else: ?>
+				<?php } else : ?>
 				<p><?php esc_html_e( 'No paywall exists!', 'revenue-generator' ); ?></p>
 			<?php endif; ?>
 		</div>

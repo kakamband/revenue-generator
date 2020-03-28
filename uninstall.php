@@ -21,7 +21,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 $lp_rg_global_options = [
 	'lp_rg_version',
 	'lp_rg_global_options',
-	'lp_rg_merchant_credentials'
+	'lp_rg_merchant_credentials',
 ];
 
 foreach ( $lp_rg_global_options as $lp_rg_global_option ) {
@@ -42,9 +42,9 @@ $args = [
 	'meta_query' => [
 		[
 			'key'     => '_rg_has_paywall',
-			'compare' => '='
-		]
-	]
+			'compare' => '=',
+		],
+	],
 ];
 
 $rg_terms = get_terms( 'category', $args );
@@ -67,7 +67,7 @@ $args = [
 	'post_status'    => [ 'publish', 'draft' ],
 ];
 
-$query = new WP_Query ( $args );
+$query = new WP_Query( $args );
 
 while ( $query->have_posts() ) {
 	// Get custom post data created by plugin and delete it.

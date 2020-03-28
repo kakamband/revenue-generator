@@ -24,7 +24,7 @@ class Config {
 	 * @var array Common values used throughout the plugin.
 	 */
 	public static $plugin_defaults = [
-		'img_dir' => REVENUE_GENERATOR_BUILD_URL . 'img/'
+		'img_dir' => REVENUE_GENERATOR_BUILD_URL . 'img/',
 	];
 
 	/**
@@ -47,7 +47,8 @@ class Config {
 		if ( false === get_option( 'lp_rg_global_options' ) ) {
 			// @todo, make region and currency empty and let the merchant choose, once EU is ready on upstream.
 			// Set default global options.
-			update_option( 'lp_rg_global_options',
+			update_option(
+				'lp_rg_global_options',
 				[
 					'average_post_publish_count' => '',
 					'merchant_currency'          => 'USD',
@@ -104,7 +105,7 @@ class Config {
 					'tier_3' => [ // 501+ content length.
 						'price'   => 3.49,
 						'revenue' => 'sis',
-					]
+					],
 				],
 				'time_pass'      => [
 					'title'       => esc_html__( '24 Hour Pass', 'revenue-generator' ),
@@ -121,7 +122,7 @@ class Config {
 					'revenue'     => 'sis',
 					'duration'    => 'm',
 					'period'      => '1',
-				]
+				],
 			],
 			'high' => [
 				'single_article' => [
@@ -136,7 +137,7 @@ class Config {
 					'tier_3' => [ // 501+ content length.
 						'price'   => 1.49,
 						'revenue' => 'ppu',
-					]
+					],
 				],
 				'time_pass'      => [
 					'title'       => esc_html__( '24 Hour Pass', 'revenue-generator' ),
@@ -153,8 +154,8 @@ class Config {
 					'revenue'     => 'sis',
 					'duration'    => 'm',
 					'period'      => '1',
-				]
-			]
+				],
+			],
 		];
 	}
 
@@ -182,7 +183,7 @@ class Config {
 				'ppu_max'        => 4.99,
 				'sis_min'        => 1.49,
 				'sis_only_limit' => 5.00,
-				'sis_max'        => 1000.00
+				'sis_max'        => 1000.00,
 			],
 			'USD' => [
 				'ppu_min'        => 0.05,
@@ -190,8 +191,8 @@ class Config {
 				'ppu_max'        => 4.99,
 				'sis_min'        => 1.99,
 				'sis_only_limit' => 5.00,
-				'sis_max'        => 1000.00
-			]
+				'sis_max'        => 1000.00,
+			],
 		];
 	}
 

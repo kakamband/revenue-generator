@@ -106,10 +106,11 @@ class Client_Account {
 		// Fresh install.
 		if ( false === get_option( 'lp_rg_merchant_credentials' ) ) {
 			// Set default data for merchant credentials.
-			update_option( 'lp_rg_merchant_credentials',
+			update_option(
+				'lp_rg_merchant_credentials',
 				[
 					'merchant_id'  => '',
-					'merchant_key' => ''
+					'merchant_key' => '',
 				]
 			);
 		}
@@ -182,13 +183,16 @@ class Client_Account {
 		// Request to fetch endpoint, and add home url as origin.
 		$fetch_url = $this->build_test_fetch_url();
 		$home_url  = get_home_url();
-		$response  = wp_remote_get( $fetch_url, [
-			// phpcs:ignore WordPressVIPMinimum.Performance.RemoteRequestTimeout.timeout_timeout -- Request done only once during initial setup.
-			'timeout' => 60,
-			'headers' => [
-				'Origin' => $home_url
+		$response  = wp_remote_get(
+			$fetch_url,
+			[
+				// phpcs:ignore WordPressVIPMinimum.Performance.RemoteRequestTimeout.timeout_timeout -- Request done only once during initial setup.
+				'timeout' => 60,
+				'headers' => [
+					'Origin' => $home_url,
+				],
 			]
-		] );
+		);
 
 		// Check and verify allowed origin matches merchant domain.
 		$allowed_origin_header = wp_remote_retrieve_header( $response, 'access-control-allow-origin' );
@@ -207,10 +211,12 @@ class Client_Account {
 	 */
 	private function build_test_fetch_url() {
 		// Demo params to verify merchant domain.
-		$fetch_url_params = build_query( [
-			'article_title' => rawurlencode( 'Revenue Generator Demo Page' ),
-			'article_url'   => rawurlencode( get_home_url() )
-		] );
+		$fetch_url_params = build_query(
+			[
+				'article_title' => rawurlencode( 'Revenue Generator Demo Page' ),
+				'article_url'   => rawurlencode( get_home_url() ),
+			]
+		);
 
 		return $this->get_api_fetch_url() . '?' . $fetch_url_params;
 	}
@@ -246,11 +252,13 @@ class Client_Account {
 	 * @return string
 	 */
 	private function build_validate_signature_url() {
-		$validation_url_params = build_query( [
-			'cp'   => $this->merchant_id,
-			'salt' => md5( microtime( true ) ),
-			'ts'   => time(),
-		] );
+		$validation_url_params = build_query(
+			[
+				'cp'   => $this->merchant_id,
+				'salt' => md5( microtime( true ) ),
+				'ts'   => time(),
+			]
+		);
 		$encoded_params        = urlencode( $validation_url_params );
 		$message               = 'GET&' . urlencode( $this->get_validate_signature_url() ) . '&' . $encoded_params;
 		$hmac                  = hash_hmac( $this->secret_algo, $message, $this->merchant_api_key );

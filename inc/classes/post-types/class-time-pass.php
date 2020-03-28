@@ -53,7 +53,7 @@ class Time_Pass extends Base {
 
 		$time_pass_count = wp_count_posts( static::SLUG );
 
-		$result = ( ( $ignore_deleted === true ) ? $time_pass_count->publish : $time_pass_count->publish + $time_pass_count->draft );
+		$result = ( ( true === $ignore_deleted ) ? $time_pass_count->publish : $time_pass_count->publish + $time_pass_count->draft );
 
 		return absint( $result );
 	}
@@ -138,7 +138,7 @@ class Time_Pass extends Base {
 	private function formatted_time_pass( $post ) {
 
 		$post_meta = get_post_meta( $post->ID );
-		$is_active = ( $post->post_status === 'draft' ) ? 0 : 1;
+		$is_active = ( 'draft' === $post->post_status ) ? 0 : 1;
 
 		$post_meta = $this->formatted_post_meta( $post_meta );
 
@@ -238,26 +238,30 @@ class Time_Pass extends Base {
 	 */
 	public function update_time_pass( $time_pass_data ) {
 		if ( empty( $time_pass_data['id'] ) ) {
-			$time_pass_id = wp_insert_post( [
-				'post_content' => $time_pass_data['description'],
-				'post_title'   => $time_pass_data['title'],
-				'post_status'  => 'publish',
-				'post_type'    => static::SLUG,
-				'meta_input'   => [
-					'_rg_price'     => $time_pass_data['price'],
-					'_rg_revenue'   => $time_pass_data['revenue'],
-					'_rg_duration'  => $time_pass_data['duration'],
-					'_rg_period'    => $time_pass_data['period'],
-					'_rg_access_to' => $time_pass_data['access_to'],
-				],
-			] );
+			$time_pass_id = wp_insert_post(
+				[
+					'post_content' => $time_pass_data['description'],
+					'post_title'   => $time_pass_data['title'],
+					'post_status'  => 'publish',
+					'post_type'    => static::SLUG,
+					'meta_input'   => [
+						'_rg_price'     => $time_pass_data['price'],
+						'_rg_revenue'   => $time_pass_data['revenue'],
+						'_rg_duration'  => $time_pass_data['duration'],
+						'_rg_period'    => $time_pass_data['period'],
+						'_rg_access_to' => $time_pass_data['access_to'],
+					],
+				]
+			);
 		} else {
 			$time_pass_id = $time_pass_data['id'];
-			wp_update_post( [
-				'ID'           => $time_pass_id,
-				'post_content' => $time_pass_data['description'],
-				'post_title'   => $time_pass_data['title'],
-			] );
+			wp_update_post(
+				[
+					'ID'           => $time_pass_id,
+					'post_content' => $time_pass_data['description'],
+					'post_title'   => $time_pass_data['title'],
+				]
+			);
 
 			update_post_meta( $time_pass_id, '_rg_price', $time_pass_data['price'] );
 			update_post_meta( $time_pass_id, '_rg_revenue', $time_pass_data['revenue'] );
@@ -349,16 +353,19 @@ class Time_Pass extends Base {
 	 */
 	public function get_time_pass_ids( $paywall_options ) {
 		if ( ! empty( $paywall_options ) ) {
-			$time_pass_ids = array_map( function ( $paywall_option ) {
-				if ( false !== strpos( $paywall_option, 'tlp_' ) ) {
-					$time_pass_data = explode( 'tlp_', $paywall_option );
-					if ( ! empty( $time_pass_data[1] ) ) {
-						return absint( $time_pass_data[1] );
+			$time_pass_ids = array_map(
+				function ( $paywall_option ) {
+					if ( false !== strpos( $paywall_option, 'tlp_' ) ) {
+						  $time_pass_data = explode( 'tlp_', $paywall_option );
+						if ( ! empty( $time_pass_data[1] ) ) {
+							return absint( $time_pass_data[1] );
+						}
 					}
-				}
 
-				return '';
-			}, $paywall_options );
+					return '';
+				},
+				$paywall_options
+			);
 
 			return array_filter( $time_pass_ids, 'strlen' );
 		}

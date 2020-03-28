@@ -77,7 +77,7 @@ class Post_Types {
 	public static function get_allowed_post_types() {
 		return [
 			'post',
-			'page'
+			'page',
 		];
 	}
 
@@ -183,7 +183,7 @@ class Post_Types {
 		} else {
 			return [
 				'time_pass'    => $time_passes_count,
-				'subscription' => $subscriptions_count
+				'subscription' => $subscriptions_count,
 			];
 		}
 	}
@@ -437,7 +437,7 @@ class Post_Types {
 					if ( isset( $current_orders['individual'] ) ) {
 						$individual_purchase_option['order'] = $current_orders['individual'];
 					} else {
-						$new_order_count                     += 1;
+						++$new_order_count;
 						$individual_purchase_option['order'] = $new_order_count;
 					}
 					$individual_purchase_option['order']         = $current_orders['individual'];
@@ -453,7 +453,7 @@ class Post_Types {
 						if ( isset( $current_orders[ $tlp_id ] ) ) {
 							$time_pass['order'] = $current_orders[ $tlp_id ];
 						} else {
-							$new_order_count    += 1;
+							++$new_order_count;
 							$time_pass['order'] = $new_order_count;
 						}
 						$options[] = $time_pass;
@@ -468,7 +468,7 @@ class Post_Types {
 						if ( isset( $current_orders[ $sub_id ] ) ) {
 							$subscription['order'] = $current_orders[ $sub_id ];
 						} else {
-							$new_order_count       += 1;
+							++$new_order_count;
 							$subscription['order'] = $new_order_count;
 						}
 						$options[] = $subscription;
@@ -487,7 +487,7 @@ class Post_Types {
 
 			// Add time pass options order.
 			foreach ( $time_passes_purchase_option as $time_pass ) {
-				$order += 1;
+				++$order;
 				if ( ! isset( $time_pass['order'] ) ) {
 					$time_pass['order']         = $order;
 					$time_pass['purchase_type'] = 'timepass';
@@ -497,7 +497,7 @@ class Post_Types {
 
 			// Add subscription options order.
 			foreach ( $subscriptions_purchase_option as $subscription ) {
-				$order += 1;
+				++$order;
 				if ( ! isset( $subscription['order'] ) ) {
 					$subscription['order']         = $order;
 					$subscription['purchase_type'] = 'subscription';
@@ -624,7 +624,8 @@ class Post_Types {
 		// Add and remove our custom filter for LIKE based search by title.
 		add_filter( 'posts_where', [ $this, 'rg_preview_title_filter' ], 10, 2 );
 		$query         = new \WP_Query();
-		$current_posts = $query->query( $query_args );;
+		$current_posts = $query->query( $query_args );
+		;
 		remove_filter( 'posts_where', [ $this, 'rg_preview_title_filter' ], 10 );
 
 		// Create formatted data for preview suggestions.

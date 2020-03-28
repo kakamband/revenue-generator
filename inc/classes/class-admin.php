@@ -105,8 +105,8 @@ class Admin {
 					'revenue'     => 'sis',
 					'duration'    => 'm',
 					'period'      => '1',
-				]
-			]
+				],
+			],
 		];
 
 		// If setup is not done.
@@ -185,7 +185,7 @@ class Admin {
 		self::load_assets();
 		$welcome_page_data = [
 			'low_count_icon'  => Config::$plugin_defaults['img_dir'] . 'low-publish.svg',
-			'high_count_icon' => Config::$plugin_defaults['img_dir'] . 'high-publish.svg'
+			'high_count_icon' => Config::$plugin_defaults['img_dir'] . 'high-publish.svg',
 		];
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
 		echo View::render_template( 'backend/welcome/welcome', $welcome_page_data );
@@ -317,7 +317,8 @@ class Admin {
 			// Get formatted data again for latest post id.
 			if ( empty( $formatted_post_data ) ) {
 				// Get latest post info for preview.
-				$target_post_id = $post_types->get_latest_post_for_preview();;
+				$target_post_id = $post_types->get_latest_post_for_preview();
+				;
 			}
 
 			$formatted_post_data = $post_types->get_formatted_post_data( $target_post_id );
@@ -369,7 +370,7 @@ class Admin {
 				'option_warning'     => Config::$plugin_defaults['img_dir'] . 'option-warning.svg',
 				'option_info'        => Config::$plugin_defaults['img_dir'] . 'option-info.svg',
 				'option_dynamic'     => Config::$plugin_defaults['img_dir'] . 'option-dynamic.svg',
-			]
+			],
 		];
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
@@ -396,10 +397,12 @@ class Admin {
 
 		// Check if the option exists already.
 		if ( ! isset( $rg_global_options[ $config_key ] ) ) {
-			wp_send_json( [
-				'success' => false,
-				'msg'     => __( 'Invalid data passed!', 'revenue-generator' )
-			] );
+			wp_send_json(
+				[
+					'success' => false,
+					'msg'     => __( 'Invalid data passed!', 'revenue-generator' ),
+				]
+			);
 		}
 
 		// Check and verify updated option.
@@ -411,10 +414,12 @@ class Admin {
 		update_option( 'lp_rg_global_options', $rg_global_options );
 
 		// Send success message.
-		wp_send_json( [
-			'success' => true,
-			'msg'     => __( 'Selection stored successfully!', 'revenue-generator' )
-		] );
+		wp_send_json(
+			[
+				'success' => true,
+				'msg'     => __( 'Selection stored successfully!', 'revenue-generator' ),
+			]
+		);
 
 	}
 
@@ -435,14 +440,14 @@ class Admin {
 				'url'    => 'revenue-generator-dashboard',
 				'title'  => __( 'Dashboard', 'revenue-generator' ),
 				'cap'    => 'manage_options',
-				'method' => 'dashboard'
+				'method' => 'dashboard',
 			];
 
 			$menus['paywall'] = [
 				'url'    => 'revenue-generator-paywall',
 				'title'  => __( 'New Paywall', 'revenue-generator' ),
 				'cap'    => 'manage_options',
-				'method' => 'paywall'
+				'method' => 'paywall',
 			];
 		}
 
@@ -542,14 +547,16 @@ class Admin {
 		$dashboard_url = add_query_arg( [ 'page' => $admin_menus['dashboard']['url'] ], admin_url( 'admin.php' ) );
 
 		// Send success message.
-		wp_send_json( [
-			'success'       => true,
-			'redirect_to'   => $dashboard_url,
-			'msg'           => empty( $paywall_data['id'] ) ? __( 'Paywall updated successfully!', 'revenue-generator' ) : __( 'Paywall saved successfully!', 'revenue-generator' ),
-			'paywall_id'    => $paywall_id,
-			'time_passes'   => $time_pass_response,
-			'subscriptions' => $subscription_response,
-		] );
+		wp_send_json(
+			[
+				'success'       => true,
+				'redirect_to'   => $dashboard_url,
+				'msg'           => empty( $paywall_data['id'] ) ? __( 'Paywall updated successfully!', 'revenue-generator' ) : __( 'Paywall saved successfully!', 'revenue-generator' ),
+				'paywall_id'    => $paywall_id,
+				'time_passes'   => $time_pass_response,
+				'subscriptions' => $subscription_response,
+			]
+		);
 
 	}
 
@@ -568,10 +575,12 @@ class Admin {
 
 		// Check if the option exists already.
 		if ( ! isset( $rg_global_options[ $config_key ] ) ) {
-			wp_send_json( [
-				'success' => false,
-				'msg'     => __( 'Invalid data passed!', 'revenue-generator' )
-			] );
+			wp_send_json(
+				[
+					'success' => false,
+					'msg'     => __( 'Invalid data passed!', 'revenue-generator' ),
+				]
+			);
 		}
 
 		// Check and verify updated option.
@@ -585,10 +594,12 @@ class Admin {
 		update_option( 'lp_rg_global_options', $rg_global_options );
 
 		// Send success message.
-		wp_send_json( [
-			'success' => true,
-			'msg'     => __( 'Currency stored successfully!', 'revenue-generator' )
-		] );
+		wp_send_json(
+			[
+				'success' => true,
+				'msg'     => __( 'Currency stored successfully!', 'revenue-generator' ),
+			]
+		);
 
 	}
 
@@ -628,10 +639,12 @@ class Admin {
 		}
 
 		// Send success message.
-		wp_send_json( [
-			'success' => true,
-			'msg'     => $msg
-		] );
+		wp_send_json(
+			[
+				'success' => true,
+				'msg'     => $msg,
+			]
+		);
 
 	}
 
@@ -653,17 +666,21 @@ class Admin {
 
 		if ( true === $removal_status ) {
 			// Send success message.
-			wp_send_json( [
-				'success'    => true,
-				'preview_id' => $preview_id,
-				'msg'        => __( 'Paywall removed!', 'revenue-generator' )
-			] );
+			wp_send_json(
+				[
+					'success'    => true,
+					'preview_id' => $preview_id,
+					'msg'        => __( 'Paywall removed!', 'revenue-generator' ),
+				]
+			);
 		} else {
 			// Send success message.
-			wp_send_json( [
-				'success' => false,
-				'msg'     => __( 'Unable to remove Paywall, something went wrong!', 'revenue-generator' )
-			] );
+			wp_send_json(
+				[
+					'success' => false,
+					'msg'     => __( 'Unable to remove Paywall, something went wrong!', 'revenue-generator' ),
+				]
+			);
 		}
 
 	}
@@ -682,16 +699,20 @@ class Admin {
 		$preview_posts       = $post_types_instance->get_preview_content_selection( $search_term );
 
 		if ( ! empty( $preview_posts ) ) {
-			wp_send_json( [
-				'success'       => true,
-				'preview_posts' => $preview_posts
-			] );
+			wp_send_json(
+				[
+					'success'       => true,
+					'preview_posts' => $preview_posts,
+				]
+			);
 		} else {
-			wp_send_json( [
-				'success'       => false,
-				'msg'           => __( 'No matching content found!', 'revenue-generator' ),
-				'preview_posts' => []
-			] );
+			wp_send_json(
+				[
+					'success'       => false,
+					'msg'           => __( 'No matching content found!', 'revenue-generator' ),
+					'preview_posts' => [],
+				]
+			);
 		}
 	}
 
@@ -732,10 +753,12 @@ class Admin {
 			);
 
 			// Send success message.
-			wp_send_json( [
-				'success'     => true,
-				'redirect_to' => $post_preview_page,
-			] );
+			wp_send_json(
+				[
+					'success'     => true,
+					'redirect_to' => $post_preview_page,
+				]
+			);
 
 		}
 	}
@@ -757,10 +780,12 @@ class Admin {
 
 		$category_instance = Categories::get_instance();
 
-		wp_send_json( [
-			'success'    => true,
-			'categories' => $category_instance->get_applicable_categories( $args )
-		] );
+		wp_send_json(
+			[
+				'success'    => true,
+				'categories' => $category_instance->get_applicable_categories( $args ),
+			]
+		);
 	}
 
 	/**
@@ -796,10 +821,12 @@ class Admin {
 
 		// Check if the option exists already.
 		if ( ! isset( $rg_global_options[ $config_key ] ) ) {
-			wp_send_json( [
-				'success' => false,
-				'msg'     => __( 'Invalid data passed!', 'revenue-generator' )
-			] );
+			wp_send_json(
+				[
+					'success' => false,
+					'msg'     => __( 'Invalid data passed!', 'revenue-generator' ),
+				]
+			);
 		}
 
 		// Check and verify updated option.
@@ -811,10 +838,12 @@ class Admin {
 		update_option( 'lp_rg_global_options', $rg_global_options );
 
 		// Send success message.
-		wp_send_json( [
-			'success' => true,
-			'msg'     => __( 'Selection stored successfully!', 'revenue-generator' )
-		] );
+		wp_send_json(
+			[
+				'success' => true,
+				'msg'     => __( 'Selection stored successfully!', 'revenue-generator' ),
+			]
+		);
 	}
 
 	/**
@@ -854,9 +883,11 @@ class Admin {
 		}
 
 		// Send success message.
-		wp_send_json( [
-			'success' => $is_valid,
-		] );
+		wp_send_json(
+			[
+				'success' => $is_valid,
+			]
+		);
 	}
 
 	/**
@@ -871,10 +902,12 @@ class Admin {
 
 		// Check and verify data exits.
 		if ( ! empty( $preview_post_id ) ) {
-			wp_send_json( [
-				'success'     => true,
-				'redirect_to' => get_permalink( $preview_post_id )
-			] );
+			wp_send_json(
+				[
+					'success'     => true,
+					'redirect_to' => get_permalink( $preview_post_id ),
+				]
+			);
 		}
 	}
 
@@ -893,10 +926,12 @@ class Admin {
 			$paywall_instance = Paywall::get_instance();
 			$paywall_instance->activate_paywall( $paywall_id );
 
-			wp_send_json( [
-				'success'      => true,
-				'has_paywalls' => $paywall_instance->get_paywalls_count() > 1,
-			] );
+			wp_send_json(
+				[
+					'success'      => true,
+					'has_paywalls' => $paywall_instance->get_paywalls_count() > 1,
+				]
+			);
 		}
 	}
 
@@ -914,10 +949,12 @@ class Admin {
 		if ( ! empty( $paywall_id ) ) {
 			$paywall_instance = Paywall::get_instance();
 			$result           = (bool) $paywall_instance->disable_paywall( $paywall_id );
-			wp_send_json( [
-				'success' => $result,
-				'msg'     => $result ? __( 'Paywall Disabled!', 'revenue-generator' ) : __( 'Something went wrong!', 'revenue-generator' )
-			] );
+			wp_send_json(
+				[
+					'success' => $result,
+					'msg'     => $result ? __( 'Paywall Disabled!', 'revenue-generator' ) : __( 'Something went wrong!', 'revenue-generator' ),
+				]
+			);
 		}
 	}
 
@@ -965,10 +1002,12 @@ class Admin {
 			);
 
 			// Send success message.
-			wp_send_json( [
-				'success'     => true,
-				'redirect_to' => $dashboard_sort_url,
-			] );
+			wp_send_json(
+				[
+					'success'     => true,
+					'redirect_to' => $dashboard_sort_url,
+				]
+			);
 		}
 	}
 
@@ -986,16 +1025,20 @@ class Admin {
 		$paywall_results  = $paywall_instance->get_paywall_by_name( $search_term );
 
 		if ( ! empty( $paywall_results ) ) {
-			wp_send_json( [
-				'success'  => true,
-				'paywalls' => $paywall_results
-			] );
+			wp_send_json(
+				[
+					'success'  => true,
+					'paywalls' => $paywall_results,
+				]
+			);
 		} else {
-			wp_send_json( [
-				'success'  => false,
-				'msg'      => __( 'No matching paywall found!', 'revenue-generator' ),
-				'paywalls' => []
-			] );
+			wp_send_json(
+				[
+					'success'  => false,
+					'msg'      => __( 'No matching paywall found!', 'revenue-generator' ),
+					'paywalls' => [],
+				]
+			);
 		}
 	}
 

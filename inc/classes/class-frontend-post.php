@@ -51,22 +51,22 @@ class Frontend_Post {
 		'EU' => [
 			'sandbox' => [
 				'us' => 'https://connector-script.laterpay.net/3.12.1/eu/sbx/app-en-us.js',
-				'eu' => 'https://connector-script.laterpay.net/3.12.1/eu/sbx/app-de-de.js'
+				'eu' => 'https://connector-script.laterpay.net/3.12.1/eu/sbx/app-de-de.js',
 			],
 			'live'    => [
 				'us' => 'https://connector-script.laterpay.net/3.12.1/eu/prod/app-en-us.js',
-				'eu' => 'https://connector-script.laterpay.net/3-stable/eu/prod/app-de-de.js'
-			]
+				'eu' => 'https://connector-script.laterpay.net/3-stable/eu/prod/app-de-de.js',
+			],
 		],
 		'US' => [
 			'sandbox' => [
 				'us' => 'https://connector-script.uselaterpay.com/3.12.1/us/sbx/app-en-us.js',
-				'eu' => 'https://connector-script.uselaterpay.com/3.12.1/us/sbx/app-de-de.js'
+				'eu' => 'https://connector-script.uselaterpay.com/3.12.1/us/sbx/app-de-de.js',
 			],
 			'live'    => [
 				'us' => 'https://connector-script.uselaterpay.com/3.12.1/us/prod/app-en-us.js',
-				'eu' => 'https://connector-script.uselaterpay.com/3.12.1/us/prod/app-de-de.js'
-			]
+				'eu' => 'https://connector-script.uselaterpay.com/3.12.1/us/prod/app-de-de.js',
+			],
 		],
 	];
 
@@ -103,10 +103,14 @@ class Frontend_Post {
 			$appearance_config = $this->get_purchase_overlay_config();
 			if ( ! empty( $post_payload_data ) ) {
 				?>
-				<script type="application/json" id="laterpay-connector"><?php
+				<script type="application/json" id="laterpay-connector">
+				<?php
 					/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- added json string is secure and escaped.*/
 					echo $appearance_config;
-					?></script>
+				?>
+
+
+				</script>
 				<script type="text/javascript">
 					function revenueGeneratorHideTeaserContent() {
 						document.querySelector('.lp-teaser-content').style.display = 'none';
@@ -121,10 +125,14 @@ class Frontend_Post {
 					}
 				</script>
 				<!-- LaterPay Connector In-Page Configuration for purchase options -->
-				<script type="application/json" id="laterpay-connector"><?php
+				<script type="application/json" id="laterpay-connector">
+				<?php
 					/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- added json string is secure and escaped.*/
 					echo $post_payload_data['payload'];
-					?></script>
+				?>
+
+
+				</script>
 				<meta property="laterpay:connector:config_token" content="<?php echo esc_attr( $post_payload_data['token'] ); ?>" />
 				<?php
 			} else {
@@ -156,6 +164,7 @@ class Frontend_Post {
 			$assets_instance = Assets::get_instance();
 
 			// Enqueue connector script based on region and environment.
+			// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.NoExplicitVersion -- Upstream script.
 			wp_enqueue_script(
 				'revenue-generator-classic-connector',
 				$connector_url,
@@ -253,8 +262,8 @@ class Frontend_Post {
 				'description' => $purchase_option['description'],
 				'expiry'      => [
 					'unit'  => $purchase_option['duration'],
-					'value' => $purchase_option['period']
-				]
+					'value' => $purchase_option['period'],
+				],
 			];
 		} else {
 			return [
@@ -269,8 +278,8 @@ class Frontend_Post {
 				'description' => $purchase_option['description'],
 				'expiry'      => [
 					'unit'  => $purchase_option['duration'],
-					'value' => $purchase_option['period']
-				]
+					'value' => $purchase_option['period'],
+				],
 			];
 		}
 	}
@@ -281,15 +290,17 @@ class Frontend_Post {
 	 * @return false|string
 	 */
 	private function get_purchase_overlay_config() {
-		return wp_json_encode( [
-			'appearance' => [
-				'variant'             => 'raw-white',
-				'primaryColor'        => '#2e2e2e',
-				'secondaryColor'      => '#ebebeb',
-				'purchaseButtonColor' => '#2e2e2e',
-				'showPaymentMethods'  => false,
-			],
-		] );
+		return wp_json_encode(
+			[
+				'appearance' => [
+					'variant'             => 'raw-white',
+					'primaryColor'        => '#2e2e2e',
+					'secondaryColor'      => '#ebebeb',
+					'purchaseButtonColor' => '#2e2e2e',
+					'showPaymentMethods'  => false,
+				],
+			]
+		);
 	}
 
 	/**
@@ -420,16 +431,18 @@ class Frontend_Post {
 
 		// Setup overlay configurations.
 		if ( ! empty( $final_purchase_options ) ) {
-			$payload = wp_json_encode( [
-				'purchase_options'                 => $final_purchase_options,
-				'ignore_database_single_purchases' => true,
-				'ignore_database_subscriptions'    => true,
-				'ignore_database_timepasses'       => true,
-			] );
+			$payload = wp_json_encode(
+				[
+					'purchase_options'                 => $final_purchase_options,
+					'ignore_database_single_purchases' => true,
+					'ignore_database_subscriptions'    => true,
+					'ignore_database_timepasses'       => true,
+				]
+			);
 
 			return [
 				'payload' => $payload,
-				'token'   => $this->get_signed_token( $payload )
+				'token'   => $this->get_signed_token( $payload ),
 			];
 		}
 
@@ -444,14 +457,18 @@ class Frontend_Post {
 	 * @return string
 	 */
 	private function get_signed_token( $payload ) {
-		$jwt_header         = wp_json_encode( [ 'typ' => 'JWT', 'alg' => 'HS256' ] );
-		$base64UrlHeader    = $this->base64url_encode( $jwt_header );
-		$base64UrlPayload   = $this->base64url_encode( $payload );
-		$signature          = hash_hmac( 'sha256', $base64UrlHeader . "." . $base64UrlPayload, $this->merchant_api_key, true );
-		$base64UrlSignature = $this->base64url_encode( $signature );
-		$token              = $base64UrlHeader . '.' . $base64UrlPayload . '.' . $base64UrlSignature;
+		$jwt_header           = wp_json_encode(
+			[
+				'typ' => 'JWT',
+				'alg' => 'HS256',
+			]
+		);
+		$base64_url_header    = $this->base64url_encode( $jwt_header );
+		$base64_url_payload   = $this->base64url_encode( $payload );
+		$signature            = hash_hmac( 'sha256', $base64_url_header . '.' . $base64_url_payload, $this->merchant_api_key, true );
+		$base64_url_signature = $this->base64url_encode( $signature );
 
-		return $token;
+		return sprintf( '%1$s.%2$s.%3$s', $base64_url_header, $base64_url_payload, $base64_url_signature );
 	}
 
 	/**
@@ -465,7 +482,7 @@ class Frontend_Post {
 		// First of all you should encode $data to Base64 string.
 		$b64 = base64_encode( $data );
 		// Make sure you get a valid result, otherwise, return FALSE, as the base64_encode() function do.
-		if ( $b64 === false ) {
+		if ( false === $b64 ) {
 			return false;
 		}
 		// Convert Base64 to Base64URL by replacing “+” with “-” and “/” with “_”.

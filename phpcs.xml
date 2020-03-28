@@ -14,6 +14,9 @@
 
 	<rule ref="WordPressVIPMinimum" />
 	<rule ref="WordPress-Docs" />
+	<rule ref="WordPress">
+		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
+	</rule>
 
 	<exclude-pattern>*/build/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>

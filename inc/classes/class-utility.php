@@ -101,46 +101,46 @@ class Utility {
 			if ( mb_strlen( preg_replace( '/<.*?>/', '', $text ) ) <= $length ) {
 				return $text;
 			}
-			$totalLength = mb_strlen( wp_strip_all_tags( $ellipsis ) );
-			$openTags    = [];
+			$total_length = mb_strlen( wp_strip_all_tags( $ellipsis ) );
+			$open_tags    = [];
 			$truncate    = '';
 
 			preg_match_all( '/(<\/?([\w+]+)[^>]*>)?([^<>]*)/', $text, $tags, PREG_SET_ORDER );
 			foreach ( $tags as $tag ) {
 				if ( ! preg_match( '/img|br|input|hr|area|base|basefont|col|frame|isindex|link|meta|param/s', $tag[2] ) ) {
 					if ( preg_match( '/<[\w]+[^>]*>/s', $tag[0] ) ) {
-						array_unshift( $openTags, $tag[2] );
-					} elseif ( preg_match( '/<\/([\w]+)[^>]*>/s', $tag[0], $closeTag ) ) {
-						$pos = array_search( $closeTag[1], $openTags, true );
-						if ( $pos !== false ) {
-							array_splice( $openTags, $pos, 1 );
+						array_unshift( $open_tags, $tag[2] );
+					} elseif ( preg_match( '/<\/([\w]+)[^>]*>/s', $tag[0], $close_tag ) ) {
+						$pos = array_search( $close_tag[1], $open_tags, true );
+						if ( false !== $pos ) {
+							array_splice( $open_tags, $pos, 1 );
 						}
 					}
 				}
 				$truncate .= $tag[1];
 
-				$contentLength = mb_strlen( preg_replace( '/&[0-9a-z]{2,8};|&#[0-9]{1,7};|&#x[0-9a-f]{1,6};/i', ' ', $tag[3] ) );
-				if ( $contentLength + $totalLength > $length ) {
-					$left           = $length - $totalLength;
-					$entitiesLength = 0;
+				$content_length = mb_strlen( preg_replace( '/&[0-9a-z]{2,8};|&#[0-9]{1,7};|&#x[0-9a-f]{1,6};/i', ' ', $tag[3] ) );
+				if ( $content_length + $total_length > $length ) {
+					$left           = $length - $total_length;
+					$entities_length = 0;
 					if ( preg_match_all( '/&[0-9a-z]{2,8};|&#[0-9]{1,7};|&#x[0-9a-f]{1,6};/i', $tag[3], $entities, PREG_OFFSET_CAPTURE ) ) {
 						foreach ( $entities[0] as $entity ) {
-							if ( $entity[1] + 1 - $entitiesLength <= $left ) {
+							if ( $entity[1] + 1 - $entities_length <= $left ) {
 								$left --;
-								$entitiesLength += mb_strlen( $entity[0] );
+								$entities_length += mb_strlen( $entity[0] );
 							} else {
 								break;
 							}
 						}
 					}
 
-					$truncate .= mb_substr( $tag[3], 0, $left + $entitiesLength );
+					$truncate .= mb_substr( $tag[3], 0, $left + $entities_length );
 					break;
 				} else {
 					$truncate    .= $tag[3];
-					$totalLength += $contentLength;
+					$total_length += $content_length;
 				}
-				if ( $totalLength >= $length ) {
+				if ( $total_length >= $length ) {
 					break;
 				}
 			}
@@ -156,26 +156,26 @@ class Utility {
 		if ( ! $exact ) {
 			$spacepos = mb_strrpos( $truncate, ' ' );
 			if ( $html ) {
-				$truncateCheck = mb_substr( $truncate, 0, $spacepos );
-				$lastOpenTag   = mb_strrpos( $truncateCheck, '<' );
-				$lastCloseTag  = mb_strrpos( $truncateCheck, '>' );
-				if ( $lastOpenTag > $lastCloseTag ) {
-					preg_match_all( '/<[\w]+[^>]*>/s', $truncate, $lastTagMatches );
-					$lastTag  = array_pop( $lastTagMatches[0] );
-					$spacepos = mb_strrpos( $truncate, $lastTag ) + mb_strlen( $lastTag );
+				$truncate_check = mb_substr( $truncate, 0, $spacepos );
+				$last_open_tag   = mb_strrpos( $truncate_check, '<' );
+				$last_close_tag  = mb_strrpos( $truncate_check, '>' );
+				if ( $last_open_tag > $last_close_tag ) {
+					preg_match_all( '/<[\w]+[^>]*>/s', $truncate, $last_tag_matches );
+					$last_tag  = array_pop( $last_tag_matches[0] );
+					$spacepos = mb_strrpos( $truncate, $last_tag ) + mb_strlen( $last_tag );
 				}
 				$bits = mb_substr( $truncate, $spacepos );
-				preg_match_all( '/<\/([a-z]+)>/', $bits, $droppedTags, PREG_SET_ORDER );
-				if ( ! empty( $droppedTags ) ) {
-					if ( ! empty( $openTags ) ) {
-						foreach ( $droppedTags as $closingTag ) {
-							if ( ! in_array( $closingTag[1], $openTags, true ) ) {
-								array_unshift( $openTags, $closingTag[1] );
+				preg_match_all( '/<\/([a-z]+)>/', $bits, $dropped_tags, PREG_SET_ORDER );
+				if ( ! empty( $dropped_tags ) ) {
+					if ( ! empty( $open_tags ) ) {
+						foreach ( $dropped_tags as $closing_tag ) {
+							if ( ! in_array( $closing_tag[1], $open_tags, true ) ) {
+								array_unshift( $open_tags, $closing_tag[1] );
 							}
 						}
 					} else {
-						foreach ( $droppedTags as $closingTag ) {
-							$openTags[] = $closingTag[1];
+						foreach ( $dropped_tags as $closing_tag ) {
+							$open_tags[] = $closing_tag[1];
 						}
 					}
 				}
@@ -185,7 +185,7 @@ class Utility {
 		$truncate .= $ellipsis;
 
 		if ( $html ) {
-			foreach ( $openTags as $tag ) {
+			foreach ( $open_tags as $tag ) {
 				$truncate .= '</' . $tag . '>';
 			}
 		}

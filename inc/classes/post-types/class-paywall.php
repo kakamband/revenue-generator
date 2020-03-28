@@ -49,25 +49,29 @@ class Paywall extends Base {
 	 */
 	public function update_paywall( $paywall_data ) {
 		if ( empty( $paywall_data['id'] ) ) {
-			$paywall_id = wp_insert_post( [
-				'post_content' => $paywall_data['description'],
-				'post_title'   => $paywall_data['name'],
-				'post_status'  => 'publish',
-				'post_type'    => static::SLUG,
-				'meta_input'   => [
-					'_rg_title'         => $paywall_data['title'],
-					'_rg_access_to'     => $paywall_data['access_to'],
-					'_rg_access_entity' => $paywall_data['access_entity'],
-					'_rg_preview_id'    => $paywall_data['preview_id'],
-				],
-			] );
+			$paywall_id = wp_insert_post(
+				[
+					'post_content' => $paywall_data['description'],
+					'post_title'   => $paywall_data['name'],
+					'post_status'  => 'publish',
+					'post_type'    => static::SLUG,
+					'meta_input'   => [
+						'_rg_title'         => $paywall_data['title'],
+						'_rg_access_to'     => $paywall_data['access_to'],
+						'_rg_access_entity' => $paywall_data['access_entity'],
+						'_rg_preview_id'    => $paywall_data['preview_id'],
+					],
+				]
+			);
 		} else {
 			$paywall_id = $paywall_data['id'];
-			wp_update_post( [
-				'ID'           => $paywall_id,
-				'post_content' => $paywall_data['description'],
-				'post_title'   => $paywall_data['name'],
-			] );
+			wp_update_post(
+				[
+					'ID'           => $paywall_id,
+					'post_content' => $paywall_data['description'],
+					'post_title'   => $paywall_data['name'],
+				]
+			);
 
 			update_post_meta( $paywall_id, '_rg_title', $paywall_data['title'] );
 			update_post_meta( $paywall_id, '_rg_access_to', $paywall_data['access_to'] );
@@ -127,7 +131,7 @@ class Paywall extends Base {
 			[
 				'key'     => '_rg_access_entity',
 				'compare' => '=',
-				'value'   => $post_id
+				'value'   => $post_id,
 			],
 			[
 				'key'     => '_rg_access_to',
@@ -248,19 +252,19 @@ class Paywall extends Base {
 			if ( empty( $result ) ) {
 				return [
 					'success'         => false,
-					'preview_post_id' => $preview_id
+					'preview_post_id' => $preview_id,
 				];
 			} else {
 				return [
 					'success'         => true,
-					'preview_post_id' => $preview_id
+					'preview_post_id' => $preview_id,
 				];
 			}
 		}
 
 		return [
 			'success'         => false,
-			'preview_post_id' => $post_types->get_latest_post_for_preview()
+			'preview_post_id' => $post_types->get_latest_post_for_preview(),
 		];
 	}
 
@@ -365,7 +369,7 @@ class Paywall extends Base {
 			[
 				'key'     => '_rg_access_entity',
 				'compare' => 'NOT IN',
-				'value'   => $categories
+				'value'   => $categories,
 			],
 			[
 				'key'     => '_rg_access_to',
@@ -450,7 +454,7 @@ class Paywall extends Base {
 			[
 				'key'     => '_rg_access_entity',
 				'compare' => '=',
-				'value'   => $category_id
+				'value'   => $category_id,
 			],
 			[
 				'key'     => '_rg_access_to',
@@ -540,7 +544,8 @@ class Paywall extends Base {
 		$post_modified_date = get_the_modified_date( '', $post->ID );
 		$post_modified_time = get_the_modified_time( '', $post->ID );
 		$post_updated_info  = sprintf(
-			__( 'Last updated on %s at %s by %s' ),
+			/* translators: %1$s modified date, %2$s modified time */
+			__( 'Last updated on %1$s at %2$s by %3$s' ),
 			$post_modified_date,
 			$post_modified_time,
 			get_the_author_meta( 'display_name', $post_author )
@@ -565,14 +570,14 @@ class Paywall extends Base {
 			$category_object = get_category( $category_id );
 			if ( 'category' === $pay_wall['access_to'] ) {
 				$published_on = sprintf(
-				/* translators: %1$s static string PUBLISHED/SAVED, %2$s category name */
+					/* translators: %1$s static string PUBLISHED/SAVED, %2$s category name */
 					__( '<b>%1$s</b> on <b>all posts</b> in the category <b>%2$s</b>', 'revenue-generator' ),
 					$saved_message,
 					$category_object->name
 				);
 			} else {
 				$published_on = sprintf(
-				/* translators: %1$s static string PUBLISHED/SAVED, %2$s category name */
+					/* translators: %1$s static string PUBLISHED/SAVED, %2$s category name */
 					__( '<b>%1$s</b> on <b>all posts</b> except the category <b>%2$s</b>', 'revenue-generator' ),
 					$saved_message,
 					$category_object->name
@@ -581,14 +586,14 @@ class Paywall extends Base {
 		} elseif ( 'supported' === $pay_wall['access_to'] ) {
 			$rg_post_object = get_post( $pay_wall['access_entity'] );
 			$published_on   = sprintf(
-			/* translators: %1$s static string PUBLISHED/SAVED, %2$s post name */
+				/* translators: %1$s static string PUBLISHED/SAVED, %2$s post name */
 				__( '<b>%1$s</b> on <b>post</b> <b>%2$s</b>', 'revenue-generator' ),
 				$saved_message,
 				$rg_post_object->post_title
 			);
 		} else {
 			$published_on = sprintf(
-			/* translators: %s static string PUBLISHED/SAVED */
+				/* translators: %s static string PUBLISHED/SAVED */
 				__( '<b>%s</b> on <b>all posts</b>', 'revenue-generator' ),
 				$saved_message
 			);
@@ -666,7 +671,7 @@ class Paywall extends Base {
 					if ( isset( $current_orders['individual'] ) ) {
 						$individual_purchase_option['order'] = $current_orders['individual'];
 					} else {
-						$new_order_count                     += 1;
+						++$new_order_count;
 						$individual_purchase_option['order'] = $new_order_count;
 					}
 					$individual_purchase_option['order']         = $current_orders['individual'];
@@ -682,7 +687,7 @@ class Paywall extends Base {
 						if ( isset( $current_orders[ $tlp_id ] ) ) {
 							$time_pass['order'] = $current_orders[ $tlp_id ];
 						} else {
-							$new_order_count    += 1;
+							++$new_order_count;
 							$time_pass['order'] = $new_order_count;
 						}
 
@@ -710,7 +715,7 @@ class Paywall extends Base {
 						if ( isset( $current_orders[ $sub_id ] ) ) {
 							$subscription['order'] = $current_orders[ $sub_id ];
 						} else {
-							$new_order_count       += 1;
+							++$new_order_count;
 							$subscription['order'] = $new_order_count;
 						}
 
@@ -747,7 +752,7 @@ class Paywall extends Base {
 
 			// Add time pass options order.
 			foreach ( $time_passes_purchase_option as $time_pass ) {
-				$order += 1;
+				++$order;
 				if ( ! isset( $time_pass['order'] ) ) {
 					$time_pass['order'] = $order;
 				}
@@ -768,7 +773,7 @@ class Paywall extends Base {
 
 			// Add subscription options order.
 			foreach ( $subscriptions_purchase_option as $subscription ) {
-				$order += 1;
+				++$order;
 				if ( ! isset( $subscription['order'] ) ) {
 					$subscription['order'] = $order;
 				}
@@ -927,7 +932,8 @@ class Paywall extends Base {
 		// Add and remove our custom filter for LIKE based search by title.
 		add_filter( 'posts_where', [ $this, 'rg_paywall_title_filter' ], 10, 2 );
 		$query         = new \WP_Query();
-		$current_posts = $query->query( $query_args );;
+		$current_posts = $query->query( $query_args );
+		;
 		remove_filter( 'posts_where', [ $this, 'rg_paywall_title_filter' ], 10 );
 
 		// Create formatted data for preview suggestions.
