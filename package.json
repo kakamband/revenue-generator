@@ -12,7 +12,7 @@
 		"lint:js:fix": "wp-scripts lint-js assets/src --fix",
 		"dev": "NODE_ENV=development webpack --mode=development --watch",
 		"build": "NODE_ENV=production webpack --mode=production",
-		"language:make-po": "wp i18n make-pot . --exclude=\"build\" languages/revenue-generator.po",
+		"language:make-po": "wp i18n make-pot . --exclude=\"build\" languages/revenue-generator.po --headers='{\"Last-Translator\":\"Kimberly Moore <kmoore@laterpay.net>\"}'",
 		"language": "run-s \"language:*\"",
 		"zip": "composer install --no-dev --optimize-autoloader && wp dist-archive . revenue-generator.zip"
 	},

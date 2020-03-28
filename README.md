@@ -10,7 +10,7 @@
 
 ### Table of Contents
 
-- [Installation](#installation)
+- [Installation and Getting Started](#installation)
 - [Contributing](#contributing)
 - [Development Notes](#development-notes)
 - [Usage](#usage)
@@ -22,6 +22,12 @@
 ## Installation
 
 The latest release of the plugin is available [here](https://github.com/laterpay/revenue-generator/releases/latest).
+
+- Install the latest zip or use the latest code from `master` branch in your test site.
+- Activate the plugin and select `Revenue Generator` in the menu.
+- Go through the Welcome wizard, check the  tutorial to understand the available features.
+- Try publishing the paywall, it will ask to connect your account ( only asked once ).
+- You should see now see the created paywall on frontend.
 
 ## Contributing
 
@@ -49,14 +55,6 @@ The latest release of the plugin is available [here](https://github.com/laterpay
 8. Run `npm run lint:js:fix` to automatically fix possible errors/warning in JS code.
 9. Run `npm run language` to update project po file.
 10. Run `npm run zip` to create final zip with production assets.
-
-## Usage
-
-- Install the latest zip or use the latest code from `master` branch in your test site.
-- Activate the plugin and select `Revenue Generator` in the menu.
-- Go through the Welcome wizard, check the  tutorial to understand the available features.
-- Try publishing the paywall, it will ask to connect your account ( only asked once ).
-- You should see now see the created paywall on frontend.
 
 ## Project Folder / File Structure
 
@@ -105,7 +103,40 @@ revenue-generator
 <hr/>
 
 - **Pay Now** - The “Pay Now” payment model will require a customer to pay directly. The item will not be added to any open invoice. Pay Now items can be offered between 1.00€ and 1000.00€ and between $1.99 and $1000.00.
-                                                                                                                                    
+
+## Screenshots ##
+
+### Welcome wizard, select the average pots published on your site.
+
+![Welcome wizard, select the average pots published on your site.](./wporgassets/screenshot_1.png)
+
+### Tutorial that guides you through available options in Paywall creation.
+
+![Tutorial that guides you through available options in Paywall creation.](./wporgassets/screenshot_2.png)
+
+### Paywall purchase options on post with preview and paywall actions bar.
+
+![Paywall purchase options on post with preview and paywall actions bar.](./wporgassets/screenshot_3.png)
+
+### Add new purchase option on the Paywall, when hovering below last option.
+
+![Add new purchase option on the Paywall, when hovering below last option.](./wporgassets/screenshot_4.png)
+
+### Edit Time Pass Purchase options.
+
+![Edit Time Pass Purchase options.](./wporgassets/screenshot_5.png)
+
+### Edit Single Purchase option.
+
+![Edit Single Purchase option.](./wporgassets/screenshot_6.png)
+
+### Available Paywall listed on Dashboard.
+
+![Available Paywall listed on Dashboard.](./wporgassets/screenshot_7.png)
+
+### Paywall on post in frontend.
+
+![Paywall on post in frontend.](./wporgassets/screenshot_8.png)
 
 ## Versioning
 
