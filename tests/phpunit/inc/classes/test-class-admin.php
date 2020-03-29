@@ -3,7 +3,6 @@
 namespace LaterPay\Revenue_Generator\Tests;
 
 use LaterPay\Revenue_Generator\Inc\Admin;
-use LaterPay\Revenue_Generator\Inc\Config;
 
 /**
  * Unit test cases for \LaterPay\Revenue_Generator\Inc\Admin

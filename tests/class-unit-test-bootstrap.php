@@ -74,7 +74,7 @@ class Unit_Tests_Bootstrap {
 		// Suppress warning and only reports errors.
 		error_reporting( E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_ERROR | E_WARNING | E_PARSE | E_USER_ERROR | E_USER_WARNING | E_RECOVERABLE_ERROR ); // phpcs:ignore
 		require_once $this->plugin_dir . '/revenue-generator.php'; // phpcs:ignore
-		require_once $this->tests_dir . '/helpers/class-utility.php';
+		require_once $this->tests_dir . '/phpunit/helpers/class-utility.php';
 	}
 
 	/**
