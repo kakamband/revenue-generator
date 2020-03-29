@@ -7,7 +7,7 @@
 	convertWarningsToExceptions="true"
 >
 	<testsuites>
-		<testsuite name="AMP_AdManager">
+		<testsuite name="Revenue_Generator">
 			<directory prefix="test-" suffix=".php">./tests/</directory>
 		</testsuite>
 	</testsuites>
