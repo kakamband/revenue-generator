@@ -1,4 +1,4 @@
-<p align="center"><img src="./wporgassets/banner-772x250.png" /></p>
+![Banner](./wporgassets/banner-1544x500.png)
 
 <h1 align="center"> Revenue Generator by LaterPay </h1>
 

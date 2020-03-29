@@ -1,7 +1,7 @@
 @import "vendor/shepherd.css";
 
 body {
-	background: #FFFFFF;
+	background: #fff;
 
 	#wpcontent {
 		padding-left: 0;
@@ -10,8 +10,8 @@ body {
 
 .rev-gen-layout-wrapper {
 	width: 100%;
-	color: #1D1D1D;
-	font-family: Helvetica Neue, serif;
+	color: #1d1d1d;
+	font-family: "Helvetica Neue", serif;
 	min-height: 750px;
 
 	.shepherd-target {
@@ -22,7 +22,7 @@ body {
 .rev-gen-no-data {
 	width: 100%;
 	color: #ec0b00;
-	font-family: Helvetica Neue, serif;
+	font-family: "Helvetica Neue", serif;
 	display: flex;
 	justify-content: center;
 	min-height: 550px;
@@ -48,7 +48,7 @@ body {
 	}
 
 	.shepherd-arrow {
-		color: black;
+		color: #000;
 	}
 
 	.shepherd-text {
@@ -75,16 +75,16 @@ body {
 .shepherd-content-add-space {
 
 	&-top {
-		top: 10px !important;
+		top: 10px !important; /* stylelint-disable-line declaration-no-important */
 	}
 
 	&-bottom {
-		bottom: 10px !important;
+		bottom: 10px !important; /* stylelint-disable-line declaration-no-important */
 	}
 }
 
 .rev-gen-powered-by-footer {
-	color: grey;
+	color: #808080;
 	margin-left: 15px;
 }
 
