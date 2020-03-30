@@ -72,9 +72,9 @@ class Time_Pass extends Base {
 	 *
 	 * @return array of time passes.
 	 */
-	public function get_active_time_pass_tokenized_ids() {
+	public function get_all_time_pass_tokenized_ids() {
 		$time_pass_ids      = [];
-		$active_time_passes = $this->get_active_time_passes();
+		$active_time_passes = $this->get_all_time_passes();
 		foreach ( $active_time_passes as $time_pass ) {
 			$time_pass_ids[] = $this->tokenize_time_pass_id( $time_pass['id'] );
 		}

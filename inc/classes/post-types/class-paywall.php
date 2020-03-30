@@ -179,7 +179,7 @@ class Paywall extends Base {
 	 */
 	public function remove_individual_purchase_option( $paywall_id ) {
 		if ( ! empty( $paywall_id ) ) {
-			$this->update_paywall_individual_option( $paywall_id, [] );
+			$this->update_paywall_individual_option( $paywall_id, [ 'individual' => 'option_did_exist' ] );
 
 			// Unset order if found.
 			$current_order = get_post_meta( $paywall_id, '_rg_options_order', true );

@@ -110,6 +110,7 @@ class Frontend_Post {
 				?>
 
 
+
 				</script>
 				<script type="text/javascript">
 					function revenueGeneratorHideTeaserContent() {
@@ -130,6 +131,7 @@ class Frontend_Post {
 					/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- added json string is secure and escaped.*/
 					echo $post_payload_data['payload'];
 				?>
+
 
 
 				</script>
@@ -361,25 +363,32 @@ class Frontend_Post {
 			$paywall_description   = $paywall_data['description'];
 			$paywall_options_order = $paywall_data['order'];
 
+			$individual_option_existed = false;
+			$individual_option_data    = $paywall_instance->get_individual_purchase_option_data( $paywall_id );
+			if ( ! empty( $individual_option_data['individual'] ) && 'option_did_exist' === $individual_option_data['individual'] ) {
+				$individual_option_existed = true;
+			}
+
 			// Get global time passes and subscriptions.
-			$active_time_pass_ids    = $time_pass_instance->get_active_time_pass_tokenized_ids();
-			$active_subscription_ids = $subscription_instance->get_active_subscription_tokenized_ids();
+			$all_time_pass_ids    = $time_pass_instance->get_all_time_pass_tokenized_ids();
+			$all_subscription_ids = $subscription_instance->get_all_subscription_tokenized_ids();
 
 			// Loop through each active time passes and add to paywall if not set already.
-			foreach ( $active_time_pass_ids as $active_time_pass_id ) {
-				if ( ! isset( $paywall_options_order[ $active_time_pass_id ] ) ) {
-					$paywall_options_order[ $active_time_pass_id ] = end( $paywall_options_order ) + 1;
+			foreach ( $all_time_pass_ids as $existing_time_pass_id ) {
+				if ( ! isset( $paywall_options_order[ $existing_time_pass_id ] ) ) {
+					$paywall_options_order[ $existing_time_pass_id ] = count( $paywall_options_order ) + 1;
 				}
 			}
 
 			// Loop through each active subscriptions and add to paywall if not set already.
-			foreach ( $active_subscription_ids as $active_subscription_id ) {
-				if ( ! isset( $paywall_options_order[ $active_subscription_id ] ) ) {
-					$paywall_options_order[ $active_subscription_id ] = end( $paywall_options_order ) + 1;
+			foreach ( $all_subscription_ids as $existing_subscription_id ) {
+				if ( ! isset( $paywall_options_order[ $existing_subscription_id ] ) ) {
+					$paywall_options_order[ $existing_subscription_id ] = count( $paywall_options_order ) + 1;
 				}
 			}
 
-			if ( ! empty( $paywall_options_order ) ) {
+			if ( ! empty( $paywall_options_order ) || true === $individual_option_existed ) {
+				$individual_option = [];
 				if ( ! empty( $paywall_options_order['individual'] ) ) {
 					$order                      = $paywall_options_order['individual'] - 1;
 					$individual_purchase_option = $paywall_instance->get_individual_purchase_option_data( $paywall_id );
@@ -388,8 +397,15 @@ class Frontend_Post {
 							$individual_purchase_option['price']   = $post_dynamic_pricing_data['price'];
 							$individual_purchase_option['revenue'] = $post_dynamic_pricing_data['revenue'];
 						}
-						$individual_option          = $this->covert_to_connector_purchase_option( $individual_purchase_option, 'individual', $rg_post->ID );
-						$purchase_options[ $order ] = $individual_option;
+						$individual_option = $this->covert_to_connector_purchase_option( $individual_purchase_option, 'individual', $rg_post->ID );
+
+						// Make sure our option is added to list.
+						if ( isset( $purchase_options[ $order ] ) ) {
+							$order                      = count( $purchase_options ) + 1;
+							$purchase_options[ $order ] = $individual_option;
+						} else {
+							$purchase_options[ $order ] = $individual_option;
+						}
 					}
 				}
 
@@ -398,8 +414,13 @@ class Frontend_Post {
 					foreach ( $time_pass_ids as $time_pass_id ) {
 						$order                    = $paywall_options_order[ 'tlp_' . $time_pass_id ] - 1;
 						$timepass_purchase_option = $time_pass_instance->get_time_pass_by_id( $time_pass_id );
-						if ( ! empty( $timepass_purchase_option['is_active'] ) && 1 === absint( $timepass_purchase_option['is_active'] ) ) {
-							$timepass_option            = $this->covert_to_connector_purchase_option( $timepass_purchase_option, 'timepass', $time_pass_id );
+						$timepass_option          = $this->covert_to_connector_purchase_option( $timepass_purchase_option, 'timepass', $time_pass_id );
+
+						// Make sure our option is added to list.
+						if ( isset( $purchase_options[ $order ] ) ) {
+							$order                      = count( $purchase_options ) + 1;
+							$purchase_options[ $order ] = $individual_option;
+						} else {
 							$purchase_options[ $order ] = $timepass_option;
 						}
 					}
@@ -410,11 +431,34 @@ class Frontend_Post {
 					foreach ( $subscription_ids as $subscription_id ) {
 						$order                        = $paywall_options_order[ 'sub_' . $subscription_id ] - 1;
 						$subscription_purchase_option = $subscription_instance->get_subscription_by_id( $subscription_id );
-						if ( ! empty( $subscription_purchase_option['is_active'] ) && 1 === absint( $subscription_purchase_option['is_active'] ) ) {
-							$subscription_option        = $this->covert_to_connector_purchase_option( $subscription_purchase_option, 'subscription', $subscription_id );
+						$subscription_option          = $this->covert_to_connector_purchase_option( $subscription_purchase_option, 'subscription', $subscription_id );
+
+						// Make sure our option is added to list.
+						if ( isset( $purchase_options[ $order ] ) ) {
+							$order                      = count( $purchase_options ) + 1;
+							$purchase_options[ $order ] = $subscription_option;
+						} else {
 							$purchase_options[ $order ] = $subscription_option;
 						}
 					}
+				}
+
+				/**
+				 * It is possible user has purchased individual article, which was later deleted by merchant,
+				 * we need to make sure user has access to it, if user has purchased then the post will be free,
+				 * else it will add pricing dynamically based on post content.
+				 */
+				if ( true === $individual_option_existed ) {
+					$order                      = end( $paywall_options_order ) + 1;
+					$individual_purchase_option = [
+						'title'       => esc_html__( 'This article', 'revenue-generator' ),
+						'description' => 'Enjoy unlimited access to all our content for one month.',
+						'price'       => $post_dynamic_pricing_data['price'],
+						'revenue'     => $post_dynamic_pricing_data['revenue'],
+						'type'        => 'static',
+					];
+					$individual_option          = $this->covert_to_connector_purchase_option( $individual_purchase_option, 'individual', $rg_post->ID );
+					$purchase_options[ $order ] = $individual_option;
 				}
 			}
 		}

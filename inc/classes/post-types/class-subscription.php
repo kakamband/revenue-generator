@@ -72,9 +72,9 @@ class Subscription extends Base {
 	 *
 	 * @return array of subscriptions ids.
 	 */
-	public function get_active_subscription_tokenized_ids() {
+	public function get_all_subscription_tokenized_ids() {
 		$subscription_ids     = [];
-		$active_subscriptions = $this->get_active_subscriptions();
+		$active_subscriptions = $this->get_all_subscriptions();
 		foreach ( $active_subscriptions as $subscription ) {
 			$subscription_ids[] = $this->tokenize_subscription_id( $subscription['id'] );
 		}

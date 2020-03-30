@@ -634,17 +634,25 @@ import tippy, { roundArrow } from 'tippy.js';
 
 					// if id exists remove item from DB after confirmation.
 					if ( entityId ) {
-						showPurchaseOptionUpdateWarning( type ).then(
-							( confirmation ) => {
-								if ( true === confirmation ) {
-									purchaseItem.remove();
-									reorderPurchaseItems();
-									removePurchaseOption( type, entityId );
-									$o.isPublish = true;
-									$o.savePaywall.trigger( 'click' );
+						if ( 'individual' !== type ) {
+							showPurchaseOptionUpdateWarning( type ).then(
+								( confirmation ) => {
+									if ( true === confirmation ) {
+										purchaseItem.remove();
+										reorderPurchaseItems();
+										removePurchaseOption( type, entityId );
+										$o.isPublish = true;
+										$o.savePaywall.trigger( 'click' );
+									}
 								}
-							}
-						);
+							);
+						} else {
+							purchaseItem.remove();
+							reorderPurchaseItems();
+							removePurchaseOption( type, entityId );
+							$o.isPublish = true;
+							$o.savePaywall.trigger( 'click' );
+						}
 					} else {
 						purchaseItem.remove();
 						reorderPurchaseItems();
@@ -705,15 +713,27 @@ import tippy, { roundArrow } from 'tippy.js';
 							$o.individualPricingSelection
 						);
 						if ( pricingSelection.prop( 'checked' ) ) {
-							const allPurchaseOptions = $($o.purchaseOptionItems);
-							const dynamicPrice = allPurchaseOptions.attr('data-dynamic-price');
-							const dynamicRevenue = allPurchaseOptions.attr('data-dynamic-revenue');
-							const priceItem = optionItem.find($o.purchaseOptionItemPrice);
-							priceItem.attr('data-pay-model', dynamicRevenue);
+							const allPurchaseOptions = $(
+								$o.purchaseOptionItems
+							);
+							const dynamicPrice = allPurchaseOptions.attr(
+								'data-dynamic-price'
+							);
+							const dynamicRevenue = allPurchaseOptions.attr(
+								'data-dynamic-revenue'
+							);
+							const priceItem = optionItem.find(
+								$o.purchaseOptionItemPrice
+							);
+							priceItem.attr( 'data-pay-model', dynamicRevenue );
 							const dynamicStar = priceItem.children();
-							const validatedPrice = validatePrice(dynamicPrice);
-							dynamicStar.css({'display': 'none'});
-							priceItem.text(validatedPrice).append(dynamicStar);
+							const validatedPrice = validatePrice(
+								dynamicPrice
+							);
+							dynamicStar.css( { display: 'none' } );
+							priceItem
+								.text( validatedPrice )
+								.append( dynamicStar );
 							optionItem.attr( 'data-pricing-type', 'dynamic' );
 							optionItem.find( $o.purchaseItemPriceIcon ).show();
 							pricingSelection.val( 1 );
@@ -2577,7 +2597,7 @@ import tippy, { roundArrow } from 'tippy.js';
 										'revenue-generator'
 									)
 								);
-						} else {
+						} else if ( 'subscription' === optionType ) {
 							updateWarning
 								.empty()
 								.text(
