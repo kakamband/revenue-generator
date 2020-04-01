@@ -7,6 +7,8 @@
 
 namespace LaterPay\Revenue_Generator\Inc\Post_Types;
 
+use LaterPay\Revenue_Generator\Inc\Config;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -89,7 +91,7 @@ class Time_Pass extends Base {
 	 *
 	 * @return string
 	 */
-	private function tokenize_time_pass_id( $id ) {
+	public function tokenize_time_pass_id( $id ) {
 		return sprintf( '%s_%s', self::TOKEN, $id );
 	}
 
@@ -356,7 +358,7 @@ class Time_Pass extends Base {
 			$time_pass_ids = array_map(
 				function ( $paywall_option ) {
 					if ( false !== strpos( $paywall_option, 'tlp_' ) ) {
-						  $time_pass_data = explode( 'tlp_', $paywall_option );
+						$time_pass_data = explode( 'tlp_', $paywall_option );
 						if ( ! empty( $time_pass_data[1] ) ) {
 							return absint( $time_pass_data[1] );
 						}
@@ -368,6 +370,33 @@ class Time_Pass extends Base {
 			);
 
 			return array_filter( $time_pass_ids, 'strlen' );
+		}
+
+		return [];
+	}
+
+	/**
+	 * Sort time pass ids by price.
+	 *
+	 * @param array $time_pass_ids Time Pass IDs.
+	 *
+	 * @return array
+	 */
+	public function get_time_pass_ids_by_price( $time_pass_ids ) {
+		if ( ! empty( $time_pass_ids ) ) {
+			$time_pass_data = [];
+
+			foreach ( $time_pass_ids as $time_pass_id ) {
+				$current_time_pass_data          = $this->get_time_pass_by_id( $time_pass_id );
+				$connector_price                 = Config::get_connector_price( floatval( $current_time_pass_data['price'] ) );
+				$time_pass_data[ $time_pass_id ] = $connector_price;
+			}
+
+			if ( ! empty( $time_pass_data ) ) {
+				asort( $time_pass_data );
+
+				return array_keys( $time_pass_data );
+			}
 		}
 
 		return [];

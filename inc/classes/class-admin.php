@@ -540,7 +540,8 @@ class Admin {
 			}
 		}
 
-		$paywall_instance->update_paywall_option_order( $paywall_id, $order_items );
+		$final_order = $this->sort_purchase_options( $order_items );
+		$paywall_instance->update_paywall_option_order( $paywall_id, $final_order );
 
 		// Set redirect for saved paywall.
 		$admin_menus   = self::get_admin_menus();
@@ -1060,5 +1061,90 @@ class Admin {
 		}
 
 		return $sql;
+	}
+
+	/**
+	 * Sort purchase options as they would be done by connector.
+	 * Expected order is single purchase -> time passes -> subscriptions.
+	 *
+	 * @param array $order_items Un ordered items in paywall.
+	 *
+	 * @return array
+	 * @todo Remove this once connector has support to move purchase option around.
+	 */
+	private function sort_purchase_options( $order_items ) {
+		$final_order  = [];
+		$option_items = array_keys( $order_items );
+
+		// Actual purchase item ids.
+		if ( ! empty( $option_items ) ) {
+
+			// Set single price to top by default if it exists.
+			if ( isset( $order_items['individual'] ) ) {
+				$final_order['individual'] = 1;
+			}
+
+			// Get time pass ids from the tokenized list.
+			$time_pass_ids = array_map(
+				function ( $order_item ) {
+					if ( false !== strpos( $order_item, 'tlp_' ) ) {
+						$time_pass_data = explode( 'tlp_', $order_item );
+						if ( ! empty( $time_pass_data[1] ) ) {
+							return absint( $time_pass_data[1] );
+						}
+					}
+
+					return '';
+				},
+				$option_items
+			);
+
+			// Get subscription ids from the tokenized list.
+			$subscription_ids = array_map(
+				function ( $paywall_option ) {
+					if ( false !== strpos( $paywall_option, 'sub_' ) ) {
+						$subscription_data = explode( 'sub_', $paywall_option );
+						if ( ! empty( $subscription_data[1] ) ) {
+							return absint( $subscription_data[1] );
+						}
+					}
+
+					return '';
+				},
+				$option_items
+			);
+
+			// Final time pass and subscription  ids.
+			$time_pass_ids    = array_filter( $time_pass_ids, 'strlen' );
+			$subscription_ids = array_filter( $subscription_ids, 'strlen' );
+
+			// Sort ids by price, similar to connector.
+			$time_pass_instance    = Time_Pass::get_instance();
+			$subscription_instance = Subscription::get_instance();
+			$sorted_pass_ids       = $time_pass_instance->get_time_pass_ids_by_price( $time_pass_ids );
+			$sorted_sub_ids        = $subscription_instance->get_subscription_ids_by_price( $subscription_ids );
+
+			// Add sorted items back to final list.
+			if ( ! empty( $sorted_pass_ids ) ) {
+				foreach ( $sorted_pass_ids as $sorted_pass_id ) {
+					$tlp_id = $time_pass_instance->tokenize_time_pass_id( $sorted_pass_id );
+					if ( isset( $order_items[ $tlp_id ] ) ) {
+						$final_order[ $tlp_id ] = count( $final_order ) + 1;
+					}
+				}
+			}
+
+			// Add sorted items back to final list.
+			if ( ! empty( $sorted_sub_ids ) ) {
+				foreach ( $sorted_sub_ids as $sorted_sub_id ) {
+					$sub_id = $subscription_instance->tokenize_subscription_id( $sorted_sub_id );
+					if ( isset( $order_items[ $sub_id ] ) ) {
+						$final_order[ $sub_id ] = count( $final_order ) + 1;
+					}
+				}
+			}
+		}
+
+		return $final_order;
 	}
 }

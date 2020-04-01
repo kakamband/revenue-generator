@@ -425,6 +425,11 @@ class Post_Types {
 		$time_passes_purchase_option       = isset( $purchase_options['time_passes'] ) ? $purchase_options['time_passes'] : [];
 		$subscriptions_purchase_option     = isset( $purchase_options['subscriptions'] ) ? $purchase_options['subscriptions'] : [];
 
+		// Reset individual option as empty if none exists currently.
+		if ( isset( $individual_purchase_option['individual'] ) && 'option_did_exist' === $individual_purchase_option['individual'] ) {
+			$individual_purchase_option = [];
+		}
+
 		// Check if an order exists for the paywall.
 		if ( isset( $final_purchase_options['paywall']['order'] ) ) {
 

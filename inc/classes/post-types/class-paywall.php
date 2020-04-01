@@ -644,6 +644,11 @@ class Paywall extends Base {
 		$time_passes_purchase_option       = isset( $purchase_options['time_passes'] ) ? $purchase_options['time_passes'] : [];
 		$subscriptions_purchase_option     = isset( $purchase_options['subscriptions'] ) ? $purchase_options['subscriptions'] : [];
 
+		// Reset individual option as empty if none exists currently.
+		if ( isset( $individual_purchase_option['individual'] ) && 'option_did_exist' === $individual_purchase_option['individual'] ) {
+			$individual_purchase_option = [];
+		}
+
 		// Remove data not required for preview.
 		unset(
 			$final_purchase_options['paywall']['name'],
@@ -671,7 +676,7 @@ class Paywall extends Base {
 					if ( isset( $current_orders['individual'] ) ) {
 						$individual_purchase_option['order'] = $current_orders['individual'];
 					} else {
-						++$new_order_count;
+						++ $new_order_count;
 						$individual_purchase_option['order'] = $new_order_count;
 					}
 					$individual_purchase_option['order']         = $current_orders['individual'];
@@ -687,7 +692,7 @@ class Paywall extends Base {
 						if ( isset( $current_orders[ $tlp_id ] ) ) {
 							$time_pass['order'] = $current_orders[ $tlp_id ];
 						} else {
-							++$new_order_count;
+							++ $new_order_count;
 							$time_pass['order'] = $new_order_count;
 						}
 
@@ -715,7 +720,7 @@ class Paywall extends Base {
 						if ( isset( $current_orders[ $sub_id ] ) ) {
 							$subscription['order'] = $current_orders[ $sub_id ];
 						} else {
-							++$new_order_count;
+							++ $new_order_count;
 							$subscription['order'] = $new_order_count;
 						}
 
@@ -752,7 +757,7 @@ class Paywall extends Base {
 
 			// Add time pass options order.
 			foreach ( $time_passes_purchase_option as $time_pass ) {
-				++$order;
+				++ $order;
 				if ( ! isset( $time_pass['order'] ) ) {
 					$time_pass['order'] = $order;
 				}
@@ -773,7 +778,7 @@ class Paywall extends Base {
 
 			// Add subscription options order.
 			foreach ( $subscriptions_purchase_option as $subscription ) {
-				++$order;
+				++ $order;
 				if ( ! isset( $subscription['order'] ) ) {
 					$subscription['order'] = $order;
 				}

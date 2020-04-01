@@ -7,6 +7,8 @@
 
 namespace LaterPay\Revenue_Generator\Inc\Post_Types;
 
+use LaterPay\Revenue_Generator\Inc\Config;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -89,7 +91,7 @@ class Subscription extends Base {
 	 *
 	 * @return string
 	 */
-	private function tokenize_subscription_id( $id ) {
+	public function tokenize_subscription_id( $id ) {
 		return sprintf( '%s_%s', self::TOKEN, $id );
 	}
 
@@ -358,7 +360,7 @@ class Subscription extends Base {
 			$subscription_ids = array_map(
 				function ( $paywall_option ) {
 					if ( false !== strpos( $paywall_option, 'sub_' ) ) {
-						  $subscription_data = explode( 'sub_', $paywall_option );
+						$subscription_data = explode( 'sub_', $paywall_option );
 						if ( ! empty( $subscription_data[1] ) ) {
 							return absint( $subscription_data[1] );
 						}
@@ -370,6 +372,33 @@ class Subscription extends Base {
 			);
 
 			return array_filter( $subscription_ids, 'strlen' );
+		}
+
+		return [];
+	}
+
+	/**
+	 * Sort subscription ids by price.
+	 *
+	 * @param array $subscriptions_ids Subscription IDs.
+	 *
+	 * @return array
+	 */
+	public function get_subscription_ids_by_price( $subscriptions_ids ) {
+		if ( ! empty( $subscriptions_ids ) ) {
+			$subscriptions_data = [];
+
+			foreach ( $subscriptions_ids as $subscriptions_id ) {
+				$current_subscription_data           = $this->get_subscription_by_id( $subscriptions_id );
+				$connector_price                     = Config::get_connector_price( floatval( $current_subscription_data['price'] ) );
+				$subscriptions_data[ $subscriptions_id ] = $connector_price;
+			}
+
+			if ( ! empty( $subscriptions_data ) ) {
+				asort( $subscriptions_data );
+
+				return array_keys( $subscriptions_data );
+			}
 		}
 
 		return [];

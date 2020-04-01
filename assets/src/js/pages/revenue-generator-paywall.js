@@ -1554,6 +1554,7 @@ import tippy, { roundArrow } from 'tippy.js';
 						setTimeout( function() {
 							publishPaywall();
 							hideLoader();
+							$o.isPublish = false;
 						}, 1500 );
 					}
 				} );
@@ -1640,6 +1641,15 @@ import tippy, { roundArrow } from 'tippy.js';
 						filter: 'unset',
 						'pointer-events': 'unset',
 					} );
+
+					// Get paywall id and refresh page so that current order is correct.
+					const paywall = $( $o.purchaseOptionItems );
+					const paywallId = paywall.attr( 'data-paywall-id' );
+					if ( paywallId ) {
+						window.location.href =
+							revenueGeneratorGlobalOptions.paywallPageBase +
+							'&current_paywall=' + paywallId;
+					}
 				} );
 
 				/**

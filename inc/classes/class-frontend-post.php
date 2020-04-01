@@ -76,13 +76,18 @@ class Frontend_Post {
 	protected function __construct() {
 		$client_account_instance = Client_Account::get_instance();
 		$global_options          = Config::get_global_options();
-		$this->merchant_region   = $global_options['merchant_region'];
-		$this->merchant_currency = 'US' === $this->merchant_region ? 'USD' : 'EUR';
-		$merchant_credentials    = $client_account_instance->get_merchant_credentials();
-		if ( ! empty( $merchant_credentials['merchant_key'] ) ) {
-			$this->merchant_api_key = $merchant_credentials['merchant_key'];
+		$is_merchant_verified    = $global_options['is_merchant_verified'];
+
+		// Go ahead if merchant is setup properly.
+		if ( ! empty( $is_merchant_verified ) ) {
+			$this->merchant_region   = $global_options['merchant_region'];
+			$this->merchant_currency = 'US' === $this->merchant_region ? 'USD' : 'EUR';
+			$merchant_credentials    = $client_account_instance->get_merchant_credentials();
+			if ( ! empty( $merchant_credentials['merchant_key'] ) ) {
+				$this->merchant_api_key = $merchant_credentials['merchant_key'];
+			}
+			$this->setup_hooks();
 		}
-		$this->setup_hooks();
 	}
 
 	/**
@@ -111,6 +116,8 @@ class Frontend_Post {
 
 
 
+
+
 				</script>
 				<script type="text/javascript">
 					function revenueGeneratorHideTeaserContent() {
@@ -131,6 +138,8 @@ class Frontend_Post {
 					/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- added json string is secure and escaped.*/
 					echo $post_payload_data['payload'];
 				?>
+
+
 
 
 
@@ -319,11 +328,12 @@ class Frontend_Post {
 		$time_pass_instance    = Time_Pass::get_instance();
 
 		// Post and paywall data.
-		$rg_post                = get_post();
-		$paywall_id             = $paywall_instance->get_connected_paywall_by_post( $rg_post->ID );
-		$paywall_data           = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
-		$purchase_options       = [];
-		$final_purchase_options = [];
+		$rg_post                   = get_post();
+		$paywall_id                = $paywall_instance->get_connected_paywall_by_post( $rg_post->ID );
+		$paywall_data              = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
+		$purchase_options          = [];
+		$final_purchase_options    = [];
+		$individual_option_existed = false;
 
 		// @todo These are default options to be used when in page script is available for title and description.
 		$paywall_title       = esc_html__( 'Keep Reading', 'revenue-generator' );
@@ -363,8 +373,7 @@ class Frontend_Post {
 			$paywall_description   = $paywall_data['description'];
 			$paywall_options_order = $paywall_data['order'];
 
-			$individual_option_existed = false;
-			$individual_option_data    = $paywall_instance->get_individual_purchase_option_data( $paywall_id );
+			$individual_option_data = $paywall_instance->get_individual_purchase_option_data( $paywall_id );
 			if ( ! empty( $individual_option_data['individual'] ) && 'option_did_exist' === $individual_option_data['individual'] ) {
 				$individual_option_existed = true;
 			}
