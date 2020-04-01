@@ -1648,7 +1648,8 @@ import tippy, { roundArrow } from 'tippy.js';
 					if ( paywallId ) {
 						window.location.href =
 							revenueGeneratorGlobalOptions.paywallPageBase +
-							'&current_paywall=' + paywallId;
+							'&current_paywall=' +
+							paywallId;
 					}
 				} );
 

@@ -33,10 +33,9 @@ abstract class Base {
 	protected function setup_hooks() {
 
 		/**
-		 * Actions
+		 * Actions.
 		 */
 		add_action( 'init', [ $this, 'register_post_type' ] );
-
 	}
 
 	/**
