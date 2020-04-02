@@ -22,6 +22,20 @@ class Frontend_Post {
 	use Singleton;
 
 	/**
+	 * Paywall ID applicable to the post.
+	 *
+	 * @var int
+	 */
+	protected $connected_paywall_id;
+
+	/**
+	 * Current content post ID.
+	 *
+	 * @var int
+	 */
+	protected $current_post_id;
+
+	/**
 	 * Merchant region.
 	 *
 	 * @var string
@@ -104,21 +118,24 @@ class Frontend_Post {
 	 */
 	public function add_connector_config() {
 		if ( is_singular( Post_Types::get_allowed_post_types() ) ) {
-			$post_payload_data = $this->get_post_payload();
 			$appearance_config = $this->get_purchase_overlay_config();
+			$deleted_articles  = $this->get_deleted_article_ids();
+			?>
+			<!-- LaterPay Connector In-Page Configuration for appearance layout and deleted purchase options. -->
+			<script type="application/json" id="laterpay-connector">
+			<?php
+				$appearance_and_deleted_config = [ 'appearance' => $appearance_config ];
+			if ( ! empty( $deleted_articles ) ) {
+				$appearance_and_deleted_config['articleId'] = $deleted_articles;
+			}
+				echo wp_json_encode( $appearance_and_deleted_config );
+			?>
+			</script>
+			<?php
+			$post_payload_data = $this->get_post_payload();
 			if ( ! empty( $post_payload_data ) ) {
 				?>
-				<script type="application/json" id="laterpay-connector">
-				<?php
-					/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- added json string is secure and escaped.*/
-					echo $appearance_config;
-				?>
-
-
-
-
-
-				</script>
+				<!-- LaterPay Connector In-Page Configuration for handling teaser whe user has access.  -->
 				<script type="text/javascript">
 					function revenueGeneratorHideTeaserContent() {
 						document.querySelector('.lp-teaser-content').style.display = 'none';
@@ -138,11 +155,6 @@ class Frontend_Post {
 					/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- added json string is secure and escaped.*/
 					echo $post_payload_data['payload'];
 				?>
-
-
-
-
-
 				</script>
 				<meta property="laterpay:connector:config_token" content="<?php echo esc_attr( $post_payload_data['token'] ); ?>" />
 				<?php
@@ -298,20 +310,69 @@ class Frontend_Post {
 	/**
 	 * Create appearance configuration for the purchase overlay.
 	 *
-	 * @return false|string
+	 * @return array
 	 */
 	private function get_purchase_overlay_config() {
-		return wp_json_encode(
-			[
-				'appearance' => [
-					'variant'             => 'raw-white',
-					'primaryColor'        => '#2e2e2e',
-					'secondaryColor'      => '#ebebeb',
-					'purchaseButtonColor' => '#2e2e2e',
-					'showPaymentMethods'  => false,
-				],
-			]
-		);
+		return [
+			'variant'             => 'raw-white',
+			'primaryColor'        => '#2e2e2e',
+			'secondaryColor'      => '#ebebeb',
+			'purchaseButtonColor' => '#2e2e2e',
+			'showPaymentMethods'  => false,
+		];
+	}
+
+	/**
+	 * Return deleted time pass, subscription and article ids to config, to make sure user has access to content,
+	 * even if it was deleted by the merchant.
+	 *
+	 * @return array
+	 */
+	private function get_deleted_article_ids() {
+		// Check if we have post id set for current post.
+		if ( empty( $this->current_post_id ) ) {
+			// Post data.
+			$rg_post = get_post();
+
+			if ( ! empty( $rg_post ) ) {
+				$this->current_post_id = $rg_post->ID;
+			} else {
+				return [];
+			}
+		}
+
+		// Bail if post data is not available.
+		if ( empty( $this->current_post_id ) ) {
+			return [];
+		}
+
+		$deleted_options           = [];
+		$individual_option_existed = false;
+		$paywall_instance          = Paywall::get_instance();
+		$time_pass_instance        = Time_Pass::get_instance();
+		$subscription_instance     = Subscription::get_instance();
+		$deleted_time_pass_ids     = $time_pass_instance->get_inactive_time_pass_tokenized_ids();
+		$deleted_subscription_ids  = $subscription_instance->get_inactive_subscription_tokenized_ids();
+		$deleted_options           = array_merge( $deleted_options, $deleted_time_pass_ids, $deleted_subscription_ids );
+
+		// Set correct paywall id for the post.
+		$this->get_connected_paywall_id( $this->current_post_id );
+
+		$individual_option_data = $paywall_instance->get_individual_purchase_option_data( $this->connected_paywall_id );
+		if ( isset( $individual_option_data['individual'] ) && 'option_did_exist' === $individual_option_data['individual'] ) {
+			$individual_option_existed = true;
+		}
+
+		/**
+		 * It is possible user has purchased individual article, which was later deleted by merchant,
+		 * we need to make sure user has access to it, if user has purchased then the post will be free,
+		 * else it will add pricing dynamically based on post content.
+		 */
+		if ( true === $individual_option_existed ) {
+			$deleted_options[] = sprintf( 'article_%s', $this->current_post_id );
+		}
+
+		return $deleted_options;
 	}
 
 	/**
@@ -327,155 +388,106 @@ class Frontend_Post {
 		$subscription_instance = Subscription::get_instance();
 		$time_pass_instance    = Time_Pass::get_instance();
 
-		// Post and paywall data.
-		$rg_post                   = get_post();
-		$paywall_id                = $paywall_instance->get_connected_paywall_by_post( $rg_post->ID );
-		$paywall_data              = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
-		$purchase_options          = [];
-		$final_purchase_options    = [];
-		$individual_option_existed = false;
+		// Check if we have post id set for current post.
+		if ( empty( $this->current_post_id ) ) {
+			// Post data.
+			$rg_post = get_post();
 
-		// @todo These are default options to be used when in page script is available for title and description.
-		$paywall_title       = esc_html__( 'Keep Reading', 'revenue-generator' );
-		$paywall_description = esc_html( sprintf( 'Support %s to get access to this content and more.', esc_url( get_home_url() ) ) );
-
-		// Get individual article pricing based on post content word count, i.e "tier" for dynamic pricing option.
-		$formatted_post_data       = $post_types->get_formatted_post_data( $rg_post->ID );
-		$post_tier                 = empty( $formatted_post_data['post_content'] ) ? 'tier_1' : $post_types->get_post_tier( $formatted_post_data['post_content'] );
-		$purchase_options_all      = Config::get_pricing_defaults( $config_data['average_post_publish_count'] );
-		$post_dynamic_pricing_data = $purchase_options_all['single_article'][ $post_tier ];
-
-		// If post doesn't have an individual paywall, check for paywall on categories.
-		if ( ! $this->is_paywall_active( $paywall_data ) ) {
-			// Check if paywall is found on post categories.
-			$post_terms = wp_get_post_categories( $rg_post->ID );
-			if ( ! empty( $post_terms ) ) {
-				$paywall_id   = $paywall_instance->get_connected_paywall_by_categories( $post_terms );
-				$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
-
-				// If paywall is no found on post categories, check for paywalls on excluded categories.
-				if ( ! $this->is_paywall_active( $paywall_data ) ) {
-					$paywall_id   = $paywall_instance->get_connected_paywall_in_excluded_categories( $post_terms );
-					$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
-				}
+			if ( ! empty( $rg_post ) ) {
+				$this->current_post_id = $rg_post->ID;
+			} else {
+				return [];
 			}
 		}
 
-		// If no paywall found in categories and individual post, check for paywall applied on all posts as last resort.
-		if ( ! $this->is_paywall_active( $paywall_data ) ) {
-			$paywall_id = $paywall_instance->get_paywall_for_all_posts();
+		// Bail if post data is not available.
+		if ( empty( $this->current_post_id ) ) {
+			return [];
 		}
 
-		// Setup purchase options.
-		$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
-		if ( $this->is_paywall_active( $paywall_data ) ) {
-			$paywall_title         = $paywall_data['title'];
-			$paywall_description   = $paywall_data['description'];
+		$purchase_options       = [];
+		$final_purchase_options = [];
+
+		// Get applicable paywall based on the post.
+		$paywall_data = $this->get_connected_paywall_id( $this->current_post_id );
+
+		// Create purchase options if we have a valid paywall.
+		if ( ! empty( $paywall_data ) ) {
 			$paywall_options_order = $paywall_data['order'];
 
-			$individual_option_data = $paywall_instance->get_individual_purchase_option_data( $paywall_id );
-			if ( ! empty( $individual_option_data['individual'] ) && 'option_did_exist' === $individual_option_data['individual'] ) {
-				$individual_option_existed = true;
-			}
-
 			// Get global time passes and subscriptions.
-			$all_time_pass_ids    = $time_pass_instance->get_all_time_pass_tokenized_ids();
-			$all_subscription_ids = $subscription_instance->get_all_subscription_tokenized_ids();
+			$active_time_pass_ids    = $time_pass_instance->get_active_time_pass_tokenized_ids();
+			$active_subscription_ids = $subscription_instance->get_active_subscription_tokenized_ids();
 
 			// Loop through each active time passes and add to paywall if not set already.
-			foreach ( $all_time_pass_ids as $existing_time_pass_id ) {
-				if ( ! isset( $paywall_options_order[ $existing_time_pass_id ] ) ) {
-					$paywall_options_order[ $existing_time_pass_id ] = count( $paywall_options_order ) + 1;
+			foreach ( $active_time_pass_ids as $active_time_pass_id ) {
+				if ( ! isset( $paywall_options_order[ $active_time_pass_id ] ) ) {
+					$paywall_options_order[ $active_time_pass_id ] = count( $paywall_options_order ) + 1;
 				}
 			}
 
 			// Loop through each active subscriptions and add to paywall if not set already.
-			foreach ( $all_subscription_ids as $existing_subscription_id ) {
-				if ( ! isset( $paywall_options_order[ $existing_subscription_id ] ) ) {
-					$paywall_options_order[ $existing_subscription_id ] = count( $paywall_options_order ) + 1;
+			foreach ( $active_subscription_ids as $all_subscription_id ) {
+				if ( ! isset( $paywall_options_order[ $all_subscription_id ] ) ) {
+					$paywall_options_order[ $all_subscription_id ] = count( $paywall_options_order ) + 1;
 				}
 			}
 
-			if ( ! empty( $paywall_options_order ) || true === $individual_option_existed ) {
-				$individual_option = [];
+			if ( ! empty( $paywall_options_order ) ) {
+				// Add individual option to purchase options.
 				if ( ! empty( $paywall_options_order['individual'] ) ) {
-					$order                      = $paywall_options_order['individual'] - 1;
-					$individual_purchase_option = $paywall_instance->get_individual_purchase_option_data( $paywall_id );
+					$order                      = $paywall_options_order['individual'];
+					$individual_purchase_option = $paywall_instance->get_individual_purchase_option_data( $this->connected_paywall_id );
+
 					if ( ! empty( $individual_purchase_option ) ) {
 						if ( 'dynamic' === $individual_purchase_option['type'] ) {
+							// Get individual article pricing based on post content word count, i.e "tier" for dynamic pricing option.
+							$formatted_post_data                   = $post_types->get_formatted_post_data( $this->current_post_id );
+							$post_tier                             = empty( $formatted_post_data['post_content'] ) ? 'tier_1' : $post_types->get_post_tier( $formatted_post_data['post_content'] );
+							$purchase_options_all                  = Config::get_pricing_defaults( $config_data['average_post_publish_count'] );
+							$post_dynamic_pricing_data             = $purchase_options_all['single_article'][ $post_tier ];
 							$individual_purchase_option['price']   = $post_dynamic_pricing_data['price'];
 							$individual_purchase_option['revenue'] = $post_dynamic_pricing_data['revenue'];
 						}
-						$individual_option = $this->covert_to_connector_purchase_option( $individual_purchase_option, 'individual', $rg_post->ID );
-
-						// Make sure our option is added to list.
-						if ( isset( $purchase_options[ $order ] ) ) {
-							$order                      = count( $purchase_options ) + 1;
-							$purchase_options[ $order ] = $individual_option;
-						} else {
-							$purchase_options[ $order ] = $individual_option;
-						}
+						$individual_option          = $this->covert_to_connector_purchase_option( $individual_purchase_option, 'individual', $this->current_post_id );
+						$purchase_options[ $order ] = $individual_option;
 					}
 				}
 
+				// Add time pass options to purchase options.
 				$time_pass_ids = $time_pass_instance->get_time_pass_ids( array_keys( $paywall_options_order ) );
 				if ( ! empty( $time_pass_ids ) ) {
 					foreach ( $time_pass_ids as $time_pass_id ) {
-						$order                    = $paywall_options_order[ 'tlp_' . $time_pass_id ] - 1;
+						$order                    = $paywall_options_order[ 'tlp_' . $time_pass_id ];
 						$timepass_purchase_option = $time_pass_instance->get_time_pass_by_id( $time_pass_id );
-						$timepass_option          = $this->covert_to_connector_purchase_option( $timepass_purchase_option, 'timepass', $time_pass_id );
 
-						// Make sure our option is added to list.
-						if ( isset( $purchase_options[ $order ] ) ) {
-							$order                      = count( $purchase_options ) + 1;
-							$purchase_options[ $order ] = $individual_option;
-						} else {
+						if ( ! empty( $timepass_purchase_option['is_active'] ) && 1 === absint( $timepass_purchase_option['is_active'] ) ) {
+							$timepass_option            = $this->covert_to_connector_purchase_option( $timepass_purchase_option, 'timepass', $time_pass_id );
 							$purchase_options[ $order ] = $timepass_option;
 						}
 					}
 				}
 
+				// Add subscription options to purchase options.
 				$subscription_ids = $subscription_instance->get_subscription_ids( array_keys( $paywall_options_order ) );
 				if ( ! empty( $subscription_ids ) ) {
 					foreach ( $subscription_ids as $subscription_id ) {
-						$order                        = $paywall_options_order[ 'sub_' . $subscription_id ] - 1;
+						$order                        = $paywall_options_order[ 'sub_' . $subscription_id ];
 						$subscription_purchase_option = $subscription_instance->get_subscription_by_id( $subscription_id );
-						$subscription_option          = $this->covert_to_connector_purchase_option( $subscription_purchase_option, 'subscription', $subscription_id );
 
-						// Make sure our option is added to list.
-						if ( isset( $purchase_options[ $order ] ) ) {
-							$order                      = count( $purchase_options ) + 1;
-							$purchase_options[ $order ] = $subscription_option;
-						} else {
+						if ( ! empty( $subscription_purchase_option['is_active'] ) && 1 === absint( $subscription_purchase_option['is_active'] ) ) {
+							$subscription_option        = $this->covert_to_connector_purchase_option( $subscription_purchase_option, 'subscription', $subscription_id );
 							$purchase_options[ $order ] = $subscription_option;
 						}
 					}
 				}
-
-				/**
-				 * It is possible user has purchased individual article, which was later deleted by merchant,
-				 * we need to make sure user has access to it, if user has purchased then the post will be free,
-				 * else it will add pricing dynamically based on post content.
-				 */
-				if ( true === $individual_option_existed ) {
-					$order                      = end( $paywall_options_order ) + 1;
-					$individual_purchase_option = [
-						'title'       => esc_html__( 'This article', 'revenue-generator' ),
-						'description' => 'Enjoy unlimited access to all our content for one month.',
-						'price'       => $post_dynamic_pricing_data['price'],
-						'revenue'     => $post_dynamic_pricing_data['revenue'],
-						'type'        => 'static',
-					];
-					$individual_option          = $this->covert_to_connector_purchase_option( $individual_purchase_option, 'individual', $rg_post->ID );
-					$purchase_options[ $order ] = $individual_option;
-				}
 			}
 		}
 
-		// Sort purchase options based on new order.
+		// Sort purchase options based on order.
 		ksort( $purchase_options );
 
-		// This is done to avoid a mismatch in oder of paywall items.
+		// This is done to avoid a mismatch in order of paywall items.
 		if ( ! empty( $purchase_options ) ) {
 			foreach ( $purchase_options as $purchase_option ) {
 				$final_purchase_options[] = $purchase_option;
@@ -556,4 +568,58 @@ class Frontend_Post {
 		return ( ! empty( $paywall_data ) && 1 === absint( $paywall_data['is_active'] ) ) ? true : false;
 	}
 
+	/**
+	 * Get connected paywall data for the current post.
+	 *
+	 * Check for paywalls in order of this priority.
+	 *
+	 * - Individual Post Paywall.
+	 * - Paywall based on categories in the post.
+	 * - Paywall based on categories not in the post.
+	 * - Global Paywall.
+	 *
+	 * @param int $post_id Post ID.
+	 *
+	 * @return array
+	 */
+	private function get_connected_paywall_id( $post_id ) {
+		$paywall_instance = Paywall::get_instance();
+		if ( empty( $this->connected_paywall_id ) ) {
+			$paywall_id   = $paywall_instance->get_connected_paywall_by_post( $post_id );
+			$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
+
+			// If post doesn't have an individual paywall, check for paywall on categories.
+			if ( ! $this->is_paywall_active( $paywall_data ) ) {
+				// Check if paywall is found on post categories.
+				$post_terms = wp_get_post_categories( $post_id );
+				if ( ! empty( $post_terms ) ) {
+					$paywall_id   = $paywall_instance->get_connected_paywall_by_categories( $post_terms );
+					$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
+
+					// If paywall is not found on post categories, check for paywalls on excluded categories.
+					if ( ! $this->is_paywall_active( $paywall_data ) ) {
+						$paywall_id   = $paywall_instance->get_connected_paywall_in_excluded_categories( $post_terms );
+						$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
+					}
+				}
+			}
+
+			// If no paywall found in categories and individual post, check for paywall applied on all posts as last resort.
+			if ( ! $this->is_paywall_active( $paywall_data ) ) {
+				$paywall_id = $paywall_instance->get_paywall_for_all_posts();
+			}
+
+			// Setup purchase options.
+			$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
+			if ( $this->is_paywall_active( $paywall_data ) ) {
+				$this->connected_paywall_id = $paywall_data['id'];
+
+				return $paywall_data;
+			} else {
+				return [];
+			}
+		} else {
+			return $paywall_instance->get_purchase_option_data_by_paywall_id( $this->connected_paywall_id );
+		}
+	}
 }

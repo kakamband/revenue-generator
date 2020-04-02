@@ -70,15 +70,47 @@ class Time_Pass extends Base {
 	}
 
 	/**
-	 * Get all active time passes id.
+	 * Get all time passes id.
 	 *
 	 * @return array of time passes.
 	 */
 	public function get_all_time_pass_tokenized_ids() {
+		$time_pass_ids   = [];
+		$all_time_passes = $this->get_all_time_passes();
+		foreach ( $all_time_passes as $time_pass ) {
+			$time_pass_ids[] = $this->tokenize_time_pass_id( $time_pass['id'] );
+		}
+
+		return $time_pass_ids;
+	}
+
+	/**
+	 * Get all active time passes id.
+	 *
+	 * @return array of time passes.
+	 */
+	public function get_active_time_pass_tokenized_ids() {
 		$time_pass_ids      = [];
-		$active_time_passes = $this->get_all_time_passes();
+		$active_time_passes = $this->get_active_time_passes();
 		foreach ( $active_time_passes as $time_pass ) {
 			$time_pass_ids[] = $this->tokenize_time_pass_id( $time_pass['id'] );
+		}
+
+		return $time_pass_ids;
+	}
+
+	/**
+	 * Get inactive time passes id.
+	 *
+	 * @return array of time passes.
+	 */
+	public function get_inactive_time_pass_tokenized_ids() {
+		$time_pass_ids   = [];
+		$all_time_passes = $this->get_all_time_passes();
+		foreach ( $all_time_passes as $time_pass ) {
+			if ( empty( $time_pass['is_active'] ) ) {
+				$time_pass_ids[] = $this->tokenize_time_pass_id( $time_pass['id'] );
+			}
 		}
 
 		return $time_pass_ids;

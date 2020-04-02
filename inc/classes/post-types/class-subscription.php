@@ -70,15 +70,47 @@ class Subscription extends Base {
 	}
 
 	/**
-	 * Get all active subscriptions id.
+	 * Get all subscriptions id.
 	 *
 	 * @return array of subscriptions ids.
 	 */
 	public function get_all_subscription_tokenized_ids() {
+		$subscription_ids  = [];
+		$all_subscriptions = $this->get_all_subscriptions();
+		foreach ( $all_subscriptions as $subscription ) {
+			$subscription_ids[] = $this->tokenize_subscription_id( $subscription['id'] );
+		}
+
+		return $subscription_ids;
+	}
+
+	/**
+	 * Get all active subscriptions id.
+	 *
+	 * @return array of subscriptions ids.
+	 */
+	public function get_active_subscription_tokenized_ids() {
 		$subscription_ids     = [];
-		$active_subscriptions = $this->get_all_subscriptions();
+		$active_subscriptions = $this->get_active_subscriptions();
 		foreach ( $active_subscriptions as $subscription ) {
 			$subscription_ids[] = $this->tokenize_subscription_id( $subscription['id'] );
+		}
+
+		return $subscription_ids;
+	}
+
+	/**
+	 * Get inactive subscriptions id.
+	 *
+	 * @return array of subscriptions ids.
+	 */
+	public function get_inactive_subscription_tokenized_ids() {
+		$subscription_ids  = [];
+		$all_subscriptions = $this->get_all_subscriptions();
+		foreach ( $all_subscriptions as $subscription ) {
+			if ( empty( $subscription['is_active'] ) ) {
+				$subscription_ids[] = $this->tokenize_subscription_id( $subscription['id'] );
+			}
 		}
 
 		return $subscription_ids;
