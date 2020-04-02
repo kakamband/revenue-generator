@@ -996,6 +996,8 @@ import tippy, { roundArrow } from 'tippy.js';
 									);
 								}
 							}
+
+							reorderPurchaseItems();
 						}, 1000 )
 					);
 
@@ -1641,16 +1643,6 @@ import tippy, { roundArrow } from 'tippy.js';
 						filter: 'unset',
 						'pointer-events': 'unset',
 					} );
-
-					// Get paywall id and refresh page so that current order is correct.
-					const paywall = $( $o.purchaseOptionItems );
-					const paywallId = paywall.attr( 'data-paywall-id' );
-					if ( paywallId ) {
-						window.location.href =
-							revenueGeneratorGlobalOptions.paywallPageBase +
-							'&current_paywall=' +
-							paywallId;
-					}
 				} );
 
 				/**
@@ -2683,16 +2675,94 @@ import tippy, { roundArrow } from 'tippy.js';
 			const reorderPurchaseItems = function() {
 				// Get all purchase options.
 				const purchaseOptions = $( $o.purchaseOptionItems );
+				// Sort options by order, single purchase, time passes, subscriptions.
+				if ( purchaseOptions.length ) {
+					// Add temporary lpc pricing attribute, for sorting.
+					purchaseOptions
+						.children( $o.purchaseOptionItem )
+						.each( function() {
+							const priceItem = $( this ).find(
+								$o.purchaseOptionItemPrice
+							);
+							const currentPrice = priceItem.text().trim();
+							const connectorPricing = (
+								currentPrice * 100
+							).toFixed( 0 );
+							$( this ).attr(
+								'data-lpc-pricing',
+								connectorPricing
+							);
+						} );
 
-				/**
-				 * Loop through all purchase options and update reorder.
-				 */
-				purchaseOptions
-					.children( $o.purchaseOptionItem )
-					.each( function( i ) {
-						const order = i + 1;
-						$( this ).attr( 'data-order', order );
-					} );
+					// Get all options, if available.
+					const individualOption = purchaseOptions.find(
+						"[data-purchase-type='individual']"
+					);
+					const timePassOptions = purchaseOptions.find(
+						"[data-purchase-type='timepass']"
+					);
+					const subscriptionOptions = purchaseOptions.find(
+						"[data-purchase-type='subscription']"
+					);
+
+					// Move individual option to the top of the list.
+					if ( individualOption.length ) {
+						purchaseOptions.prepend( individualOption );
+					}
+
+					// Add time passes after individual option else add to top.
+					if ( timePassOptions.length ) {
+						// Sort the time passes internally.
+						timePassOptions.sort( function( a, b ) {
+							return (
+								+$( a ).attr( 'data-lpc-pricing' ) -
+								+$( b ).attr( 'data-lpc-pricing' )
+							);
+						} );
+
+						// Remove options and add sorted options.
+						purchaseOptions
+							.find( "[data-purchase-type='timepass']" )
+							.remove();
+
+						if ( individualOption.length ) {
+							purchaseOptions
+								.find( individualOption )
+								.after( timePassOptions );
+						} else {
+							purchaseOptions.prepend( timePassOptions );
+						}
+					}
+
+					// Add subscriptions to the end.
+					if ( subscriptionOptions.length ) {
+						// Sort the subscriptions internally.
+						subscriptionOptions.sort( function( a, b ) {
+							return (
+								+$( a ).data( 'lpc-pricing' ) -
+								+$( b ).data( 'lpc-pricing' )
+							);
+						} );
+
+						// Remove options and add sorted options.
+						purchaseOptions
+							.find( "[data-purchase-type='subscription']" )
+							.remove();
+
+						// Append sorted subscriptions to the purchase options.
+						purchaseOptions.append( subscriptionOptions );
+					}
+
+					/**
+					 * Loop through all purchase options and update the order.
+					 */
+					purchaseOptions
+						.children( $o.purchaseOptionItem )
+						.each( function( i ) {
+							const order = i + 1;
+							$( this ).attr( 'data-order', order );
+						} );
+				}
 			};
 
 			/**

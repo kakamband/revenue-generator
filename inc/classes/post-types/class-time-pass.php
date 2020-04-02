@@ -375,31 +375,4 @@ class Time_Pass extends Base {
 		return [];
 	}
 
-	/**
-	 * Sort time pass ids by price.
-	 *
-	 * @param array $time_pass_ids Time Pass IDs.
-	 *
-	 * @return array
-	 */
-	public function get_time_pass_ids_by_price( $time_pass_ids ) {
-		if ( ! empty( $time_pass_ids ) ) {
-			$time_pass_data = [];
-
-			foreach ( $time_pass_ids as $time_pass_id ) {
-				$current_time_pass_data          = $this->get_time_pass_by_id( $time_pass_id );
-				$connector_price                 = Config::get_connector_price( floatval( $current_time_pass_data['price'] ) );
-				$time_pass_data[ $time_pass_id ] = $connector_price;
-			}
-
-			if ( ! empty( $time_pass_data ) ) {
-				asort( $time_pass_data );
-
-				return array_keys( $time_pass_data );
-			}
-		}
-
-		return [];
-	}
-
 }

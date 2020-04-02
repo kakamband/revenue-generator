@@ -376,31 +376,4 @@ class Subscription extends Base {
 
 		return [];
 	}
-
-	/**
-	 * Sort subscription ids by price.
-	 *
-	 * @param array $subscriptions_ids Subscription IDs.
-	 *
-	 * @return array
-	 */
-	public function get_subscription_ids_by_price( $subscriptions_ids ) {
-		if ( ! empty( $subscriptions_ids ) ) {
-			$subscriptions_data = [];
-
-			foreach ( $subscriptions_ids as $subscriptions_id ) {
-				$current_subscription_data           = $this->get_subscription_by_id( $subscriptions_id );
-				$connector_price                     = Config::get_connector_price( floatval( $current_subscription_data['price'] ) );
-				$subscriptions_data[ $subscriptions_id ] = $connector_price;
-			}
-
-			if ( ! empty( $subscriptions_data ) ) {
-				asort( $subscriptions_data );
-
-				return array_keys( $subscriptions_data );
-			}
-		}
-
-		return [];
-	}
 }
