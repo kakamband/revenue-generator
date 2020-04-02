@@ -125,6 +125,34 @@ class Frontend_Post {
 		add_action( 'wp_enqueue_scripts', [ $this, 'register_connector_assets' ] );
 		add_filter( 'wp_head', [ $this, 'add_connector_config' ] );
 		add_filter( 'the_content', [ $this, 'revenue_generator_post_content' ] );
+		add_action( 'wp_ajax_rg_replace_main_content', [ $this, 'rg_replace_main_content' ] );
+		add_action( 'wp_ajax_nopriv_rg_replace_main_content', [ $this, 'rg_replace_main_content' ] );
+	}
+
+	/**
+	 * Replace teaser content with actual content when user has access.
+	 */
+	public function rg_replace_main_content() {
+		// Verify authenticity.
+		check_ajax_referer( 'rg_front_paywall_nonce', 'security' );
+		$rg_post_content = '';
+
+		$rg_post_id = filter_input( INPUT_POST, 'rgPostId', FILTER_SANITIZE_NUMBER_INT );
+
+		// If we have a post id, get it's content, runt through a filter and return.
+		if ( ! empty( $rg_post_id ) ) {
+			// Get current post ID.
+			$rg_post_data    = get_post( $rg_post_id );
+			$rg_post_content = $rg_post_data->post_content;
+			$rg_post_content = apply_filters( 'the_content', $rg_post_content );
+		}
+
+		wp_send_json(
+			[
+				'success' => true,
+				'content' => $rg_post_content,
+			]
+		);
 	}
 
 	/**
@@ -135,15 +163,42 @@ class Frontend_Post {
 			$appearance_config = $this->get_purchase_overlay_config();
 			$deleted_articles  = $this->get_deleted_article_ids();
 			?>
+			<!-- LaterPay Connector In-Page Configuration for handling teaser whe user has access.  -->
+			<script type="text/javascript">
+					function revenueGeneratorHideTeaserContent(context, done) {
+						document.querySelector('.lp-teaser-content').style.display = 'none';
+						const formData = {
+							action  : 'rg_replace_main_content',
+							security: '<?php echo wp_create_nonce( 'rg_front_paywall_nonce' ); ?>',
+							rgPostId: '<?php echo esc_html( $this->current_post_id ) ?>',
+						};
+
+						// Set the post content when user has access.
+						setTimeout(function () {
+							jQuery.post('<?php echo admin_url( 'admin-ajax.php' ); ?>',
+								formData,
+								function (r) {
+									if (r.content) {
+										console.log(r.content);
+										jQuery('.lp-main-content').empty().append(r.content);
+									}
+								});
+						}, 1000);
+						return false;
+					}
+			</script>
 			<!-- LaterPay Connector In-Page Configuration for appearance layout and deleted purchase options. -->
 			<script type="application/json" id="laterpay-connector">
 			<?php
 				$appearance_and_deleted_config = [
-					'appearance'      => $appearance_config,
+					'appearance'   => $appearance_config,
+					'callbacks'    => [
+						'onUserHasAccess' => 'revenueGeneratorHideTeaserContent',
+					],
 					'translations' => [
 						'purchaseOverlay' => [
-							'heading' => esc_html__( 'Keep Reading', 'revenue-generator' ),
-							'currentArticle' => empty( $this->individual_article_title ) ? esc_html__( 'Access Article Now', 'revenue-generator' ) : esc_html( $this->individual_article_title ),
+							'heading'                   => esc_html__( 'Keep Reading', 'revenue-generator' ),
+							'currentArticle'            => empty( $this->individual_article_title ) ? esc_html__( 'Access Article Now', 'revenue-generator' ) : esc_html( $this->individual_article_title ),
 							'currentArticleDescription' => empty( $this->individual_article_description ) ? esc_html__( 'You\'ll only be charged once you\'ve reached $5.', 'revenue-generator' ) : esc_html( $this->individual_article_description ),
 						],
 					],
@@ -158,26 +213,12 @@ class Frontend_Post {
 			$post_payload_data = $this->get_post_payload();
 			if ( ! empty( $post_payload_data ) ) {
 				?>
-				<!-- LaterPay Connector In-Page Configuration for handling teaser whe user has access.  -->
-				<script type="text/javascript">
-					function revenueGeneratorHideTeaserContent() {
-						document.querySelector('.lp-teaser-content').style.display = 'none';
-					}
-				</script>
-				<!-- LaterPay Connector In-Page Configuration for callbacks -->
-				<script type="application/json" id="laterpay-connector">
-					{
-						"callbacks": {
-							"onUserHasAccess": "revenueGeneratorHideTeaserContent"
-						}
-					}
-				</script>
 				<!-- LaterPay Connector In-Page Configuration for purchase options -->
 				<script type="application/json" id="laterpay-connector">
 				<?php
 					/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- added json string is secure and escaped.*/
 					echo $post_payload_data['payload'];
-				?>
+					?>
 				</script>
 				<meta property="laterpay:connector:config_token" content="<?php echo esc_attr( $post_payload_data['token'] ); ?>" />
 				<?php
@@ -214,7 +255,7 @@ class Frontend_Post {
 			wp_enqueue_script(
 				'revenue-generator-classic-connector',
 				$connector_url,
-				[],
+				[ 'jquery' ],
 				false,
 				true
 			);
@@ -262,7 +303,7 @@ class Frontend_Post {
 			}
 		}
 
-		$post_content = sprintf( '<div class="lp-main-content" data-lp-show-on-access>%s</div>', $post_content );
+		$post_content = sprintf( '<div class="lp-main-content" data-lp-show-on-access>%s</div>', $teaser );
 		if ( ! empty( $teaser ) ) {
 			$rg_post_content = $teaser . $post_content;
 		} else {
@@ -385,7 +426,7 @@ class Frontend_Post {
 		if ( isset( $individual_option_data['individual'] ) && 'option_did_exist' === $individual_option_data['individual'] ) {
 			$individual_option_existed = true;
 		} else {
-			$this->individual_article_title = $individual_option_data['title'];
+			$this->individual_article_title       = $individual_option_data['title'];
 			$this->individual_article_description = $individual_option_data['description'];
 		}
 
