@@ -36,6 +36,20 @@ class Frontend_Post {
 	protected $current_post_id;
 
 	/**
+	 * Individual article purchase option tile.
+	 *
+	 * @var string
+	 */
+	protected $individual_article_title;
+
+	/**
+	 * Individual article purchase option description.
+	 *
+	 * @var string
+	 */
+	protected $individual_article_description;
+
+	/**
 	 * Merchant region.
 	 *
 	 * @var string
@@ -124,12 +138,21 @@ class Frontend_Post {
 			<!-- LaterPay Connector In-Page Configuration for appearance layout and deleted purchase options. -->
 			<script type="application/json" id="laterpay-connector">
 			<?php
-				$appearance_and_deleted_config = [ 'appearance' => $appearance_config ];
-			if ( ! empty( $deleted_articles ) ) {
-				$appearance_and_deleted_config['articleId'] = $deleted_articles;
-			}
+				$appearance_and_deleted_config = [
+					'appearance'      => $appearance_config,
+					'translations' => [
+						'purchaseOverlay' => [
+							'heading' => esc_html__( 'Keep Reading', 'revenue-generator' ),
+							'currentArticle' => empty( $this->individual_article_title ) ? esc_html__( 'Access Article Now', 'revenue-generator' ) : esc_html( $this->individual_article_title ),
+							'currentArticleDescription' => empty( $this->individual_article_description ) ? esc_html__( 'You\'ll only be charged once you\'ve reached $5.', 'revenue-generator' ) : esc_html( $this->individual_article_description ),
+						],
+					],
+				];
+				if ( ! empty( $deleted_articles ) ) {
+					$appearance_and_deleted_config['articleId'] = $deleted_articles;
+				}
 				echo wp_json_encode( $appearance_and_deleted_config );
-			?>
+				?>
 			</script>
 			<?php
 			$post_payload_data = $this->get_post_payload();
@@ -361,6 +384,9 @@ class Frontend_Post {
 		$individual_option_data = $paywall_instance->get_individual_purchase_option_data( $this->connected_paywall_id );
 		if ( isset( $individual_option_data['individual'] ) && 'option_did_exist' === $individual_option_data['individual'] ) {
 			$individual_option_existed = true;
+		} else {
+			$this->individual_article_title = $individual_option_data['title'];
+			$this->individual_article_description = $individual_option_data['description'];
 		}
 
 		/**

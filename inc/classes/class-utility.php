@@ -32,17 +32,17 @@ class Utility {
 	 * Determine the number of words to be shown for teaser/overlay.
 	 *
 	 * @param string $content Post content.
+	 * @param int    $min     Minimum number of words.
+	 * @param int    $max     Maximum number of words.
 	 *
 	 * @return int $number_of_words
 	 */
-	public static function determine_number_of_words( $content ) {
+	public static function determine_number_of_words( $content, $min = 50, $max = 100 ) {
 		$content     = preg_replace( '/\s+/', ' ', $content );
 		$total_words = count( explode( ' ', $content ) );
 
 		// Static values passed for creating the number of words.
 		$percent = max( min( 5, 100 ), 1 );
-		$min     = 10;
-		$max     = 25;
 
 		$number_of_words = $total_words * ( $percent / 100 );
 		$number_of_words = max( min( $number_of_words, $max ), $min );
@@ -103,7 +103,7 @@ class Utility {
 			}
 			$total_length = mb_strlen( wp_strip_all_tags( $ellipsis ) );
 			$open_tags    = [];
-			$truncate    = '';
+			$truncate     = '';
 
 			preg_match_all( '/(<\/?([\w+]+)[^>]*>)?([^<>]*)/', $text, $tags, PREG_SET_ORDER );
 			foreach ( $tags as $tag ) {
@@ -121,7 +121,7 @@ class Utility {
 
 				$content_length = mb_strlen( preg_replace( '/&[0-9a-z]{2,8};|&#[0-9]{1,7};|&#x[0-9a-f]{1,6};/i', ' ', $tag[3] ) );
 				if ( $content_length + $total_length > $length ) {
-					$left           = $length - $total_length;
+					$left            = $length - $total_length;
 					$entities_length = 0;
 					if ( preg_match_all( '/&[0-9a-z]{2,8};|&#[0-9]{1,7};|&#x[0-9a-f]{1,6};/i', $tag[3], $entities, PREG_OFFSET_CAPTURE ) ) {
 						foreach ( $entities[0] as $entity ) {
@@ -137,7 +137,7 @@ class Utility {
 					$truncate .= mb_substr( $tag[3], 0, $left + $entities_length );
 					break;
 				} else {
-					$truncate    .= $tag[3];
+					$truncate     .= $tag[3];
 					$total_length += $content_length;
 				}
 				if ( $total_length >= $length ) {
@@ -157,11 +157,11 @@ class Utility {
 			$spacepos = mb_strrpos( $truncate, ' ' );
 			if ( $html ) {
 				$truncate_check = mb_substr( $truncate, 0, $spacepos );
-				$last_open_tag   = mb_strrpos( $truncate_check, '<' );
-				$last_close_tag  = mb_strrpos( $truncate_check, '>' );
+				$last_open_tag  = mb_strrpos( $truncate_check, '<' );
+				$last_close_tag = mb_strrpos( $truncate_check, '>' );
 				if ( $last_open_tag > $last_close_tag ) {
 					preg_match_all( '/<[\w]+[^>]*>/s', $truncate, $last_tag_matches );
-					$last_tag  = array_pop( $last_tag_matches[0] );
+					$last_tag = array_pop( $last_tag_matches[0] );
 					$spacepos = mb_strrpos( $truncate, $last_tag ) + mb_strlen( $last_tag );
 				}
 				$bits = mb_substr( $truncate, $spacepos );

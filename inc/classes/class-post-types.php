@@ -162,12 +162,21 @@ class Post_Types {
 			]
 		);
 
+		$post_content_for_preview = Utility::truncate(
+			preg_replace( '/\s+/', ' ', $post_content ),
+			Utility::determine_number_of_words( $post_content ),
+			[
+				'html'  => true,
+				'words' => true,
+			]
+		);
+
 		return [
 			'ID'           => $post_data->ID,
 			'title'        => $post_data->post_title,
-			'excerpt'      => $post_data->excerpt,
+			'excerpt'      => $post_data->post_excerpt,
 			'teaser'       => $teaser_content,
-			'post_content' => apply_filters( 'the_content', $post_data->post_content ),
+			'post_content' => empty( $post_data->post_excerpt ) ? $post_content_for_preview : $post_data->post_excerpt,
 		];
 	}
 
