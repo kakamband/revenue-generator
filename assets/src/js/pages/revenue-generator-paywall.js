@@ -267,6 +267,8 @@ import tippy, { roundArrow } from 'tippy.js';
 						// Hack to get tooltip on expected place.
 						Shepherd.activeTour.next();
 						Shepherd.activeTour.back();
+					}else if ( 'rg-purchase-option-paywall-publish' === stepId ) {
+						$o.activatePaywall.css('background-color', '#000');
 					}
 				} );
 
@@ -2071,11 +2073,13 @@ import tippy, { roundArrow } from 'tippy.js';
 				const skipTourButton = {
 					text: __( 'Skip Tour', 'revenue-generator' ),
 					action: tour.complete,
+					classes: 'shepherd-content-skip-tour',
 				};
 
 				const nextButton = {
 					text: __( 'Next >', 'revenue-generator' ),
 					action: tour.next,
+					classes: 'shepherd-content-next-tour-element',
 				};
 
 				// Add tutorial step for main search.
@@ -2234,6 +2238,7 @@ import tippy, { roundArrow } from 'tippy.js';
 						{
 							text: __( 'Complete', 'revenue-generator' ),
 							action: tour.next,
+							classes: 'shepherd-content-complete-tour-element',
 						},
 					],
 				} );

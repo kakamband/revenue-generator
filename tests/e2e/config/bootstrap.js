@@ -123,43 +123,6 @@ function observeConsoleLogging() {
 }
 
 /**
- * Runs Axe tests when the block editor is found on the current page.
- *
- * @return {?Promise} Promise resolving once Axe texts are finished.
- */
-async function runAxeTestsForBlockEditor() {
-	if ( ! await page.$( '.block-editor' ) ) {
-		return;
-	}
-
-	await expect( page ).toPassAxeTests( {
-		/**
-		 * Rules are disabled, as there are still accessibility issues within gutenberg.
-		 *
-		 * See: https://github.com/WordPress/gutenberg/pull/15018 & https://github.com/WordPress/gutenberg/issues/15452
-		 */
-		disabledRules: [
-			'aria-allowed-role',
-			'aria-valid-attr-value',
-			'button-name',
-			'color-contrast',
-			'dlitem',
-			'duplicate-id',
-			'label',
-			'link-name',
-			'listitem',
-			'region',
-		],
-		exclude: [
-			// Ignores elements created by metaboxes.
-			'.edit-post-layout__metaboxes',
-			// Ignores elements created by TinyMCE.
-			'.mce-container',
-		],
-	} );
-}
-
-/**
  * Before every test suite run, delete all content created by the test. This ensures
  * other posts/comments/etc. aren't dirtying tests and tests don't depend on
  * each other's side-effects.
@@ -171,13 +134,12 @@ beforeAll( async () => {
 	observeConsoleLogging();
 	await setBrowserViewport( 'large' );
 	await page.setDefaultNavigationTimeout( 10000 );
-	await page.setDefaultTimeout( 3000 );
+	await page.setDefaultTimeout( 10000 );
 } );
 
 // eslint-disable-next-line jest/require-top-level-describe
 afterEach( async () => {
 	await clearLocalStorage();
-	await runAxeTestsForBlockEditor();
 	await setBrowserViewport( 'large' );
 } );
 

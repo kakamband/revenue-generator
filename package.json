@@ -19,7 +19,7 @@
 		"env:reset-site": "./bin/local-env/install-wordpress.sh --reset-site",
 		"test:e2e": "cross-env WP_BASE_URL=http://localhost:8890 wp-scripts test-e2e --config=tests/e2e/jest.config.js",
 		"test:e2e:help": "npm run test:e2e -- --help",
-		"test:e2e:interactive": "npm run test:e2e -- --puppeteer-interactive",
+		"test:e2e:interactive": "npm run test:e2e -- --puppeteer-interactive --puppeteer-slowmo=150",
 		"build": "NODE_ENV=production webpack --mode=production",
 		"language:make-po": "wp i18n make-pot . --exclude=\"build\" languages/revenue-generator.po --headers='{\"Last-Translator\":\"Kimberly Moore <kmoore@laterpay.net>\"}'",
 		"language": "run-s \"language:*\"",
@@ -28,6 +28,7 @@
 	"devDependencies": {
 		"@babel/core": "^7.4.3",
 		"@babel/preset-env": "^7.4.3",
+		"@jest/test-sequencer": "25.2.7",
 		"@wordpress/e2e-test-utils": "^4.3.1",
 		"@wordpress/i18n": "^3.9.0",
 		"@wordpress/jest-puppeteer-axe": "^1.6.0",

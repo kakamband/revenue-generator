@@ -20,4 +20,5 @@ module.exports = {
 		'<rootDir>/vendor',
 	],
 	reporters: [ [ 'jest-silent-reporter', { useDots: true } ] ],
+	testSequencer : '<rootDir>/tests/e2e/config/jest-custom-sequencer.js'
 };
