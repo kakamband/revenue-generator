@@ -1,4 +1,4 @@
-/* global revenueGeneratorGlobalOptions */
+/* global revenueGeneratorGlobalOptions, Shepherd, tippy */
 /**
  * JS to handle plugin paywall preview screen interactions.
  *
@@ -11,8 +11,6 @@
 import '../utils';
 import { debounce } from '../helpers';
 import { __, sprintf } from '@wordpress/i18n';
-import Shepherd from 'shepherd.js';
-import tippy, { roundArrow } from 'tippy.js';
 
 ( function( $ ) {
 	$( function() {
@@ -194,7 +192,7 @@ import tippy, { roundArrow } from 'tippy.js';
 								'.rev-gen-preview-main--search'
 							),
 							{
-								arrow: roundArrow,
+								arrow: tippy.roundArrow,
 							}
 						);
 						tippyInstance.show();
@@ -2012,7 +2010,7 @@ import tippy, { roundArrow } from 'tippy.js';
 			 * @param {string} elementIdentifier Selector matching elements on the document
 			 */
 			const initializeTooltip = function( elementIdentifier ) {
-				tippy( elementIdentifier, { arrow: roundArrow } );
+				tippy( elementIdentifier, { arrow: tippy.roundArrow } );
 			};
 
 			/**
