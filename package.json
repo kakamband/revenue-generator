@@ -51,13 +51,11 @@
 		"sass-loader": "^7.1.0",
 		"stylelint": "^13.2.1",
 		"stylelint-config-wordpress": "^16.0.0",
+		"tippy.js": "^6.0.3",
 		"url-loader": "^3.0.0",
 		"webpack": "^4.30.0",
 		"webpack-cli": "^3.3.9",
 		"webpackbar": "^4.0.0"
 	},
-	"dependencies": {
-		"shepherd.js": "^7.0.3",
-		"tippy.js": "^6.0.3"
-	}
+	"dependencies": {}
 }

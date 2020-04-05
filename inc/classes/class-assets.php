@@ -49,7 +49,8 @@ class Assets {
 			'revenue-generator-select2',
 			REVENUE_GENERATOR_BUILD_URL . 'vendor/select2/select2.min.js',
 			[ 'jquery' ],
-			$this->get_asset_version( 'vendor/select2/select2.min.js' )
+			$this->get_asset_version( 'vendor/select2/select2.min.js' ),
+			true
 		);
 
 		wp_register_style(
@@ -59,11 +60,38 @@ class Assets {
 			$this->get_asset_version( 'vendor/select2/select2.min.css' )
 		);
 
+		// Register required library script for plugin tour.
+		wp_register_script(
+			'revenue-generator-shepherd',
+			REVENUE_GENERATOR_BUILD_URL . 'vendor/shepherd/shepherd.min.js',
+			[],
+			$this->get_asset_version( 'vendor/shepherd/shepherd.min.js' ),
+			true
+		);
+
+		// Register required library scripts for tooltip.
+		wp_register_script(
+			'revenue-generator-popper',
+			REVENUE_GENERATOR_BUILD_URL . 'vendor/tippy/popper.min.js',
+			[],
+			$this->get_asset_version( 'vendor/tippy/popper.min.js' ),
+			true
+		);
+
+		wp_register_script(
+			'revenue-generator-tippy',
+			REVENUE_GENERATOR_BUILD_URL . 'vendor/tippy/tippy.min.js',
+			[ 'revenue-generator-popper' ],
+			$this->get_asset_version( 'vendor/tippy/tippy.min.js' ),
+			true
+		);
+
 		wp_register_script(
 			'revenue-generator',
 			REVENUE_GENERATOR_BUILD_URL . 'revenue-generator-admin.js',
-			[ 'jquery', 'wp-util', 'revenue-generator-select2' ],
-			$this->get_asset_version( 'revenue-generator-admin.js' )
+			[ 'jquery', 'revenue-generator-shepherd', 'revenue-generator-select2', 'revenue-generator-tippy', 'wp-util' ],
+			$this->get_asset_version( 'revenue-generator-admin.js' ),
+			true
 		);
 
 		// Sets translated strings for JS script.
