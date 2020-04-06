@@ -61,14 +61,28 @@ body {
 		text-transform: uppercase;
 		border: 0;
 		cursor: pointer;
-		margin-right: 20px;
 		padding: 0;
-		margin-left: 5px;
 	}
 
 	.shepherd-footer {
 		position: absolute;
 		bottom: 10px;
+		right: 0;
+	}
+
+	.shepherd-content-skip-tour {
+		position: relative;
+		right: 100px;
+	}
+
+	.shepherd-content-complete-tour-element {
+		position: relative;
+		left: -10px;
+	}
+
+	.shepherd-content-next-tour-element {
+		position: relative;
+		left: -10px;
 	}
 }
 
