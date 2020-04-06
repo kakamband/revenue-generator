@@ -136,13 +136,13 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 				<option
 				<# data.entityType === 'individual' ? print("selected") : print('') #> value="individual"><?php esc_html_e( 'Individual Article', 'revenue-generator' ); ?></option>
 				<option
-				<# data.entityType === 'timepass' ? print("selected") : print('') #> value="timepass"><?php esc_html_e( 'Time Pass', 'revenue-generator' ); ?></option>
+				<# data.entityType === 'timepass' ? print("selected") : print('') #> value="timepass"><?php esc_html_e( 'Time Pass (for the entire site)', 'revenue-generator' ); ?></option>
 				<option
-				<# data.entityType === 'subscription' ? print("selected") : print('') #> value="subscription"><?php esc_html_e( 'Subscription', 'revenue-generator' ); ?></option>
+				<# data.entityType === 'subscription' ? print("selected") : print('') #> value="subscription"><?php esc_html_e( 'Subscription (for the entire site)', 'revenue-generator' ); ?></option>
 			</select>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-revenue">
-			<span><?php esc_html_e( 'Pay Now', 'revenue-generator' ); ?></span>
+			<span class="align-text"><?php esc_html_e( 'Pay Now', 'revenue-generator' ); ?></span>
 			<label class="switch">
 				<input class="rg-purchase-overlay-option-revenue-selection" type="checkbox">
 				<span class="slider round"></span>
@@ -153,7 +153,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 			</button>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-pricing">
-			<span><?php esc_html_e( 'Static Pricing', 'revenue-generator' ); ?></span>
+			<span class="align-text"><?php esc_html_e( 'Static Pricing', 'revenue-generator' ); ?></span>
 			<label class="switch">
 				<input class="rg-purchase-overlay-option-pricing-selection" type="checkbox">
 				<span class="slider round"></span>

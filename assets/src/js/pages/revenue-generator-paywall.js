@@ -265,8 +265,10 @@ import { __, sprintf } from '@wordpress/i18n';
 						// Hack to get tooltip on expected place.
 						Shepherd.activeTour.next();
 						Shepherd.activeTour.back();
-					}else if ( 'rg-purchase-option-paywall-publish' === stepId ) {
-						$o.activatePaywall.css('background-color', '#000');
+					} else if (
+						'rg-purchase-option-paywall-publish' === stepId
+					) {
+						$o.activatePaywall.css( 'background-color', '#000' );
 					}
 				} );
 
@@ -428,6 +430,23 @@ import { __, sprintf } from '@wordpress/i18n';
 				} );
 
 				/**
+				 * Hide the existing option manager if open by any chance.
+				 */
+				$o.previewWrapper.on( 'click', function( e ) {
+					const currentTarget = $( e.target );
+					// Hide other existing option manager in the view, if parent is not the manager element.
+					if (
+						! currentTarget.parents(
+							'.rg-purchase-overlay-option-manager'
+						).length
+					) {
+						$o.body
+							.find( '.rg-purchase-overlay-option-manager' )
+							.hide();
+					}
+				} );
+
+				/**
 				 * Add action items on purchase item hover.
 				 */
 				$o.body.on( 'mouseenter', $o.purchaseOptionItem, function() {
@@ -469,9 +488,6 @@ import { __, sprintf } from '@wordpress/i18n';
 							'.rg-purchase-overlay-purchase-options-item-actions'
 						)
 						.remove();
-					$( this )
-						.find( '.rg-purchase-overlay-option-manager' )
-						.hide();
 				} );
 
 				/**
@@ -484,6 +500,11 @@ import { __, sprintf } from '@wordpress/i18n';
 					let actionManager = optionItem.find(
 						'.rg-purchase-overlay-option-manager'
 					);
+
+					// Hide any other existing option manager in the view.
+					$o.body
+						.find( '.rg-purchase-overlay-option-manager' )
+						.hide();
 
 					// Get all purchase options.
 					const allPurchaseOptions = $( $o.purchaseOptionItems );
@@ -581,6 +602,10 @@ import { __, sprintf } from '@wordpress/i18n';
 							$o.purchaseRevenueWrapper
 						);
 						if ( 'subscription' === entityType ) {
+							// Add extra height to get proper styling.
+							actionManager
+								.find( 'div' )
+								.css( { height: ' 55px' } );
 							revenueWrapper.hide();
 						} else {
 							// Set revenue model for selected option.
@@ -611,7 +636,9 @@ import { __, sprintf } from '@wordpress/i18n';
 								.filter( '[value=individual]' );
 							individualOption.attr( 'disabled', true );
 						}
+						// Highlight the current option being edited and open option manager.
 						actionManager.show();
+						optionItem.addClass( 'option-highlight' );
 					}
 				} );
 
@@ -1220,6 +1247,9 @@ import { __, sprintf } from '@wordpress/i18n';
 					);
 					const currentType = optionItem.attr( 'data-purchase-type' );
 					const selectedEntityType = $( this ).val();
+					const optionManager = optionItem.find(
+						'.rg-purchase-overlay-option-manager'
+					);
 					let entityId;
 
 					if ( currentType !== selectedEntityType ) {
@@ -1317,6 +1347,10 @@ import { __, sprintf } from '@wordpress/i18n';
 								optionItem
 									.find( $o.purchaseOptionItemDesc )
 									.text( timePassDefaultValues.description );
+
+								optionManager
+									.find( 'div' )
+									.css( { height: ' 45px' } );
 							} else if (
 								'subscription' === selectedEntityType
 							) {
@@ -1351,11 +1385,18 @@ import { __, sprintf } from '@wordpress/i18n';
 									.text(
 										subscriptionDefaultValues.description
 									);
+
+								optionManager
+									.find( 'div' )
+									.css( { height: ' 55px' } );
 							}
 						} else {
 							// Set static pricing by default if individual.
 							optionItem.attr( 'data-pricing-type', 'static' );
 							optionItem.attr( 'data-paywall-id', '' );
+							optionManager
+								.find( 'div' )
+								.css( { height: ' 45px' } );
 						}
 					}
 				} );
