@@ -22,7 +22,7 @@ import { debounce } from '../helpers';
 				// Paywall listing area elements.
 				paywallContent: '.rev-gen-dashboard-content',
 				paywallPreview: '.rev-gen-dashboard-content-paywall-preview',
-
+				paywallContentWrapper : '.rev-gen-dashboard-content-paywall',
 				// Dashboard bar action items.
 				newPaywall: $( '#rg_js_newPaywall' ),
 				sortPaywalls: $( '#rg_js_filterPaywalls' ),
@@ -31,6 +31,7 @@ import { debounce } from '../helpers';
 					'.rev-gen-dashboard-bar--search-results'
 				),
 				searchResultItem: '.rev-gen-dashboard-bar--search-results-item',
+				editPayWallName : $( '.rev-gen-dashboard-paywall-name' ),
 
 				// Dashboard footer area.
 				restartTour: $( '#rg_js_RestartTutorial' ),
@@ -175,6 +176,47 @@ import { debounce } from '../helpers';
 							searchPostID;
 					}
 				} );
+				
+				$o.editPayWallName.on( 'focusout', function() {
+
+					$( $o.paywallContent ).addClass( 'blury' );
+					$o.body.css( {
+					    overflow: 'hidden',
+					    height: '100%',
+					} );
+
+					// Create form data.
+					const formData = {
+					    action: 'rg_set_paywall_name',
+					    new_paywall_name : $(this).text().trim(),
+					    paywall_id : $(this).closest( $o.paywallContentWrapper ).find( $o.paywallPreview ).attr( 'data-paywall-id' ),
+					    rg_current_url: window.location.href,
+					    security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
+					};
+
+					// Update the title.
+					$.ajax( {
+					    url: revenueGeneratorGlobalOptions.ajaxUrl,
+					    method: 'POST',
+					    data: formData,
+					    dataType: 'json',
+					} ).done( function( r ) {
+
+						if ( true === r.success ) {
+						    $o.snackBar.showSnackbar( r.msg, 1500 );
+						} else if ( false === r.success ) {
+						    $o.snackBar.showSnackbar( r.msg, 1500 );
+						}
+
+						$o.body.css( {
+						    overflow: 'auto',
+						    height: 'auto',
+						} );
+
+						$( $o.paywallContent ).removeClass( 'blury' );
+					} );
+
+				});
 			};
 
 			/**

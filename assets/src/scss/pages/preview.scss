@@ -757,9 +757,12 @@
 }
 
 .rev-gen-snackbar {
-	left: 15px;
 	z-index: 15;
-	bottom: 25%;
+	left: 50%;
+	top: 50%;
+	height: 25px;
+	position: fixed;
+	transform: translate(-50%, 0);
 }
 
 .rev-gen-exit-tour {

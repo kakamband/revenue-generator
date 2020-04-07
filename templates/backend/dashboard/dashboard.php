@@ -46,7 +46,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<div class="rev-gen-dashboard-content-paywall">
 						<?php Paywall::generate_paywall_mini_preview( $paywall_id ); ?>
 						<div class="rev-gen-dashboard-content-paywall-info">
-							<span><?php echo esc_html( $paywall_title ); ?></span>
+							<span contenteditable="true" class="rev-gen-dashboard-paywall-name"><?php echo esc_html( $paywall_title ); ?></span>
 							<p><?php echo wp_kses_post( $paywall_published ); ?></p>
 							<p class="rev-gen-dashboard-content-paywall-info-updated"><?php echo esc_html( $paywall_updated ); ?></p>
 						</div>
