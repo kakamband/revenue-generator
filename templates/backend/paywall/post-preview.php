@@ -136,13 +136,13 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 				<option
 				<# data.entityType === 'individual' ? print("selected") : print('') #> value="individual"><?php esc_html_e( 'Individual Article', 'revenue-generator' ); ?></option>
 				<option
-				<# data.entityType === 'timepass' ? print("selected") : print('') #> value="timepass"><?php esc_html_e( 'Time Pass', 'revenue-generator' ); ?></option>
+				<# data.entityType === 'timepass' ? print("selected") : print('') #> value="timepass"><?php esc_html_e( 'Time Pass (for the entire site)', 'revenue-generator' ); ?></option>
 				<option
-				<# data.entityType === 'subscription' ? print("selected") : print('') #> value="subscription"><?php esc_html_e( 'Subscription', 'revenue-generator' ); ?></option>
+				<# data.entityType === 'subscription' ? print("selected") : print('') #> value="subscription"><?php esc_html_e( 'Subscription (for the entire site)', 'revenue-generator' ); ?></option>
 			</select>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-revenue">
-			<span><?php esc_html_e( 'Pay Now', 'revenue-generator' ); ?></span>
+			<span class="align-text"><?php esc_html_e( 'Pay Now', 'revenue-generator' ); ?></span>
 			<label class="switch">
 				<input class="rg-purchase-overlay-option-revenue-selection" type="checkbox">
 				<span class="slider round"></span>
@@ -153,7 +153,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 			</button>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-pricing">
-			<span><?php esc_html_e( 'Static Pricing', 'revenue-generator' ); ?></span>
+			<span class="align-text"><?php esc_html_e( 'Static Pricing', 'revenue-generator' ); ?></span>
 			<label class="switch">
 				<input class="rg-purchase-overlay-option-pricing-selection" type="checkbox">
 				<span class="slider round"></span>
@@ -383,7 +383,6 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 <!-- Template for revenue info modal -->
 <script type="text/template" id="tmpl-revgen-info-revenue">
 	<div class="rev-gen-preview-main-info-modal">
-		<span class="rev-gen-preview-main-info-modal-cross">X</span>
 		<h4 class="rev-gen-preview-main-info-modal-title"><?php esc_html_e( 'Pay Now v Pay Later?', 'revenue-generator' ); ?></h4>
 		<p class="rev-gen-preview-main-info-modal-message">
 			<?php
@@ -426,7 +425,6 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 <!-- Template for pricing info modal -->
 <script type="text/template" id="tmpl-revgen-info-pricing">
 	<div class="rev-gen-preview-main-info-modal">
-		<span class="rev-gen-preview-main-info-modal-cross">X</span>
 		<h4 class="rev-gen-preview-main-info-modal-title"><?php esc_html_e( 'Static Pricing and Dynamic Pricing', 'revenue-generator' ); ?></h4>
 		<p class="rev-gen-preview-main-info-modal-message">
 			<?php
@@ -518,6 +516,12 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 			</div>
 			<div class="rev-gen-preview-main-account-modal-fields">
 				<h5 class="rev-gen-preview-main-account-modal-fields-title"><?php esc_html_e( 'Connect your account to activate paywall', 'revenue-generator' ); ?></h5>
+				<p>
+					<?php esc_html_e( 'Unsure where to find this information?', 'revenue-generator' ); ?>
+					<a target="_blank" rel="noopener noreferrer" href="https://support.laterpay.net/what-is-my-laterpay-merchant-id-api-key-and-where-can-i-find-them">
+						<?php esc_html_e( 'Click here.', 'revenue-generator' ); ?>
+					</a>
+				</p>
 				<input class="rev-gen-preview-main-account-modal-fields-merchant-id" type="text" placeholder="<?php esc_attr_e( 'Merchant ID', 'revenue-generator' ); ?>" maxlength="22" />
 				<input class="rev-gen-preview-main-account-modal-fields-merchant-key" type="text" placeholder="<?php esc_attr_e( 'API Key', 'revenue-generator' ); ?>" maxlength="32" />
 				<div class="rev-gen-preview-main-account-modal-actions">
@@ -538,12 +542,13 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 					<?php
 					echo wp_kses(
 						sprintf(
-							/* translators: %s static anchor id */
+							/* translators: %1$s static anchor id to handle signup link %2$s statuc anchor id to handle re verification. */
 							__(
-								'It looks like you need to create a LaterPay account. Please <a id="%s" href="#">sign up here,</a> or contact <a href="mailto:integration@laterpay.net">integration@laterpay.net</a> if you’re still experiencing difficulties.',
+								'It looks like you need to create a LaterPay account. Please <a id="%1$s" href="#">sign up here</a>, <a id="%2$s" href="#">try again</a>, or contact <a href="mailto:integration@laterpay.net">integration@laterpay.net</a> if you’re still experiencing difficulties.',
 								'revenue-generator'
 							),
-							'rg_js_warningSignup'
+							'rg_js_warningSignup',
+							'rg_js_restartVerification'
 						),
 						[
 							'a' => [

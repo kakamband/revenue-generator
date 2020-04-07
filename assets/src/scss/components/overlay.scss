@@ -32,7 +32,7 @@
 		flex-direction: column;
 
 		.option-highlight {
-			border: 4px solid;
+			border: solid #000 3px;
 		}
 
 		&-item {
@@ -48,6 +48,7 @@
 			width: 80%;
 			align-self: center;
 			position: relative;
+			box-sizing: border-box;
 
 			&-actions {
 				display: flex;
@@ -63,8 +64,11 @@
 					width: 40px;
 					cursor: pointer;
 
+					&:focus,
 					&:active {
-						border: none;
+						border: unset;
+						color: unset;
+						box-shadow: unset;
 					}
 
 					img {
@@ -82,13 +86,14 @@
 
 				&-title {
 					font-size: 18px;
+					font-weight: 500;
 					margin-bottom: 4px;
 					color: #2e2e2e;
 					cursor: auto;
 				}
 
 				&-description {
-					font-size: 13px;
+					font-size: 14px;
 					color: #585858;
 					cursor: auto;
 				}
@@ -109,6 +114,9 @@
 
 				span {
 					text-align: center;
+					font-size: 18px;
+					font-weight: 600;
+					font-family: "LaterPay WorkSans", serif;
 				}
 
 				&-icon {
@@ -134,33 +142,46 @@
 		width: 300px;
 		background: #fff;
 		font-weight: bold;
+		font-family: "Helvetica Neue", serif;
+
+		&::after,
+		&::before {
+			left: 100%;
+			top: 40%;
+			border: solid transparent;
+			content: " ";
+			position: absolute;
+			pointer-events: none;
+		}
 
 		&::after {
-			content: "";
-			position: absolute;
-			right: -10px;
-			top: 40px;
-			width: 0;
-			height: 0;
-			border: 10px solid transparent;
+			border-color: transparent;
+			border-left-color: #fff;
+			border-width: 8px;
+			margin-top: -28px;
+		}
+
+		&::before {
+			border-color: transparent;
 			border-left-color: #000;
-			border-right: 0;
+			border-width: 10px;
+			margin-top: -30px;
 		}
 
 		div {
 			border: 0;
-			border-color: #e3e4e6;
-			border-top: 1px solid;
+			border-color: #e3e4e6 !important; /* stylelint-disable-line declaration-no-important */
 			border-bottom: 1px solid;
-			height: 30px;
+			height: 45px;
 			font-size: 12px;
+			text-align: left;
 			display: table;
-			width: 100%;
+			width: 95%;
+			padding-left: 5%;
 
 			span {
 				display: table-cell;
 				vertical-align: middle;
-				text-align: center;
 			}
 
 			button {
@@ -172,9 +193,19 @@
 			select {
 				border: 0;
 				width: 100%;
+				height: 100%;
+				padding-left: 10px;
 				display: table-cell;
 				vertical-align: middle;
 				margin: 0;
+				background: #fff url(../img/select-down.svg) no-repeat right 15px top 55%;
+				background-size: 13px 13px;
+
+				&:focus {
+					border: unset;
+					color: unset;
+					box-shadow: unset;
+				}
 			}
 		}
 
@@ -198,28 +229,29 @@
 			.switch {
 				position: relative;
 				display: inline-block;
-				width: 50px;
-				height: 25px;
-				top: -7px;
+				margin: 0 15px 0 10px;
+				height: 20px;
 
 				.slider {
 					position: absolute;
 					cursor: pointer;
 					top: 0;
-					left: 0;
+					left: -5px;
 					right: 0;
 					bottom: 0;
 					background-color: #ccc;
 					transition: 0.4s;
-					border-radius: 34px;
+					width: 35px;
+					height: 20px;
+					border-radius: 35px;
 
 					&::before {
 						position: absolute;
 						content: "";
-						height: 15px;
-						width: 15px;
-						left: 5px;
-						bottom: 5px;
+						height: 10px;
+						width: 10px;
+						left: 1px;
+						top: 5px;
 						background-color: #fff;
 						transition: 0.4s;
 						border-radius: 50%;
@@ -229,6 +261,11 @@
 
 			span {
 				color: #1e1e1e;
+				padding-left: 5px;
+			}
+
+			span.align-text {
+				text-align: center;
 			}
 
 			button {
@@ -236,6 +273,7 @@
 				border: 0;
 				float: right;
 				height: 100%;
+				padding-right: 15px;
 				cursor: pointer;
 
 				img {
@@ -245,11 +283,16 @@
 		}
 
 		div.rg-purchase-overlay-option-manager-action {
+			border-bottom: 0;
+
 			button {
 				width: 100%;
 				height: 100%;
 				background: transparent;
 				cursor: pointer;
+				text-align: left;
+				padding-left: 10px;
+				border: 0;
 			}
 		}
 
@@ -260,7 +303,18 @@
 		&-duration {
 			select {
 				border-radius: 0;
-				padding: 0 0 0 5px;
+				font-weight: 400;
+				border-color: #e3e4e6 !important; /* stylelint-disable-line declaration-no-important */
+				height: 100%;
+				background: #fff url(../img/select-down.svg) no-repeat right 5px top 55%;
+				background-size: 13px 13px;
+				padding: 0 0 0 8px;
+
+				&:focus {
+					border: unset;
+					color: unset;
+					box-shadow: unset;
+				}
 			}
 
 			&-count {
@@ -271,7 +325,7 @@
 
 			&-period {
 				border: 0;
-				width: 75%;
+				width: 80%;
 			}
 		}
 	}
@@ -358,9 +412,16 @@
 @media (max-width: 1279px) {
 	.rg-purchase-overlay {
 		&-option-manager {
-			top: -40px;
-			left: -250px;
-			width: 205px;
+			top: -45px;
+			left: -260px;
+			width: 210px;
+
+			div.rg-purchase-overlay-option-manager-entity-selection {
+				select {
+					font-size: 11px;
+					font-weight: 500;
+				}
+			}
 
 			div {
 				font-size: 10px;
@@ -370,6 +431,10 @@
 
 				&-count {
 					width: 45px;
+				}
+
+				&-period {
+					width: 75%;
 				}
 			}
 		}

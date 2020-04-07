@@ -71,6 +71,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				// Option manager.
 				optionRemove: '.rg-purchase-overlay-option-remove',
 				purchaseOptionType: '#rg_js_purchaseOptionType',
+				optionManager: '.rg-purchase-overlay-option-manager',
 				individualPricingWrapper:
 					'.rg-purchase-overlay-option-manager-pricing',
 				individualPricingSelection:
@@ -119,8 +120,6 @@ import { __, sprintf } from '@wordpress/i18n';
 				// Purchase options info modal.
 				purchaseOptionInfoButton: '.rg-purchase-overlay-option-info',
 				purchaseOptionInfoModal: '.rev-gen-preview-main-info-modal',
-				purchaseOptionInfoClose:
-					'.rev-gen-preview-main-info-modal-cross',
 
 				// Paywall remove warning modal.
 				paywallRemovalModal: '.rev-gen-preview-main-remove-paywall',
@@ -134,6 +133,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				connectAccount: '#rg_js_connectAccount',
 				accountSignup: '#rg_js_signUp',
 				activateAccount: '#rg_js_verifyAccount',
+				reVerifyAccount: '#rg_js_restartVerification',
 				accountActionsWrapper:
 					'.rev-gen-preview-main-account-modal-action',
 				accountActionsFields:
@@ -249,6 +249,9 @@ import { __, sprintf } from '@wordpress/i18n';
 
 					if ( 'rg-purchase-option-item' === stepId ) {
 						$( $o.previewSecondItem ).trigger( 'mouseenter' );
+						$o.searchContentWrapper.css( {
+							'background-color': '#a9a9a9',
+						} );
 						$( $o.previewSecondItem ).css( {
 							'background-color': '#fff',
 						} );
@@ -265,8 +268,19 @@ import { __, sprintf } from '@wordpress/i18n';
 						// Hack to get tooltip on expected place.
 						Shepherd.activeTour.next();
 						Shepherd.activeTour.back();
-					}else if ( 'rg-purchase-option-paywall-publish' === stepId ) {
-						$o.activatePaywall.css('background-color', '#000');
+					} else if (
+						'rg-purchase-option-paywall-publish' === stepId
+					) {
+						$o.activatePaywall.css( 'background-color', '#000' );
+					}
+
+					if ( stepId ) {
+						const stepParentOffset = $(
+							`div[data-shepherd-step-id="${ stepId }"]`
+						).offset().top;
+						$( 'html, body' ).animate( {
+							scrollTop: stepParentOffset,
+						} );
 					}
 				} );
 
@@ -428,6 +442,27 @@ import { __, sprintf } from '@wordpress/i18n';
 				} );
 
 				/**
+				 * Hide the existing option manager if open by any chance.
+				 */
+				$o.previewWrapper.on( 'click', function( e ) {
+					const currentTarget = $( e.target );
+					/**
+					 * Hide other existing option manager in the view if parent is not the manager element
+					 * and no modal is show currently.
+					 */
+					if (
+						! currentTarget.parents(
+							'.rg-purchase-overlay-option-manager'
+						).length &&
+						! $( $o.purchaseOptionInfoModal ).length
+					) {
+						$o.body
+							.find( '.rg-purchase-overlay-option-manager' )
+							.hide();
+					}
+				} );
+
+				/**
 				 * Add action items on purchase item hover.
 				 */
 				$o.body.on( 'mouseenter', $o.purchaseOptionItem, function() {
@@ -469,9 +504,6 @@ import { __, sprintf } from '@wordpress/i18n';
 							'.rg-purchase-overlay-purchase-options-item-actions'
 						)
 						.remove();
-					$( this )
-						.find( '.rg-purchase-overlay-option-manager' )
-						.hide();
 				} );
 
 				/**
@@ -484,6 +516,11 @@ import { __, sprintf } from '@wordpress/i18n';
 					let actionManager = optionItem.find(
 						'.rg-purchase-overlay-option-manager'
 					);
+
+					// Hide any other existing option manager in the view.
+					$o.body
+						.find( '.rg-purchase-overlay-option-manager' )
+						.hide();
 
 					// Get all purchase options.
 					const allPurchaseOptions = $( $o.purchaseOptionItems );
@@ -581,6 +618,10 @@ import { __, sprintf } from '@wordpress/i18n';
 							$o.purchaseRevenueWrapper
 						);
 						if ( 'subscription' === entityType ) {
+							// Add extra height to get proper styling.
+							actionManager
+								.find( 'div' )
+								.css( { height: ' 55px' } );
 							revenueWrapper.hide();
 						} else {
 							// Set revenue model for selected option.
@@ -611,7 +652,9 @@ import { __, sprintf } from '@wordpress/i18n';
 								.filter( '[value=individual]' );
 							individualOption.attr( 'disabled', true );
 						}
+						// Highlight the current option being edited and open option manager.
 						actionManager.show();
+						optionItem.addClass( 'option-highlight' );
 					}
 				} );
 
@@ -1140,32 +1183,94 @@ import { __, sprintf } from '@wordpress/i18n';
 				$o.body.on( 'click', $o.purchaseOptionInfoButton, function() {
 					const infoButton = $( this );
 					const modalType = infoButton.attr( 'data-info-for' );
-					$o.previewWrapper
-						.find( $o.purchaseOptionInfoModal )
-						.remove();
-					const template = wp.template(
-						`revgen-info-${ modalType }`
+					const existingModal = $o.previewWrapper.find(
+						$o.purchaseOptionInfoModal
 					);
-					$o.previewWrapper.append( template );
-					$o.body.addClass( 'modal-blur' );
-					$o.purchaseOverlay.css( {
-						filter: 'blur(5px)',
-						'pointer-events': 'none',
-					} );
-				} );
 
-				/**
-				 * Close info modal.
-				 */
-				$o.body.on( 'click', $o.purchaseOptionInfoClose, function() {
-					$o.previewWrapper
-						.find( $o.purchaseOptionInfoModal )
-						.remove();
-					$o.body.removeClass( 'modal-blur' );
-					$o.purchaseOverlay.css( {
-						filter: 'unset',
-						'pointer-events': 'unset',
-					} );
+					// Remove any existing modal.
+					if ( existingModal.length ) {
+						$o.body.removeClass( 'modal-blur' );
+						existingModal.remove();
+
+						// Reset the background for all greyed out elements.
+						$( $o.optionManager ).css( {
+							'background-color': '#fff',
+						} );
+						$( $o.optionManager )
+							.find( 'select' )
+							.css( {
+								'background-color': '#fff',
+							} );
+						$( $o.purchaseOptionItem ).css( {
+							'background-color': '#fff',
+						} );
+						$o.purchaseOverlay.css( {
+							'pointer-events': 'all',
+						} );
+						$o.actionsWrapper.css( {
+							'background-color': '#fff',
+							position: 'fixed',
+						} );
+						$( $o.purchaseRevenueWrapper ).css( {
+							'background-color': '#fff',
+						} );
+						$( $o.individualPricingWrapper ).css( {
+							'background-color': '#fff',
+						} );
+					} else {
+						const template = wp.template(
+							`revgen-info-${ modalType }`
+						);
+						$o.previewWrapper.append( template );
+
+						// Change background color and highlight the clicked parent.
+						$o.body.addClass( 'modal-blur' );
+
+						// Grey out the option manager and overlay elements in it.
+						$( $o.optionManager ).css( {
+							'background-color': '#a9a9a9',
+						} );
+						$( $o.optionManager )
+							.find( 'select' )
+							.css( {
+								'background-color': '#a9a9a9',
+							} );
+						$( $o.purchaseOptionItem ).css( {
+							'background-color': '#a9a9a9',
+						} );
+
+						// Grey out the paywall overlay.
+						$o.purchaseOverlay.css( {
+							'pointer-events': 'none',
+						} );
+
+						// Grey out the paywall actions and change position.
+						$o.actionsWrapper.css( {
+							'background-color': '#a9a9a9',
+							position: 'absolute',
+						} );
+
+						// Highlight selected info modal parent based on type.
+						if ( 'revenue' === modalType ) {
+							$( $o.purchaseRevenueWrapper ).css( {
+								'background-color': '#fff',
+								cursor: 'pointer',
+								'pointer-events': 'all',
+							} );
+							$( $o.individualPricingWrapper ).css( {
+								'background-color': '#a9a9a9',
+							} );
+						} else {
+							$( $o.individualPricingWrapper ).css( {
+								'background-color': '#fff',
+								cursor: 'pointer',
+								'pointer-events': 'all',
+							} );
+							$( $o.purchaseRevenueWrapper ).css( {
+								'background-color': '#a9a9a9',
+							} );
+						}
+					}
 				} );
 
 				/**
@@ -1220,6 +1325,9 @@ import { __, sprintf } from '@wordpress/i18n';
 					);
 					const currentType = optionItem.attr( 'data-purchase-type' );
 					const selectedEntityType = $( this ).val();
+					const optionManager = optionItem.find(
+						'.rg-purchase-overlay-option-manager'
+					);
 					let entityId;
 
 					if ( currentType !== selectedEntityType ) {
@@ -1317,6 +1425,10 @@ import { __, sprintf } from '@wordpress/i18n';
 								optionItem
 									.find( $o.purchaseOptionItemDesc )
 									.text( timePassDefaultValues.description );
+
+								optionManager
+									.find( 'div' )
+									.css( { height: ' 45px' } );
 							} else if (
 								'subscription' === selectedEntityType
 							) {
@@ -1351,11 +1463,18 @@ import { __, sprintf } from '@wordpress/i18n';
 									.text(
 										subscriptionDefaultValues.description
 									);
+
+								optionManager
+									.find( 'div' )
+									.css( { height: ' 55px' } );
 							}
 						} else {
 							// Set static pricing by default if individual.
 							optionItem.attr( 'data-pricing-type', 'static' );
 							optionItem.attr( 'data-paywall-id', '' );
+							optionManager
+								.find( 'div' )
+								.css( { height: ' 45px' } );
 						}
 					}
 				} );
@@ -1532,6 +1651,13 @@ import { __, sprintf } from '@wordpress/i18n';
 						revenueGeneratorGlobalOptions.ajaxUrl,
 						data
 					);
+				} );
+
+				/**
+				 * Reload the Connect account page.
+				 */
+				$o.body.on( 'click', $o.reVerifyAccount, function() {
+					showAccountActivationModal();
 				} );
 
 				/**
@@ -2429,11 +2555,25 @@ import { __, sprintf } from '@wordpress/i18n';
 								$o.searchResultWrapper.empty();
 								const postPreviews = r.preview_posts;
 								postPreviews.forEach( function( item ) {
+									const itemType =
+										item.type === 'post'
+											? 'dashicons-admin-post'
+											: 'dashicons-admin-page';
+									const itemTitle = item.title;
+									const searchRegExp = new RegExp(
+										searchTerm,
+										'i'
+									);
+									const highlightedTitle = itemTitle.replace(
+										searchRegExp,
+										`<b>${ searchTerm }</b>`
+									);
 									const searchItem = $( '<span/>', {
 										'data-id': item.id,
 										class:
-											'rev-gen-preview-main--search-results-item',
-									} ).text( item.title );
+											'rev-gen-preview-main--search-results-item dashicons-before',
+									} ).append( highlightedTitle );
+									searchItem.addClass( itemType );
 									$o.searchResultWrapper.append( searchItem );
 									$o.searchResultWrapper.css( {
 										display: 'flex',
