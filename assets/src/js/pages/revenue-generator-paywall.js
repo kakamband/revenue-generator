@@ -2543,11 +2543,25 @@ import { __, sprintf } from '@wordpress/i18n';
 								$o.searchResultWrapper.empty();
 								const postPreviews = r.preview_posts;
 								postPreviews.forEach( function( item ) {
+									const itemType =
+										item.type === 'post'
+											? 'dashicons-admin-post'
+											: 'dashicons-admin-page';
+									const itemTitle = item.title;
+									const searchRegExp = new RegExp(
+										searchTerm,
+										'i'
+									);
+									const highlightedTitle = itemTitle.replace(
+										searchRegExp,
+										`<b>${ searchTerm }</b>`
+									);
 									const searchItem = $( '<span/>', {
 										'data-id': item.id,
 										class:
-											'rev-gen-preview-main--search-results-item',
-									} ).text( item.title );
+											'rev-gen-preview-main--search-results-item dashicons-before',
+									} ).append( highlightedTitle );
+									searchItem.addClass( itemType );
 									$o.searchResultWrapper.append( searchItem );
 									$o.searchResultWrapper.css( {
 										display: 'flex',
