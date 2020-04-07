@@ -516,6 +516,12 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 			</div>
 			<div class="rev-gen-preview-main-account-modal-fields">
 				<h5 class="rev-gen-preview-main-account-modal-fields-title"><?php esc_html_e( 'Connect your account to activate paywall', 'revenue-generator' ); ?></h5>
+				<p>
+					<?php esc_html_e( 'Unsure where to find this information?', 'revenue-generator' ); ?>
+					<a target="_blank" rel="noopener noreferrer" href="https://support.laterpay.net/what-is-my-laterpay-merchant-id-api-key-and-where-can-i-find-them">
+						<?php esc_html_e( 'Click here.', 'revenue-generator' ); ?>
+					</a>
+				</p>
 				<input class="rev-gen-preview-main-account-modal-fields-merchant-id" type="text" placeholder="<?php esc_attr_e( 'Merchant ID', 'revenue-generator' ); ?>" maxlength="22" />
 				<input class="rev-gen-preview-main-account-modal-fields-merchant-key" type="text" placeholder="<?php esc_attr_e( 'API Key', 'revenue-generator' ); ?>" maxlength="32" />
 				<div class="rev-gen-preview-main-account-modal-actions">
@@ -536,12 +542,13 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 					<?php
 					echo wp_kses(
 						sprintf(
-							/* translators: %s static anchor id */
+							/* translators: %1$s static anchor id to handle signup link %2$s statuc anchor id to handle re verification. */
 							__(
-								'It looks like you need to create a LaterPay account. Please <a id="%s" href="#">sign up here,</a> or contact <a href="mailto:integration@laterpay.net">integration@laterpay.net</a> if you’re still experiencing difficulties.',
+								'It looks like you need to create a LaterPay account. Please <a id="%1$s" href="#">sign up here</a>, <a id="%2$s" href="#">try again</a>, or contact <a href="mailto:integration@laterpay.net">integration@laterpay.net</a> if you’re still experiencing difficulties.',
 								'revenue-generator'
 							),
-							'rg_js_warningSignup'
+							'rg_js_warningSignup',
+							'rg_js_restartVerification'
 						),
 						[
 							'a' => [

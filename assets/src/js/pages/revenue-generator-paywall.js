@@ -133,6 +133,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				connectAccount: '#rg_js_connectAccount',
 				accountSignup: '#rg_js_signUp',
 				activateAccount: '#rg_js_verifyAccount',
+				reVerifyAccount: '#rg_js_restartVerification',
 				accountActionsWrapper:
 					'.rev-gen-preview-main-account-modal-action',
 				accountActionsFields:
@@ -1638,6 +1639,13 @@ import { __, sprintf } from '@wordpress/i18n';
 						revenueGeneratorGlobalOptions.ajaxUrl,
 						data
 					);
+				} );
+
+				/**
+				 * Reload the Connect account page.
+				 */
+				$o.body.on( 'click', $o.reVerifyAccount, function() {
+					showAccountActivationModal();
 				} );
 
 				/**
