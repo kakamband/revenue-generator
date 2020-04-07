@@ -32,7 +32,7 @@
 		flex-direction: column;
 
 		.option-highlight {
-			border: 4px solid;
+			border: solid #000 3px;
 		}
 
 		&-item {
@@ -48,6 +48,7 @@
 			width: 80%;
 			align-self: center;
 			position: relative;
+			box-sizing: border-box;
 
 			&-actions {
 				display: flex;
@@ -85,13 +86,14 @@
 
 				&-title {
 					font-size: 18px;
+					font-weight: 500;
 					margin-bottom: 4px;
 					color: #2e2e2e;
 					cursor: auto;
 				}
 
 				&-description {
-					font-size: 13px;
+					font-size: 14px;
 					color: #585858;
 					cursor: auto;
 				}
@@ -112,6 +114,9 @@
 
 				span {
 					text-align: center;
+					font-size: 18px;
+					font-weight: 600;
+					font-family: "LaterPay WorkSans", serif;
 				}
 
 				&-icon {
