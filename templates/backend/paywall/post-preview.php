@@ -383,7 +383,6 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 <!-- Template for revenue info modal -->
 <script type="text/template" id="tmpl-revgen-info-revenue">
 	<div class="rev-gen-preview-main-info-modal">
-		<span class="rev-gen-preview-main-info-modal-cross">X</span>
 		<h4 class="rev-gen-preview-main-info-modal-title"><?php esc_html_e( 'Pay Now v Pay Later?', 'revenue-generator' ); ?></h4>
 		<p class="rev-gen-preview-main-info-modal-message">
 			<?php
@@ -426,7 +425,6 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 <!-- Template for pricing info modal -->
 <script type="text/template" id="tmpl-revgen-info-pricing">
 	<div class="rev-gen-preview-main-info-modal">
-		<span class="rev-gen-preview-main-info-modal-cross">X</span>
 		<h4 class="rev-gen-preview-main-info-modal-title"><?php esc_html_e( 'Static Pricing and Dynamic Pricing', 'revenue-generator' ); ?></h4>
 		<p class="rev-gen-preview-main-info-modal-message">
 			<?php

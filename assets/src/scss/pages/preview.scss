@@ -376,14 +376,14 @@
 		align-items: center;
 		flex-direction: column;
 		position: fixed;
-		left: 58%;
-		top: 20%;
+		left: 60%;
+		top: 30%;
 		overflow: hidden;
 		bottom: 20px;
-		height: 350px;
-		width: 300px;
+		height: 330px;
+		width: 250px;
 		margin: 0 0 0 -190px;
-		padding: 30px;
+		padding: 20px;
 		background-color: #fff;
 		color: #1e1e1e;
 		z-index: 999;
@@ -397,17 +397,7 @@
 
 		&-message {
 			font-size: 14px;
-			font-weight: 500;
 			margin: 10px 0;
-		}
-
-		&-cross {
-			position: absolute;
-			right: 20px;
-			top: 10px;
-			font-weight: 700;
-			font-size: 15px;
-			cursor: pointer;
 		}
 
 	}

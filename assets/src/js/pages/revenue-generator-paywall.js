@@ -71,6 +71,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				// Option manager.
 				optionRemove: '.rg-purchase-overlay-option-remove',
 				purchaseOptionType: '#rg_js_purchaseOptionType',
+				optionManager: '.rg-purchase-overlay-option-manager',
 				individualPricingWrapper:
 					'.rg-purchase-overlay-option-manager-pricing',
 				individualPricingSelection:
@@ -119,8 +120,6 @@ import { __, sprintf } from '@wordpress/i18n';
 				// Purchase options info modal.
 				purchaseOptionInfoButton: '.rg-purchase-overlay-option-info',
 				purchaseOptionInfoModal: '.rev-gen-preview-main-info-modal',
-				purchaseOptionInfoClose:
-					'.rev-gen-preview-main-info-modal-cross',
 
 				// Paywall remove warning modal.
 				paywallRemovalModal: '.rev-gen-preview-main-remove-paywall',
@@ -434,11 +433,15 @@ import { __, sprintf } from '@wordpress/i18n';
 				 */
 				$o.previewWrapper.on( 'click', function( e ) {
 					const currentTarget = $( e.target );
-					// Hide other existing option manager in the view, if parent is not the manager element.
+					/**
+					 * Hide other existing option manager in the view if parent is not the manager element
+					 * and no modal is show currently.
+					 */
 					if (
 						! currentTarget.parents(
 							'.rg-purchase-overlay-option-manager'
-						).length
+						).length &&
+						! $( $o.purchaseOptionInfoModal ).length
 					) {
 						$o.body
 							.find( '.rg-purchase-overlay-option-manager' )
@@ -1167,32 +1170,94 @@ import { __, sprintf } from '@wordpress/i18n';
 				$o.body.on( 'click', $o.purchaseOptionInfoButton, function() {
 					const infoButton = $( this );
 					const modalType = infoButton.attr( 'data-info-for' );
-					$o.previewWrapper
-						.find( $o.purchaseOptionInfoModal )
-						.remove();
-					const template = wp.template(
-						`revgen-info-${ modalType }`
+					const existingModal = $o.previewWrapper.find(
+						$o.purchaseOptionInfoModal
 					);
-					$o.previewWrapper.append( template );
-					$o.body.addClass( 'modal-blur' );
-					$o.purchaseOverlay.css( {
-						filter: 'blur(5px)',
-						'pointer-events': 'none',
-					} );
-				} );
 
-				/**
-				 * Close info modal.
-				 */
-				$o.body.on( 'click', $o.purchaseOptionInfoClose, function() {
-					$o.previewWrapper
-						.find( $o.purchaseOptionInfoModal )
-						.remove();
-					$o.body.removeClass( 'modal-blur' );
-					$o.purchaseOverlay.css( {
-						filter: 'unset',
-						'pointer-events': 'unset',
-					} );
+					// Remove any existing modal.
+					if ( existingModal.length ) {
+						$o.body.removeClass( 'modal-blur' );
+						existingModal.remove();
+
+						// Reset the background for all greyed out elements.
+						$( $o.optionManager ).css( {
+							'background-color': '#fff',
+						} );
+						$( $o.optionManager )
+							.find( 'select' )
+							.css( {
+								'background-color': '#fff',
+							} );
+						$( $o.purchaseOptionItem ).css( {
+							'background-color': '#fff',
+						} );
+						$o.purchaseOverlay.css( {
+							'pointer-events': 'all',
+						} );
+						$o.actionsWrapper.css( {
+							'background-color': '#fff',
+							position: 'fixed',
+						} );
+						$( $o.purchaseRevenueWrapper ).css( {
+							'background-color': '#fff',
+						} );
+						$( $o.individualPricingWrapper ).css( {
+							'background-color': '#fff',
+						} );
+					} else {
+						const template = wp.template(
+							`revgen-info-${ modalType }`
+						);
+						$o.previewWrapper.append( template );
+
+						// Change background color and highlight the clicked parent.
+						$o.body.addClass( 'modal-blur' );
+
+						// Grey out the option manager and overlay elements in it.
+						$( $o.optionManager ).css( {
+							'background-color': '#a9a9a9',
+						} );
+						$( $o.optionManager )
+							.find( 'select' )
+							.css( {
+								'background-color': '#a9a9a9',
+							} );
+						$( $o.purchaseOptionItem ).css( {
+							'background-color': '#a9a9a9',
+						} );
+
+						// Grey out the paywall overlay.
+						$o.purchaseOverlay.css( {
+							'pointer-events': 'none',
+						} );
+
+						// Grey out the paywall actions and change position.
+						$o.actionsWrapper.css( {
+							'background-color': '#a9a9a9',
+							position: 'absolute',
+						} );
+
+						// Highlight selected info modal parent based on type.
+						if ( 'revenue' === modalType ) {
+							$( $o.purchaseRevenueWrapper ).css( {
+								'background-color': '#fff',
+								cursor: 'pointer',
+								'pointer-events': 'all',
+							} );
+							$( $o.individualPricingWrapper ).css( {
+								'background-color': '#a9a9a9',
+							} );
+						} else {
+							$( $o.individualPricingWrapper ).css( {
+								'background-color': '#fff',
+								cursor: 'pointer',
+								'pointer-events': 'all',
+							} );
+							$( $o.purchaseRevenueWrapper ).css( {
+								'background-color': '#a9a9a9',
+							} );
+						}
+					}
 				} );
 
 				/**
