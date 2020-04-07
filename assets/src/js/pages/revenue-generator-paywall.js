@@ -249,6 +249,9 @@ import { __, sprintf } from '@wordpress/i18n';
 
 					if ( 'rg-purchase-option-item' === stepId ) {
 						$( $o.previewSecondItem ).trigger( 'mouseenter' );
+						$o.searchContentWrapper.css( {
+							'background-color': '#a9a9a9',
+						} );
 						$( $o.previewSecondItem ).css( {
 							'background-color': '#fff',
 						} );
@@ -269,6 +272,15 @@ import { __, sprintf } from '@wordpress/i18n';
 						'rg-purchase-option-paywall-publish' === stepId
 					) {
 						$o.activatePaywall.css( 'background-color', '#000' );
+					}
+
+					if ( stepId ) {
+						const stepParentOffset = $(
+							`div[data-shepherd-step-id="${ stepId }"]`
+						).offset().top;
+						$( 'html, body' ).animate( {
+							scrollTop: stepParentOffset,
+						} );
 					}
 				} );
 
