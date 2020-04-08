@@ -67,7 +67,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 				<div class="rev-gen-preview-main--paywall-actions-apply">
 					<p>
 						<?php
-						$paywall_name = ! empty( $paywall_data['name'] ) ? $paywall_data['name'] : esc_html__( 'Paywall 1', 'revenue-generator' );
+						$paywall_name = ! empty( $paywall_data['name'] ) ? $paywall_data['name'] : $default_paywall_title;
 						echo wp_kses(
 							sprintf(
 								/* translators: %s Paywall name */
