@@ -90,6 +90,9 @@ import { __, sprintf } from '@wordpress/i18n';
 				// Paywall publish actions.
 				addPaywall: '#rj_js_addNewPaywall',
 				actionsWrapper: $( '.rev-gen-preview-main--paywall-actions' ),
+				actionButtons: $(
+					'.rev-gen-preview-main--paywall-actions-update'
+				),
 				activatePaywall: $( '#rg_js_activatePaywall' ),
 				savePaywall: $( '#rg_js_savePaywall' ),
 				searchPaywallContent: $( '#rg_js_searchPaywallContent' ),
@@ -138,6 +141,8 @@ import { __, sprintf } from '@wordpress/i18n';
 					'.rev-gen-preview-main-account-modal-action',
 				accountActionsFields:
 					'.rev-gen-preview-main-account-modal-fields',
+				accountCredentialsInfo:
+					'.rev-gen-preview-main-account-modal-credentials-info',
 				accountActionId:
 					'.rev-gen-preview-main-account-modal-fields-merchant-id',
 				accountActionKey:
@@ -465,6 +470,24 @@ import { __, sprintf } from '@wordpress/i18n';
 							.find( '.rg-purchase-overlay-option-manager' )
 							.hide();
 					}
+
+					if (
+						! currentTarget.parents(
+							'.rg-purchase-overlay-option-manager'
+						).length
+					) {
+						if ( $( '.pricing-info-modal' ).length ) {
+							$o.body
+								.find( '#pricing-info-modal' )
+								.trigger( 'click' );
+						}
+
+						if ( $( '.revenue-info-modal' ).length ) {
+							$o.body
+								.find( '#revenue-info-modal' )
+								.trigger( 'click' );
+						}
+					}
 				} );
 
 				/**
@@ -483,6 +506,7 @@ import { __, sprintf } from '@wordpress/i18n';
 					// Show action options if it already exist, else add it.
 					if ( actionsExist ) {
 						actionOptions.show();
+						$( this ).addClass( 'option-highlight' );
 					} else {
 						// Get the template for purchase overlay action.
 						const actionTemplate = wp.template(
@@ -570,6 +594,13 @@ import { __, sprintf } from '@wordpress/i18n';
 						const pricingManager = actionManager.find(
 							'.rg-purchase-overlay-option-manager-entity'
 						);
+
+						$( '.rg-purchase-overlay-option-manager div' ).css( {
+							'border-bottom-color': '#e3e4e6',
+						} );
+						$( '.rg-purchase-overlay-option-manager select' ).css( {
+							'border-color': '#e3e4e6',
+						} );
 
 						// Duration selection.
 						const periodSelection = actionManager.find(
@@ -1272,26 +1303,29 @@ import { __, sprintf } from '@wordpress/i18n';
 						$( $o.optionManager ).css( {
 							'background-color': '#fff',
 						} );
+						$( '.rg-purchase-overlay-option-manager div' ).css( {
+							'border-bottom-color': '#a9a9a9',
+						} );
 						$( $o.optionManager )
 							.find( 'select' )
 							.css( {
 								'background-color': '#fff',
+								'border-bottom-color': '#a9a9a9',
 							} );
 						$( $o.purchaseOptionItem ).css( {
 							'background-color': '#fff',
 						} );
-						$o.purchaseOverlay.css( {
-							'pointer-events': 'all',
-						} );
 						$o.actionsWrapper.css( {
 							'background-color': '#fff',
-							position: 'fixed',
 						} );
+						$o.actionButtons.css( { opacity: '1' } );
 						$( $o.purchaseRevenueWrapper ).css( {
 							'background-color': '#fff',
+							'border-bottom-color': 'unset !important',
 						} );
 						$( $o.individualPricingWrapper ).css( {
 							'background-color': '#fff',
+							'border-color': 'unset !important',
 						} );
 					} else {
 						const template = wp.template(
@@ -1306,25 +1340,24 @@ import { __, sprintf } from '@wordpress/i18n';
 						$( $o.optionManager ).css( {
 							'background-color': '#a9a9a9',
 						} );
+						$( '.rg-purchase-overlay-option-manager div' ).css( {
+							'border-bottom-color': '#000',
+						} );
 						$( $o.optionManager )
 							.find( 'select' )
 							.css( {
 								'background-color': '#a9a9a9',
+								'border-color': '#a9a9a9',
 							} );
 						$( $o.purchaseOptionItem ).css( {
 							'background-color': '#a9a9a9',
 						} );
 
-						// Grey out the paywall overlay.
-						$o.purchaseOverlay.css( {
-							'pointer-events': 'none',
-						} );
-
 						// Grey out the paywall actions and change position.
 						$o.actionsWrapper.css( {
 							'background-color': '#a9a9a9',
-							position: 'absolute',
 						} );
+						$o.actionButtons.css( { opacity: '0.5' } );
 
 						// Highlight selected info modal parent based on type.
 						if ( 'revenue' === modalType ) {
@@ -1732,7 +1765,8 @@ import { __, sprintf } from '@wordpress/i18n';
 				/**
 				 * Reload the Connect account page.
 				 */
-				$o.body.on( 'click', $o.reVerifyAccount, function() {
+				$o.body.on( 'click', $o.reVerifyAccount, function( e ) {
+					e.preventDefault();
 					showAccountActivationModal();
 				} );
 
@@ -2158,6 +2192,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						.find( $o.accountActionTitle )
 						.text( __( 'Just a second...', 'revenue-generator' ) );
 					activationModal.find( $o.accountActionId ).remove();
+					activationModal.find( $o.accountCredentialsInfo ).remove();
 					activationModal.find( $o.accountActionKey ).remove();
 					activationModal.find( $o.accountActions ).remove();
 					activationModal.find( $o.accountVerificationLoader ).show();

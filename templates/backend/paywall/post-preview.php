@@ -148,7 +148,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 				<span class="slider round"></span>
 			</label>
 			<span class="pay-later"><?php esc_html_e( 'Pay Later', 'revenue-generator' ); ?></span>
-			<button data-info-for="revenue" class="rg-purchase-overlay-option-info">
+			<button data-info-for="revenue" id="revenue-info-modal" class="rg-purchase-overlay-option-info">
 				<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
 			</button>
 		</div>
@@ -159,7 +159,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 				<span class="slider round"></span>
 			</label>
 			<span class="dynamic-pricing"><?php esc_html_e( 'Dynamic Pricing', 'revenue-generator' ); ?></span>
-			<button data-info-for="pricing" class="rg-purchase-overlay-option-info">
+			<button data-info-for="pricing"  id="pricing-info-modal" class="rg-purchase-overlay-option-info">
 				<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>"></button>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-duration">
@@ -382,7 +382,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 
 <!-- Template for revenue info modal -->
 <script type="text/template" id="tmpl-revgen-info-revenue">
-	<div class="rev-gen-preview-main-info-modal">
+	<div class="rev-gen-preview-main-info-modal revenue-info-modal">
 		<h4 class="rev-gen-preview-main-info-modal-title"><?php esc_html_e( 'Pay Now v Pay Later?', 'revenue-generator' ); ?></h4>
 		<p class="rev-gen-preview-main-info-modal-message">
 			<?php
@@ -424,7 +424,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 
 <!-- Template for pricing info modal -->
 <script type="text/template" id="tmpl-revgen-info-pricing">
-	<div class="rev-gen-preview-main-info-modal">
+	<div class="rev-gen-preview-main-info-modal pricing-info-modal">
 		<h4 class="rev-gen-preview-main-info-modal-title"><?php esc_html_e( 'Static Pricing and Dynamic Pricing', 'revenue-generator' ); ?></h4>
 		<p class="rev-gen-preview-main-info-modal-message">
 			<?php
@@ -516,7 +516,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 			</div>
 			<div class="rev-gen-preview-main-account-modal-fields">
 				<h5 class="rev-gen-preview-main-account-modal-fields-title"><?php esc_html_e( 'Connect your account to activate paywall', 'revenue-generator' ); ?></h5>
-				<p>
+				<p class="rev-gen-preview-main-account-modal-credentials-info">
 					<?php esc_html_e( 'Unsure where to find this information?', 'revenue-generator' ); ?>
 					<a target="_blank" rel="noopener noreferrer" href="https://support.laterpay.net/what-is-my-laterpay-merchant-id-api-key-and-where-can-i-find-them">
 						<?php esc_html_e( 'Click here.', 'revenue-generator' ); ?>

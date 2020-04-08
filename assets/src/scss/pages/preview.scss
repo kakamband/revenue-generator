@@ -388,28 +388,41 @@
 		align-items: center;
 		flex-direction: column;
 		position: fixed;
-		left: 60%;
-		top: 30%;
+		left: 45%;
+		top: 20%;
 		overflow: hidden;
-		bottom: 20px;
-		height: 330px;
-		width: 250px;
-		margin: 0 0 0 -190px;
+		width: 392px;
+		height: 506px;
+		border-radius: 4px;
 		padding: 20px;
 		background-color: #fff;
 		color: #1e1e1e;
 		z-index: 999;
-		border-radius: 5px;
 		box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
 		text-align: center;
+		padding-bottom: 55px;
 
 		&-title {
-			font-size: 14px;
+			font-family: HelveticaNeue, serif;
+			font-size: 26px;
+			font-weight: 500;
+			font-stretch: normal;
+			font-style: normal;
+			line-height: 1.23;
+			letter-spacing: normal;
+			margin: 0;
+			padding: 55px;
 		}
 
 		&-message {
-			font-size: 14px;
-			margin: 10px 0;
+			font-family: HelveticaNeue, serif;
+			font-size: 16px;
+			font-weight: 500;
+			font-stretch: normal;
+			font-style: normal;
+			line-height: 1.31;
+			letter-spacing: normal;
+			padding: 0 55px;
 		}
 
 	}
@@ -466,6 +479,12 @@
 
 			p {
 				font-size: 12px;
+
+				a {
+					cursor: pointer;
+					color: #000;
+					text-decoration: underline;
+				}
 			}
 
 			&-title {

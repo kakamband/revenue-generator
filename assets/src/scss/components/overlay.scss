@@ -147,7 +147,7 @@
 		width: 320px;
 		background: #fff;
 		font-weight: bold;
-		font-family: "Helvetica Neue", serif;
+		font-family: HelveticaNeue, serif;
 
 		&::after,
 		&::before {
@@ -175,7 +175,7 @@
 
 		div {
 			border: 0;
-			border-color: #e3e4e6 !important; /* stylelint-disable-line declaration-no-important */
+			border-color: #e3e4e6;
 			border-bottom: 1px solid;
 			height: 45px;
 			text-align: left;
@@ -215,7 +215,6 @@
 				background: #fff url(../img/select-down.svg) no-repeat right 15px top 55%;
 				background-size: 13px 13px;
 				padding-left: 0;
-
 
 				&:focus {
 					border: unset;
@@ -319,7 +318,7 @@
 		&-duration {
 			select {
 				border-radius: 0;
-				border-color: #e3e4e6 !important; /* stylelint-disable-line declaration-no-important */
+				border-color: #e3e4e6;
 				height: 100%;
 				background: #fff url(../img/select-down.svg) no-repeat right 5px top 55%;
 				background-size: 13px 13px;
