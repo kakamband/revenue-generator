@@ -1062,15 +1062,11 @@ class Admin {
 			);
 		}
 
-		$response = ( ! empty( $return_post_id ) || ! is_wp_error( $return_post_id ) ) ?
-				[
-					'success' => true,
-					'msg'     => esc_html__( 'Paywall title updated.', 'revenue-generator' ),
-				] :
-				[
-					'success' => false,
-					'msg'     => esc_html__( 'Failed to update paywall title.', 'revenue-generator' ),
-				];
+		$is_updated = ( ! empty( $return_post_id ) || ! is_wp_error( $return_post_id ) );
+		$response   = [
+			'success' => $is_updated,
+			'msg'     => $is_updated ? esc_html__( 'Paywall title updated.', 'revenue-generator' ) : esc_html__( 'Failed to update paywall title.', 'revenue-generator' ),
+		];
 
 		wp_send_json( $response );
 
