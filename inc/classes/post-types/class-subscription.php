@@ -7,8 +7,6 @@
 
 namespace LaterPay\Revenue_Generator\Inc\Post_Types;
 
-use LaterPay\Revenue_Generator\Inc\Config;
-
 defined( 'ABSPATH' ) || exit;
 
 /**

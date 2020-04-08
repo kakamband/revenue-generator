@@ -661,7 +661,7 @@ class Post_Types {
 		$rg_post          = [];
 		$rg_post['id']    = $post->ID;
 		$rg_post['title'] = $post->post_title;
-		$rg_post['type'] = $post->post_type;
+		$rg_post['type']  = $post->post_type;
 
 		return $rg_post;
 	}

@@ -89,7 +89,13 @@ class Assets {
 		wp_register_script(
 			'revenue-generator',
 			REVENUE_GENERATOR_BUILD_URL . 'revenue-generator-admin.js',
-			[ 'jquery', 'revenue-generator-shepherd', 'revenue-generator-select2', 'revenue-generator-tippy', 'wp-util' ],
+			[
+				'jquery',
+				'revenue-generator-shepherd',
+				'revenue-generator-select2',
+				'revenue-generator-tippy',
+				'wp-util',
+			],
 			$this->get_asset_version( 'revenue-generator-admin.js' ),
 			true
 		);

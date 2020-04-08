@@ -319,7 +319,6 @@ class Admin {
 			if ( empty( $formatted_post_data ) ) {
 				// Get latest post info for preview.
 				$target_post_id = $post_types->get_latest_post_for_preview();
-				;
 			}
 
 			$formatted_post_data = $post_types->get_formatted_post_data( $target_post_id );
