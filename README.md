@@ -5,7 +5,7 @@
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 [![License](https://img.shields.io/github/license/laterpay/revenue-generator)](https://github.com/laterpay/revenue-generator/blob/master/LICENSE)
 
-##### Revenue Generator is the official Plugin for selling digital content with WordPress which uses [Connector Integration](https://docs.laterpay.net/connector/).
+##### Revenue Generator is the official WordPress plugin for selling digital content using LaterPay’s patented [Pay Later model](https://www.laterpay.net/blog/how-to-laterpay-dos-and-donts-from-8-years-expertise).
 <hr/>
 
 ### Table of Contents
@@ -25,25 +25,25 @@ The latest release of the plugin is available [here](https://github.com/laterpay
 
 - Install the latest zip or use the latest code from `master` branch in your test site.
 - Activate the plugin and select `Revenue Generator` in the menu.
-- Go through the Welcome wizard, check the  tutorial to understand the available features.
-- Try publishing the paywall, it will ask to connect your account ( only asked once ).
-- You should see now see the created paywall on frontend.
+- Go through the on-boarding tutorial to get an overview of the available features.
+- Once you have your first paywall set up, click “Publish.” You will be asked to connect your [LaterPay account](http://laterpay.net/) (only asked once).
+- You should now see the paywall has been created.
 
 ## Contributing
 
 1. Fork it [here](https://github.com/laterpay/revenue-generator/fork).
-2. Run `composer install` to install all the dependencies, mainly used for linting `PHP` code.
-3. Run `npm install` to install all the dependencies, mainly used for building/compiling plugin assets.
+2. Run `composer install` to install all the dependencies, mainly used for linting `PHP` code
+3. Run `npm install` to install all the dependencies, mainly used for building/compiling plugin assets
 4. Create your feature branch (`git checkout -b feature/my_new_feature develop`)
-4. Add your changes, verify coding standards and PHP compatibility ( [Check Development Notes](#Development Notes) )
-5. Run `npm run build` for `js` and / or `css` changes. Please check [package.json](package.json) for more development scripts.
-6. Commit your changes ( eg. `git commit -am 'Add support for feature x'`)
-7. Push to the branch (`git push origin feature/my_new_feature`)
-8. Create a new Pull Request to `develop`.
+5. Add your changes, verify coding standards and PHP compatibility ( [Check Development Notes](#Development Notes) )
+6. Run `npm run build` for `js` and / or `css` changes. Please check [package.json](package.json) for more development scripts
+7. Commit your changes ( eg. `git commit -am 'Add support for feature x'`)
+8. Push to the branch (`git push origin feature/my_new_feature`)
+9. Create a new Pull Request to `develop`
 
 ## Development Notes
 
-##### Please run following commands from the root directory of this repository.
+##### Please run the following commands from the root directory of this repository.
 
 1. Please verify your code is in compliance to the Coding Standards used in this Project.
 2. Run `composer phpcs filename` or `composer phpcs` to check for PHPCS errors/warnings.
@@ -53,8 +53,8 @@ The latest release of the plugin is available [here](https://github.com/laterpay
 6. Run `npm run dev` to keep the build process running while making changes to assets.
 7. Run `npm run lint:js` to to check for JS errors/warning.
 8. Run `npm run lint:js:fix` to automatically fix possible errors/warning in JS code.
-9. Run `npm run language` to update project po file.
-10. Run `npm run zip` to create final zip with production assets.
+9. Run `npm run language` to update project the po file.
+10. Run `npm run zip` to create a final zip with production assets.
 
 ## Project Folder / File Structure
 
@@ -86,57 +86,57 @@ revenue-generator
 
 #### Payment Options
 
-- **Paywall** - A Paywall comprises of several purchase options including Single Purchases / Time Passes / Subscriptions, which is used to add pricing to your sites content.
+- **Paywall** - A Paywall consists of several purchase options including single purchases, time passes and subscriptions. It is used to add pricing to your site's content.
 <hr/>
 
-- **Single Purchase** - A Single Purchase grants a customer infinite access to a single piece of content and can be sold as “Buy Now, Pay Later” and “Buy Now”.
+- **Single Purchase** - A single purchase grants a customer infinite access to a single piece of content and can be sold as “Buy Now, Pay Later” and “Buy Now.”
 <hr/>
 
-- **Subscription** - A Subscription grants a customer access for a limited period of time, but it will automatically renew afterwards and the user will be charged again. Therefore, Subscriptions are only available as “Buy Now”.
+- **Subscription** - A subscription grants a customer access for a specified period of time; it will automatically renew until the user cancels. Subscriptions are only available as “Buy Now.”
 <hr/>
 
-- **Time Pass** - A Time Pass grants a customer access to a resource for a set amount of time, they do not auto-renew after the set time period for the purchase runs out. Time Passes can also be sold as “Buy Now, Pay Later” and “Buy Now”.
+- **Time Pass** - A time pass grants a customer access to a resource for a set amount of time; they do not auto-renew. Time passes can be sold as “Buy Now, Pay Later” and “Buy Now.”
 
 #### Payment Models
 
-- **Pay Later** - When a customer purchases “Pay Later” content, the item is added to their open invoice and they will be asked to pay once they hit the threshold of 5€ or $5. Pay Later items can be offered between 0.05€ and 5.00€ and between $0.05 and $5.00.
+- **Pay Later** - When a customer purchases “Pay Later” content, the item is added to their LaterPay Tab and they will be asked to pay once they hit the threshold of 5€ or $5. Pay Later items can be priced between 0.05€ and 5.00€ and between $0.05 and $5.00.
 <hr/>
 
-- **Pay Now** - The “Pay Now” payment model will require a customer to pay directly. The item will not be added to any open invoice. Pay Now items can be offered between 1.00€ and 1000.00€ and between $1.99 and $1000.00.
+- **Pay Now** - The “Pay Now” model is a traditional payment model which requires a customer to pay immediately. Pay Now items can be priced between 1.00€ and 1,000.00€ and between $1.99 and $1,000.00.
 
 ## Screenshots ##
 
-### Welcome wizard, select the average pots published on your site.
+### Welcome screen
 
-![Welcome wizard, select the average pots published on your site.](./wporgassets/screenshot_1.png)
+![Welcome screen](./wporgassets/screenshot_1.png)
 
-### Tutorial that guides you through available options in Paywall creation.
+### Onboarding tutorial
 
-![Tutorial that guides you through available options in Paywall creation.](./wporgassets/screenshot_2.png)
+![Onboarding tutorial](./wporgassets/screenshot_2.png)
 
-### Paywall purchase options on post with preview and paywall actions bar.
+### Paywall preview
 
-![Paywall purchase options on post with preview and paywall actions bar.](./wporgassets/screenshot_3.png)
+![Paywall preview](./wporgassets/screenshot_3.png)
 
-### Add new purchase option on the Paywall, when hovering below last option.
+### Add purchase option
 
-![Add new purchase option on the Paywall, when hovering below last option.](./wporgassets/screenshot_4.png)
+![Add purchase option](./wporgassets/screenshot_4.png)
 
-### Edit Time Pass Purchase options.
+### Edit time pass purchase options
 
-![Edit Time Pass Purchase options.](./wporgassets/screenshot_5.png)
+![Edit time pass purchase options](./wporgassets/screenshot_5.png)
 
-### Edit Single Purchase option.
+### Edit single purchase option
 
-![Edit Single Purchase option.](./wporgassets/screenshot_6.png)
+![Edit single purchase option](./wporgassets/screenshot_6.png)
 
-### Available Paywall listed on Dashboard.
+### Paywall Dashboard
 
-![Available Paywall listed on Dashboard.](./wporgassets/screenshot_7.png)
+![Paywall Dashboard](./wporgassets/screenshot_7.png)
 
-### Paywall on post in frontend.
+### Published paywall
 
-![Paywall on post in frontend.](./wporgassets/screenshot_8.png)
+![Published paywallg](./wporgassets/screenshot_8.png)
 
 ## Versioning
 
