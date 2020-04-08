@@ -114,9 +114,14 @@
 
 				span {
 					text-align: center;
+					font-family: "LaterPay WorkSans", serif;
 					font-size: 18px;
 					font-weight: 600;
-					font-family: "LaterPay WorkSans", serif;
+					font-stretch: normal;
+					font-style: normal;
+					line-height: normal;
+					letter-spacing: normal;
+
 				}
 
 				&-icon {
@@ -204,12 +209,13 @@
 				border: 0;
 				width: 100%;
 				height: 100%;
-				padding-left: 10px;
 				display: table-cell;
 				vertical-align: middle;
 				margin: 0;
 				background: #fff url(../img/select-down.svg) no-repeat right 15px top 55%;
 				background-size: 13px 13px;
+				padding-left: 0;
+
 
 				&:focus {
 					border: unset;
@@ -231,7 +237,7 @@
 				height: 0;
 
 				&:checked + .slider::before {
-					transform: translateX(20px);
+					transform: translateX(15px);
 				}
 
 			}
@@ -271,11 +277,11 @@
 
 			span {
 				color: #1e1e1e;
-				padding-left: 5px;
+				text-align: left;
 			}
 
 			span.align-text {
-				text-align: center;
+				text-align: left;
 			}
 
 			button {
@@ -301,7 +307,7 @@
 				background: transparent;
 				cursor: pointer;
 				text-align: left;
-				padding-left: 10px;
+				padding-left: 0;
 				border: 0;
 			}
 		}

@@ -142,7 +142,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 			</select>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-revenue">
-			<span class="align-text pay-now"><?php esc_html_e( 'Pay Now', 'revenue-generator' ); ?></span>
+			<span class="pay-now"><?php esc_html_e( 'Pay Now', 'revenue-generator' ); ?></span>
 			<label class="switch">
 				<input class="rg-purchase-overlay-option-revenue-selection" type="checkbox">
 				<span class="slider round"></span>
@@ -153,7 +153,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 			</button>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-pricing">
-			<span class="align-text static-pricing"><?php esc_html_e( 'Static Pricing', 'revenue-generator' ); ?></span>
+			<span class="static-pricing"><?php esc_html_e( 'Static Pricing', 'revenue-generator' ); ?></span>
 			<label class="switch">
 				<input class="rg-purchase-overlay-option-pricing-selection" type="checkbox">
 				<span class="slider round"></span>
