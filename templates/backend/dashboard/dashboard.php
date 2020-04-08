@@ -43,7 +43,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					$paywall_updated   = $paywall['updated'];
 					$paywall_published = $paywall['published_on'];
 					?>
-					<div class="rev-gen-dashboard-content-paywall">
+					<div class="rev-gen-dashboard-content-paywall" data-paywall-id="<?php echo esc_attr( $paywall_id ); ?>">
 						<?php Paywall::generate_paywall_mini_preview( $paywall_id ); ?>
 						<div class="rev-gen-dashboard-content-paywall-info">
 							<span contenteditable="true" class="rev-gen-dashboard-paywall-name"><?php echo esc_html( $paywall_title ); ?></span>

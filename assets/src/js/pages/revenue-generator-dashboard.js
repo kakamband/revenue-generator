@@ -47,7 +47,7 @@ import { debounce } from '../helpers';
 				 * Handle the next button events of the tour and update preview accordingly.
 				 */
 				$o.body.on( 'click', $o.paywallPreview, function() {
-					const paywallId = $( this ).attr( 'data-paywall-id' );
+					const paywallId = $( this ).closest($o.paywallContentWrapper).attr( 'data-paywall-id' );
 					if ( paywallId ) {
 						window.location.href =
 							revenueGeneratorGlobalOptions.paywallPageBase +
@@ -177,46 +177,56 @@ import { debounce } from '../helpers';
 					}
 				} );
 				
+				/**
+				 * Handle the paywall title update.
+				 */
 				$o.editPayWallName.on( 'focusout', function() {
+				    if ( ! $o.requestSent ) {
+					    
+					    // Prevent duplicate requests.
+					    $o.requestSent = true;
 
-					$( $o.paywallContent ).addClass( 'blury' );
-					$o.body.css( {
-					    overflow: 'hidden',
-					    height: '100%',
-					} );
+					    $( $o.paywallContent ).addClass( 'blury' );
+					    $o.body.css( {
+						overflow: 'hidden',
+						height: '100%',
+					    } );
 
-					// Create form data.
-					const formData = {
-					    action: 'rg_set_paywall_name',
-					    new_paywall_name : $(this).text().trim(),
-					    paywall_id : $(this).closest( $o.paywallContentWrapper ).find( $o.paywallPreview ).attr( 'data-paywall-id' ),
-					    rg_current_url: window.location.href,
-					    security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
-					};
+					    // Create form data.
+					    const formData = {
+						action: 'rg_set_paywall_name',
+						new_paywall_name : $(this).text().trim(),
+						paywall_id : $(this).closest( $o.paywallContentWrapper ).attr( 'data-paywall-id' ),
+						security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
+					    };
 
-					// Update the title.
-					$.ajax( {
-					    url: revenueGeneratorGlobalOptions.ajaxUrl,
-					    method: 'POST',
-					    data: formData,
-					    dataType: 'json',
-					} ).done( function( r ) {
+					    // Update the title.
+					    $.ajax( {
+						url: revenueGeneratorGlobalOptions.ajaxUrl,
+						method: 'POST',
+						data: formData,
+						dataType: 'json',
+					    } ).done( function( r ) {
 
-						if ( true === r.success ) {
-						    $o.snackBar.showSnackbar( r.msg, 1500 );
-						} else if ( false === r.success ) {
-						    $o.snackBar.showSnackbar( r.msg, 1500 );
-						}
+						    if ( true === r.success ) {
+							$o.snackBar.showSnackbar( r.msg, 1500 );
+						    } else if ( false === r.success ) {
+							$o.snackBar.showSnackbar( r.msg, 1500 );
+						    }
 
-						$o.body.css( {
-						    overflow: 'auto',
-						    height: 'auto',
-						} );
+						    $o.body.css( {
+							overflow: 'auto',
+							height: 'auto',
+						    } );
 
-						$( $o.paywallContent ).removeClass( 'blury' );
-					} );
+						    $( $o.paywallContent ).removeClass( 'blury' );
 
+						    // Release request lock.
+						    $o.requestSent = false;
+					    } );
+				    }
 				});
+				
 			};
 
 			/**

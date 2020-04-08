@@ -1044,7 +1044,7 @@ class Admin {
 	}
 
 	/**
-	 * Servers Ajax requests From DashBoard to Set New Paywall Name based on ID.
+	 * Handle Paywall Name change triggered from Paywall Dashboard.
 	 */
 	public function rg_set_paywall_name() {
 		// Verify authenticity.
@@ -1055,27 +1055,24 @@ class Admin {
 
 		if ( ! empty( $paywall_id ) ) {
 			$return_post_id = wp_update_post(
-				array(
+				[
 					'ID'         => $paywall_id,
 					'post_title' => $new_name,
-				)
+				]
 			);
 		}
-		if ( 0 !== $return_post_id || ! is_wp_error( $return_post_id ) ) {
-			wp_send_json(
-				array(
+
+		$response = ( ! empty( $return_post_id ) || ! is_wp_error( $return_post_id ) ) ?
+				[
 					'success' => true,
 					'msg'     => esc_html__( 'Paywall title updated.', 'revenue-generator' ),
-				)
-			);
-		} else {
-			wp_send_json(
-				array(
+				] :
+				[
 					'success' => false,
 					'msg'     => esc_html__( 'Failed to update paywall title.', 'revenue-generator' ),
-				)
-			);
-		}
+				];
+
+		wp_send_json( $response );
 
 	}
 
