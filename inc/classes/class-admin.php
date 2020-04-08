@@ -319,7 +319,6 @@ class Admin {
 			if ( empty( $formatted_post_data ) ) {
 				// Get latest post info for preview.
 				$target_post_id = $post_types->get_latest_post_for_preview();
-				;
 			}
 
 			$formatted_post_data = $post_types->get_formatted_post_data( $target_post_id );
@@ -347,10 +346,17 @@ class Admin {
 			$is_merchant_verified = true;
 		}
 
+		$default_paywall_title = '';
+		// Generate default incremental paywall title.
+		if ( empty( $current_paywall ) ) {
+			$default_paywall_title = $this->generate_default_paywall_title();
+		}
+
 		$admin_menus = self::get_admin_menus();
 
 		// Paywall purchase options data.
 		$post_preview_data = [
+			'default_paywall_title' => $default_paywall_title,
 			'rg_preview_post'       => $formatted_post_data,
 			'purchase_options_data' => $purchase_options,
 			'default_option_data'   => $default_option_data,
@@ -379,6 +385,26 @@ class Admin {
 
 		return '';
 	}
+
+	/**
+	 * Generates default paywall title.
+	 */
+	public function generate_default_paywall_title() {
+		$paywall_instance      = Paywall::get_instance();
+		$paywall_post_count    = $paywall_instance->get_paywalls_count();
+		$default_paywall_count = ( ! empty( $paywall_post_count ) ) ? (int) $paywall_post_count + 1 : 1;
+		$default_paywall_title = esc_html__( 'Paywall 1', 'revenue-generator' );
+
+		if ( $default_paywall_count ) {
+
+			/* translators: Default paywall title with incrementing count. */
+			$default_paywall_title = sprintf( esc_html__( 'Paywall %s', 'revenue-generator' ), $default_paywall_count );
+
+		}
+
+		return $default_paywall_title;
+	}
+
 
 	/**
 	 * Update the global config with provided data.
