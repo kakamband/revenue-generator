@@ -138,8 +138,8 @@
 		position: absolute;
 		top: -15px;
 		border: 2px solid;
-		left: -345px;
-		width: 300px;
+		left: -365px;
+		width: 320px;
 		background: #fff;
 		font-weight: bold;
 		font-family: "Helvetica Neue", serif;
@@ -173,11 +173,21 @@
 			border-color: #e3e4e6 !important; /* stylelint-disable-line declaration-no-important */
 			border-bottom: 1px solid;
 			height: 45px;
-			font-size: 12px;
 			text-align: left;
 			display: table;
 			width: 95%;
 			padding-left: 5%;
+			font-family: HelveticaNeue, serif;
+			font-size: 14px;
+			font-weight: bold;
+			font-stretch: normal;
+			font-style: normal;
+			line-height: normal;
+			letter-spacing: normal;
+
+			span.unchecked {
+				font-weight: 500;
+			}
 
 			span {
 				display: table-cell;
@@ -221,7 +231,7 @@
 				height: 0;
 
 				&:checked + .slider::before {
-					transform: translateX(26px);
+					transform: translateX(20px);
 				}
 
 			}
@@ -241,20 +251,20 @@
 					bottom: 0;
 					background-color: #ccc;
 					transition: 0.4s;
-					width: 35px;
-					height: 20px;
-					border-radius: 35px;
+					width: 29px;
+					height: 16px;
+					border-radius: 8px;
 
 					&::before {
 						position: absolute;
 						content: "";
-						height: 10px;
-						width: 10px;
 						left: 1px;
-						top: 5px;
+						top: 2px;
 						background-color: #fff;
 						transition: 0.4s;
-						border-radius: 50%;
+						width: 12px;
+						height: 12px;
+						border-radius: 12px;
 					}
 				}
 			}
@@ -303,12 +313,18 @@
 		&-duration {
 			select {
 				border-radius: 0;
-				font-weight: 400;
 				border-color: #e3e4e6 !important; /* stylelint-disable-line declaration-no-important */
 				height: 100%;
 				background: #fff url(../img/select-down.svg) no-repeat right 5px top 55%;
 				background-size: 13px 13px;
 				padding: 0 0 0 8px;
+				font-family: HelveticaNeue, serif;
+				font-size: 14px;
+				font-weight: 500;
+				font-stretch: normal;
+				font-style: normal;
+				line-height: normal;
+				letter-spacing: normal;
 
 				&:focus {
 					border: unset;
@@ -419,7 +435,6 @@
 			div.rg-purchase-overlay-option-manager-entity-selection {
 				select {
 					font-size: 11px;
-					font-weight: 500;
 				}
 			}
 

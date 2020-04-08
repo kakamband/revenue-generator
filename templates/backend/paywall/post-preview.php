@@ -142,23 +142,23 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 			</select>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-revenue">
-			<span class="align-text"><?php esc_html_e( 'Pay Now', 'revenue-generator' ); ?></span>
+			<span class="align-text pay-now"><?php esc_html_e( 'Pay Now', 'revenue-generator' ); ?></span>
 			<label class="switch">
 				<input class="rg-purchase-overlay-option-revenue-selection" type="checkbox">
 				<span class="slider round"></span>
 			</label>
-			<span><?php esc_html_e( 'Pay Later', 'revenue-generator' ); ?></span>
+			<span class="pay-later"><?php esc_html_e( 'Pay Later', 'revenue-generator' ); ?></span>
 			<button data-info-for="revenue" class="rg-purchase-overlay-option-info">
 				<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
 			</button>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-pricing">
-			<span class="align-text"><?php esc_html_e( 'Static Pricing', 'revenue-generator' ); ?></span>
+			<span class="align-text static-pricing"><?php esc_html_e( 'Static Pricing', 'revenue-generator' ); ?></span>
 			<label class="switch">
 				<input class="rg-purchase-overlay-option-pricing-selection" type="checkbox">
 				<span class="slider round"></span>
 			</label>
-			<span><?php esc_html_e( 'Dynamic Pricing', 'revenue-generator' ); ?></span>
+			<span class="dynamic-pricing"><?php esc_html_e( 'Dynamic Pricing', 'revenue-generator' ); ?></span>
 			<button data-info-for="pricing" class="rg-purchase-overlay-option-info">
 				<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>"></button>
 		</div>

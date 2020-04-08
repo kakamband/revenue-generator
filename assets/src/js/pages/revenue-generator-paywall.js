@@ -446,6 +446,10 @@ import { __, sprintf } from '@wordpress/i18n';
 				 */
 				$o.previewWrapper.on( 'click', function( e ) {
 					const currentTarget = $( e.target );
+					const isEditButton = currentTarget.parent(
+						'.rg-purchase-overlay-option-edit'
+					).length;
+
 					/**
 					 * Hide other existing option manager in the view if parent is not the manager element
 					 * and no modal is show currently.
@@ -454,7 +458,8 @@ import { __, sprintf } from '@wordpress/i18n';
 						! currentTarget.parents(
 							'.rg-purchase-overlay-option-manager'
 						).length &&
-						! $( $o.purchaseOptionInfoModal ).length
+						! $( $o.purchaseOptionInfoModal ).length &&
+						! isEditButton
 					) {
 						$o.body
 							.find( '.rg-purchase-overlay-option-manager' )
@@ -470,28 +475,28 @@ import { __, sprintf } from '@wordpress/i18n';
 					$o.purchaseOverlay.removeClass( 'overlay-border' );
 					$( $o.purchaseOverlayRemove ).hide();
 
-					// Get the template for purchase overlay action.
-					const actionTemplate = wp.template(
-						'revgen-purchase-overlay-actions'
+					const actionOptions = $( this ).find(
+						'.rg-purchase-overlay-purchase-options-item-actions'
 					);
+					const actionsExist = actionOptions.length;
 
-					// Send the data to our new template function, get the HTML markup back.
-					const data = {
-						showMoveUp: $( this ).prev(
-							'.rg-purchase-overlay-purchase-options-item'
-						).length,
-						showMoveDown: $( this ).next(
-							'.rg-purchase-overlay-purchase-options-item'
-						).length,
-					};
+					// Show action options if it already exist, else add it.
+					if ( actionsExist ) {
+						actionOptions.show();
+					} else {
+						// Get the template for purchase overlay action.
+						const actionTemplate = wp.template(
+							'revgen-purchase-overlay-actions'
+						);
 
-					const overlayMarkup = actionTemplate( data );
+						const overlayMarkup = actionTemplate();
 
-					// Highlight the current option being edited.
-					$( this ).addClass( 'option-highlight' );
+						// Highlight the current option being edited.
+						$( this ).addClass( 'option-highlight' );
 
-					// Add purchase option actions to the highlighted item.
-					$( this ).prepend( overlayMarkup );
+						// Add purchase option actions to the highlighted item.
+						$( this ).prepend( overlayMarkup );
+					}
 				} );
 
 				/**
@@ -499,11 +504,17 @@ import { __, sprintf } from '@wordpress/i18n';
 				 */
 				$o.body.on( 'mouseleave', $o.purchaseOptionItem, function() {
 					$( this ).removeClass( 'option-highlight' );
-					$( this )
-						.find(
-							'.rg-purchase-overlay-purchase-options-item-actions'
-						)
-						.remove();
+					if (
+						! $o.body.find(
+							'.rg-purchase-overlay-option-manager:visible'
+						).length
+					) {
+						$( this )
+							.find(
+								'.rg-purchase-overlay-purchase-options-item-actions'
+							)
+							.hide();
+					}
 				} );
 
 				/**
@@ -516,11 +527,6 @@ import { __, sprintf } from '@wordpress/i18n';
 					let actionManager = optionItem.find(
 						'.rg-purchase-overlay-option-manager'
 					);
-
-					// Hide any other existing option manager in the view.
-					$o.body
-						.find( '.rg-purchase-overlay-option-manager' )
-						.hide();
 
 					// Get all purchase options.
 					const allPurchaseOptions = $( $o.purchaseOptionItems );
@@ -607,10 +613,16 @@ import { __, sprintf } from '@wordpress/i18n';
 								pricingWrapper
 									.find( $o.individualPricingSelection )
 									.prop( 'checked', true );
+								pricingWrapper
+									.find( '.static-pricing' )
+									.addClass( 'unchecked' );
 							} else {
 								pricingWrapper
 									.find( $o.individualPricingSelection )
 									.prop( 'checked', false );
+								pricingWrapper
+									.find( '.dynamic-pricing' )
+									.addClass( 'unchecked' );
 							}
 						}
 
@@ -635,10 +647,16 @@ import { __, sprintf } from '@wordpress/i18n';
 								revenueWrapper
 									.find( $o.purchaseRevenueSelection )
 									.prop( 'checked', true );
+								revenueWrapper
+									.find( '.pay-now' )
+									.addClass( 'unchecked' );
 							} else {
 								revenueWrapper
 									.find( $o.purchaseRevenueSelection )
 									.prop( 'checked', false );
+								revenueWrapper
+									.find( '.pay-later' )
+									.addClass( 'unchecked' );
 							}
 							revenueWrapper.show();
 						}
@@ -652,8 +670,8 @@ import { __, sprintf } from '@wordpress/i18n';
 								.filter( '[value=individual]' );
 							individualOption.attr( 'disabled', true );
 						}
-						// Highlight the current option being edited and open option manager.
-						actionManager.show();
+
+						actionManager.toggle();
 						optionItem.addClass( 'option-highlight' );
 					}
 				} );
@@ -755,6 +773,10 @@ import { __, sprintf } from '@wordpress/i18n';
 						const pricingSelection = purchaseManager.find(
 							$o.individualPricingSelection
 						);
+						const pricingWrapper = purchaseManager.find(
+							$o.individualPricingWrapper
+						);
+
 						if ( pricingSelection.prop( 'checked' ) ) {
 							const allPurchaseOptions = $(
 								$o.purchaseOptionItems
@@ -780,10 +802,22 @@ import { __, sprintf } from '@wordpress/i18n';
 							optionItem.attr( 'data-pricing-type', 'dynamic' );
 							optionItem.find( $o.purchaseItemPriceIcon ).show();
 							pricingSelection.val( 1 );
+							pricingWrapper
+								.find( '.static-pricing' )
+								.addClass( 'unchecked' );
+							pricingWrapper
+								.find( '.dynamic-pricing' )
+								.removeClass( 'unchecked' );
 						} else {
 							optionItem.attr( 'data-pricing-type', 'static' );
 							optionItem.find( $o.purchaseItemPriceIcon ).hide();
 							pricingSelection.val( 0 );
+							pricingWrapper
+								.find( '.static-pricing' )
+								.removeClass( 'unchecked' );
+							pricingWrapper
+								.find( '.dynamic-pricing' )
+								.addClass( 'unchecked' );
 						}
 					}
 				);
@@ -807,6 +841,9 @@ import { __, sprintf } from '@wordpress/i18n';
 					const currentRevenue = priceItem.attr( 'data-pay-model' );
 					const currentValue = revenueSelection.val();
 					const optionType = optionItem.attr( 'data-purchase-type' );
+					const revenueWrapper = purchaseManager.find(
+						$o.purchaseRevenueWrapper
+					);
 					let entityId = '';
 
 					// Check if edited option is saved already.
@@ -831,6 +868,12 @@ import { __, sprintf } from '@wordpress/i18n';
 											optionItem,
 											true
 										);
+										revenueWrapper
+											.find( '.pay-later' )
+											.removeClass( 'unchecked' );
+										revenueWrapper
+											.find( '.pay-now' )
+											.addClass( 'unchecked' );
 									} else {
 										priceItem.attr(
 											'data-pay-model',
@@ -841,6 +884,12 @@ import { __, sprintf } from '@wordpress/i18n';
 											optionItem,
 											false
 										);
+										revenueWrapper
+											.find( '.pay-later' )
+											.addClass( 'unchecked' );
+										revenueWrapper
+											.find( '.pay-now' )
+											.removeClass( 'unchecked' );
 									}
 								} else {
 									priceItem.attr(
@@ -856,6 +905,21 @@ import { __, sprintf } from '@wordpress/i18n';
 										optionItem,
 										1 === parseInt( currentValue )
 									);
+									if ( 1 === parseInt( currentValue ) ) {
+										revenueWrapper
+											.find( '.pay-later' )
+											.removeClass( 'unchecked' );
+										revenueWrapper
+											.find( '.pay-now' )
+											.addClass( 'unchecked' );
+									} else {
+										revenueWrapper
+											.find( '.pay-later' )
+											.addClass( 'unchecked' );
+										revenueWrapper
+											.find( '.pay-now' )
+											.removeClass( 'unchecked' );
+									}
 								}
 							}
 						);
@@ -866,10 +930,22 @@ import { __, sprintf } from '@wordpress/i18n';
 						priceItem.attr( 'data-pay-model', 'ppu' );
 						revenueSelection.val( 1 );
 						validatePricingRevenue( optionItem, true );
+						revenueWrapper
+							.find( '.pay-later' )
+							.removeClass( 'unchecked' );
+						revenueWrapper
+							.find( '.pay-now' )
+							.addClass( 'unchecked' );
 					} else {
 						priceItem.attr( 'data-pay-model', 'sis' );
 						revenueSelection.val( 0 );
 						validatePricingRevenue( optionItem, false );
+						revenueWrapper
+							.find( '.pay-later' )
+							.addClass( 'unchecked' );
+						revenueWrapper
+							.find( '.pay-now' )
+							.removeClass( 'unchecked' );
 					}
 				} );
 
