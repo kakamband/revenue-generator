@@ -390,9 +390,9 @@ class Admin {
 	 * Generates default paywall title.
 	 */
 	public function generate_default_paywall_title() {
-
-		$paywall_post_count    = wp_count_posts( 'rg_paywall', 'readable' );
-		$default_paywall_count = ( ! empty( $paywall_post_count->publish ) ) ? (int) $paywall_post_count->publish + 1 : 1;
+		$paywall_instance      = Paywall::get_instance();
+		$paywall_post_count    = $paywall_instance->get_paywalls_count();
+		$default_paywall_count = ( ! empty( $paywall_post_count ) ) ? (int) $paywall_post_count + 1 : 1;
 		$default_paywall_title = esc_html__( 'Paywall 1', 'revenue-generator' );
 
 		if ( $default_paywall_count ) {
