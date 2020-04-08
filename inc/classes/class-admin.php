@@ -55,6 +55,7 @@ class Admin {
 		add_action( 'wp_ajax_rg_restart_tour', [ $this, 'restart_tour' ] );
 		add_action( 'wp_ajax_rg_set_paywall_order', [ $this, 'set_paywall_sort_order' ] );
 		add_action( 'wp_ajax_rg_search_paywall', [ $this, 'search_paywall' ] );
+		add_action( 'wp_ajax_rg_set_paywall_name', [ $this, 'rg_set_paywall_name' ] );
 	}
 
 	/**
@@ -1040,6 +1041,35 @@ class Admin {
 				]
 			);
 		}
+	}
+
+	/**
+	 * Handle Paywall Name change triggered from Paywall Dashboard.
+	 */
+	public function rg_set_paywall_name() {
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+		$new_name       = filter_input( INPUT_POST, 'new_paywall_name', FILTER_SANITIZE_STRING );
+		$paywall_id     = filter_input( INPUT_POST, 'paywall_id', FILTER_SANITIZE_NUMBER_INT );
+		$return_post_id = 0;
+
+		if ( ! empty( $paywall_id ) ) {
+			$return_post_id = wp_update_post(
+				[
+					'ID'         => $paywall_id,
+					'post_title' => $new_name,
+				]
+			);
+		}
+
+		$is_updated = ( ! empty( $return_post_id ) || ! is_wp_error( $return_post_id ) );
+		$response   = [
+			'success' => $is_updated,
+			'msg'     => $is_updated ? esc_html__( 'Paywall title updated.', 'revenue-generator' ) : esc_html__( 'Failed to update paywall title.', 'revenue-generator' ),
+		];
+
+		wp_send_json( $response );
+
 	}
 
 	/**
