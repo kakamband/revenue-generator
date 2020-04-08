@@ -396,10 +396,10 @@ class Admin {
 		$default_paywall_title = esc_html__( 'Paywall 1', 'revenue-generator' );
 
 		if ( $default_paywall_count ) {
-			/*
-			* translators: Default Paywall title with incrementing count.
-			*/
+
+			/* translators: Default paywall title with incrementing count. */
 			$default_paywall_title = sprintf( esc_html__( 'Paywall %s', 'revenue-generator' ), $default_paywall_count );
+
 		}
 
 		return $default_paywall_title;
