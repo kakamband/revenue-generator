@@ -22,7 +22,7 @@ import { debounce } from '../helpers';
 				// Paywall listing area elements.
 				paywallContent: '.rev-gen-dashboard-content',
 				paywallPreview: '.rev-gen-dashboard-content-paywall-preview',
-				paywallContentWrapper : '.rev-gen-dashboard-content-paywall',
+				paywallContentWrapper: '.rev-gen-dashboard-content-paywall',
 				// Dashboard bar action items.
 				newPaywall: $( '#rg_js_newPaywall' ),
 				sortPaywalls: $( '#rg_js_filterPaywalls' ),
@@ -31,7 +31,7 @@ import { debounce } from '../helpers';
 					'.rev-gen-dashboard-bar--search-results'
 				),
 				searchResultItem: '.rev-gen-dashboard-bar--search-results-item',
-				editPayWallName : $( '.rev-gen-dashboard-paywall-name' ),
+				editPayWallName: $( '.rev-gen-dashboard-paywall-name' ),
 
 				// Dashboard footer area.
 				restartTour: $( '#rg_js_RestartTutorial' ),
@@ -47,7 +47,9 @@ import { debounce } from '../helpers';
 				 * Handle the next button events of the tour and update preview accordingly.
 				 */
 				$o.body.on( 'click', $o.paywallPreview, function() {
-					const paywallId = $( this ).closest($o.paywallContentWrapper).attr( 'data-paywall-id' );
+					const paywallId = $( this )
+						.closest( $o.paywallContentWrapper )
+						.attr( 'data-paywall-id' );
 					if ( paywallId ) {
 						window.location.href =
 							revenueGeneratorGlobalOptions.paywallPageBase +
@@ -176,57 +178,59 @@ import { debounce } from '../helpers';
 							searchPostID;
 					}
 				} );
-				
+
 				/**
 				 * Handle the paywall title update.
 				 */
 				$o.editPayWallName.on( 'focusout', function() {
-				    if ( ! $o.requestSent ) {
-					    
-					    // Prevent duplicate requests.
-					    $o.requestSent = true;
+					if ( ! $o.requestSent ) {
+						// Prevent duplicate requests.
+						$o.requestSent = true;
 
-					    $( $o.paywallContent ).addClass( 'blury' );
-					    $o.body.css( {
-						overflow: 'hidden',
-						height: '100%',
-					    } );
+						$( $o.paywallContent ).addClass( 'blury' );
+						$o.body.css( {
+							overflow: 'hidden',
+							height: '100%',
+						} );
 
-					    // Create form data.
-					    const formData = {
-						action: 'rg_set_paywall_name',
-						new_paywall_name : $(this).text().trim(),
-						paywall_id : $(this).closest( $o.paywallContentWrapper ).attr( 'data-paywall-id' ),
-						security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
-					    };
+						// Create form data.
+						const formData = {
+							action: 'rg_set_paywall_name',
+							new_paywall_name: $( this )
+								.text()
+								.trim(),
+							paywall_id: $( this )
+								.closest( $o.paywallContentWrapper )
+								.attr( 'data-paywall-id' ),
+							security:
+								revenueGeneratorGlobalOptions.rg_paywall_nonce,
+						};
 
-					    // Update the title.
-					    $.ajax( {
-						url: revenueGeneratorGlobalOptions.ajaxUrl,
-						method: 'POST',
-						data: formData,
-						dataType: 'json',
-					    } ).done( function( r ) {
+						// Update the title.
+						$.ajax( {
+							url: revenueGeneratorGlobalOptions.ajaxUrl,
+							method: 'POST',
+							data: formData,
+							dataType: 'json',
+						} ).done( function( r ) {
+							if ( true === r.success ) {
+								$o.snackBar.showSnackbar( r.msg, 1500 );
+							} else if ( false === r.success ) {
+								$o.snackBar.showSnackbar( r.msg, 1500 );
+							}
 
-						    if ( true === r.success ) {
-							$o.snackBar.showSnackbar( r.msg, 1500 );
-						    } else if ( false === r.success ) {
-							$o.snackBar.showSnackbar( r.msg, 1500 );
-						    }
+							$o.body.css( {
+								overflow: 'auto',
+								height: 'auto',
+							} );
 
-						    $o.body.css( {
-							overflow: 'auto',
-							height: 'auto',
-						    } );
+							$( $o.paywallContent ).removeClass( 'blury' );
 
-						    $( $o.paywallContent ).removeClass( 'blury' );
-
-						    // Release request lock.
-						    $o.requestSent = false;
-					    } );
-				    }
-				});
-				
+							// Release request lock.
+							$o.requestSent = false;
+						} );
+					}
+				} );
 			};
 
 			/**
