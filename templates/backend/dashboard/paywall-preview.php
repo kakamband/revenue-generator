@@ -17,7 +17,7 @@ $rg_is_paywall_active  = 1 === absint( $paywall_data['is_active'] ) ? true : fal
 
 <div class="rev-gen-dashboard-content-paywall-preview <?php echo ! $rg_is_paywall_active ? 'is-disabled' : ''; ?>">
 	<div class="rev-gen-dashboard-content-paywall-preview-title"><?php echo esc_html( $paywall_data['title'] ); ?></div>
-	<div class="rev-gen-dashboard-content-paywall-preview-description"><?php echo esc_html( $paywall_data['description'] ); ?></div>
+	<div class="rev-gen-dashboard-content-paywall-preview-description hide"><?php echo esc_html( $paywall_data['description'] ); ?></div>
 	<div class="rev-gen-dashboard-content-paywall-preview-purchase-options">
 		<?php
 		if ( ! empty( $purchase_option_items ) ) :

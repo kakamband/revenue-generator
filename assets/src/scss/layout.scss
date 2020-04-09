@@ -86,6 +86,10 @@ body {
 	}
 }
 
+.rev-gen-tutorial-title {
+	height: auto;
+}
+
 .shepherd-content-add-space {
 
 	&-top {
@@ -117,4 +121,7 @@ body {
 
 #wpbody-content {
 	padding-bottom: 0;
+}
+.hide {
+	display: none;
 }

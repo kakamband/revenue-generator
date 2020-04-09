@@ -71,6 +71,13 @@ class Frontend_Post {
 	protected $merchant_api_key;
 
 	/**
+	 * Paywall Header Title.
+	 *
+	 * @var string
+	 */
+	protected $paywall_header_title;
+
+	/**
 	 * Store common values used in the plugin.
 	 *
 	 * @var array Common values used for api related info throughout the plugin.
@@ -134,15 +141,22 @@ class Frontend_Post {
 		if ( is_singular( Post_Types::get_allowed_post_types() ) ) {
 			$appearance_config = $this->get_purchase_overlay_config();
 			$deleted_articles  = $this->get_deleted_article_ids();
+
+			$this->current_post_id = ( ! empty( $this->current_post_id ) ) ? $this->current_post_id : get_the_ID();
+			$paywall_data          = $this->get_connected_paywall_id( $this->current_post_id );
+
 			?>
 			<!-- LaterPay Connector In-Page Configuration for appearance layout and deleted purchase options. -->
 			<script type="application/json" id="laterpay-connector">
 			<?php
+
+				$this->paywall_header_title = ( ! empty( $paywall_data['title'] ) ) ? $paywall_data['title'] : esc_html__( 'Keep Reading', 'revenue-generator' );
+
 				$appearance_and_deleted_config = [
 					'appearance'   => $appearance_config,
 					'translations' => [
 						'purchaseOverlay' => [
-							'heading'                   => esc_html__( 'Keep Reading', 'revenue-generator' ),
+							'heading'                   => $this->paywall_header_title,
 							'currentArticle'            => empty( $this->individual_article_title ) ? esc_html__( 'Access Article Now', 'revenue-generator' ) : esc_html( $this->individual_article_title ),
 							'currentArticleDescription' => empty( $this->individual_article_description ) ? esc_html__( 'You\'ll only be charged once you\'ve reached $5.', 'revenue-generator' ) : esc_html( $this->individual_article_description ),
 						],
