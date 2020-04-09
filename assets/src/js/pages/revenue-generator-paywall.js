@@ -705,6 +705,31 @@ import { __, sprintf } from '@wordpress/i18n';
 						actionManager.toggle();
 						optionItem.addClass( 'option-highlight' );
 					}
+
+					/**
+					 * This is done to keep current state of triggered action manger
+					 * not be changed by the hiding of all others.
+					 */
+					const actionManagerCurrentState = actionManager.css(
+						'display'
+					);
+					const actionOptions = optionItem.find(
+						'.rg-purchase-overlay-purchase-options-item-actions'
+					);
+
+					// Hide other open option managers.
+					$o.body
+						.find( '.rg-purchase-overlay-option-manager' )
+						.hide();
+					$o.body
+						.find(
+							'.rg-purchase-overlay-purchase-options-item-actions'
+						)
+						.hide();
+					actionOptions.show();
+
+					// Reset current action manager back to original state.
+					actionManager.css( { display: actionManagerCurrentState } );
 				} );
 
 				/**
