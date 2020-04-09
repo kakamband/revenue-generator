@@ -89,6 +89,7 @@ import { __, sprintf } from '@wordpress/i18n';
 
 				// Paywall publish actions.
 				addPaywall: '#rj_js_addNewPaywall',
+				gotoDashboard: '#rg_js_gotoDashboard',
 				actionsWrapper: $( '.rev-gen-preview-main--paywall-actions' ),
 				actionButtons: $(
 					'.rev-gen-preview-main--paywall-actions-update'
@@ -1431,6 +1432,17 @@ import { __, sprintf } from '@wordpress/i18n';
 					);
 					if ( postPreviewId ) {
 						showPreviewContent( postPreviewId );
+					}
+				} );
+
+				/**
+				 * Handle the dashboard redirection on paywall deletion.
+				 */
+				$o.body.on( 'click', $o.gotoDashboard, function() {
+					const dashboardURL = $( this ).attr( 'data-dashboard-url' );
+
+					if ( dashboardURL ) {
+						window.location.href = dashboardURL;
 					}
 				} );
 

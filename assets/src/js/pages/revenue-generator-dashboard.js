@@ -213,11 +213,7 @@ import { debounce } from '../helpers';
 							data: formData,
 							dataType: 'json',
 						} ).done( function( r ) {
-							if ( true === r.success ) {
-								$o.snackBar.showSnackbar( r.msg, 1500 );
-							} else if ( false === r.success ) {
-								$o.snackBar.showSnackbar( r.msg, 1500 );
-							}
+							$o.snackBar.showSnackbar( r.msg, 1500 );
 
 							$o.body.css( {
 								overflow: 'auto',
