@@ -479,6 +479,8 @@
 
 			p {
 				font-size: 12px;
+				padding: 0 10%;
+				margin: 15px 0;
 
 				a {
 					cursor: pointer;
@@ -876,6 +878,10 @@
 				}
 			}
 		}
+
+		&-info-modal {
+			left: 35%;
+		}
 	}
 }
 
@@ -883,6 +889,11 @@
 	.rev-gen-preview-main {
 		&--post {
 			width: 70%;
+		}
+
+		&-info-modal {
+			top: 15%;
+			padding-bottom: 25px;
 		}
 	}
 }

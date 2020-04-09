@@ -724,30 +724,24 @@ import { __, sprintf } from '@wordpress/i18n';
 						entityId = purchaseItem.attr( 'data-sub-id' );
 					}
 
-					// if id exists remove item from DB after confirmation.
-					if ( entityId ) {
-						if ( 'individual' !== type ) {
-							showPurchaseOptionUpdateWarning( type ).then(
-								( confirmation ) => {
-									if ( true === confirmation ) {
-										purchaseItem.remove();
-										reorderPurchaseItems();
-										removePurchaseOption( type, entityId );
-										$o.isPublish = true;
-										$o.savePaywall.trigger( 'click' );
-									}
+					if ( 'individual' !== type ) {
+						showPurchaseOptionUpdateWarning( type ).then(
+							( confirmation ) => {
+								if ( true === confirmation ) {
+									purchaseItem.remove();
+									reorderPurchaseItems();
+									removePurchaseOption( type, entityId );
+									$o.isPublish = true;
+									$o.savePaywall.trigger( 'click' );
 								}
-							);
-						} else {
-							purchaseItem.remove();
-							reorderPurchaseItems();
-							removePurchaseOption( type, entityId );
-							$o.isPublish = true;
-							$o.savePaywall.trigger( 'click' );
-						}
+							}
+						);
 					} else {
 						purchaseItem.remove();
 						reorderPurchaseItems();
+						removePurchaseOption( type, entityId );
+						$o.isPublish = true;
+						$o.savePaywall.trigger( 'click' );
 					}
 				} );
 
@@ -875,17 +869,9 @@ import { __, sprintf } from '@wordpress/i18n';
 					const revenueWrapper = purchaseManager.find(
 						$o.purchaseRevenueWrapper
 					);
-					let entityId = '';
-
-					// Check if edited option is saved already.
-					if ( 'subscription' === optionType ) {
-						entityId = optionItem.attr( 'data-sub-id' );
-					} else if ( 'timepass' === optionType ) {
-						entityId = optionItem.attr( 'data-tlp-id' );
-					}
 
 					// If a saved option is being edited, get confirmation.
-					if ( entityId ) {
+					if ( 'individual' !== optionType ) {
 						showPurchaseOptionUpdateWarning( optionType ).then(
 							( confirmation ) => {
 								if ( true === confirmation ) {
@@ -1058,7 +1044,6 @@ import { __, sprintf } from '@wordpress/i18n';
 							const currentRevenue = priceItem.attr(
 								'data-pay-model'
 							);
-							let entityId = '';
 
 							const symbol = priceSymbol.text().trim();
 							if (
@@ -1069,15 +1054,8 @@ import { __, sprintf } from '@wordpress/i18n';
 								showCurrencySelectionModal();
 							}
 
-							// Check if edited option is saved already.
-							if ( 'subscription' === optionType ) {
-								entityId = optionItem.attr( 'data-sub-id' );
-							} else if ( 'timepass' === optionType ) {
-								entityId = optionItem.attr( 'data-tlp-id' );
-							}
-
 							// If a saved item is being updated, display warning.
-							if ( entityId ) {
+							if ( 'individual' !== optionType ) {
 								showPurchaseOptionUpdateWarning(
 									optionType
 								).then( ( confirmation ) => {
@@ -1319,6 +1297,9 @@ import { __, sprintf } from '@wordpress/i18n';
 							'background-color': '#fff',
 						} );
 						$o.actionButtons.css( { opacity: '1' } );
+						$o.searchContentWrapper.css( {
+							'background-color': '#fff',
+						} );
 						$( $o.purchaseRevenueWrapper ).css( {
 							'background-color': '#fff',
 							'border-bottom-color': 'unset !important',
@@ -1358,6 +1339,9 @@ import { __, sprintf } from '@wordpress/i18n';
 							'background-color': '#a9a9a9',
 						} );
 						$o.actionButtons.css( { opacity: '0.5' } );
+						$o.searchContentWrapper.css( {
+							'background-color': '#a9a9a9',
+						} );
 
 						// Highlight selected info modal parent based on type.
 						if ( 'revenue' === modalType ) {
@@ -1449,10 +1433,7 @@ import { __, sprintf } from '@wordpress/i18n';
 							entityId = optionItem.attr( 'data-paywall-id-id' );
 						}
 
-						if (
-							typeof entityId !== 'undefined' &&
-							entityId.length
-						) {
+						if ( 'individual' !== currentType ) {
 							showPurchaseOptionUpdateWarning( currentType ).then(
 								( confirmation ) => {
 									// If merchant selects to continue, remove current option from DB.
@@ -1879,6 +1860,13 @@ import { __, sprintf } from '@wordpress/i18n';
 						filter: 'unset',
 						'pointer-events': 'unset',
 					} );
+					$o.actionsWrapper.css( {
+						'background-color': '#fff',
+					} );
+					$o.actionButtons.css( { opacity: '1' } );
+					$o.searchContentWrapper.css( {
+						'background-color': '#fff',
+					} );
 				} );
 
 				/**
@@ -2035,6 +2023,13 @@ import { __, sprintf } from '@wordpress/i18n';
 					$o.purchaseOverlay.css( {
 						filter: 'blur(5px)',
 						'pointer-events': 'none',
+					} );
+					$o.actionsWrapper.css( {
+						'background-color': '#a9a9a9',
+					} );
+					$o.actionButtons.css( { opacity: '0.5' } );
+					$o.searchContentWrapper.css( {
+						'background-color': '#a9a9a9',
 					} );
 				}
 
@@ -2285,6 +2280,13 @@ import { __, sprintf } from '@wordpress/i18n';
 				$o.purchaseOverlay.css( {
 					filter: 'blur(5px)',
 					'pointer-events': 'none',
+				} );
+				$o.actionsWrapper.css( {
+					'background-color': '#a9a9a9',
+				} );
+				$o.actionButtons.css( { opacity: '0.5' } );
+				$o.searchContentWrapper.css( {
+					'background-color': '#a9a9a9',
 				} );
 			};
 
@@ -2825,6 +2827,13 @@ import { __, sprintf } from '@wordpress/i18n';
 					filter: 'unset',
 					'pointer-events': 'unset',
 				} );
+
+				// Grey out the paywall actions and change position.
+				$o.actionsWrapper.css( {
+					'background-color': '#fff',
+				} );
+				$o.actionButtons.css( { opacity: '1' } );
+				$o.searchContentWrapper.css( { 'background-color': '#fff' } );
 				return confirm;
 			};
 
@@ -2873,6 +2882,16 @@ import { __, sprintf } from '@wordpress/i18n';
 					$o.purchaseOverlay.css( {
 						filter: 'blur(5px)',
 						'pointer-events': 'none',
+					} );
+
+					// Grey out the paywall actions and change position.
+					$o.actionsWrapper.css( {
+						'background-color': '#a9a9a9',
+					} );
+					$o.actionButtons.css( { opacity: '0.5' } );
+
+					$o.searchContentWrapper.css( {
+						'background-color': '#a9a9a9',
 					} );
 
 					$( $o.purchaseOperationContinue ).off( 'click' );
