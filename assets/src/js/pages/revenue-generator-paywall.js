@@ -2363,6 +2363,20 @@ import { __, sprintf } from '@wordpress/i18n';
 					buttons: [ skipTourButton, nextButton ],
 				} );
 
+				// Add tutorial step for editing header title
+				tour.addStep( {
+					id: 'rg-purchase-overlay-header',
+					text: __( 'Click to Edit', 'revenue-generator' ),
+					attachTo: {
+						element: '.rg-purchase-overlay-title',
+						on: 'bottom',
+					},
+					arrow: true,
+					classes: 'rev-gen-tutorial-title',
+					buttons: [ nextButton ],
+					scrollToHandler: topScrollHandler,
+				} );
+
 				// Add tutorial step for option item.
 				tour.addStep( {
 					id: 'rg-purchase-option-item',
@@ -2507,6 +2521,25 @@ import { __, sprintf } from '@wordpress/i18n';
 						},
 					],
 				} );
+			};
+
+			/**
+			 * Handles Guided tour going out of screen/ top of page.
+			 *
+			 * @param {string} element DOM element
+			 */
+			const topScrollHandler = function( element ) {
+				const $element = $( element );
+				const topOfElement = $element.offset().top;
+
+				$( 'html, body' ).animate(
+					{
+						scrollTop: topOfElement - topOfElement / 4,
+					},
+					{
+						duration: 800,
+					}
+				);
 			};
 
 			/**

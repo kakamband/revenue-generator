@@ -198,10 +198,10 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 
 <!-- Template for purchase overlay -->
 <script type="text/template" id="tmpl-revgen-purchase-overlay">
-	<div class="rg-purchase-overlay-title">
+	<div class="rg-purchase-overlay-title" contenteditable="true">
 		<?php echo empty( $paywall_data['title'] ) ? esc_html__( 'Keep Reading', 'revenue-generator' ) : esc_html( $paywall_data['title'] ); ?>
 	</div>
-	<div class="rg-purchase-overlay-description">
+	<div class="rg-purchase-overlay-description hide">
 		<?php echo empty( $paywall_data['description'] ) ? esc_html( sprintf( 'Support %s to get access to this content and more.', esc_url( get_home_url() ) ) ) : esc_html( $paywall_data['description'] ); ?>
 	</div>
 	<div class="rg-purchase-overlay-purchase-options"
