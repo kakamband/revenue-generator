@@ -55,6 +55,7 @@ class Admin {
 		add_action( 'wp_ajax_rg_restart_tour', [ $this, 'restart_tour' ] );
 		add_action( 'wp_ajax_rg_set_paywall_order', [ $this, 'set_paywall_sort_order' ] );
 		add_action( 'wp_ajax_rg_search_paywall', [ $this, 'search_paywall' ] );
+		add_action( 'wp_ajax_rg_set_paywall_name', [ $this, 'rg_set_paywall_name' ] );
 	}
 
 	/**
@@ -129,6 +130,7 @@ class Admin {
 	public function hide_paywall() {
 		// Hide paywall menu from submenu of plugin.
 		remove_submenu_page( 'revenue-generator', 'revenue-generator-paywall' );
+		remove_submenu_page( 'revenue-generator', 'revenue-generator' );
 	}
 
 	/**
@@ -318,7 +320,6 @@ class Admin {
 			if ( empty( $formatted_post_data ) ) {
 				// Get latest post info for preview.
 				$target_post_id = $post_types->get_latest_post_for_preview();
-				;
 			}
 
 			$formatted_post_data = $post_types->get_formatted_post_data( $target_post_id );
@@ -346,10 +347,17 @@ class Admin {
 			$is_merchant_verified = true;
 		}
 
+		$default_paywall_title = '';
+		// Generate default incremental paywall title.
+		if ( empty( $current_paywall ) ) {
+			$default_paywall_title = $this->generate_default_paywall_title();
+		}
+
 		$admin_menus = self::get_admin_menus();
 
 		// Paywall purchase options data.
 		$post_preview_data = [
+			'default_paywall_title' => $default_paywall_title,
 			'rg_preview_post'       => $formatted_post_data,
 			'purchase_options_data' => $purchase_options,
 			'default_option_data'   => $default_option_data,
@@ -378,6 +386,26 @@ class Admin {
 
 		return '';
 	}
+
+	/**
+	 * Generates default paywall title.
+	 */
+	public function generate_default_paywall_title() {
+		$paywall_instance      = Paywall::get_instance();
+		$paywall_post_count    = $paywall_instance->get_paywalls_count();
+		$default_paywall_count = ( ! empty( $paywall_post_count ) ) ? (int) $paywall_post_count + 1 : 1;
+		$default_paywall_title = esc_html__( 'Paywall 1', 'revenue-generator' );
+
+		if ( $default_paywall_count ) {
+
+			/* translators: Default paywall title with incrementing count. */
+			$default_paywall_title = sprintf( esc_html__( 'Paywall %s', 'revenue-generator' ), $default_paywall_count );
+
+		}
+
+		return $default_paywall_title;
+	}
+
 
 	/**
 	 * Update the global config with provided data.
@@ -1040,6 +1068,35 @@ class Admin {
 				]
 			);
 		}
+	}
+
+	/**
+	 * Handle Paywall Name change triggered from Paywall Dashboard.
+	 */
+	public function rg_set_paywall_name() {
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+		$new_name       = filter_input( INPUT_POST, 'new_paywall_name', FILTER_SANITIZE_STRING );
+		$paywall_id     = filter_input( INPUT_POST, 'paywall_id', FILTER_SANITIZE_NUMBER_INT );
+		$return_post_id = 0;
+
+		if ( ! empty( $paywall_id ) ) {
+			$return_post_id = wp_update_post(
+				[
+					'ID'         => $paywall_id,
+					'post_title' => $new_name,
+				]
+			);
+		}
+
+		$is_updated = ( ! empty( $return_post_id ) || ! is_wp_error( $return_post_id ) );
+		$response   = [
+			'success' => $is_updated,
+			'msg'     => $is_updated ? esc_html__( 'Paywall title updated.', 'revenue-generator' ) : esc_html__( 'Failed to update paywall title.', 'revenue-generator' ),
+		];
+
+		wp_send_json( $response );
+
 	}
 
 	/**

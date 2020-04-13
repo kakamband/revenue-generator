@@ -11,7 +11,7 @@ body {
 .rev-gen-layout-wrapper {
 	width: 100%;
 	color: #1d1d1d;
-	font-family: "Helvetica Neue", serif;
+	font-family: HelveticaNeue, serif;
 	min-height: 750px;
 
 	.shepherd-target {
@@ -22,7 +22,7 @@ body {
 .rev-gen-no-data {
 	width: 100%;
 	color: #ec0b00;
-	font-family: "Helvetica Neue", serif;
+	font-family: HelveticaNeue, serif;
 	display: flex;
 	justify-content: center;
 	min-height: 550px;
@@ -61,15 +61,33 @@ body {
 		text-transform: uppercase;
 		border: 0;
 		cursor: pointer;
-		margin-right: 20px;
 		padding: 0;
-		margin-left: 5px;
 	}
 
 	.shepherd-footer {
 		position: absolute;
 		bottom: 10px;
+		right: 0;
 	}
+
+	.shepherd-content-skip-tour {
+		position: relative;
+		right: 100px;
+	}
+
+	.shepherd-content-complete-tour-element {
+		position: relative;
+		left: -10px;
+	}
+
+	.shepherd-content-next-tour-element {
+		position: relative;
+		left: -10px;
+	}
+}
+
+.rev-gen-tutorial-title {
+	height: auto;
 }
 
 .shepherd-content-add-space {
@@ -103,4 +121,7 @@ body {
 
 #wpbody-content {
 	padding-bottom: 0;
+}
+.hide {
+	display: none;
 }

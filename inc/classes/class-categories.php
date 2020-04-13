@@ -28,8 +28,8 @@ class Categories {
 	 */
 	public function get_applicable_categories( $args ) {
 		$query = [
-			'taxonomy'     => 'category',
-			'hide_empty'   => false,
+			'taxonomy'   => 'category',
+			'hide_empty' => false,
 		];
 
 		$args = wp_parse_args(

@@ -67,7 +67,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 				<div class="rev-gen-preview-main--paywall-actions-apply">
 					<p>
 						<?php
-						$paywall_name = ! empty( $paywall_data['name'] ) ? $paywall_data['name'] : esc_html__( 'Paywall 1', 'revenue-generator' );
+						$paywall_name = ! empty( $paywall_data['name'] ) ? $paywall_data['name'] : $default_paywall_title;
 						echo wp_kses(
 							sprintf(
 								/* translators: %s Paywall name */
@@ -136,30 +136,30 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 				<option
 				<# data.entityType === 'individual' ? print("selected") : print('') #> value="individual"><?php esc_html_e( 'Individual Article', 'revenue-generator' ); ?></option>
 				<option
-				<# data.entityType === 'timepass' ? print("selected") : print('') #> value="timepass"><?php esc_html_e( 'Time Pass', 'revenue-generator' ); ?></option>
+				<# data.entityType === 'timepass' ? print("selected") : print('') #> value="timepass"><?php esc_html_e( 'Time Pass (for the entire site)', 'revenue-generator' ); ?></option>
 				<option
-				<# data.entityType === 'subscription' ? print("selected") : print('') #> value="subscription"><?php esc_html_e( 'Subscription', 'revenue-generator' ); ?></option>
+				<# data.entityType === 'subscription' ? print("selected") : print('') #> value="subscription"><?php esc_html_e( 'Subscription (for the entire site)', 'revenue-generator' ); ?></option>
 			</select>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-revenue">
-			<span><?php esc_html_e( 'Pay Now', 'revenue-generator' ); ?></span>
+			<span class="pay-now"><?php esc_html_e( 'Pay Now', 'revenue-generator' ); ?></span>
 			<label class="switch">
 				<input class="rg-purchase-overlay-option-revenue-selection" type="checkbox">
 				<span class="slider round"></span>
 			</label>
-			<span><?php esc_html_e( 'Pay Later', 'revenue-generator' ); ?></span>
-			<button data-info-for="revenue" class="rg-purchase-overlay-option-info">
+			<span class="pay-later"><?php esc_html_e( 'Pay Later', 'revenue-generator' ); ?></span>
+			<button data-info-for="revenue" id="revenue-info-modal" class="rg-purchase-overlay-option-info">
 				<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
 			</button>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-pricing">
-			<span><?php esc_html_e( 'Static Pricing', 'revenue-generator' ); ?></span>
+			<span class="static-pricing"><?php esc_html_e( 'Static Pricing', 'revenue-generator' ); ?></span>
 			<label class="switch">
 				<input class="rg-purchase-overlay-option-pricing-selection" type="checkbox">
 				<span class="slider round"></span>
 			</label>
-			<span><?php esc_html_e( 'Dynamic Pricing', 'revenue-generator' ); ?></span>
-			<button data-info-for="pricing" class="rg-purchase-overlay-option-info">
+			<span class="dynamic-pricing"><?php esc_html_e( 'Dynamic Pricing', 'revenue-generator' ); ?></span>
+			<button data-info-for="pricing"  id="pricing-info-modal" class="rg-purchase-overlay-option-info">
 				<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>"></button>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-duration">
@@ -198,10 +198,10 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 
 <!-- Template for purchase overlay -->
 <script type="text/template" id="tmpl-revgen-purchase-overlay">
-	<div class="rg-purchase-overlay-title">
+	<div class="rg-purchase-overlay-title" contenteditable="true">
 		<?php echo empty( $paywall_data['title'] ) ? esc_html__( 'Keep Reading', 'revenue-generator' ) : esc_html( $paywall_data['title'] ); ?>
 	</div>
-	<div class="rg-purchase-overlay-description">
+	<div class="rg-purchase-overlay-description hide">
 		<?php echo empty( $paywall_data['description'] ) ? esc_html( sprintf( 'Support %s to get access to this content and more.', esc_url( get_home_url() ) ) ) : esc_html( $paywall_data['description'] ); ?>
 	</div>
 	<div class="rg-purchase-overlay-purchase-options"
@@ -382,8 +382,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 
 <!-- Template for revenue info modal -->
 <script type="text/template" id="tmpl-revgen-info-revenue">
-	<div class="rev-gen-preview-main-info-modal">
-		<span class="rev-gen-preview-main-info-modal-cross">X</span>
+	<div class="rev-gen-preview-main-info-modal revenue-info-modal">
 		<h4 class="rev-gen-preview-main-info-modal-title"><?php esc_html_e( 'Pay Now v Pay Later?', 'revenue-generator' ); ?></h4>
 		<p class="rev-gen-preview-main-info-modal-message">
 			<?php
@@ -425,8 +424,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 
 <!-- Template for pricing info modal -->
 <script type="text/template" id="tmpl-revgen-info-pricing">
-	<div class="rev-gen-preview-main-info-modal">
-		<span class="rev-gen-preview-main-info-modal-cross">X</span>
+	<div class="rev-gen-preview-main-info-modal pricing-info-modal">
 		<h4 class="rev-gen-preview-main-info-modal-title"><?php esc_html_e( 'Static Pricing and Dynamic Pricing', 'revenue-generator' ); ?></h4>
 		<p class="rev-gen-preview-main-info-modal-message">
 			<?php
@@ -492,6 +490,9 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 		<p>
 			<?php esc_html_e( 'You don’t have a paywall on this page - all content will be publicly visible.', 'revenue-generator' ); ?>
 		</p>
+		<button id="rg_js_gotoDashboard" class="goto-dashboard-button" data-dashboard-url="<?php echo esc_url( $dashboard_url ); ?>">
+			<?php esc_html_e( 'View Dashboard', 'revenue-generator' ); ?>
+		</button>
 		<button id="rj_js_addNewPaywall" data-preview-id="">
 			<?php esc_html_e( 'Add Paywall', 'revenue-generator' ); ?>
 		</button>
@@ -518,6 +519,12 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 			</div>
 			<div class="rev-gen-preview-main-account-modal-fields">
 				<h5 class="rev-gen-preview-main-account-modal-fields-title"><?php esc_html_e( 'Connect your account to activate paywall', 'revenue-generator' ); ?></h5>
+				<p class="rev-gen-preview-main-account-modal-credentials-info">
+					<?php esc_html_e( 'Unsure where to find this information?', 'revenue-generator' ); ?>
+					<a target="_blank" rel="noopener noreferrer" href="https://support.laterpay.net/what-is-my-laterpay-merchant-id-api-key-and-where-can-i-find-them">
+						<?php esc_html_e( 'Click here.', 'revenue-generator' ); ?>
+					</a>
+				</p>
 				<input class="rev-gen-preview-main-account-modal-fields-merchant-id" type="text" placeholder="<?php esc_attr_e( 'Merchant ID', 'revenue-generator' ); ?>" maxlength="22" />
 				<input class="rev-gen-preview-main-account-modal-fields-merchant-key" type="text" placeholder="<?php esc_attr_e( 'API Key', 'revenue-generator' ); ?>" maxlength="32" />
 				<div class="rev-gen-preview-main-account-modal-actions">
@@ -538,12 +545,13 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 					<?php
 					echo wp_kses(
 						sprintf(
-							/* translators: %s static anchor id */
+							/* translators: %1$s static anchor id to handle signup link %2$s statuc anchor id to handle re verification. */
 							__(
-								'It looks like you need to create a LaterPay account. Please <a id="%s" href="#">sign up here,</a> or contact <a href="mailto:integration@laterpay.net">integration@laterpay.net</a> if you’re still experiencing difficulties.',
+								'It looks like you need to create a LaterPay account. Please <a id="%1$s" href="#">sign up here</a>, <a id="%2$s" href="#">try again</a>, or contact <a href="mailto:integration@laterpay.net">integration@laterpay.net</a> if you’re still experiencing difficulties.',
 								'revenue-generator'
 							),
-							'rg_js_warningSignup'
+							'rg_js_warningSignup',
+							'rg_js_restartVerification'
 						),
 						[
 							'a' => [

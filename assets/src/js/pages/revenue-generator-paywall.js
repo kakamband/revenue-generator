@@ -1,4 +1,4 @@
-/* global revenueGeneratorGlobalOptions */
+/* global revenueGeneratorGlobalOptions, Shepherd, tippy */
 /**
  * JS to handle plugin paywall preview screen interactions.
  *
@@ -11,8 +11,6 @@
 import '../utils';
 import { debounce } from '../helpers';
 import { __, sprintf } from '@wordpress/i18n';
-import Shepherd from 'shepherd.js';
-import tippy, { roundArrow } from 'tippy.js';
 
 ( function( $ ) {
 	$( function() {
@@ -73,6 +71,7 @@ import tippy, { roundArrow } from 'tippy.js';
 				// Option manager.
 				optionRemove: '.rg-purchase-overlay-option-remove',
 				purchaseOptionType: '#rg_js_purchaseOptionType',
+				optionManager: '.rg-purchase-overlay-option-manager',
 				individualPricingWrapper:
 					'.rg-purchase-overlay-option-manager-pricing',
 				individualPricingSelection:
@@ -90,7 +89,11 @@ import tippy, { roundArrow } from 'tippy.js';
 
 				// Paywall publish actions.
 				addPaywall: '#rj_js_addNewPaywall',
+				gotoDashboard: '#rg_js_gotoDashboard',
 				actionsWrapper: $( '.rev-gen-preview-main--paywall-actions' ),
+				actionButtons: $(
+					'.rev-gen-preview-main--paywall-actions-update'
+				),
 				activatePaywall: $( '#rg_js_activatePaywall' ),
 				savePaywall: $( '#rg_js_savePaywall' ),
 				searchPaywallContent: $( '#rg_js_searchPaywallContent' ),
@@ -121,8 +124,6 @@ import tippy, { roundArrow } from 'tippy.js';
 				// Purchase options info modal.
 				purchaseOptionInfoButton: '.rg-purchase-overlay-option-info',
 				purchaseOptionInfoModal: '.rev-gen-preview-main-info-modal',
-				purchaseOptionInfoClose:
-					'.rev-gen-preview-main-info-modal-cross',
 
 				// Paywall remove warning modal.
 				paywallRemovalModal: '.rev-gen-preview-main-remove-paywall',
@@ -136,10 +137,13 @@ import tippy, { roundArrow } from 'tippy.js';
 				connectAccount: '#rg_js_connectAccount',
 				accountSignup: '#rg_js_signUp',
 				activateAccount: '#rg_js_verifyAccount',
+				reVerifyAccount: '#rg_js_restartVerification',
 				accountActionsWrapper:
 					'.rev-gen-preview-main-account-modal-action',
 				accountActionsFields:
 					'.rev-gen-preview-main-account-modal-fields',
+				accountCredentialsInfo:
+					'.rev-gen-preview-main-account-modal-credentials-info',
 				accountActionId:
 					'.rev-gen-preview-main-account-modal-fields-merchant-id',
 				accountActionKey:
@@ -194,7 +198,7 @@ import tippy, { roundArrow } from 'tippy.js';
 								'.rev-gen-preview-main--search'
 							),
 							{
-								arrow: roundArrow,
+								arrow: tippy.roundArrow,
 							}
 						);
 						tippyInstance.show();
@@ -249,14 +253,23 @@ import tippy, { roundArrow } from 'tippy.js';
 						'background-color': 'darkgray',
 					} );
 
+					$( $o.purchaseOptionItemInfo ).css( {
+						'border-right': '1px solid #928d8d',
+					} );
+
 					if ( 'rg-purchase-option-item' === stepId ) {
 						$( $o.previewSecondItem ).trigger( 'mouseenter' );
+						$o.searchContentWrapper.css( {
+							'background-color': '#a9a9a9',
+						} );
 						$( $o.previewSecondItem ).css( {
 							'background-color': '#fff',
 						} );
-						$( $o.purchaseOptionItemInfo ).css( {
-							'border-right': '1px solid #e3e4e6',
-						} );
+						$( $o.previewSecondItem )
+							.find( $o.purchaseOptionItemInfo )
+							.css( {
+								'border-right': '1px solid #e3e4e6',
+							} );
 					} else if ( 'rg-purchase-option-item-price' === stepId ) {
 						$( $o.optionArea ).trigger( 'mouseenter' );
 						$( $o.previewSecondItem ).trigger( 'mouseleave' );
@@ -267,6 +280,10 @@ import tippy, { roundArrow } from 'tippy.js';
 						// Hack to get tooltip on expected place.
 						Shepherd.activeTour.next();
 						Shepherd.activeTour.back();
+					} else if (
+						'rg-purchase-option-paywall-publish' === stepId
+					) {
+						$o.activatePaywall.css( 'background-color', '#000' );
 					}
 				} );
 
@@ -428,6 +445,50 @@ import tippy, { roundArrow } from 'tippy.js';
 				} );
 
 				/**
+				 * Hide the existing option manager if open by any chance.
+				 */
+				$o.previewWrapper.on( 'click', function( e ) {
+					const currentTarget = $( e.target );
+					const isEditButton = currentTarget.parent(
+						'.rg-purchase-overlay-option-edit'
+					).length;
+
+					/**
+					 * Hide other existing option manager in the view if parent is not the manager element
+					 * and no modal is show currently.
+					 */
+					if (
+						! currentTarget.parents(
+							'.rg-purchase-overlay-option-manager'
+						).length &&
+						! $( $o.purchaseOptionInfoModal ).length &&
+						! isEditButton
+					) {
+						$o.body
+							.find( '.rg-purchase-overlay-option-manager' )
+							.hide();
+					}
+
+					if (
+						! currentTarget.parents(
+							'.rg-purchase-overlay-option-manager'
+						).length
+					) {
+						if ( $( '.pricing-info-modal' ).length ) {
+							$o.body
+								.find( '#pricing-info-modal' )
+								.trigger( 'click' );
+						}
+
+						if ( $( '.revenue-info-modal' ).length ) {
+							$o.body
+								.find( '#revenue-info-modal' )
+								.trigger( 'click' );
+						}
+					}
+				} );
+
+				/**
 				 * Add action items on purchase item hover.
 				 */
 				$o.body.on( 'mouseenter', $o.purchaseOptionItem, function() {
@@ -435,28 +496,29 @@ import tippy, { roundArrow } from 'tippy.js';
 					$o.purchaseOverlay.removeClass( 'overlay-border' );
 					$( $o.purchaseOverlayRemove ).hide();
 
-					// Get the template for purchase overlay action.
-					const actionTemplate = wp.template(
-						'revgen-purchase-overlay-actions'
+					const actionOptions = $( this ).find(
+						'.rg-purchase-overlay-purchase-options-item-actions'
 					);
+					const actionsExist = actionOptions.length;
 
-					// Send the data to our new template function, get the HTML markup back.
-					const data = {
-						showMoveUp: $( this ).prev(
-							'.rg-purchase-overlay-purchase-options-item'
-						).length,
-						showMoveDown: $( this ).next(
-							'.rg-purchase-overlay-purchase-options-item'
-						).length,
-					};
+					// Show action options if it already exist, else add it.
+					if ( actionsExist ) {
+						actionOptions.show();
+						$( this ).addClass( 'option-highlight' );
+					} else {
+						// Get the template for purchase overlay action.
+						const actionTemplate = wp.template(
+							'revgen-purchase-overlay-actions'
+						);
 
-					const overlayMarkup = actionTemplate( data );
+						const overlayMarkup = actionTemplate();
 
-					// Highlight the current option being edited.
-					$( this ).addClass( 'option-highlight' );
+						// Highlight the current option being edited.
+						$( this ).addClass( 'option-highlight' );
 
-					// Add purchase option actions to the highlighted item.
-					$( this ).prepend( overlayMarkup );
+						// Add purchase option actions to the highlighted item.
+						$( this ).prepend( overlayMarkup );
+					}
 				} );
 
 				/**
@@ -464,14 +526,17 @@ import tippy, { roundArrow } from 'tippy.js';
 				 */
 				$o.body.on( 'mouseleave', $o.purchaseOptionItem, function() {
 					$( this ).removeClass( 'option-highlight' );
-					$( this )
-						.find(
-							'.rg-purchase-overlay-purchase-options-item-actions'
-						)
-						.remove();
-					$( this )
-						.find( '.rg-purchase-overlay-option-manager' )
-						.hide();
+					if (
+						! $o.body.find(
+							'.rg-purchase-overlay-option-manager:visible'
+						).length
+					) {
+						$( this )
+							.find(
+								'.rg-purchase-overlay-purchase-options-item-actions'
+							)
+							.hide();
+					}
 				} );
 
 				/**
@@ -528,6 +593,13 @@ import tippy, { roundArrow } from 'tippy.js';
 							'.rg-purchase-overlay-option-manager-entity'
 						);
 
+						$( '.rg-purchase-overlay-option-manager div' ).css( {
+							'border-bottom-color': '#e3e4e6',
+						} );
+						$( '.rg-purchase-overlay-option-manager select' ).css( {
+							'border-color': '#e3e4e6',
+						} );
+
 						// Duration selection.
 						const periodSelection = actionManager.find(
 							$o.durationWrapper
@@ -570,10 +642,16 @@ import tippy, { roundArrow } from 'tippy.js';
 								pricingWrapper
 									.find( $o.individualPricingSelection )
 									.prop( 'checked', true );
+								pricingWrapper
+									.find( '.static-pricing' )
+									.addClass( 'unchecked' );
 							} else {
 								pricingWrapper
 									.find( $o.individualPricingSelection )
 									.prop( 'checked', false );
+								pricingWrapper
+									.find( '.dynamic-pricing' )
+									.addClass( 'unchecked' );
 							}
 						}
 
@@ -581,6 +659,10 @@ import tippy, { roundArrow } from 'tippy.js';
 							$o.purchaseRevenueWrapper
 						);
 						if ( 'subscription' === entityType ) {
+							// Add extra height to get proper styling.
+							actionManager
+								.find( 'div' )
+								.css( { height: ' 55px' } );
 							revenueWrapper.hide();
 						} else {
 							// Set revenue model for selected option.
@@ -594,10 +676,16 @@ import tippy, { roundArrow } from 'tippy.js';
 								revenueWrapper
 									.find( $o.purchaseRevenueSelection )
 									.prop( 'checked', true );
+								revenueWrapper
+									.find( '.pay-now' )
+									.addClass( 'unchecked' );
 							} else {
 								revenueWrapper
 									.find( $o.purchaseRevenueSelection )
 									.prop( 'checked', false );
+								revenueWrapper
+									.find( '.pay-later' )
+									.addClass( 'unchecked' );
 							}
 							revenueWrapper.show();
 						}
@@ -611,8 +699,35 @@ import tippy, { roundArrow } from 'tippy.js';
 								.filter( '[value=individual]' );
 							individualOption.attr( 'disabled', true );
 						}
-						actionManager.show();
+
+						actionManager.toggle();
+						optionItem.addClass( 'option-highlight' );
 					}
+
+					/**
+					 * This is done to keep current state of triggered action manger
+					 * not be changed by the hiding of all others.
+					 */
+					const actionManagerCurrentState = actionManager.css(
+						'display'
+					);
+					const actionOptions = optionItem.find(
+						'.rg-purchase-overlay-purchase-options-item-actions'
+					);
+
+					// Hide other open option managers.
+					$o.body
+						.find( '.rg-purchase-overlay-option-manager' )
+						.hide();
+					$o.body
+						.find(
+							'.rg-purchase-overlay-purchase-options-item-actions'
+						)
+						.hide();
+					actionOptions.show();
+
+					// Reset current action manager back to original state.
+					actionManager.css( { display: actionManagerCurrentState } );
 				} );
 
 				/**
@@ -632,30 +747,24 @@ import tippy, { roundArrow } from 'tippy.js';
 						entityId = purchaseItem.attr( 'data-sub-id' );
 					}
 
-					// if id exists remove item from DB after confirmation.
-					if ( entityId ) {
-						if ( 'individual' !== type ) {
-							showPurchaseOptionUpdateWarning( type ).then(
-								( confirmation ) => {
-									if ( true === confirmation ) {
-										purchaseItem.remove();
-										reorderPurchaseItems();
-										removePurchaseOption( type, entityId );
-										$o.isPublish = true;
-										$o.savePaywall.trigger( 'click' );
-									}
+					if ( 'individual' !== type ) {
+						showPurchaseOptionUpdateWarning( type ).then(
+							( confirmation ) => {
+								if ( true === confirmation ) {
+									purchaseItem.remove();
+									reorderPurchaseItems();
+									removePurchaseOption( type, entityId );
+									$o.isPublish = true;
+									$o.savePaywall.trigger( 'click' );
 								}
-							);
-						} else {
-							purchaseItem.remove();
-							reorderPurchaseItems();
-							removePurchaseOption( type, entityId );
-							$o.isPublish = true;
-							$o.savePaywall.trigger( 'click' );
-						}
+							}
+						);
 					} else {
 						purchaseItem.remove();
 						reorderPurchaseItems();
+						removePurchaseOption( type, entityId );
+						$o.isPublish = true;
+						$o.savePaywall.trigger( 'click' );
 					}
 				} );
 
@@ -712,6 +821,10 @@ import tippy, { roundArrow } from 'tippy.js';
 						const pricingSelection = purchaseManager.find(
 							$o.individualPricingSelection
 						);
+						const pricingWrapper = purchaseManager.find(
+							$o.individualPricingWrapper
+						);
+
 						if ( pricingSelection.prop( 'checked' ) ) {
 							const allPurchaseOptions = $(
 								$o.purchaseOptionItems
@@ -737,10 +850,22 @@ import tippy, { roundArrow } from 'tippy.js';
 							optionItem.attr( 'data-pricing-type', 'dynamic' );
 							optionItem.find( $o.purchaseItemPriceIcon ).show();
 							pricingSelection.val( 1 );
+							pricingWrapper
+								.find( '.static-pricing' )
+								.addClass( 'unchecked' );
+							pricingWrapper
+								.find( '.dynamic-pricing' )
+								.removeClass( 'unchecked' );
 						} else {
 							optionItem.attr( 'data-pricing-type', 'static' );
 							optionItem.find( $o.purchaseItemPriceIcon ).hide();
 							pricingSelection.val( 0 );
+							pricingWrapper
+								.find( '.static-pricing' )
+								.removeClass( 'unchecked' );
+							pricingWrapper
+								.find( '.dynamic-pricing' )
+								.addClass( 'unchecked' );
 						}
 					}
 				);
@@ -764,17 +889,12 @@ import tippy, { roundArrow } from 'tippy.js';
 					const currentRevenue = priceItem.attr( 'data-pay-model' );
 					const currentValue = revenueSelection.val();
 					const optionType = optionItem.attr( 'data-purchase-type' );
-					let entityId = '';
-
-					// Check if edited option is saved already.
-					if ( 'subscription' === optionType ) {
-						entityId = optionItem.attr( 'data-sub-id' );
-					} else if ( 'timepass' === optionType ) {
-						entityId = optionItem.attr( 'data-tlp-id' );
-					}
+					const revenueWrapper = purchaseManager.find(
+						$o.purchaseRevenueWrapper
+					);
 
 					// If a saved option is being edited, get confirmation.
-					if ( entityId ) {
+					if ( 'individual' !== optionType ) {
 						showPurchaseOptionUpdateWarning( optionType ).then(
 							( confirmation ) => {
 								if ( true === confirmation ) {
@@ -788,6 +908,12 @@ import tippy, { roundArrow } from 'tippy.js';
 											optionItem,
 											true
 										);
+										revenueWrapper
+											.find( '.pay-later' )
+											.removeClass( 'unchecked' );
+										revenueWrapper
+											.find( '.pay-now' )
+											.addClass( 'unchecked' );
 									} else {
 										priceItem.attr(
 											'data-pay-model',
@@ -798,6 +924,12 @@ import tippy, { roundArrow } from 'tippy.js';
 											optionItem,
 											false
 										);
+										revenueWrapper
+											.find( '.pay-later' )
+											.addClass( 'unchecked' );
+										revenueWrapper
+											.find( '.pay-now' )
+											.removeClass( 'unchecked' );
 									}
 								} else {
 									priceItem.attr(
@@ -813,6 +945,21 @@ import tippy, { roundArrow } from 'tippy.js';
 										optionItem,
 										1 === parseInt( currentValue )
 									);
+									if ( 1 === parseInt( currentValue ) ) {
+										revenueWrapper
+											.find( '.pay-later' )
+											.removeClass( 'unchecked' );
+										revenueWrapper
+											.find( '.pay-now' )
+											.addClass( 'unchecked' );
+									} else {
+										revenueWrapper
+											.find( '.pay-later' )
+											.addClass( 'unchecked' );
+										revenueWrapper
+											.find( '.pay-now' )
+											.removeClass( 'unchecked' );
+									}
 								}
 							}
 						);
@@ -823,10 +970,22 @@ import tippy, { roundArrow } from 'tippy.js';
 						priceItem.attr( 'data-pay-model', 'ppu' );
 						revenueSelection.val( 1 );
 						validatePricingRevenue( optionItem, true );
+						revenueWrapper
+							.find( '.pay-later' )
+							.removeClass( 'unchecked' );
+						revenueWrapper
+							.find( '.pay-now' )
+							.addClass( 'unchecked' );
 					} else {
 						priceItem.attr( 'data-pay-model', 'sis' );
 						revenueSelection.val( 0 );
 						validatePricingRevenue( optionItem, false );
+						revenueWrapper
+							.find( '.pay-later' )
+							.addClass( 'unchecked' );
+						revenueWrapper
+							.find( '.pay-now' )
+							.removeClass( 'unchecked' );
 					}
 				} );
 
@@ -908,7 +1067,6 @@ import tippy, { roundArrow } from 'tippy.js';
 							const currentRevenue = priceItem.attr(
 								'data-pay-model'
 							);
-							let entityId = '';
 
 							const symbol = priceSymbol.text().trim();
 							if (
@@ -919,15 +1077,8 @@ import tippy, { roundArrow } from 'tippy.js';
 								showCurrencySelectionModal();
 							}
 
-							// Check if edited option is saved already.
-							if ( 'subscription' === optionType ) {
-								entityId = optionItem.attr( 'data-sub-id' );
-							} else if ( 'timepass' === optionType ) {
-								entityId = optionItem.attr( 'data-tlp-id' );
-							}
-
 							// If a saved item is being updated, display warning.
-							if ( entityId ) {
+							if ( 'individual' !== optionType ) {
 								showPurchaseOptionUpdateWarning(
 									optionType
 								).then( ( confirmation ) => {
@@ -1140,32 +1291,102 @@ import tippy, { roundArrow } from 'tippy.js';
 				$o.body.on( 'click', $o.purchaseOptionInfoButton, function() {
 					const infoButton = $( this );
 					const modalType = infoButton.attr( 'data-info-for' );
-					$o.previewWrapper
-						.find( $o.purchaseOptionInfoModal )
-						.remove();
-					const template = wp.template(
-						`revgen-info-${ modalType }`
+					const existingModal = $o.previewWrapper.find(
+						$o.purchaseOptionInfoModal
 					);
-					$o.previewWrapper.append( template );
-					$o.body.addClass( 'modal-blur' );
-					$o.purchaseOverlay.css( {
-						filter: 'blur(5px)',
-						'pointer-events': 'none',
-					} );
-				} );
 
-				/**
-				 * Close info modal.
-				 */
-				$o.body.on( 'click', $o.purchaseOptionInfoClose, function() {
-					$o.previewWrapper
-						.find( $o.purchaseOptionInfoModal )
-						.remove();
-					$o.body.removeClass( 'modal-blur' );
-					$o.purchaseOverlay.css( {
-						filter: 'unset',
-						'pointer-events': 'unset',
-					} );
+					// Remove any existing modal.
+					if ( existingModal.length ) {
+						$o.body.removeClass( 'modal-blur' );
+						existingModal.remove();
+
+						// Reset the background for all greyed out elements.
+						$( $o.optionManager ).css( {
+							'background-color': '#fff',
+						} );
+						$( '.rg-purchase-overlay-option-manager div' ).css( {
+							'border-bottom-color': '#a9a9a9',
+						} );
+						$( $o.optionManager )
+							.find( 'select' )
+							.css( {
+								'background-color': '#fff',
+								'border-bottom-color': '#a9a9a9',
+							} );
+						$( $o.purchaseOptionItem ).css( {
+							'background-color': '#fff',
+						} );
+						$o.actionsWrapper.css( {
+							'background-color': '#fff',
+						} );
+						$o.actionButtons.css( { opacity: '1' } );
+						$o.searchContentWrapper.css( {
+							'background-color': '#fff',
+						} );
+						$( $o.purchaseRevenueWrapper ).css( {
+							'background-color': '#fff',
+							'border-bottom-color': 'unset !important',
+						} );
+						$( $o.individualPricingWrapper ).css( {
+							'background-color': '#fff',
+							'border-color': 'unset !important',
+						} );
+					} else {
+						const template = wp.template(
+							`revgen-info-${ modalType }`
+						);
+						$o.previewWrapper.append( template );
+
+						// Change background color and highlight the clicked parent.
+						$o.body.addClass( 'modal-blur' );
+
+						// Grey out the option manager and overlay elements in it.
+						$( $o.optionManager ).css( {
+							'background-color': '#a9a9a9',
+						} );
+						$( '.rg-purchase-overlay-option-manager div' ).css( {
+							'border-bottom-color': '#000',
+						} );
+						$( $o.optionManager )
+							.find( 'select' )
+							.css( {
+								'background-color': '#a9a9a9',
+								'border-color': '#a9a9a9',
+							} );
+						$( $o.purchaseOptionItem ).css( {
+							'background-color': '#a9a9a9',
+						} );
+
+						// Grey out the paywall actions and change position.
+						$o.actionsWrapper.css( {
+							'background-color': '#a9a9a9',
+						} );
+						$o.actionButtons.css( { opacity: '0.5' } );
+						$o.searchContentWrapper.css( {
+							'background-color': '#a9a9a9',
+						} );
+
+						// Highlight selected info modal parent based on type.
+						if ( 'revenue' === modalType ) {
+							$( $o.purchaseRevenueWrapper ).css( {
+								'background-color': '#fff',
+								cursor: 'pointer',
+								'pointer-events': 'all',
+							} );
+							$( $o.individualPricingWrapper ).css( {
+								'background-color': '#a9a9a9',
+							} );
+						} else {
+							$( $o.individualPricingWrapper ).css( {
+								'background-color': '#fff',
+								cursor: 'pointer',
+								'pointer-events': 'all',
+							} );
+							$( $o.purchaseRevenueWrapper ).css( {
+								'background-color': '#a9a9a9',
+							} );
+						}
+					}
 				} );
 
 				/**
@@ -1212,6 +1433,17 @@ import tippy, { roundArrow } from 'tippy.js';
 				} );
 
 				/**
+				 * Handle the dashboard redirection on paywall deletion.
+				 */
+				$o.body.on( 'click', $o.gotoDashboard, function() {
+					const dashboardURL = $( this ).attr( 'data-dashboard-url' );
+
+					if ( dashboardURL ) {
+						window.location.href = dashboardURL;
+					}
+				} );
+
+				/**
 				 * Handle the change of entity type i.e Individual, TimePass, Subscription.
 				 */
 				$o.body.on( 'change', $o.entitySelection, function() {
@@ -1220,6 +1452,9 @@ import tippy, { roundArrow } from 'tippy.js';
 					);
 					const currentType = optionItem.attr( 'data-purchase-type' );
 					const selectedEntityType = $( this ).val();
+					const optionManager = optionItem.find(
+						'.rg-purchase-overlay-option-manager'
+					);
 					let entityId;
 
 					if ( currentType !== selectedEntityType ) {
@@ -1232,10 +1467,7 @@ import tippy, { roundArrow } from 'tippy.js';
 							entityId = optionItem.attr( 'data-paywall-id-id' );
 						}
 
-						if (
-							typeof entityId !== 'undefined' &&
-							entityId.length
-						) {
+						if ( 'individual' !== currentType ) {
 							showPurchaseOptionUpdateWarning( currentType ).then(
 								( confirmation ) => {
 									// If merchant selects to continue, remove current option from DB.
@@ -1317,6 +1549,10 @@ import tippy, { roundArrow } from 'tippy.js';
 								optionItem
 									.find( $o.purchaseOptionItemDesc )
 									.text( timePassDefaultValues.description );
+
+								optionManager
+									.find( 'div' )
+									.css( { height: ' 45px' } );
 							} else if (
 								'subscription' === selectedEntityType
 							) {
@@ -1351,11 +1587,18 @@ import tippy, { roundArrow } from 'tippy.js';
 									.text(
 										subscriptionDefaultValues.description
 									);
+
+								optionManager
+									.find( 'div' )
+									.css( { height: ' 55px' } );
 							}
 						} else {
 							// Set static pricing by default if individual.
 							optionItem.attr( 'data-pricing-type', 'static' );
 							optionItem.attr( 'data-paywall-id', '' );
+							optionManager
+								.find( 'div' )
+								.css( { height: ' 45px' } );
 						}
 					}
 				} );
@@ -1535,6 +1778,14 @@ import tippy, { roundArrow } from 'tippy.js';
 				} );
 
 				/**
+				 * Reload the Connect account page.
+				 */
+				$o.body.on( 'click', $o.reVerifyAccount, function( e ) {
+					e.preventDefault();
+					showAccountActivationModal();
+				} );
+
+				/**
 				 * Handle paywall activation.
 				 */
 				$o.activatePaywall.on( 'click', function() {
@@ -1642,6 +1893,13 @@ import tippy, { roundArrow } from 'tippy.js';
 					$o.purchaseOverlay.css( {
 						filter: 'unset',
 						'pointer-events': 'unset',
+					} );
+					$o.actionsWrapper.css( {
+						'background-color': '#fff',
+					} );
+					$o.actionButtons.css( { opacity: '1' } );
+					$o.searchContentWrapper.css( {
+						'background-color': '#fff',
 					} );
 				} );
 
@@ -1800,6 +2058,13 @@ import tippy, { roundArrow } from 'tippy.js';
 						filter: 'blur(5px)',
 						'pointer-events': 'none',
 					} );
+					$o.actionsWrapper.css( {
+						'background-color': '#a9a9a9',
+					} );
+					$o.actionButtons.css( { opacity: '0.5' } );
+					$o.searchContentWrapper.css( {
+						'background-color': '#a9a9a9',
+					} );
 				}
 
 				if ( ! $o.requestSent ) {
@@ -1956,6 +2221,7 @@ import tippy, { roundArrow } from 'tippy.js';
 						.find( $o.accountActionTitle )
 						.text( __( 'Just a second...', 'revenue-generator' ) );
 					activationModal.find( $o.accountActionId ).remove();
+					activationModal.find( $o.accountCredentialsInfo ).remove();
 					activationModal.find( $o.accountActionKey ).remove();
 					activationModal.find( $o.accountActions ).remove();
 					activationModal.find( $o.accountVerificationLoader ).show();
@@ -1998,6 +2264,9 @@ import tippy, { roundArrow } from 'tippy.js';
 								}, 2000 );
 							}
 						} else {
+							// Save paywall even if verification fails.
+							$o.isPublish = true;
+							$o.savePaywall.trigger( 'click' );
 							activationModal
 								.find( $o.activationModalError )
 								.css( { display: 'flex' } );
@@ -2012,7 +2281,7 @@ import tippy, { roundArrow } from 'tippy.js';
 			 * @param {string} elementIdentifier Selector matching elements on the document
 			 */
 			const initializeTooltip = function( elementIdentifier ) {
-				tippy( elementIdentifier, { arrow: roundArrow } );
+				tippy( elementIdentifier, { arrow: tippy.roundArrow } );
 			};
 
 			/**
@@ -2046,6 +2315,13 @@ import tippy, { roundArrow } from 'tippy.js';
 					filter: 'blur(5px)',
 					'pointer-events': 'none',
 				} );
+				$o.actionsWrapper.css( {
+					'background-color': '#a9a9a9',
+				} );
+				$o.actionButtons.css( { opacity: '0.5' } );
+				$o.searchContentWrapper.css( {
+					'background-color': '#a9a9a9',
+				} );
 			};
 
 			/**
@@ -2057,7 +2333,7 @@ import tippy, { roundArrow } from 'tippy.js';
 				return new Shepherd.Tour( {
 					defaultStepOptions: {
 						classes: 'rev-gen-tutorial-card',
-						scrollTo: true,
+						scrollTo: { behavior: 'smooth', block: 'center' },
 					},
 				} );
 			};
@@ -2071,11 +2347,13 @@ import tippy, { roundArrow } from 'tippy.js';
 				const skipTourButton = {
 					text: __( 'Skip Tour', 'revenue-generator' ),
 					action: tour.complete,
+					classes: 'shepherd-content-skip-tour',
 				};
 
 				const nextButton = {
 					text: __( 'Next >', 'revenue-generator' ),
 					action: tour.next,
+					classes: 'shepherd-content-next-tour-element',
 				};
 
 				// Add tutorial step for main search.
@@ -2092,6 +2370,19 @@ import tippy, { roundArrow } from 'tippy.js';
 					arrow: true,
 					classes: 'shepherd-content-add-space-top',
 					buttons: [ skipTourButton, nextButton ],
+				} );
+
+				// Add tutorial step for editing header title
+				tour.addStep( {
+					id: 'rg-purchase-overlay-header',
+					text: __( 'Click to Edit', 'revenue-generator' ),
+					attachTo: {
+						element: '.rg-purchase-overlay-title',
+						on: 'bottom',
+					},
+					arrow: true,
+					classes: 'rev-gen-tutorial-title',
+					buttons: [ nextButton ],
 				} );
 
 				// Add tutorial step for option item.
@@ -2234,6 +2525,7 @@ import tippy, { roundArrow } from 'tippy.js';
 						{
 							text: __( 'Complete', 'revenue-generator' ),
 							action: tour.next,
+							classes: 'shepherd-content-complete-tour-element',
 						},
 					],
 				} );
@@ -2261,7 +2553,7 @@ import tippy, { roundArrow } from 'tippy.js';
 					'background-color': 'darkgray',
 				} );
 				$( $o.purchaseOptionItemInfo ).css( {
-					'border-right': '1px solid darkgray',
+					'border-right': '1px solid #928d8d',
 				} );
 
 				const directionalKeys = [
@@ -2426,11 +2718,25 @@ import tippy, { roundArrow } from 'tippy.js';
 								$o.searchResultWrapper.empty();
 								const postPreviews = r.preview_posts;
 								postPreviews.forEach( function( item ) {
+									const itemType =
+										item.type === 'post'
+											? 'dashicons-admin-post'
+											: 'dashicons-admin-page';
+									const itemTitle = item.title;
+									const searchRegExp = new RegExp(
+										searchTerm,
+										'i'
+									);
+									const highlightedTitle = itemTitle.replace(
+										searchRegExp,
+										`<b>${ searchTerm }</b>`
+									);
 									const searchItem = $( '<span/>', {
 										'data-id': item.id,
 										class:
-											'rev-gen-preview-main--search-results-item',
-									} ).text( item.title );
+											'rev-gen-preview-main--search-results-item dashicons-before',
+									} ).append( highlightedTitle );
+									searchItem.addClass( itemType );
 									$o.searchResultWrapper.append( searchItem );
 									$o.searchResultWrapper.css( {
 										display: 'flex',
@@ -2568,6 +2874,13 @@ import tippy, { roundArrow } from 'tippy.js';
 					filter: 'unset',
 					'pointer-events': 'unset',
 				} );
+
+				// Grey out the paywall actions and change position.
+				$o.actionsWrapper.css( {
+					'background-color': '#fff',
+				} );
+				$o.actionButtons.css( { opacity: '1' } );
+				$o.searchContentWrapper.css( { 'background-color': '#fff' } );
 				return confirm;
 			};
 
@@ -2616,6 +2929,16 @@ import tippy, { roundArrow } from 'tippy.js';
 					$o.purchaseOverlay.css( {
 						filter: 'blur(5px)',
 						'pointer-events': 'none',
+					} );
+
+					// Grey out the paywall actions and change position.
+					$o.actionsWrapper.css( {
+						'background-color': '#a9a9a9',
+					} );
+					$o.actionButtons.css( { opacity: '0.5' } );
+
+					$o.searchContentWrapper.css( {
+						'background-color': '#a9a9a9',
 					} );
 
 					$( $o.purchaseOperationContinue ).off( 'click' );

@@ -33,8 +33,19 @@ const finalConfig = (mode) => {
 						],
 					},
 					{
-						test  : /\.(png|woff|woff2|eot|ttf|svg)$/,
+						test  : /\.(png|svg)$/,
 						loader: 'url-loader?limit=100000'
+					},
+					{
+						test: /\.(woff|woff2|eot|ttf)?$/,
+						use: [
+							{
+								loader: 'url-loader?limit=100000',
+								options: {
+									name: '[name].[ext]',
+								}
+							}
+						]
 					}
 				],
 			},
@@ -51,6 +62,9 @@ const finalConfig = (mode) => {
 				}),
 				new CopyPlugin([
 					{ from: './assets/src/img', to: 'img' },
+				]),
+				new CopyPlugin([
+					{ from: './assets/src/vendor', to: 'vendor' },
 				]),
 				new CopyPlugin([
 					{ from: './assets/src/vendor', to: 'vendor' },
