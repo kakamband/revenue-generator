@@ -285,15 +285,6 @@ import { __, sprintf } from '@wordpress/i18n';
 					) {
 						$o.activatePaywall.css( 'background-color', '#000' );
 					}
-
-					if ( stepId ) {
-						const stepParentOffset = $(
-							`div[data-shepherd-step-id="${ stepId }"]`
-						).offset().top;
-						$( 'html, body' ).animate( {
-							scrollTop: stepParentOffset,
-						} );
-					}
 				} );
 
 				/**
@@ -2342,7 +2333,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				return new Shepherd.Tour( {
 					defaultStepOptions: {
 						classes: 'rev-gen-tutorial-card',
-						scrollTo: true,
+						scrollTo: { behavior: 'smooth', block: 'center' },
 					},
 				} );
 			};
@@ -2392,7 +2383,6 @@ import { __, sprintf } from '@wordpress/i18n';
 					arrow: true,
 					classes: 'rev-gen-tutorial-title',
 					buttons: [ nextButton ],
-					scrollToHandler: topScrollHandler,
 				} );
 
 				// Add tutorial step for option item.
@@ -2539,25 +2529,6 @@ import { __, sprintf } from '@wordpress/i18n';
 						},
 					],
 				} );
-			};
-
-			/**
-			 * Handles Guided tour going out of screen/ top of page.
-			 *
-			 * @param {string} element DOM element
-			 */
-			const topScrollHandler = function( element ) {
-				const $element = $( element );
-				const topOfElement = $element.offset().top;
-
-				$( 'html, body' ).animate(
-					{
-						scrollTop: topOfElement - topOfElement / 4,
-					},
-					{
-						duration: 800,
-					}
-				);
 			};
 
 			/**
