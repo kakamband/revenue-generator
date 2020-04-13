@@ -130,6 +130,7 @@ class Admin {
 	public function hide_paywall() {
 		// Hide paywall menu from submenu of plugin.
 		remove_submenu_page( 'revenue-generator', 'revenue-generator-paywall' );
+		remove_submenu_page( 'revenue-generator', 'revenue-generator' );
 	}
 
 	/**
