@@ -253,6 +253,10 @@ import { __, sprintf } from '@wordpress/i18n';
 						'background-color': 'darkgray',
 					} );
 
+					$( $o.purchaseOptionItemInfo ).css( {
+						'border-right': '1px solid #928d8d',
+					} );
+
 					if ( 'rg-purchase-option-item' === stepId ) {
 						$( $o.previewSecondItem ).trigger( 'mouseenter' );
 						$o.searchContentWrapper.css( {
@@ -261,9 +265,11 @@ import { __, sprintf } from '@wordpress/i18n';
 						$( $o.previewSecondItem ).css( {
 							'background-color': '#fff',
 						} );
-						$( $o.purchaseOptionItemInfo ).css( {
-							'border-right': '1px solid #e3e4e6',
-						} );
+						$( $o.previewSecondItem )
+							.find( $o.purchaseOptionItemInfo )
+							.css( {
+								'border-right': '1px solid #e3e4e6',
+							} );
 					} else if ( 'rg-purchase-option-item-price' === stepId ) {
 						$( $o.optionArea ).trigger( 'mouseenter' );
 						$( $o.previewSecondItem ).trigger( 'mouseleave' );
@@ -2576,7 +2582,7 @@ import { __, sprintf } from '@wordpress/i18n';
 					'background-color': 'darkgray',
 				} );
 				$( $o.purchaseOptionItemInfo ).css( {
-					'border-right': '1px solid darkgray',
+					'border-right': '1px solid #928d8d',
 				} );
 
 				const directionalKeys = [
