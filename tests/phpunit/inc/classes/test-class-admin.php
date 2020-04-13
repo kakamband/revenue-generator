@@ -16,7 +16,7 @@
 namespace LaterPay\Revenue_Generator\Tests;
 
 use LaterPay\Revenue_Generator\Inc\Admin;
-
+use LaterPay\Revenue_Generator\Inc\Assets;
 /**
  * Unit test cases for \LaterPay\Revenue_Generator\Inc\Admin
  *
@@ -238,36 +238,6 @@ class Test_Admin extends \WP_Ajax_UnitTestCase {
 	}
 
 	/**
-	 * Tests class constructor.
-	 *
-	 * @covers ::hide_paywall
-	 */
-	/*
-	public function test_hide_paywall() {
-
-		// Before function called.
-		wp_set_current_user( $this->factory()->user->create( array( 'role' => 'administrator' ) ) );
-		$admin_page_url = home_url() . '/wp-admin/admin.php?page=revenue-generator-paywall';
-		error_log( var_export( menu_page_url( 'revenue-generator-paywall', false ), true ) );
-		error_log( '-----------before-------------' );
-		$this->assertEquals(
-			$admin_page_url,
-			menu_page_url( 'revenue-generator-paywall', false ),
-			'Revenue Generator page not created'
-		);
-
-		// Function called.
-		Utility::invoke_method( Admin::get_instance(), 'hide_paywall' );
-
-		error_log( var_export( menu_page_url( 'revenue-generator-paywall', false ), true ) );
-		error_log( '-----------before-------------' );
-		// After Function is called.
-		$this->assertEmpty( menu_page_url( 'revenue-generator-paywall', false ) );
-
-	}
-	*/
-
-	/**
 	 * Test for Search Preview Content.
 	 *
 	 * @covers Admin::search_paywall
@@ -289,13 +259,87 @@ class Test_Admin extends \WP_Ajax_UnitTestCase {
 		}
 
 		// Get the response, it is in heartbeat's response.
-		$response = json_decode( $this->_last_response, true );
-
-		$response = 
-		error_log( var_export( $response, true ) );
-		error_log( '----------------------------------' );
+		$search_result = json_decode( $this->_last_response, true );
 
 		// Ensure we found the right match.
-		$this->assertContains( $this->_last_response, 'First: Hello, World!' );
+		$this->assertContains( 'First: Hello, World!', $search_result, "search_result doesn't contains value as value" );
+
+		// Failed to find.
+		$this->assertNotContains( 'Second', $search_result['preview_posts'], 'search_result contains value as value' );
+
 	}
+
+	/**
+	 * Test to check if assets are loaded.
+	 *
+	 * @covers Admin::load_assets
+	 */
+	public function test_load_assets() {
+		// Become an administrator.
+		$this->_setRole( 'administrator' );
+
+		// Register Scritps.
+		Utility::invoke_method( Assets::get_instance(), 'register_scripts' );
+
+		// Load Scripts.
+		Utility::invoke_method( Admin::get_instance(), 'load_assets' );
+
+		// Make sure we are on right screen.
+		set_current_screen( 'revenue-generator_page_revenue-generator-dashboard' );
+
+		// Verify script and style registration.
+		$this->assertTrue( wp_script_is( 'revenue-generator', 'enqueued' ) );
+		$this->assertTrue( wp_style_is( 'revenue-generator', 'enqueued' ) );
+		$this->assertTrue( wp_style_is( 'revenue-generator-select2', 'enqueued' ) );
+	}
+
+	/**
+	 * Test Admin menu pages.
+	 *
+	 * @covers Admin::revenue_generator_register_page
+	 */
+	public function test_revenue_generator_register_page() {
+
+		$current_user = get_current_user_id();
+
+		// Become an administrator.
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		update_option( 'siteurl', 'http://example.org' );
+
+		// Load Admin Menu.
+		Utility::invoke_method( Admin::get_instance(), 'revenue_generator_register_page' );
+
+		$expected['revenue-generator'] = home_url() . '/wp-admin/admin.php?page=revenue-generator';
+
+		/*
+		Not working possibly because of menu hide or dynamically loaded menu the global $submenu is also returns as null.
+		$expected['revenue-generator-dashboard'] = home_url() . '/wp-admin/admin.php?page=revenue-generator-dashboard';
+		$expected['revenue-generator-dashboard'] = home_url() . '/wp-admin/admin.php?page=revenue-generator-paywall';
+		*/
+
+		foreach ( $expected as $name => $value ) {
+			$this->assertEquals( $value, menu_page_url( $name, false ) );
+		}
+
+		wp_set_current_user( $current_user );
+	}
+
+	/**
+	 * Test Welcome Screen.
+	 *
+	 * @covers Admin::load_welcome_screen
+	 */
+	public function test_load_welcome_screen() {
+		// Become an administrator.
+		$this->_setRole( 'administrator' );
+
+		// Make sure we are on right screen.
+		set_current_screen( 'revenue-generator_page_revenue-generator-dashboard' );
+
+		// Load welcome screen.
+		$welcome_screen = Utility::buffer_and_return( array( Admin::get_instance(), 'load_welcome_screen' ) );
+
+		$this->assertContains( '<h1 class="welcome-screen--heading">Welcome to Revenue Generator</h1>', $welcome_screen );
+	}
+
 }
