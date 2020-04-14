@@ -247,16 +247,14 @@ class Test_Admin extends \WP_Ajax_UnitTestCase {
 		$this->_setRole( 'administrator' );
 
 		// Set up a default request.
-		$_POST['action']      = 'rg_search_preview_content';
-		$_POST['search_term'] = 'First:';
-		$_POST['security']    = wp_create_nonce( 'rg_paywall_nonce' );
+		$request = array(
+			'action'      => 'rg_search_preview_content',
+			'search_term' => 'First:',
+			'security'    => wp_create_nonce( 'rg_paywall_nonce' ),
+		);
 
-		// Make the request.
-		try {
-			$this->_handleAjax( 'rg_search_preview_content' );
-		} catch ( \WPAjaxDieContinueException $e ) {
-			unset( $e );
-		}
+		$this->_set_input_vars( $request );
+		$this->_make_ajax_call( 'rg_search_preview_content' );
 
 		// Get the response, it is in heartbeat's response.
 		$search_result = json_decode( $this->_last_response, true );
@@ -340,6 +338,95 @@ class Test_Admin extends \WP_Ajax_UnitTestCase {
 		$welcome_screen = Utility::buffer_and_return( array( Admin::get_instance(), 'load_welcome_screen' ) );
 
 		$this->assertContains( '<h1 class="welcome-screen--heading">Welcome to Revenue Generator</h1>', $welcome_screen );
+	}
+
+	/**
+	 * Test to check Screen redirection.
+	 *
+	 * @param string $current_screen current screen.
+	 *
+	 * @dataProvider data_redirect_merchant
+	 */
+	public function test_redirect_merchant( $current_screen ) {
+
+		// Become an administrator.
+		$this->_setRole( 'administrator' );
+
+		// Make sure we are on right screen.
+		set_current_screen( $current_screen );
+
+		$screen = get_current_screen();
+
+		$admin_instance = Admin::get_instance();
+
+		update_option(
+			'lp_rg_global_options',
+			array(
+				'average_post_publish_count' => '',
+				'is_tutorial_completed'      => true,
+			)
+		);
+
+		$admin_instance->redirect_merchant( $screen );
+
+		$current_screen = get_current_screen();
+
+		$this->assertEquals( 'toplevel_page_revenue-generator', $current_screen->id );
+
+	}
+
+	/**
+	 * Data provider for test_redirect_merchant().
+	 *
+	 * Passes Screen value.
+	 *
+	 * @return array {
+	 *    @type array{
+	 *        @type string $screen The Screen.
+	 *    }
+	 * }
+	 */
+	public function data_redirect_merchant() {
+		return array(
+			array(
+				'toplevel_page_revenue-generator',
+			),
+		);
+	}
+
+	/**
+	 * Helper function to make ajax call.
+	 *
+	 * @param string $action Action.
+	 */
+	protected function _make_ajax_call( $action ) {
+
+		/**
+		 * WP_Ajax_UnitTestCase::_handleAjax() should always be in try/catch,
+		 * Since, it throw an exception to stop execution before it die.
+		 */
+		try {
+			$this->_last_response = '';
+			$this->_handleAjax( $action );
+		} catch ( \WPAjaxDieContinueException $e ) {
+			unset( $e );
+		}
+	}
+
+	/**
+	 * Setup Input Variables.
+	 *
+	 * @param array  $vars variables.
+	 * @param string $method method either POST or GET.
+	 */
+	protected function _set_input_vars( array $vars = array(), $method = 'POST' ) {
+		$filterd_variables = wp_slash( $vars );
+
+		$_GET     = $filterd_variables;
+		$_POST    = $filterd_variables;
+		$_REQUEST = $filterd_variables;
+
+		$_SERVER['REQUEST_METHOD'] = $method;
 	}
 
 }
