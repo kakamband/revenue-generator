@@ -52,23 +52,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 						</div>
 					</div>
 				<?php } else : ?>
-					<div class="rev-gen-dashboard-content-nopaywall">
-						<div class="rev-gen-dashboard-content-nopaywall--title">
-							<?php
-								printf(
-									wp_kses(
-										__( 'It’s pretty empty here, <br /> let’s create your first Paywall.', 'revenue-generator' ),
-										[
-											'br' => [],
-										]
-									)
-								);
-							?>
-						</div>
-						<div class="rev-gen-dashboard-content-nopaywall--create-paywall">
-							<a href="<?php echo esc_url( $new_paywall_url ); ?>" class="rev-gen-dashboard-content-nopaywall--create-paywall--button"><?php esc_html_e( 'Create your first Paywall', 'revenue-generator' ); ?></a>
-						</div>
+				<div class="rev-gen-dashboard-content-nopaywall">
+					<div class="rev-gen-dashboard-content-nopaywall--title">
+						<?php
+						printf(
+							wp_kses(
+								__( 'It’s pretty empty here, <br /> let’s create your first Paywall.', 'revenue-generator' ),
+								[
+									'br' => [],
+								]
+							)
+						);
+						?>
 					</div>
+					<div class="rev-gen-dashboard-content-nopaywall--create-paywall">
+						<a href="<?php echo esc_url( $new_paywall_url ); ?>" class="rev-gen-dashboard-content-nopaywall--create-paywall--button"><?php esc_html_e( 'Create your first Paywall', 'revenue-generator' ); ?></a>
+					</div>
+				</div>
 			<?php endif; ?>
 		</div>
 	</div>
