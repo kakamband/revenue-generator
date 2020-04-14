@@ -14,9 +14,9 @@ describe('Revenue Generator Tour Complete', () => {
 		// Search page tour element.
 		await expect(page).toMatchElement('#rg-main-search-input-description');
 		await clickNextTour( 'rg-main-search-input-description' );
-		
+
 		// Paywall Header element.
-		await expect(page).toMatchElement('#rg-main-search-input-description');
+		await expect(page).toMatchElement('#rg-purchase-overlay-header-description');
 		await clickNextTour( 'rg-purchase-overlay-header-description' );
 
 		// Option description tour element.
