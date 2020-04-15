@@ -438,7 +438,7 @@ class Test_Admin extends \WP_Ajax_UnitTestCase {
 		// Load welcome screen.
 		$pawall_template = Utility::buffer_and_return( array( Admin::get_instance(), 'load_paywall' ) );
 
-		$this->assertContains( '<div class="rev-gen-layout-wrapper">', $dashboard_template );
+		$this->assertContains( '<div class="rev-gen-layout-wrapper">', $pawall_template );
 	}
 
 	/**
