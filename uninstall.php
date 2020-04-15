@@ -60,20 +60,44 @@ if ( ! empty( $rg_terms ) ) {
  *
  * Get all paywalls, passes and subscriptions for deletion.
  */
-$args = [
-	'post_type'      => [ 'rg_paywall', 'rg_pass', 'rg_subscription' ],
+$paywall_args = [
+	'post_type'      => [ 'rg_paywall' ],
 	'posts_per_page' => 100,
 	'no_found_rows'  => true,
-	'post_status'    => [ 'publish', 'draft' ],
+	'post_status'    => [ 'publish' ],
 ];
 
-$query = new WP_Query( $args );
+$paywall_query = new WP_Query( $paywall_args );
 
-while ( $query->have_posts() ) {
+// Don't keep paywall info upon deletion.
+while ( $paywall_query->have_posts() ) {
 	// Get custom post data created by plugin and delete it.
-	$query->the_post();
-	$rg_post_id = get_the_ID();
-	wp_delete_post( $rg_post_id, true );
+	$paywall_query->the_post();
+	$rg_paywall_id = get_the_ID();
+	wp_delete_post( $rg_paywall_id, true );
+}
+
+wp_reset_postdata();
+
+// Get all active Time Passes and Subscriptions and set to draft, make sure to check user access based on these options.
+$pass_sub_args = [
+	'post_type'      => [ 'rg_pass', 'rg_subscription' ],
+	'posts_per_page' => 100,
+	'no_found_rows'  => true,
+	'post_status'    => [ 'publish' ],
+];
+
+$pass_sub_query = new WP_Query( $pass_sub_args );
+
+while ( $pass_sub_query->have_posts() ) {
+	// Get custom post data created by plugin and delete it.
+	$pass_sub_query->the_post();
+	$rg_pass_sub_id   = get_the_ID();
+	$rg_pass_sub_post = [
+		'ID' => $rg_pass_sub_id,
+		'post_status' => 'draft',
+	];
+	wp_update_post( $rg_pass_sub_post );
 }
 
 wp_reset_postdata();
