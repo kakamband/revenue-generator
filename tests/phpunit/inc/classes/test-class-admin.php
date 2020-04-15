@@ -343,17 +343,17 @@ class Test_Admin extends \WP_Ajax_UnitTestCase {
 	/**
 	 * Test to check Screen redirection.
 	 *
-	 * @param string $current_screen current screen.
+	 * @param string $input_screen current screen.
 	 *
 	 * @dataProvider data_redirect_merchant
 	 */
-	public function test_redirect_merchant( $current_screen ) {
+	public function test_redirect_merchant( $input_screen ) {
 
 		// Become an administrator.
 		$this->_setRole( 'administrator' );
 
 		// Make sure we are on right screen.
-		set_current_screen( $current_screen );
+		set_current_screen( $input_screen );
 
 		$screen = get_current_screen();
 
@@ -371,7 +371,15 @@ class Test_Admin extends \WP_Ajax_UnitTestCase {
 
 		$current_screen = get_current_screen();
 
-		$this->assertEquals( 'toplevel_page_revenue-generator', $current_screen->id );
+		if ( 'toplevel_page_revenue-generator' === $current_screen->id ) {
+			$this->assertEquals( 'toplevel_page_revenue-generator', $current_screen->id );
+			$this->assertNotEquals( 'revenue-generator_page_revenue-generator-dashboard', $current_screen->id );
+		}
+
+		if ( 'revenue-generator_page_revenue-generator-dashboard' === $current_screen->id ) {
+			$this->assertEquals( 'revenue-generator_page_revenue-generator-dashboard', $current_screen->id );
+			$this->assertNotEquals( 'toplevel_page_revenue-generator', $current_screen->id );
+		}
 
 	}
 
@@ -391,7 +399,46 @@ class Test_Admin extends \WP_Ajax_UnitTestCase {
 			array(
 				'toplevel_page_revenue-generator',
 			),
+			array(
+				'revenue-generator_page_revenue-generator-dashboard',
+			),
 		);
+	}
+
+	/**
+	 * Tests load dashboard function.
+	 *
+	 * @covers Admin::load_dashboard
+	 */
+	public function test_load_dashboard() {
+		// Become an administrator.
+		$this->_setRole( 'administrator' );
+
+		// Make sure we are on right screen.
+		set_current_screen( 'revenue-generator_page_revenue-generator-dashboard' );
+
+		// Load welcome screen.
+		$dashboard_template = Utility::buffer_and_return( array( Admin::get_instance(), 'load_dashboard' ) );
+
+		$this->assertContains( '<div class="rev-gen-layout-wrapper">', $dashboard_template );
+	}
+
+	/**
+	 * Tests load paywall function.
+	 *
+	 * @covers Admin::load_paywall
+	 */
+	public function test_load_paywall() {
+		// Become an administrator.
+		$this->_setRole( 'administrator' );
+
+		// Make sure we are on right screen.
+		set_current_screen( 'revenue-generator_page_revenue-generator-dashboard' );
+
+		// Load welcome screen.
+		$pawall_template = Utility::buffer_and_return( array( Admin::get_instance(), 'load_paywall' ) );
+
+		$this->assertContains( '<div class="rev-gen-layout-wrapper">', $dashboard_template );
 	}
 
 	/**
