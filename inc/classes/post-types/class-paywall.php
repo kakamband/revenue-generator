@@ -179,7 +179,7 @@ class Paywall extends Base {
 	 */
 	public function remove_individual_purchase_option( $paywall_id ) {
 		if ( ! empty( $paywall_id ) ) {
-			$this->update_paywall_individual_option( $paywall_id, [ 'individual' => 'option_did_exist' ] );
+			$this->update_paywall_individual_option( $paywall_id, [] );
 
 			// Unset order if found.
 			$current_order = get_post_meta( $paywall_id, '_rg_options_order', true );
@@ -643,11 +643,6 @@ class Paywall extends Base {
 		$individual_purchase_option        = isset( $purchase_options['individual'] ) ? $purchase_options['individual'] : [];
 		$time_passes_purchase_option       = isset( $purchase_options['time_passes'] ) ? $purchase_options['time_passes'] : [];
 		$subscriptions_purchase_option     = isset( $purchase_options['subscriptions'] ) ? $purchase_options['subscriptions'] : [];
-
-		// Reset individual option as empty if none exists currently.
-		if ( isset( $individual_purchase_option['individual'] ) && 'option_did_exist' === $individual_purchase_option['individual'] ) {
-			$individual_purchase_option = [];
-		}
 
 		// Remove data not required for preview.
 		unset(

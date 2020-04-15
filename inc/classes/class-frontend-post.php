@@ -383,33 +383,28 @@ class Frontend_Post {
 			return [];
 		}
 
-		$deleted_options           = [];
-		$individual_option_existed = false;
-		$paywall_instance          = Paywall::get_instance();
-		$time_pass_instance        = Time_Pass::get_instance();
-		$subscription_instance     = Subscription::get_instance();
-		$deleted_time_pass_ids     = $time_pass_instance->get_inactive_time_pass_tokenized_ids();
-		$deleted_subscription_ids  = $subscription_instance->get_inactive_subscription_tokenized_ids();
-		$deleted_options           = array_merge( $deleted_options, $deleted_time_pass_ids, $deleted_subscription_ids );
+		$deleted_options          = [];
+		$paywall_instance         = Paywall::get_instance();
+		$time_pass_instance       = Time_Pass::get_instance();
+		$subscription_instance    = Subscription::get_instance();
+		$deleted_time_pass_ids    = $time_pass_instance->get_inactive_time_pass_tokenized_ids();
+		$deleted_subscription_ids = $subscription_instance->get_inactive_subscription_tokenized_ids();
+		$deleted_options          = array_merge( $deleted_options, $deleted_time_pass_ids, $deleted_subscription_ids );
 
 		// Set correct paywall id for the post.
 		$this->get_connected_paywall_id( $this->current_post_id );
 
 		$individual_option_data = $paywall_instance->get_individual_purchase_option_data( $this->connected_paywall_id );
-		if ( isset( $individual_option_data['individual'] ) && 'option_did_exist' === $individual_option_data['individual'] ) {
-			$individual_option_existed = true;
-		} else {
-			$this->individual_article_title       = $individual_option_data['title'];
-			$this->individual_article_description = $individual_option_data['description'];
-		}
 
 		/**
 		 * It is possible user has purchased individual article, which was later deleted by merchant,
-		 * we need to make sure user has access to it, if user has purchased then the post will be free,
-		 * else it will add pricing dynamically based on post content.
+		 * we need to make sure user has access to it, if user has purchased then the post will be free.
 		 */
-		if ( true === $individual_option_existed ) {
-			$deleted_options[] = sprintf( 'article_%s', $this->current_post_id );
+		$deleted_options[] = sprintf( 'article_%s', $this->current_post_id );
+
+		if ( ! empty( $individual_option_data ) ) {
+			$this->individual_article_title       = isset( $individual_option_data['title'] ) ? $individual_option_data['title'] : '';
+			$this->individual_article_description = isset( $individual_option_data['description'] ) ? $individual_option_data['description'] : '';
 		}
 
 		return $deleted_options;
