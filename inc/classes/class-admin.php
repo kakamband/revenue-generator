@@ -388,6 +388,27 @@ class Admin {
 	}
 
 	/**
+	 * Load plugin settings.
+	 *
+	 * @return string
+	 *
+	 * @codeCoverageIgnore -- Test will be covered in e2e tests.
+	 */
+	public function load_settings() {
+		self::load_assets();
+
+		$rg_merchant_credentials = Client_Account::get_merchant_credentials();
+		$settings_page_data = [
+			'merchant_credentials'    => $rg_merchant_credentials,
+		];
+
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
+		echo View::render_template( 'backend/settings/settings', $settings_page_data );
+
+		return '';
+	}
+
+	/**
 	 * Generates default paywall title.
 	 */
 	public function generate_default_paywall_title() {
@@ -476,6 +497,13 @@ class Admin {
 				'title'  => __( 'New Paywall', 'revenue-generator' ),
 				'cap'    => 'manage_options',
 				'method' => 'paywall',
+			];
+
+			$menus['settings'] = [
+				'url'    => 'revenue-generator-settings',
+				'title'  => __( 'Settings', 'revenue-generator' ),
+				'cap'    => 'manage_options',
+				'method' => 'settings',
 			];
 		}
 
@@ -886,7 +914,7 @@ class Admin {
 		$merchant_key = sanitize_text_field( filter_input( INPUT_POST, 'merchant_key', FILTER_SANITIZE_STRING ) );
 
 		$client_account_instance = Client_Account::get_instance();
-		$rg_merchant_credentials = $client_account_instance->get_merchant_credentials();
+		$rg_merchant_credentials = Client_Account::get_merchant_credentials();
 
 		// Check and verify merchant id data.
 		if ( ! empty( $merchant_id ) ) {

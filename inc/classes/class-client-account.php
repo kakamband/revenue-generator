@@ -121,7 +121,7 @@ class Client_Account {
 	 *
 	 * @return array
 	 */
-	public function get_merchant_credentials() {
+	public static function get_merchant_credentials() {
 		return get_option( 'lp_rg_merchant_credentials', [] );
 	}
 
