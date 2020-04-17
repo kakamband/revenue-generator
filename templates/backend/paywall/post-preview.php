@@ -45,7 +45,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 				<label for="rg_js_searchContent"><?php esc_html_e( 'Previewing', 'revenue-generator' ); ?>:</label>
 			<?php endif; ?>
 			<input type="text" id="rg_js_searchContent" placeholder="<?php esc_attr_e( 'search for the page or post you\'d like to preview here', 'revenue-generator' ); ?>" value="<?php echo esc_attr( $rg_preview_post_title ); ?>" />
-			<i class="dashicons dashicons-search"></i>
+			<i class="rev-gen-preview-main--search-icon"></i>
 			<div class="rev-gen-preview-main--search-results"></div>
 		</div>
 		<?php if ( ! empty( $rg_preview_post ) ) : ?>
@@ -98,7 +98,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 							</option>
 						<?php endif; ?>
 					</select>
-					<i class="dashicons dashicons-search"></i>
+					<i class="rev-gen-preview-main--paywall-actions-search-icon"></i>
 				</div>
 				<div class="rev-gen-preview-main--paywall-actions-update">
 					<button id="rg_js_savePaywall" class="rev-gen-preview-main-paywall-actions-update-save">
