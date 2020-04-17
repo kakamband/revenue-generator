@@ -58,6 +58,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 					<?php echo wp_kses_post( $rg_preview_post['post_content'] ); ?>
 				</div>
 				<div class="rg-purchase-overlay" id="rg_js_purchaseOverlay">
+					<div class="rg-purchase-overlay-highlight"></div>
 					<button class="rg-purchase-overlay-remove">
 						<img alt="<?php echo esc_attr( 'Paywall Remove', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['option_remove'] ); ?>" />
 					</button>
@@ -252,6 +253,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 					data-uid=""
 					data-order="<?php echo esc_attr( $purchase_option_order ); ?>"
 				>
+				<div class="rg-purchase-overlay-purchase-options-item-highlight"></div>
 					<div class="rg-purchase-overlay-purchase-options-item-info">
 						<div class="rg-purchase-overlay-purchase-options-item-info-title" contenteditable="true">
 							<?php echo empty( $purchase_option['title'] ) ? esc_html__( 'Access Article Now', 'revenue-generator' ) : esc_html( $purchase_option['title'] ); ?>

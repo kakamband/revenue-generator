@@ -493,18 +493,23 @@ import { __, sprintf } from '@wordpress/i18n';
 				 */
 				$o.body.on( 'mouseenter', $o.purchaseOptionItem, function() {
 					// Hide the paywall border.
-					$o.purchaseOverlay.removeClass( 'overlay-border' );
+					$o.purchaseOverlay
+						.children( '.rg-purchase-overlay-highlight' )
+						.hide();
 					$( $o.purchaseOverlayRemove ).hide();
 
 					const actionOptions = $( this ).find(
 						'.rg-purchase-overlay-purchase-options-item-actions'
 					);
 					const actionsExist = actionOptions.length;
+					const optionHighlight = $( this ).children(
+						'.rg-purchase-overlay-purchase-options-item-highlight'
+					);
 
 					// Show action options if it already exist, else add it.
 					if ( actionsExist ) {
 						actionOptions.show();
-						$( this ).addClass( 'option-highlight' );
+						$( optionHighlight ).show();
 					} else {
 						// Get the template for purchase overlay action.
 						const actionTemplate = wp.template(
@@ -514,7 +519,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						const overlayMarkup = actionTemplate();
 
 						// Highlight the current option being edited.
-						$( this ).addClass( 'option-highlight' );
+						$( optionHighlight ).show();
 
 						// Add purchase option actions to the highlighted item.
 						$( this ).prepend( overlayMarkup );
@@ -525,7 +530,11 @@ import { __, sprintf } from '@wordpress/i18n';
 				 * Remove action items when purchase item is not being edited.
 				 */
 				$o.body.on( 'mouseleave', $o.purchaseOptionItem, function() {
-					$( this ).removeClass( 'option-highlight' );
+					const optionHighlight = $( this ).children(
+						'.rg-purchase-overlay-purchase-options-item-highlight'
+					);
+					optionHighlight.hide();
+
 					if (
 						! $o.body.find(
 							'.rg-purchase-overlay-option-manager:visible'
@@ -548,6 +557,10 @@ import { __, sprintf } from '@wordpress/i18n';
 					);
 					let actionManager = optionItem.find(
 						'.rg-purchase-overlay-option-manager'
+					);
+
+					const optionHighlight = $( this ).children(
+						'.rg-purchase-overlay-purchase-options-item-highlight'
 					);
 
 					// Get all purchase options.
@@ -701,7 +714,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						}
 
 						actionManager.toggle();
-						optionItem.addClass( 'option-highlight' );
+						optionHighlight.show();
 					}
 
 					/**
@@ -1248,7 +1261,9 @@ import { __, sprintf } from '@wordpress/i18n';
 				 */
 				$o.body.on( 'mouseenter', $o.optionArea, function() {
 					// Hide the paywall border.
-					$o.purchaseOverlay.removeClass( 'overlay-border' );
+					$o.purchaseOverlay
+						.children( '.rg-purchase-overlay-highlight' )
+						.hide();
 					$( $o.purchaseOverlayRemove ).hide();
 
 					// Only show if total count limit doesn't exceed.
@@ -1396,7 +1411,9 @@ import { __, sprintf } from '@wordpress/i18n';
 					const paywall = $( $o.purchaseOptionItems );
 					const paywallId = paywall.attr( 'data-paywall-id' );
 					if ( paywallId.length ) {
-						$o.purchaseOverlay.addClass( 'overlay-border' );
+						$o.purchaseOverlay
+							.children( '.rg-purchase-overlay-highlight' )
+							.show();
 						$( $o.purchaseOverlayRemove ).show();
 					}
 				} );
@@ -1405,7 +1422,9 @@ import { __, sprintf } from '@wordpress/i18n';
 				 * Hide the border and paywall remove button when not in focus.
 				 */
 				$o.purchaseOverlay.on( 'mouseleave', function() {
-					$o.purchaseOverlay.removeClass( 'overlay-border' );
+					$o.purchaseOverlay
+						.children( '.rg-purchase-overlay-highlight' )
+						.hide();
 					$( $o.purchaseOverlayRemove ).hide();
 				} );
 
