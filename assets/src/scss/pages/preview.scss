@@ -864,15 +864,17 @@
 	height: 100%;
 	display: none;
 	justify-content: center;
-	position: absolute;
+	position: fixed;
 	z-index: 1000;
 	backdrop-filter: blur(5px);
 
 	img {
 		width: 150px;
 		position: absolute;
-		top: 50%;
+		top: 40%;
 		animation: breathing 2s ease-out infinite normal;
+		left: 40%;
+		transform: translate(-50%, 0);
 	}
 }
 
