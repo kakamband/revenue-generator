@@ -933,7 +933,6 @@ class Paywall extends Base {
 		add_filter( 'posts_where', [ $this, 'rg_paywall_title_filter' ], 10, 2 );
 		$query         = new \WP_Query();
 		$current_posts = $query->query( $query_args );
-		;
 		remove_filter( 'posts_where', [ $this, 'rg_paywall_title_filter' ], 10 );
 
 		// Create formatted data for preview suggestions.

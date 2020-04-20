@@ -9,7 +9,6 @@
  * Internal dependencies.
  */
 import '../utils';
-import { debounce } from '../helpers';
 
 ( function( $ ) {
 	$( function() {
@@ -27,11 +26,8 @@ import { debounce } from '../helpers';
 				newPaywall: $( '#rg_js_newPaywall' ),
 				sortPaywalls: $( '#rg_js_filterPaywalls' ),
 				searchPaywall: $( '#rg_js_searchPaywall' ),
-				searchResultWrapper: $(
-					'.rev-gen-dashboard-bar--search-results'
-				),
-				searchResultItem: '.rev-gen-dashboard-bar--search-results-item',
 				editPayWallName: $( '.rev-gen-dashboard-paywall-name' ),
+				laterpayLoader: $( '.laterpay-loader-wrapper' ),
 
 				// Dashboard footer area.
 				restartTour: $( '#rg_js_RestartTutorial' ),
@@ -147,35 +143,19 @@ import { debounce } from '../helpers';
 						height: 'auto',
 					} );
 					$( $o.paywallContent ).removeClass( 'blury' );
-					$( $o.searchResultWrapper ).css( { display: 'none' } );
 				} );
 
 				/**
-				 * Handle preview content search input.
+				 * Handle Search input on enter.
 				 */
-				$o.searchPaywall.on(
-					'input change',
-					debounce( function() {
+				$o.searchPaywall.on( 'keyup', function( event ) {
+					// Check for enter key.
+					if ( event.keyCode === 13 ) {
+						showLoader();
 						const searchPaywallTerm = $( this )
 							.val()
 							.trim();
-						if ( searchPaywallTerm.length ) {
-							searchPaywall( searchPaywallTerm );
-						}
-					}, 1500 )
-				);
-
-				/**
-				 * Handle the event when merchant has clicked a paywall for preview.
-				 */
-				$o.body.on( 'click', $o.searchResultItem, function() {
-					const searchItem = $( this );
-					const searchPostID = searchItem.attr( 'data-id' );
-					if ( searchPostID ) {
-						window.location.href =
-							revenueGeneratorGlobalOptions.paywallPageBase +
-							'&current_paywall=' +
-							searchPostID;
+						searchPaywall( searchPaywallTerm );
 					}
 				} );
 
@@ -230,24 +210,35 @@ import { debounce } from '../helpers';
 			};
 
 			/**
+			 * Show the loader.
+			 */
+			const showLoader = function() {
+				$o.laterpayLoader.css( { display: 'flex' } );
+			};
+
+			/**
 			 * Search paywall based on merchants search term.
 			 *
 			 * @param {string} searchTerm The part of name being searched for.
 			 */
 			const searchPaywall = function( searchTerm ) {
-				if ( searchTerm.length ) {
-					// prevent duplicate requests.
-					if ( ! $o.requestSent ) {
-						$o.requestSent = true;
+				// prevent duplicate requests.
+				if ( ! $o.requestSent ) {
+					$o.requestSent = true;
 
+					// Has something input.
+					if ( searchTerm.length ) {
+						// Search and display resultset.
 						// Create form data.
 						const formData = {
 							action: 'rg_search_paywall',
+							rg_current_url: window.location.href,
 							search_term: searchTerm,
 							security:
 								revenueGeneratorGlobalOptions.rg_paywall_nonce,
 						};
 
+						// Delete the option.
 						$.ajax( {
 							url: revenueGeneratorGlobalOptions.ajaxUrl,
 							method: 'POST',
@@ -255,24 +246,21 @@ import { debounce } from '../helpers';
 							dataType: 'json',
 						} ).done( function( r ) {
 							$o.requestSent = false;
-							if ( true === r.success ) {
-								$o.searchResultWrapper.empty();
-								const resultPaywalls = r.paywalls;
-								resultPaywalls.forEach( function( item ) {
-									const searchItem = $( '<span/>', {
-										'data-id': item.id,
-										class:
-											'rev-gen-dashboard-bar--search-results-item',
-									} ).text( item.name );
-									$o.searchResultWrapper.append( searchItem );
-									$o.searchResultWrapper.css( {
-										display: 'inline-flex',
-									} );
-								} );
-							} else {
-								$o.snackBar.showSnackbar( r.msg, 1500 );
+							if ( true === r.success && r.redirect_to ) {
+								window.location.href = r.redirect_to;
 							}
 						} );
+					} else {
+						const url = new URL( window.location.href );
+						const params = url.searchParams;
+
+						// Delete the search_term parameter.
+						params.delete( 'search_term' );
+						url.search = params.toString();
+						const dashboardURL = url.toString();
+
+						// redirects to dashboard url.
+						window.location.href = dashboardURL;
 					}
 				}
 			};
