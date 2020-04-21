@@ -44,6 +44,13 @@
 			line-height: normal;
 			letter-spacing: normal;
 			color: #1e1e1e;
+			background: #fff url(../img/select-down.svg) no-repeat right 5px top 55%;
+
+			&:focus {
+				border-color: #1e1e1e;
+				color: #1e1e1e;
+				box-shadow: 0 0 0 1px #1e1e1e;
+			}
 		}
 	}
 
@@ -69,8 +76,10 @@
 			}
 		}
 
-		i {
+		i.custom-dashicons-search {
 			padding: 5px;
+			background: #fff url(../img/icon-search.svg) no-repeat right 0 center;
+			cursor: pointer;
 		}
 
 	}
