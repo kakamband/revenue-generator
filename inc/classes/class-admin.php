@@ -65,9 +65,6 @@ class Admin {
 		// Localize required data.
 		$current_global_options = Config::get_global_options();
 
-		// Check if setup is done, and load page accordingly.
-		$is_welcome_setup_done = empty( $current_global_options['average_post_publish_count'] ) ? false : true;
-
 		$currency_limits   = Config::get_currency_limits();
 		$merchant_currency = '';
 
@@ -110,10 +107,7 @@ class Admin {
 			],
 		];
 
-		// If setup is not done.
-		if ( ! $is_welcome_setup_done ) {
-			$rg_script_data['rg_global_config_nonce'] = wp_create_nonce( 'rg_global_config_nonce' );
-		}
+		$rg_script_data['rg_global_config_nonce'] = wp_create_nonce( 'rg_global_config_nonce' );
 
 		// Create variable and add data.
 		$rg_global_data = 'var revenueGeneratorGlobalOptions = ' . wp_json_encode( $rg_script_data ) . '; ';
@@ -417,8 +411,13 @@ class Admin {
 		self::load_assets();
 
 		$rg_merchant_credentials = Client_Account::get_merchant_credentials();
-		$settings_page_data = [
-			'merchant_credentials'    => $rg_merchant_credentials,
+		$rg_global_options       = Config::get_global_options();
+		$settings_page_data      = [
+			'merchant_credentials' => $rg_merchant_credentials,
+			'global_options'       => $rg_global_options,
+			'action_icons'         => [
+				'lp_icon' => Config::$plugin_defaults['img_dir'] . 'lp-logo-icon.svg',
+			],
 		];
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
