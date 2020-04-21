@@ -45,6 +45,7 @@
 			letter-spacing: normal;
 			color: #1e1e1e;
 			background: #fff url(../img/select-down.svg) no-repeat right 5px top 55%;
+			background-size: 13px 8px;
 
 			&:focus {
 				border-color: #1e1e1e;
@@ -76,10 +77,13 @@
 			}
 		}
 
-		i.custom-dashicons-search {
-			padding: 5px;
+		&-icon {
+			padding: 7px 5px;
 			background: #fff url(../img/icon-search.svg) no-repeat right 0 center;
 			cursor: pointer;
+			height: 16px;
+			width: 16px;
+			background-size: 16px 16px;
 		}
 
 	}

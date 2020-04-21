@@ -28,7 +28,7 @@ import '../utils';
 				sortPaywalls: $( '#rg_js_filterPaywalls' ),
 				searchPaywall: $( '#rg_js_searchPaywall' ),
 				editPayWallName: $( '.rev-gen-dashboard-paywall-name' ),
-				paywallSearchIcon: $( '.custom-dashicons-search' ),
+				paywallSearchIcon: $( '.rev-gen-dashboard-bar--search-icon' ),
 				laterpayLoader: $( '.laterpay-loader-wrapper' ),
 
 				// Dashboard footer area.
