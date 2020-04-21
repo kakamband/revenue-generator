@@ -252,11 +252,18 @@ class Admin {
 
 		// Add search parameter.
 		if ( $search_term ) {
-			$paywall_filter_args['s'] = $search_term;
+			$paywall_filter_args['rg_paywall_title'] = $search_term;
 		}
 
 		$paywall_filter_args['order'] = $new_sort_order;
-		$dashboard_paywalls           = $paywall_instance->get_all_paywalls( $paywall_filter_args );
+
+		// Adds filter posts by title.
+		add_filter( 'posts_where', [ $paywall_instance, 'rg_paywall_title_filter' ], 10, 2 );
+
+		$dashboard_paywalls = $paywall_instance->get_all_paywalls( $paywall_filter_args );
+
+		// Removes post filter by title.
+		remove_filter( 'posts_where', [ $paywall_instance, 'rg_paywall_title_filter' ], 10 );
 
 		// Sort paywall by priority, more details in class `Paywall` function `sort_paywall_by_priority()`.
 		if ( 'priority' === $sort_order ) {

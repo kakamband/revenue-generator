@@ -22,11 +22,13 @@ import '../utils';
 				paywallContent: '.rev-gen-dashboard-content',
 				paywallPreview: '.rev-gen-dashboard-content-paywall-preview',
 				paywallContentWrapper: '.rev-gen-dashboard-content-paywall',
+
 				// Dashboard bar action items.
 				newPaywall: $( '#rg_js_newPaywall' ),
 				sortPaywalls: $( '#rg_js_filterPaywalls' ),
 				searchPaywall: $( '#rg_js_searchPaywall' ),
 				editPayWallName: $( '.rev-gen-dashboard-paywall-name' ),
+				paywallSearchIcon: $( '.rev-gen-dashboard-bar--search-icon' ),
 				laterpayLoader: $( '.laterpay-loader-wrapper' ),
 
 				// Dashboard footer area.
@@ -112,7 +114,6 @@ import '../utils';
 				$o.searchPaywall.on( 'focus', function() {
 					$( $o.paywallContent ).addClass( 'blury' );
 					$o.body.css( {
-						overflow: 'hidden',
 						height: '100%',
 					} );
 					const searchPaywallTerm = $( this )
@@ -128,7 +129,6 @@ import '../utils';
 				 */
 				$o.searchPaywall.on( 'focusout', function() {
 					$o.body.css( {
-						overflow: 'auto',
 						height: 'auto',
 					} );
 					$( $o.paywallContent ).removeClass( 'blury' );
@@ -146,16 +146,21 @@ import '../utils';
 				} );
 
 				/**
+				 * Handle dashboard search icon click event.
+				 */
+				$o.paywallSearchIcon.on( 'click', function() {
+					showLoader();
+					const searchPaywallTerm = $o.searchPaywall.val().trim();
+					searchPaywall( searchPaywallTerm );
+				} );
+
+				/**
 				 * Handle Search input on enter.
 				 */
 				$o.searchPaywall.on( 'keyup', function( event ) {
 					// Check for enter key.
 					if ( event.keyCode === 13 ) {
-						showLoader();
-						const searchPaywallTerm = $( this )
-							.val()
-							.trim();
-						searchPaywall( searchPaywallTerm );
+						$o.paywallSearchIcon.trigger( 'click' );
 					}
 				} );
 
