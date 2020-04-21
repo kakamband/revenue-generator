@@ -239,6 +239,9 @@ class Admin {
 			'order' => 'DESC',
 		];
 
+		// Paywall Search Term.
+		$search_term = filter_input( INPUT_GET, 'search_term', FILTER_SANITIZE_STRING );
+
 		// If no sort param is set default to DESC.
 		if ( empty( $sort_order ) ) {
 			$new_sort_order = 'DESC';
@@ -247,8 +250,20 @@ class Admin {
 			$new_sort_order = in_array( strtoupper( $sort_order ), $allowed_sort_order ) ? strtoupper( $sort_order ) : 'DESC';
 		}
 
+		// Add search parameter.
+		if ( $search_term ) {
+			$paywall_filter_args['rg_paywall_title'] = $search_term;
+		}
+
 		$paywall_filter_args['order'] = $new_sort_order;
-		$dashboard_paywalls           = $paywall_instance->get_all_paywalls( $paywall_filter_args );
+
+		// Adds filter posts by title.
+		add_filter( 'posts_where', [ $paywall_instance, 'rg_paywall_title_filter' ], 10, 2 );
+
+		$dashboard_paywalls = $paywall_instance->get_all_paywalls( $paywall_filter_args );
+
+		// Removes post filter by title.
+		remove_filter( 'posts_where', [ $paywall_instance, 'rg_paywall_title_filter' ], 10 );
 
 		// Sort paywall by priority, more details in class `Paywall` function `sort_paywall_by_priority()`.
 		if ( 'priority' === $sort_order ) {
@@ -259,6 +274,10 @@ class Admin {
 			'new_paywall_url'    => add_query_arg( [ 'page' => $admin_menus['paywall']['url'] ], admin_url( 'admin.php' ) ),
 			'current_sort_order' => $sort_order,
 			'paywalls'           => $dashboard_paywalls,
+			'search_term'        => $search_term,
+			'action_icons'       => [
+				'lp_icon' => Config::$plugin_defaults['img_dir'] . 'lp-logo-icon.svg',
+			],
 		];
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
@@ -1075,24 +1094,25 @@ class Admin {
 		check_ajax_referer( 'rg_paywall_nonce', 'security' );
 
 		// Get all data and sanitize it.
-		$search_term = sanitize_text_field( filter_input( INPUT_POST, 'search_term', FILTER_SANITIZE_STRING ) );
+		$search_term      = sanitize_text_field( filter_input( INPUT_POST, 'search_term', FILTER_SANITIZE_STRING ) );
+		$rg_dashboard_url = sanitize_text_field( filter_input( INPUT_POST, 'rg_current_url', FILTER_SANITIZE_URL ) );
 
-		$paywall_instance = Paywall::get_instance();
-		$paywall_results  = $paywall_instance->get_paywall_by_name( $search_term );
+		if ( ! empty( $search_term ) ) {
 
-		if ( ! empty( $paywall_results ) ) {
-			wp_send_json(
-				[
-					'success'  => true,
-					'paywalls' => $paywall_results,
-				]
+			// Set search term.
+			$preview_query_args['search_term'] = $search_term;
+
+			// Create redirect URL.
+			$dashboard_url = add_query_arg(
+				$preview_query_args,
+				$rg_dashboard_url
 			);
-		} else {
+
+			// Send success message.
 			wp_send_json(
 				[
-					'success'  => false,
-					'msg'      => __( 'No matching paywall found!', 'revenue-generator' ),
-					'paywalls' => [],
+					'success'     => true,
+					'redirect_to' => $dashboard_url,
 				]
 			);
 		}

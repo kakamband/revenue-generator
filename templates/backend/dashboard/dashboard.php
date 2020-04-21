@@ -15,6 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <div class="rev-gen-layout-wrapper">
+	<div class="laterpay-loader-wrapper">
+		<img alt="<?php esc_attr_e( 'LaterPay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
+	</div>
 	<div class="rev-gen-dashboard-main">
 		<div class="rev-gen-dashboard-bar">
 			<div class="rev-gen-dashboard-bar--item rev-gen-dashboard-bar--filter">
@@ -26,9 +29,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</select>
 			</div>
 			<div class="rev-gen-dashboard-bar--item rev-gen-dashboard-bar--search">
-				<input placeholder="<?php esc_attr_e( 'Search Paywalls', 'revenue-generator' ); ?>" type="text" id="rg_js_searchPaywall">
-				<i class="dashicons dashicons-search"></i>
-				<div class="rev-gen-dashboard-bar--search-results"></div>
+				<input placeholder="<?php esc_attr_e( 'Search Paywalls', 'revenue-generator' ); ?>" type="text" id="rg_js_searchPaywall" value="<?php echo esc_attr( $search_term ); ?>">
+				<i class="rev-gen-dashboard-bar--search-icon"></i>
 			</div>
 			<div class="rev-gen-dashboard-bar--item rev-gen-dashboard-bar--actions">
 				<a href="<?php echo esc_url( $new_paywall_url ); ?>" id="rg_js_newPaywall" class="rg-button"><?php esc_html_e( 'New Paywall', 'revenue-generator' ); ?></a>
@@ -55,9 +57,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<div class="rev-gen-dashboard-content-nopaywall">
 					<div class="rev-gen-dashboard-content-nopaywall--title">
 						<?php
+
+						$empty_paywall_button_text = ( ! empty( $search_term ) ) ? __( 'Create a new Paywall', 'revenue-generator' ) : __( 'Create your first Paywall', 'revenue-generator' );
+						$empty_paywall_message     = ( ! empty( $search_term ) ) ? __( 'No paywalls matched your search, <br /> try again or', 'revenue-generator' ) : __( 'It’s pretty empty here, <br /> let’s create your first Paywall.', 'revenue-generator' );
+
 						printf(
 							wp_kses(
-								__( 'It’s pretty empty here, <br /> let’s create your first Paywall.', 'revenue-generator' ),
+								$empty_paywall_message,
 								[
 									'br' => [],
 								]
@@ -66,7 +72,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						?>
 					</div>
 					<div class="rev-gen-dashboard-content-nopaywall--create-paywall">
-						<a href="<?php echo esc_url( $new_paywall_url ); ?>" class="rev-gen-dashboard-content-nopaywall--create-paywall--button"><?php esc_html_e( 'Create your first Paywall', 'revenue-generator' ); ?></a>
+						<a href="<?php echo esc_url( $new_paywall_url ); ?>" class="rev-gen-dashboard-content-nopaywall--create-paywall--button"><?php echo esc_html( $empty_paywall_button_text ); ?></a>
 					</div>
 				</div>
 			<?php endif; ?>

@@ -37,7 +37,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 
 <div class="rev-gen-layout-wrapper">
 	<div class="laterpay-loader-wrapper">
-		<img alt="<?php echo esc_attr( 'LaterPay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
+		<img alt="<?php esc_attr_e( 'LaterPay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
 	</div>
 	<div class="rev-gen-preview-main">
 		<div class="rev-gen-preview-main--search" data-tippy-content="<?php esc_attr_e( 'Search for the page or post you\'d like to preview with Revenue Generator here.', 'revenue-generator' ); ?>">

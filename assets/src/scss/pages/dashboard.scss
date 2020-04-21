@@ -12,6 +12,9 @@
 	display: flex;
 	justify-content: space-between;
 	height: 50px;
+	position: sticky;
+	top: 33px;
+	background: #fff;
 
 	&--filter {
 		align-self: flex-start;
@@ -41,6 +44,14 @@
 			line-height: normal;
 			letter-spacing: normal;
 			color: #1e1e1e;
+			background: #fff url(../img/select-down.svg) no-repeat right 5px top 55%;
+			background-size: 13px 8px;
+
+			&:focus {
+				border-color: #1e1e1e;
+				color: #1e1e1e;
+				box-shadow: 0 0 0 1px #1e1e1e;
+			}
 		}
 	}
 
@@ -66,28 +77,15 @@
 			}
 		}
 
-		i {
-			padding: 5px;
+		&-icon {
+			padding: 7px 5px;
+			background: #fff url(../img/icon-search.svg) no-repeat right 0 center;
+			cursor: pointer;
+			height: 16px;
+			width: 16px;
+			background-size: 16px 16px;
 		}
 
-		&-results {
-			display: none;
-			flex-direction: column;
-			background: #fff;
-			align-self: center;
-			width: inherit;
-			box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.55);
-			position: absolute;
-			top: 45px;
-			z-index: 5;
-			height: 100px;
-
-			span {
-				height: 20px;
-				cursor: pointer;
-				margin: 2px;
-			}
-		}
 	}
 
 	&--actions {
