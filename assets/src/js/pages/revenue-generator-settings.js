@@ -19,9 +19,17 @@ import { debounce } from '../helpers';
 				body: $( 'body' ),
 				requestSent: false,
 
+				// Settings Elements
+				settingsMerchantID: '.rev-gen-settings-main-merchant-id',
+				settingsMerchantKey: '.rev-gen-settings-main-merchant-key',
+				settingsMerchantInputs:
+					'.rev-gen-settings-main-merchant-id, .rev-gen-settings-main-merchant-key',
+				settingsUserRoles: '.rev-gen-settings-main-user-roles',
+
 				// Settings Action items.
-				settingsPerMonth: $( '.rev-gen-settings-post-per-month' ),
 				laterpayLoader: $( '.laterpay-loader-wrapper' ),
+
+				settingsPerMonth: $( '.rev-gen-settings-main-post-per-month' ),
 
 				// Popup.
 				snackBar: $( '#rg_js_SnackBar' ),
@@ -42,9 +50,6 @@ import { debounce } from '../helpers';
 							// Add lock.
 							$o.requestSent = true;
 
-							// Display Loader.
-							showLoader();
-
 							const perMonth = $( this ).val();
 
 							// Create form Data.
@@ -56,14 +61,43 @@ import { debounce } from '../helpers';
 									revenueGeneratorGlobalOptions.rg_global_config_nonce,
 							};
 
+							// Display Loader.
+							showLoader();
 							// Update Global Configurations.
 							updateGloablConfig( formData );
 
 							// Release request lock.
 							$o.requestSent = false;
+						}
+					}, 500 )
+				);
 
-							// Hide Loader.
-							hideLoader();
+				/**
+				 * Validate and Store Merchant Credentials.
+				 */
+				$( $o.settingsMerchantInputs ).on(
+					'focusout',
+					debounce( function() {
+						if ( ! $o.requestSent ) {
+							const merchantID = $( $o.settingsMerchantID ).val();
+							const merchantKey = $(
+								$o.settingsMerchantKey
+							).val();
+
+							if ( merchantID.length && merchantKey.length ) {
+								const formData = {
+									action: 'rg_verify_account_credentials',
+									merchant_id: merchantID,
+									merchant_key: merchantKey,
+									security:
+										revenueGeneratorGlobalOptions.rg_paywall_nonce,
+								};
+
+								showLoader();
+
+								// Validate Merchant Credentials.
+								validateMerchant( formData );
+							}
 						}
 					}, 500 )
 				);
@@ -73,7 +107,7 @@ import { debounce } from '../helpers';
 			 * Show the loader.
 			 */
 			const showLoader = function() {
-				$o.laterpayLoader.css( { display: 'flex' } );
+				$o.laterpayLoader.css( 'display', 'flex' );
 			};
 
 			/**
@@ -81,6 +115,28 @@ import { debounce } from '../helpers';
 			 */
 			const hideLoader = function() {
 				$o.laterpayLoader.hide();
+			};
+
+			const validateMerchant = function( formData ) {
+				// Check Validation.
+				$.ajax( {
+					url: revenueGeneratorGlobalOptions.ajaxUrl,
+					method: 'POST',
+					data: formData,
+					dataType: 'json',
+				} ).done( function( r ) {
+					hideLoader();
+					$o.snackBar.showSnackbar( r.msg, 1500 );
+
+					// Release request lock.
+					$o.requestSent = false;
+
+					if ( true === r.success ) {
+						validBorder( $o.settingsMerchantInputs );
+					} else {
+						invalidBorder( $o.settingsMerchantInputs );
+					}
+				} );
 			};
 
 			/**
@@ -97,15 +153,31 @@ import { debounce } from '../helpers';
 					data: formData,
 					dataType: 'json',
 				} ).done( function( r ) {
+					hideLoader();
 					$o.snackBar.showSnackbar( r.msg, 1500 );
-
-					$o.body.css( {
-						overflow: 'auto',
-						height: 'auto',
-					} );
-
-					$( $o.paywallContent ).removeClass( 'blury' );
+					// Release request lock.
+					$o.requestSent = false;
 				} );
+			};
+
+			/**
+			 * Adds valid Border.
+			 *
+			 * @param {string} element
+			 * @return {void}
+			 */
+			const validBorder = function( element ) {
+				$( element ).css( 'border-color', '#19e4ac' );
+			};
+
+			/**
+			 * Adds Invalid Border.
+			 *
+			 * @param {string} element
+			 * @return {void}
+			 */
+			const invalidBorder = function( element ) {
+				$( element ).css( 'border-color', '#ff1939' );
 			};
 
 			// Initialize all required events.

@@ -80,6 +80,7 @@ class Admin {
 			'globalOptions'    => $current_global_options,
 			'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
 			'rg_paywall_nonce' => wp_create_nonce( 'rg_paywall_nonce' ),
+			'rg_setting_nonce' => wp_create_nonce( 'rg_setting_nonce' ),
 			'currency'         => $merchant_currency,
 			'locale'           => get_locale(),
 			'paywallPageBase'  => $paywall_base,
@@ -408,13 +409,40 @@ class Admin {
 	 * @codeCoverageIgnore -- Test will be covered in e2e tests.
 	 */
 	public function load_settings() {
+		global $wp_roles;
 		self::load_assets();
+
+		$args = array(
+			'hide_empty' => false,
+			'taxonomy'   => 'category',
+		);
+
+		$default_roles = array( 'administrator' );
+		$custom_roles  = array();
+		$categories    = array();
 
 		$rg_merchant_credentials = Client_Account::get_merchant_credentials();
 		$rg_global_options       = Config::get_global_options();
+
+		// get categories and add them to the array.
+		$wp_categories = get_categories( $args );
+		foreach ( $wp_categories as $category ) {
+			$categories[ $category->term_id ] = $category->name;
+		}
+
+		// get all roles.
+		foreach ( $wp_roles->roles as $key_role => $role_data ) {
+
+			if ( ! in_array( $key_role, $default_roles, true ) ) {
+				$custom_roles[ $key_role ] = $role_data['name'];
+			}
+		}
+
 		$settings_page_data      = [
 			'merchant_credentials' => $rg_merchant_credentials,
 			'global_options'       => $rg_global_options,
+			'user_roles'           => $custom_roles,
+			'categories'           => $categories,
 			'action_icons'         => [
 				'lp_icon' => Config::$plugin_defaults['img_dir'] . 'lp-logo-icon.svg',
 			],
@@ -956,12 +984,20 @@ class Admin {
 			update_option( 'lp_rg_global_options', $rg_global_options );
 		}
 
+		if ( $is_valid ) {
+			$response = array(
+				'success' => true,
+				'msg'     => esc_html__( 'Saved valid crendetials!' ),
+			);
+		} else {
+			$response = array(
+				'success' => false,
+				'msg'     => esc_html__( 'Invalid credentials!' ),
+			);
+		}
+
 		// Send success message.
-		wp_send_json(
-			[
-				'success' => $is_valid,
-			]
-		);
+		wp_send_json( $response );
 	}
 
 	/**
