@@ -10,6 +10,7 @@ namespace LaterPay\Revenue_Generator\Inc;
 use \LaterPay\Revenue_Generator\Inc\Post_Types\Paywall;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Subscription;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Time_Pass;
+use LaterPay\Revenue_Generator\Inc\Settings;
 use \LaterPay\Revenue_Generator\Inc\Traits\Singleton;
 
 defined( 'ABSPATH' ) || exit;
@@ -37,6 +38,7 @@ class Admin {
 	protected function setup_hooks() {
 		add_action( 'admin_menu', [ $this, 'revenue_generator_register_page' ] );
 		add_action( 'admin_head', [ $this, 'hide_paywall' ] );
+		add_action( 'admin_footer', [ $this, 'add_ga_event' ] );
 		add_action( 'current_screen', [ $this, 'redirect_merchant' ] );
 		add_action( 'wp_ajax_rg_update_global_config', [ $this, 'update_global_config' ] );
 		add_action( 'wp_ajax_rg_update_paywall', [ $this, 'update_paywall' ] );
@@ -64,6 +66,7 @@ class Admin {
 	protected static function load_assets() {
 		// Localize required data.
 		$current_global_options = Config::get_global_options();
+		$settings_options       = Settings::get_settings_options();
 
 		$currency_limits   = Config::get_currency_limits();
 		$merchant_currency = '';
@@ -77,18 +80,20 @@ class Admin {
 
 		// Script date required for operations.
 		$rg_script_data = [
-			'globalOptions'    => $current_global_options,
-			'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
-			'rg_paywall_nonce' => wp_create_nonce( 'rg_paywall_nonce' ),
-			'rg_setting_nonce' => wp_create_nonce( 'rg_setting_nonce' ),
-			'currency'         => $merchant_currency,
-			'locale'           => get_locale(),
-			'paywallPageBase'  => $paywall_base,
-			'signupURL'        => [
+			'globalOptions'       => $current_global_options,
+			'ajaxUrl'             => admin_url( 'admin-ajax.php' ),
+			'rg_paywall_nonce'    => wp_create_nonce( 'rg_paywall_nonce' ),
+			'rg_setting_nonce'    => wp_create_nonce( 'rg_setting_nonce' ),
+			'rg_tracking_id'      => $settings_options['rg_laterpay_ga_ua_id'],
+			'rg_user_tracking_id' => $settings_options['rg_personal_ga_ua_id'],
+			'currency'            => $merchant_currency,
+			'locale'              => get_locale(),
+			'paywallPageBase'     => $paywall_base,
+			'signupURL'           => [
 				'US' => 'https://web.uselaterpay.com/dialog/entry/?redirect_to=/merchant/add/#/signup',
 				'EU' => 'https://web.laterpay.net/dialog/entry/?redirect_to=/merchant/add/#/signup',
 			],
-			'defaultConfig'    => [
+			'defaultConfig'       => [
 				'timepass'     => [
 					'title'       => esc_html__( '24 Hour Pass', 'revenue-generator' ),
 					'description' => esc_html__( 'Enjoy unlimited access to all our content for 24 hours.', 'revenue-generator' ),
@@ -423,6 +428,7 @@ class Admin {
 
 		$rg_merchant_credentials = Client_Account::get_merchant_credentials();
 		$rg_global_options       = Config::get_global_options();
+		$rg_settings_options     = Settings::get_settings_options();
 
 		// get categories and add them to the array.
 		$wp_categories = get_categories( $args );
@@ -441,6 +447,7 @@ class Admin {
 		$settings_page_data      = [
 			'merchant_credentials' => $rg_merchant_credentials,
 			'global_options'       => $rg_global_options,
+			'settings_options'     => $rg_settings_options,
 			'user_roles'           => $custom_roles,
 			'categories'           => $categories,
 			'action_icons'         => [

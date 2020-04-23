@@ -53,6 +53,47 @@ if ( ! defined( 'ABSPATH' ) ) {
 						</td>
 					</tr>
 				</table>
+				<table class="form-table">
+					<tr>
+						<td>
+							<?php esc_html_e( 'Analytics', 'revenue-generator' ); ?>
+						</td>
+						<td>
+						</td>
+						<td>
+							<?php esc_html_e( 'Google Analytics “UA-ID”', 'revenue-generator' ); ?>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<?php esc_html_e( 'Google Analytics', 'revenue-generator' ); ?>
+						</td>
+						<td>
+							<label for="rgGAUserStatus">
+								<input id="rgGAUserStatus" type="checkbox" value="1" <?php checked( $settings_options['rg_ga_personal_enabled_status'], '1', true ); ?> class="rev-gen-settings-main-ga-user-status rg-settings-ga-status" value="1" />
+							<?php esc_html_e( 'Enabled', 'revenue-generator' ); ?>
+							</label>
+						</td>
+						<td>
+							<input type="text" class="rev-gen-settings-main-ga-code-user" autocomplete="off" value="<?php echo esc_attr( $settings_options['rg_personal_ga_ua_id'] ); ?>" />
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<?php esc_html_e( 'LaterPay Google Analytics', 'revenue-generator' ); ?>
+						</td>
+						<td>
+							<label for="rgGALaterPayStatus">
+								<input id="rgGALaterPayStatus" type="checkbox" value="1" <?php checked( $settings_options['rg_ga_enabled_status'], '1', true ); ?> class="rev-gen-settings-main-ga-laterpay-status rg-settings-ga-status" value="1" />
+							<?php esc_html_e( 'Enabled', 'revenue-generator' ); ?>
+							</label>
+						</td>
+						<td>
+							<input type="text" readonly="readonly" class="rev-gen-settings-main-ga-code-laterpay" autocomplete="off" value="<?php echo esc_attr( $settings_options['rg_laterpay_ga_ua_id'] ); ?>" />
+						</td>
+					</tr>
+				</table>
+
 			</div>
 		</div>
 		<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>

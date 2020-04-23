@@ -43,6 +43,9 @@ class Plugin {
 		// Initialize frontend post class.
 		Frontend_Post::get_instance();
 
+		// Initialize settigns class.
+		Settings::get_instance();
+
 		// Setup required hooks.
 		$this->setup_hooks();
 	}
