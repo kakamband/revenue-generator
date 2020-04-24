@@ -38,7 +38,6 @@ class Admin {
 	protected function setup_hooks() {
 		add_action( 'admin_menu', [ $this, 'revenue_generator_register_page' ] );
 		add_action( 'admin_head', [ $this, 'hide_paywall' ] );
-		add_action( 'admin_footer', [ $this, 'add_ga_event' ] );
 		add_action( 'current_screen', [ $this, 'redirect_merchant' ] );
 		add_action( 'wp_ajax_rg_update_global_config', [ $this, 'update_global_config' ] );
 		add_action( 'wp_ajax_rg_update_paywall', [ $this, 'update_paywall' ] );
@@ -75,6 +74,9 @@ class Admin {
 			$merchant_currency = $currency_limits[ $current_global_options['merchant_currency'] ];
 		}
 
+		$lp_config_id        = Settings::get_tracking_id();
+		$lp_user_tracking_id = Settings::get_tracking_id( 'user' );
+
 		$admin_menus  = self::get_admin_menus();
 		$paywall_base = empty( $admin_menus['paywall'] ) ? '' : add_query_arg( [ 'page' => $admin_menus['paywall']['url'] ], admin_url( 'admin.php' ) );
 
@@ -84,8 +86,8 @@ class Admin {
 			'ajaxUrl'             => admin_url( 'admin-ajax.php' ),
 			'rg_paywall_nonce'    => wp_create_nonce( 'rg_paywall_nonce' ),
 			'rg_setting_nonce'    => wp_create_nonce( 'rg_setting_nonce' ),
-			'rg_tracking_id'      => $settings_options['rg_laterpay_ga_ua_id'],
-			'rg_user_tracking_id' => $settings_options['rg_personal_ga_ua_id'],
+			'rg_tracking_id'      => ( ! empty( $lp_config_id ) ) ? esc_html( $lp_config_id ) : '',
+			'rg_user_tracking_id' => ( ! empty( $lp_user_tracking_id ) ) ? esc_html( $lp_user_tracking_id ) : '',
 			'currency'            => $merchant_currency,
 			'locale'              => get_locale(),
 			'paywallPageBase'     => $paywall_base,

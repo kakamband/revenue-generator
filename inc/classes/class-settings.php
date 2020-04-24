@@ -19,41 +19,6 @@ class Settings {
 	use Singleton;
 
 	/**
-	 * Get all Settings.
-	 *
-	 * @var array settings
-	 */
-	protected $settings;
-
-	/**
-	 * Settings to check Laterpay Tracking enabled.
-	 *
-	 * @var string
-	 */
-	protected $ga_status_enabled;
-
-	/**
-	 * Settings to check User is Enabled.
-	 *
-	 * @var string
-	 */
-	protected $ga_personal_status_enabled;
-
-	/**
-	 * Settings for GA laterpay.
-	 *
-	 * @var string
-	 */
-	protected $ga_ui_id;
-
-	/**
-	 * Settings for GA User ID.
-	 *
-	 * @var string
-	 */
-	protected $ga_personal_ui_id;
-
-	/**
 	 * Class Admin construct method.
 	 */
 	protected function __construct() {
@@ -157,28 +122,28 @@ class Settings {
 	 */
 	public static function get_tracking_id( $type = '' ) {
 
-		$this->settings = $this->get_settings_options();
+		$rg_settings = get_option( 'lp_rg_settings_options', [] );
 
 		if ( 'user' === $type ) {
 
 			// Check if Personal Tracking Setting is Enabled.
-			$is_enabled_user_tracking = ( ! empty( $this->settings['rg_ga_personal_enabled_status'] ) &&
-			1 === intval( $this->settings['rg_ga_personal_enabled_status'] ) );
+			$is_enabled_user_tracking = ( ! empty( $rg_settings['rg_ga_personal_enabled_status'] ) &&
+			1 === intval( $rg_settings['rg_ga_personal_enabled_status'] ) );
 
 			// Add user tracking id if enabled.
-			if ( $is_enabled_user_tracking && ! empty( $this->settings['rg_personal_ga_ua_id'] ) ) {
-				return $this->settings['rg_personal_ga_ua_id'];
+			if ( $is_enabled_user_tracking && ! empty( $rg_settings['rg_personal_ga_ua_id'] ) ) {
+				return $rg_settings['rg_personal_ga_ua_id'];
 			}
 		} else {
 
 			// Check if LaterPay Tracking Setting is Enabled.
-			$is_enabled_lp_tracking = ( ! empty( $this->settings['rg_ga_enabled_status'] ) &&
-			1 === intval( $this->settings['rg_ga_enabled_status'] ) );
+			$is_enabled_lp_tracking = ( ! empty( $rg_settings['rg_ga_enabled_status'] ) &&
+			1 === intval( $rg_settings['rg_ga_enabled_status'] ) );
 
 			// Add LaterPay Tracking Id if enabled. We will be using config value, not the one stored in option,
 			// to make sure correct tracking id is, available for GA.
-			if ( $is_enabled_lp_tracking && ! empty( $lp_tracking_data['rg_laterpay_ga_ua_id'] ) ) {
-				return $this->settings['rg_laterpay_ga_ua_id'];
+			if ( $is_enabled_lp_tracking && ! empty( $rg_settings['rg_laterpay_ga_ua_id'] ) ) {
+				return $rg_settings['rg_laterpay_ga_ua_id'];
 			}
 		}
 
