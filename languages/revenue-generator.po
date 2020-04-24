@@ -9,14 +9,14 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-04-15T12:23:47+05:30\n"
+"POT-Creation-Date: 2020-04-24T14:57:10+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: revenue-generator\n"
 
 #. Plugin Name of the plugin
-#: inc/classes/class-admin.php:148
-#: inc/classes/class-admin.php:149
+#: inc/classes/class-admin.php:150
+#: inc/classes/class-admin.php:151
 msgid "Revenue Generator"
 msgstr ""
 
@@ -36,142 +36,152 @@ msgstr ""
 msgid "https://laterpay.net/"
 msgstr ""
 
-#: inc/classes/class-admin.php:95
+#: inc/classes/class-admin.php:100
 #: inc/classes/class-config.php:111
 #: inc/classes/class-config.php:143
 msgid "24 Hour Pass"
 msgstr ""
 
-#: inc/classes/class-admin.php:96
+#: inc/classes/class-admin.php:101
 #: inc/classes/class-config.php:112
 #: inc/classes/class-config.php:144
 msgid "Enjoy unlimited access to all our content for 24 hours."
 msgstr ""
 
-#: inc/classes/class-admin.php:103
+#: inc/classes/class-admin.php:108
 #: inc/classes/class-config.php:119
 #: inc/classes/class-config.php:151
 #: inc/classes/class-config.php:206
 msgid "1 Month Subscription"
 msgstr ""
 
-#: inc/classes/class-admin.php:104
+#: inc/classes/class-admin.php:109
 #: inc/classes/class-config.php:120
 #: inc/classes/class-config.php:152
 #: inc/classes/class-config.php:207
 msgid "Enjoy unlimited access to all our content for one month."
 msgstr ""
 
-#: inc/classes/class-admin.php:169
+#: inc/classes/class-admin.php:171
 msgid "Revenue Generator Settings"
 msgstr ""
 
-#: inc/classes/class-admin.php:397
+#: inc/classes/class-admin.php:474
 msgid "Paywall 1"
 msgstr ""
 
 #. translators: Default paywall title with incrementing count.
-#: inc/classes/class-admin.php:402
+#: inc/classes/class-admin.php:479
 msgid "Paywall %s"
 msgstr ""
 
-#: inc/classes/class-admin.php:431
-#: inc/classes/class-admin.php:609
-#: inc/classes/class-admin.php:855
+#: inc/classes/class-admin.php:508
+#: inc/classes/class-admin.php:693
+#: inc/classes/class-admin.php:939
+#: inc/classes/class-settings.php:91
 msgid "Invalid data passed!"
 msgstr ""
 
-#: inc/classes/class-admin.php:448
-#: inc/classes/class-admin.php:872
+#: inc/classes/class-admin.php:525
+#: inc/classes/class-admin.php:956
 msgid "Selection stored successfully!"
 msgstr ""
 
-#: inc/classes/class-admin.php:469
+#: inc/classes/class-admin.php:546
 msgid "Dashboard"
 msgstr ""
 
-#: inc/classes/class-admin.php:476
-#: templates/backend/dashboard/dashboard.php:34
+#: inc/classes/class-admin.php:553
+#: templates/backend/dashboard/dashboard.php:36
 msgid "New Paywall"
 msgstr ""
 
-#: inc/classes/class-admin.php:582
+#: inc/classes/class-admin.php:560
+#: templates/backend/settings/settings.php:21
+msgid "Settings"
+msgstr ""
+
+#: inc/classes/class-admin.php:666
 msgid "Paywall updated successfully!"
 msgstr ""
 
-#: inc/classes/class-admin.php:582
+#: inc/classes/class-admin.php:666
 msgid "Paywall saved successfully!"
 msgstr ""
 
-#: inc/classes/class-admin.php:628
+#: inc/classes/class-admin.php:712
 msgid "Currency stored successfully!"
 msgstr ""
 
-#: inc/classes/class-admin.php:654
+#: inc/classes/class-admin.php:738
 msgid "Purchase option removed!"
 msgstr ""
 
-#: inc/classes/class-admin.php:657
+#: inc/classes/class-admin.php:741
 msgid "Subscription removed!"
 msgstr ""
 
-#: inc/classes/class-admin.php:659
+#: inc/classes/class-admin.php:743
 msgid "Unable to remove Subscription, something went wrong!"
 msgstr ""
 
-#: inc/classes/class-admin.php:663
+#: inc/classes/class-admin.php:747
 msgid "Time Pass removed!"
 msgstr ""
 
-#: inc/classes/class-admin.php:665
+#: inc/classes/class-admin.php:749
 msgid "Unable to remove Time Pass, something went wrong!"
 msgstr ""
 
-#: inc/classes/class-admin.php:701
+#: inc/classes/class-admin.php:785
 msgid "Paywall removed!"
 msgstr ""
 
-#: inc/classes/class-admin.php:709
+#: inc/classes/class-admin.php:793
 msgid "Unable to remove Paywall, something went wrong!"
 msgstr ""
 
-#: inc/classes/class-admin.php:740
+#: inc/classes/class-admin.php:824
 msgid "No matching content found!"
 msgstr ""
 
-#: inc/classes/class-admin.php:983
+#: inc/classes/class-admin.php:1000
+msgid "Saved valid crendetials!"
+msgstr ""
+
+#: inc/classes/class-admin.php:1005
+msgid "Invalid credentials!"
+msgstr ""
+
+#: inc/classes/class-admin.php:1075
 msgid "Paywall Disabled!"
 msgstr ""
 
-#: inc/classes/class-admin.php:983
+#: inc/classes/class-admin.php:1075
 msgid "Something went wrong!"
 msgstr ""
 
-#: inc/classes/class-admin.php:1066
-msgid "No matching paywall found!"
-msgstr ""
-
-#: inc/classes/class-admin.php:1095
+#: inc/classes/class-admin.php:1188
 msgid "Paywall title updated."
 msgstr ""
 
-#: inc/classes/class-admin.php:1095
+#: inc/classes/class-admin.php:1188
 msgid "Failed to update paywall title."
 msgstr ""
 
 #: inc/classes/class-frontend-post.php:153
-#: templates/backend/paywall/post-preview.php:202
+#: templates/backend/paywall/post-preview.php:203
 msgid "Keep Reading"
 msgstr ""
 
 #: inc/classes/class-frontend-post.php:160
 #: inc/classes/class-frontend-post.php:310
-#: templates/backend/paywall/post-preview.php:257
+#: templates/backend/paywall/post-preview.php:259
 msgid "Access Article Now"
 msgstr ""
 
 #: inc/classes/class-frontend-post.php:161
-#: templates/backend/paywall/post-preview.php:260
+#: templates/backend/paywall/post-preview.php:262
 msgid "You'll only be charged once you've reached $5."
 msgstr ""
 
@@ -193,6 +203,10 @@ msgstr ""
 
 #: inc/classes/class-post-types.php:371
 msgid "Year"
+msgstr ""
+
+#: inc/classes/class-settings.php:112
+msgid "Settings saved successfully!"
 msgstr ""
 
 #: inc/classes/post-types/class-paywall.php:37
@@ -252,43 +266,54 @@ msgid "Powered by"
 msgstr ""
 
 #: templates/backend/common/footer.php:16
+#: templates/backend/dashboard/dashboard.php:19
+#: templates/backend/paywall/post-preview.php:40
+#: templates/backend/settings/settings.php:18
 msgid "LaterPay Logo"
 msgstr ""
 
-#: templates/backend/dashboard/dashboard.php:21
+#: templates/backend/dashboard/dashboard.php:24
 msgid "Sort By"
 msgstr ""
 
-#: templates/backend/dashboard/dashboard.php:23
+#: templates/backend/dashboard/dashboard.php:26
 msgid "Newest First"
 msgstr ""
 
-#: templates/backend/dashboard/dashboard.php:24
+#: templates/backend/dashboard/dashboard.php:27
 msgid "Oldest First"
 msgstr ""
 
-#: templates/backend/dashboard/dashboard.php:25
+#: templates/backend/dashboard/dashboard.php:28
 msgid "Priority"
 msgstr ""
 
-#: templates/backend/dashboard/dashboard.php:29
+#: templates/backend/dashboard/dashboard.php:32
 msgid "Search Paywalls"
 msgstr ""
 
-#: templates/backend/dashboard/dashboard.php:60
-msgid "It’s pretty empty here, <br /> let’s create your first Paywall."
+#: templates/backend/dashboard/dashboard.php:61
+msgid "Create a new Paywall"
 msgstr ""
 
-#: templates/backend/dashboard/dashboard.php:69
+#: templates/backend/dashboard/dashboard.php:61
 msgid "Create your first Paywall"
 msgstr ""
 
-#: templates/backend/dashboard/dashboard.php:76
+#: templates/backend/dashboard/dashboard.php:62
+msgid "No paywalls matched your search, <br /> try again or"
+msgstr ""
+
+#: templates/backend/dashboard/dashboard.php:62
+msgid "It’s pretty empty here, <br /> let’s create your first Paywall."
+msgstr ""
+
+#: templates/backend/dashboard/dashboard.php:82
 msgid "Tutorial"
 msgstr ""
 
 #: templates/backend/paywall/post-preview.php:43
-#: assets/src/js/pages/revenue-generator-paywall.js:2362
+#: assets/src/js/pages/revenue-generator-paywall.js:2381
 msgid "Search for the page or post you'd like to preview with Revenue Generator here."
 msgstr ""
 
@@ -301,257 +326,313 @@ msgid "search for the page or post you'd like to preview here"
 msgstr ""
 
 #. translators: %s Paywall name
-#: templates/backend/paywall/post-preview.php:74
+#: templates/backend/paywall/post-preview.php:75
 msgid "Apply <span contenteditable=\"true\" class=\"rev-gen-preview-main-paywall-name\">%s</span> to"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:87
+#: templates/backend/paywall/post-preview.php:88
 msgid "all posts and pages"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:88
+#: templates/backend/paywall/post-preview.php:89
 msgid "selected post or page"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:89
+#: templates/backend/paywall/post-preview.php:90
 msgid "category"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:90
+#: templates/backend/paywall/post-preview.php:91
 msgid "except for category"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:105
+#: templates/backend/paywall/post-preview.php:106
 msgid "Save"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:108
+#: templates/backend/paywall/post-preview.php:109
 msgid "Publish"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:114
+#: templates/backend/paywall/post-preview.php:115
 #: templates/backend/welcome/welcome.php:37
 msgid "More posts icon"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:119
+#: templates/backend/paywall/post-preview.php:120
 msgid "Exit Tour"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:137
+#: templates/backend/paywall/post-preview.php:138
 msgid "Individual Article"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:139
+#: templates/backend/paywall/post-preview.php:140
 msgid "Time Pass (for the entire site)"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:141
+#: templates/backend/paywall/post-preview.php:142
 msgid "Subscription (for the entire site)"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:145
+#: templates/backend/paywall/post-preview.php:146
 msgid "Pay Now"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:150
+#: templates/backend/paywall/post-preview.php:151
 msgid "Pay Later"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:156
+#: templates/backend/paywall/post-preview.php:157
 msgid "Static Pricing"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:161
+#: templates/backend/paywall/post-preview.php:162
 msgid "Dynamic Pricing"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:194
+#: templates/backend/paywall/post-preview.php:195
 msgid "Delete This Purchase Option"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:269
+#: templates/backend/paywall/post-preview.php:271
 msgid "You’re using Dynamic Pricing. The revenue generator automatically assigns a price to each article this paywall is applied to based on the amount of content the article contains. The price for this specific article is shown here."
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:289
+#: templates/backend/paywall/post-preview.php:291
 msgid "Add a new purchase option"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:297
+#: templates/backend/paywall/post-preview.php:299
 msgid "By selecting an option above, I am confirming that I have read and agree to LaterPay's <a href=\"#\">privacy policy</a> and <a href=\"#\">terms of service</a>."
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:308
+#: templates/backend/paywall/post-preview.php:310
 msgid "I already bought this"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:316
+#: templates/backend/paywall/post-preview.php:318
 msgid "Choose your currency"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:317
+#: templates/backend/paywall/post-preview.php:319
 msgid "In what currency do you sell content?"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:321
+#: templates/backend/paywall/post-preview.php:323
 msgid "USD"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:325
+#: templates/backend/paywall/post-preview.php:327
 msgid "EURO"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:329
+#: templates/backend/paywall/post-preview.php:331
 msgid "Apply currency"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:365
+#: templates/backend/paywall/post-preview.php:367
 msgid "This will affect all your paywalls."
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:369
-#: assets/src/js/pages/revenue-generator-paywall.js:2920
+#: templates/backend/paywall/post-preview.php:371
+#: assets/src/js/pages/revenue-generator-paywall.js:2939
 msgid "The changes you have made will impact this subscription offer on all paywalls across your entire site."
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:374
+#: templates/backend/paywall/post-preview.php:376
 msgid "Continue"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:377
+#: templates/backend/paywall/post-preview.php:379
 msgid "Cancel"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:386
+#: templates/backend/paywall/post-preview.php:388
 msgid "Pay Now v Pay Later?"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:389
+#: templates/backend/paywall/post-preview.php:391
 msgid "Choose the pricing model that best suits your needs!"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:396
+#: templates/backend/paywall/post-preview.php:398
 msgid "<b>Pay Later</b> means users agree to pay for content or timed access later - once their tab reaches $5 or 5€. Think of it as ‘the internet’s running tab.’"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:411
+#: templates/backend/paywall/post-preview.php:413
 msgid "<b>Pay Now</b> is the traditional upfront payment method that everyone is familiar with. Recurring subscriptions automatically work on a pay now basis."
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:428
+#: templates/backend/paywall/post-preview.php:430
 msgid "Static Pricing and Dynamic Pricing"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:431
+#: templates/backend/paywall/post-preview.php:433
 msgid "Revenue Generator allows you two ways to go about pricing content."
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:438
+#: templates/backend/paywall/post-preview.php:440
 msgid "Select <b>Static Pricing</b> to manually set the prices of individual articles based on your own pricing strategy. Charge as little - or as much - as you want."
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:453
+#: templates/backend/paywall/post-preview.php:455
 msgid "If you select <b>Dynamic Pricing</b>, LaterPay’s AI will “dynamically” adjust the price based on our own data, analytics and algorithms based on the length of each article."
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:470
+#: templates/backend/paywall/post-preview.php:472
 msgid "Are you sure you want to remove the paywall?"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:473
+#: templates/backend/paywall/post-preview.php:475
 msgid "This content will be visible to all users."
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:478
+#: templates/backend/paywall/post-preview.php:480
 msgid "Yes, remove Paywall"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:481
+#: templates/backend/paywall/post-preview.php:483
 msgid "No, keep Paywall"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:491
+#: templates/backend/paywall/post-preview.php:493
 msgid "You don’t have a paywall on this page - all content will be publicly visible."
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:494
+#: templates/backend/paywall/post-preview.php:496
 msgid "View Dashboard"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:497
+#: templates/backend/paywall/post-preview.php:499
 msgid "Add Paywall"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:508
+#: templates/backend/paywall/post-preview.php:510
 msgid "You’re almost done!"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:509
+#: templates/backend/paywall/post-preview.php:511
 msgid "To make sure you get your revenues, we need you to connect your LaterPay account."
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:512
-#: templates/backend/paywall/post-preview.php:532
+#: templates/backend/paywall/post-preview.php:514
+#: templates/backend/paywall/post-preview.php:534
 msgid "Connect Account"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:515
-#: templates/backend/paywall/post-preview.php:536
+#: templates/backend/paywall/post-preview.php:517
+#: templates/backend/paywall/post-preview.php:538
 msgid "Signup"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:517
+#: templates/backend/paywall/post-preview.php:519
 msgid "Learn more"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:521
+#: templates/backend/paywall/post-preview.php:523
 msgid "Connect your account to activate paywall"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:523
+#: templates/backend/paywall/post-preview.php:525
 msgid "Unsure where to find this information?"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:525
+#: templates/backend/paywall/post-preview.php:527
 msgid "Click here."
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:528
+#: templates/backend/paywall/post-preview.php:530
+#: templates/backend/settings/settings.php:41
 msgid "Merchant ID"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:529
+#: templates/backend/paywall/post-preview.php:531
+#: templates/backend/settings/settings.php:49
 msgid "API Key"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:535
+#: templates/backend/paywall/post-preview.php:537
 msgid "Don’t have an account?"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:542
+#: templates/backend/paywall/post-preview.php:544
 msgid "Sorry, something went wrong."
 msgstr ""
 
 #. translators: %1$s static anchor id to handle signup link %2$s statuc anchor id to handle re verification.
-#: templates/backend/paywall/post-preview.php:549
+#: templates/backend/paywall/post-preview.php:551
 msgid "It looks like you need to create a LaterPay account. Please <a id=\"%1$s\" href=\"#\">sign up here</a>, <a id=\"%2$s\" href=\"#\">try again</a>, or contact <a href=\"mailto:integration@laterpay.net\">integration@laterpay.net</a> if you’re still experiencing difficulties."
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:573
+#: templates/backend/paywall/post-preview.php:575
 msgid "Now that you have more than one paywall, please be aware that the most specific will be applied to an article. <a href=\"mailto:wordpress@laterpay.net\">Contact us</a> if you have any questions or feedback."
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:587
+#: templates/backend/paywall/post-preview.php:589
 msgid "View on live post"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:590
+#: templates/backend/paywall/post-preview.php:592
 msgid "Disable paywall"
 msgstr ""
 
-#: templates/backend/paywall/post-preview.php:592
+#: templates/backend/paywall/post-preview.php:594
 msgid "Go to the Paywall Dashboard"
+msgstr ""
+
+#: templates/backend/settings/settings.php:26
+msgid "Posts per month"
+msgstr ""
+
+#: templates/backend/settings/settings.php:31
+msgid "Fewer than 10"
+msgstr ""
+
+#: templates/backend/settings/settings.php:35
+msgid "More than 10"
+msgstr ""
+
+#: templates/backend/settings/settings.php:59
+msgid "Analytics"
+msgstr ""
+
+#: templates/backend/settings/settings.php:64
+msgid "Google Analytics “UA-ID”"
+msgstr ""
+
+#: templates/backend/settings/settings.php:69
+msgid "Google Analytics"
+msgstr ""
+
+#: templates/backend/settings/settings.php:74
+#: templates/backend/settings/settings.php:93
+msgid "Enabled"
+msgstr ""
+
+#: templates/backend/settings/settings.php:88
+#: templates/backend/settings/settings.php:157
+msgid "LaterPay Google Analytics"
+msgstr ""
+
+#: templates/backend/settings/settings.php:116
+msgid "Your Google Analytics"
+msgstr ""
+
+#: templates/backend/settings/settings.php:121
+msgid "Provide us with your <a href=\"https://support.google.com/analytics/answer/7372977?hl=en\" target=\"_blank\">Google Analytics UA-ID</a> and check to enable this feature if you would like to receive LaterPay events in your own Google Analytics instance."
+msgstr ""
+
+#: templates/backend/settings/settings.php:133
+msgid "This will include things like the number of times your customers come across our paywall as well as the number of successful purchases, so that you can easily track your conversion rates."
+msgstr ""
+
+#: templates/backend/settings/settings.php:139
+msgid "For more analytics, log in to your <a href=\"https://www.laterpay.net/\" target=\"_blank\">LaterPay Merchant Portal</a> and check out your Analytics Dashboard."
+msgstr ""
+
+#: templates/backend/settings/settings.php:160
+msgid "LaterPay collects information on how you are using our plugin in order to improve our products and services. We are not in the business of selling data but use this data only to benefit you, our customer."
 msgstr ""
 
 #: templates/backend/welcome/welcome.php:20
@@ -602,88 +683,88 @@ msgstr ""
 msgid "No results found."
 msgstr ""
 
-#: assets/src/js/pages/revenue-generator-paywall.js:1134
-#: assets/src/js/pages/revenue-generator-paywall.js:3185
+#: assets/src/js/pages/revenue-generator-paywall.js:1147
+#: assets/src/js/pages/revenue-generator-paywall.js:3204
 msgid "Pay Now is only available for prices set to $1.99 or higher."
 msgstr ""
 
-#: assets/src/js/pages/revenue-generator-paywall.js:1142
-#: assets/src/js/pages/revenue-generator-paywall.js:3208
+#: assets/src/js/pages/revenue-generator-paywall.js:1155
+#: assets/src/js/pages/revenue-generator-paywall.js:3227
 msgid "Pay Later is only available for prices set less than $5."
 msgstr ""
 
 #. translators: %s category name
-#: assets/src/js/pages/revenue-generator-paywall.js:2115
+#: assets/src/js/pages/revenue-generator-paywall.js:2134
 msgid "Has been published to <b>all posts</b> in category <b>%s</b>."
 msgstr ""
 
 #. translators: %s category name
-#: assets/src/js/pages/revenue-generator-paywall.js:2124
+#: assets/src/js/pages/revenue-generator-paywall.js:2143
 msgid "Has been published to <b>all posts, except posts under</b> in category <b>%s</b>."
 msgstr ""
 
 #. translators: %s post name
-#: assets/src/js/pages/revenue-generator-paywall.js:2134
+#: assets/src/js/pages/revenue-generator-paywall.js:2153
 msgid "Has been published on <b>%s</b>."
 msgstr ""
 
-#: assets/src/js/pages/revenue-generator-paywall.js:2143
+#: assets/src/js/pages/revenue-generator-paywall.js:2162
 msgid "Has been published on <b>all posts</b>."
 msgstr ""
 
-#: assets/src/js/pages/revenue-generator-paywall.js:2222
+#: assets/src/js/pages/revenue-generator-paywall.js:2241
 msgid "Just a second..."
 msgstr ""
 
-#: assets/src/js/pages/revenue-generator-paywall.js:2348
+#: assets/src/js/pages/revenue-generator-paywall.js:2367
 msgid "Skip Tour"
 msgstr ""
 
-#: assets/src/js/pages/revenue-generator-paywall.js:2354
+#: assets/src/js/pages/revenue-generator-paywall.js:2373
 msgid "Next >"
 msgstr ""
 
-#: assets/src/js/pages/revenue-generator-paywall.js:2378
+#: assets/src/js/pages/revenue-generator-paywall.js:2397
 msgid "Click to Edit"
 msgstr ""
 
-#: assets/src/js/pages/revenue-generator-paywall.js:2391
+#: assets/src/js/pages/revenue-generator-paywall.js:2410
 msgid "Hover over each element to see the available options."
 msgstr ""
 
-#: assets/src/js/pages/revenue-generator-paywall.js:2408
+#: assets/src/js/pages/revenue-generator-paywall.js:2427
 msgid "Click on the ‘more options’ icon to set the product type (single item purchase, time pass, or subscription)."
 msgstr ""
 
-#: assets/src/js/pages/revenue-generator-paywall.js:2424
+#: assets/src/js/pages/revenue-generator-paywall.js:2443
 msgid "Click on any text element to edit it."
 msgstr ""
 
 #. translators: %1$s line break tag, %2$s laterpay.net info link opening,  %3$s laterpay.net info link closing
-#: assets/src/js/pages/revenue-generator-paywall.js:2443
+#: assets/src/js/pages/revenue-generator-paywall.js:2462
 msgid "These are our recommended prices. %1$s%1$sClick to edit; prices lower than 5.00 will default to %2$spay later%3$s."
 msgstr ""
 
-#: assets/src/js/pages/revenue-generator-paywall.js:2464
+#: assets/src/js/pages/revenue-generator-paywall.js:2483
 msgid "Hover below the paywall to get the option to add another purchase button."
 msgstr ""
 
-#: assets/src/js/pages/revenue-generator-paywall.js:2480
+#: assets/src/js/pages/revenue-generator-paywall.js:2499
 msgid "Click here to change the name of your paywall."
 msgstr ""
 
-#: assets/src/js/pages/revenue-generator-paywall.js:2496
+#: assets/src/js/pages/revenue-generator-paywall.js:2515
 msgid "Select the content that  should display this paywall."
 msgstr ""
 
-#: assets/src/js/pages/revenue-generator-paywall.js:2513
+#: assets/src/js/pages/revenue-generator-paywall.js:2532
 msgid "When you’re ready to activate your paywall, connect your LaterPay account."
 msgstr ""
 
-#: assets/src/js/pages/revenue-generator-paywall.js:2526
+#: assets/src/js/pages/revenue-generator-paywall.js:2545
 msgid "Complete"
 msgstr ""
 
-#: assets/src/js/pages/revenue-generator-paywall.js:2911
+#: assets/src/js/pages/revenue-generator-paywall.js:2930
 msgid "The changes you have made will impact this time pass offer on all paywalls across your entire site."
 msgstr ""

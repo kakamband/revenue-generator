@@ -75,10 +75,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 							</label>
 						</td>
 						<td>
-							<input type="text" class="rev-gen-settings-main-ga-code-user rev-gen-settings-main-ga-input" autocomplete="off" value="<?php echo esc_attr( $settings_options['rg_personal_ga_ua_id'] ); ?>" size="24" />
-							<button data-info-for="user" id="rev-gen-settings-user-info-modal" class="rev-gen-settings-main-option-info">
-								<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
-							</button>
+							<div class="rev-gen-settings-main-field-right">
+								<input type="text" class="rev-gen-settings-main-ga-code-user rev-gen-settings-main-ga-input" autocomplete="off" value="<?php echo esc_attr( $settings_options['rg_personal_ga_ua_id'] ); ?>" size="24" />
+								<button data-info-for="user" id="rev-gen-settings-user-info-modal" class="rev-gen-settings-main-option-info">
+									<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
+								</button>
+							</div>
 						</td>
 					</tr>
 					<tr class="rg-laterpay-row">
@@ -92,10 +94,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 							</label>
 						</td>
 						<td>
-							<input type="text" readonly="readonly" class="rev-gen-settings-main-ga-code-laterpay rev-gen-settings-main-ga-input" autocomplete="off" value="<?php echo esc_attr( $settings_options['rg_laterpay_ga_ua_id'] ); ?>" size="24" />
-							<button data-info-for="laterpay" id="rev-gen-settings-laterpay-info-modal" class="rev-gen-settings-main-option-info">
-								<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
-							</button>
+							<div class="rev-gen-settings-main-field-right">
+								<input type="text" readonly="readonly" class="rev-gen-settings-main-ga-code-laterpay rev-gen-settings-main-ga-input" autocomplete="off" value="<?php echo esc_attr( $settings_options['rg_laterpay_ga_ua_id'] ); ?>" size="24" />
+								<button data-info-for="laterpay" id="rev-gen-settings-laterpay-info-modal" class="rev-gen-settings-main-option-info">
+									<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
+								</button>
+							</div>
 						</td>
 					</tr>
 				</table>
