@@ -96,8 +96,10 @@ class Settings {
 		// Check and verify updated option.
 		if ( ! empty( $config_value ) ) {
 			$rg_settings_options[ $config_key ] = $config_value;
-		} else {
+		} elseif ( ( 'rg_ga_personal_enabled_status' === $config_key || 'rg_ga_enabled_status' === $config_key ) && ! is_null( $config_value ) ) {
 			$rg_settings_options[ $config_key ] = 0;
+		} else {
+			$rg_settings_options[ $config_key ] = '';
 		}
 
 		// Update the option value.

@@ -453,7 +453,8 @@ class Admin {
 			'user_roles'           => $custom_roles,
 			'categories'           => $categories,
 			'action_icons'         => [
-				'lp_icon' => Config::$plugin_defaults['img_dir'] . 'lp-logo-icon.svg',
+				'lp_icon'     => Config::$plugin_defaults['img_dir'] . 'lp-logo-icon.svg',
+				'option_info' => Config::$plugin_defaults['img_dir'] . 'option-info.svg',
 			],
 		];
 
@@ -996,12 +997,12 @@ class Admin {
 		if ( $is_valid ) {
 			$response = array(
 				'success' => true,
-				'msg'     => esc_html__( 'Saved valid crendetials!' ),
+				'msg'     => esc_html__( 'Saved valid crendetials!', 'revenue-generator' ),
 			);
 		} else {
 			$response = array(
 				'success' => false,
-				'msg'     => esc_html__( 'Invalid credentials!' ),
+				'msg'     => esc_html__( 'Invalid credentials!', 'revenue-generator' ),
 			);
 		}
 

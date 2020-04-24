@@ -1,2 +1,49 @@
-div.lpc-s69 .lpc-s65 .lpc-s64,div.lpc-s68 .lpc-s65 .lpc-s64{min-height:730px !important}div.lpc-s69 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s36,div.lpc-s68 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s36{display:flex;justify-content:center}div.lpc-s69 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s36 a,div.lpc-s68 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s36 a{display:flex;align-self:center}div.lpc-s69 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28,div.lpc-s68 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28{display:flex;flex-direction:column;background:transparent !important;box-shadow:unset !important}div.lpc-s69 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody,div.lpc-s68 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody{display:flex !important;flex-direction:column !important}div.lpc-s69 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody tr.lpc-s2,div.lpc-s68 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody tr.lpc-s2{width:100% !important;margin:5px 0;cursor:pointer !important;background-color:#fff !important;border:2px solid #2e2e2e !important;border-radius:5px !important}div.lpc-s69 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody tr.lpc-s2 td.lpc-s3,div.lpc-s68 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody tr.lpc-s2 td.lpc-s3{width:15% !important}div.lpc-s69 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody tr.lpc-s2 td.lpc-s5,div.lpc-s68 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody tr.lpc-s2 td.lpc-s5{width:60% !important}div.lpc-s69 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody tr.lpc-s2 td.lpc-s9,div.lpc-s68 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody tr.lpc-s2 td.lpc-s9{width:25% !important}div.lpc-s69 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s29,div.lpc-s68 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s29{background:transparent !important}
+/*
+ * Overriding is necessary, as the upstream adds styles with !important,
+ * and we have to add more specificity to overcome that.
+ */
+/* stylelint-disable declaration-no-important */
+div.lpc-s69 .lpc-s65 .lpc-s64,
+div.lpc-s68 .lpc-s65 .lpc-s64 {
+  min-height: 730px !important; }
+  div.lpc-s69 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s36,
+  div.lpc-s68 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s36 {
+    display: flex;
+    justify-content: center; }
+    div.lpc-s69 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s36 a,
+    div.lpc-s68 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s36 a {
+      display: flex;
+      align-self: center; }
+  div.lpc-s69 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28,
+  div.lpc-s68 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 {
+    display: flex;
+    flex-direction: column;
+    background: transparent !important;
+    box-shadow: unset !important; }
+    div.lpc-s69 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody,
+    div.lpc-s68 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody {
+      display: flex !important;
+      flex-direction: column !important; }
+      div.lpc-s69 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody tr.lpc-s2,
+      div.lpc-s68 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody tr.lpc-s2 {
+        width: 100% !important;
+        margin: 5px 0;
+        cursor: pointer !important;
+        background-color: #fff !important;
+        border: 2px solid #2e2e2e !important;
+        border-radius: 5px !important; }
+        div.lpc-s69 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody tr.lpc-s2 td.lpc-s3,
+        div.lpc-s68 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody tr.lpc-s2 td.lpc-s3 {
+          width: 15% !important; }
+        div.lpc-s69 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody tr.lpc-s2 td.lpc-s5,
+        div.lpc-s68 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody tr.lpc-s2 td.lpc-s5 {
+          width: 60% !important; }
+        div.lpc-s69 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody tr.lpc-s2 td.lpc-s9,
+        div.lpc-s68 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s38 div.lpc-s12 table.lpc-s0 tbody tr.lpc-s2 td.lpc-s9 {
+          width: 25% !important; }
+    div.lpc-s69 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s29,
+    div.lpc-s68 .lpc-s65 .lpc-s64 .lpc-s25 .lpc-s28 .lpc-s29 {
+      background: transparent !important; }
+
+/* stylelint-enable declaration-no-important */
 

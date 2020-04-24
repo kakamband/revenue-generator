@@ -28,9 +28,19 @@ import { debounce } from '../helpers';
 
 				rgDashboard: '.rev-gen-dashboard-main',
 
+				// HelpModel
+				helpGAButton: '.rev-gen-settings-main-option-info',
+				helpGAModal: '.rev-gen-settings-main-info-modal',
+
+				// The hightlight rows
+				rgGALaterpayRow: '.rg-laterpay-row',
+				rgGAUserRow: '.rg-user-row',
+
 				// Settings Action items.
 				laterpayLoader: $( '.laterpay-loader-wrapper' ),
+				rgLayoutWrapper: $( '.rev-gen-layout-wrapper' ),
 
+				settingsWrapper: $( '.rev-gen-settings-main' ),
 				settingsGAUserStatus: $( '.rg-settings-ga-status' ),
 				settingsPerMonth: $( '.rev-gen-settings-main-post-per-month' ),
 				settingsGAUserID: $( '.rev-gen-settings-main-ga-code-user' ),
@@ -189,6 +199,59 @@ import { debounce } from '../helpers';
 			);
 
 			/**
+			 * Handle tooltip button events for info modals.
+			 */
+			$o.body.on( 'click', $o.helpGAButton, function() {
+				const infoButton = $( this );
+				const modalType = infoButton.attr( 'data-info-for' );
+				const existingModal = $o.settingsWrapper.find( $o.helpGAModal );
+
+				// Remove any existing modal.
+				if ( existingModal.length ) {
+					$o.body.removeClass( 'modal-blur' );
+					$o.body.find( 'input' ).removeClass( 'input-blur' );
+					existingModal.remove();
+				} else {
+					const template = wp.template(
+						`revgen-info-${ modalType }`
+					);
+					$o.settingsWrapper.append( template );
+
+					// Change background color and highlight the clicked parent.
+					$o.body.addClass( 'modal-blur' );
+					$o.body.find( 'input' ).addClass( 'input-blur' );
+					// Highlight selected info modal parent based on type.
+					if ( 'user' === modalType ) {
+						$( $o.rgGAUserRow )
+							.find( 'input' )
+							.removeClass( 'input-blur' );
+						$( $o.rgGALaterpayRow ).removeAttr( 'style' );
+						$( $o.rgGAUserRow ).css( 'background-color', '#fff' );
+					} else {
+						$( $o.rgGALaterpayRow )
+							.find( 'input' )
+							.removeClass( 'input-blur' );
+						$( $o.rgGAUserRow ).removeAttr( 'style' );
+						$( $o.rgGALaterpayRow ).css(
+							'background-color',
+							'#fff'
+						);
+					}
+				}
+			} );
+
+			/**
+			 * Hide the existing help popup.
+			 */
+			$o.rgLayoutWrapper.on( 'click', function() {
+				$( $o.helpGAModal ).remove();
+				$o.body.removeClass( 'modal-blur' );
+				$( $o.rgGAUserRow ).css( 'background-color', 'inherit' );
+				$( $o.rgGALaterpayRow ).css( 'background-color', 'inherit' );
+				$o.body.find( 'input' ).removeClass( 'input-blur' );
+			} );
+
+			/**
 			 * Show the loader.
 			 */
 			const showLoader = function() {
@@ -253,6 +316,9 @@ import { debounce } from '../helpers';
 			 */
 			const validBorder = function( element ) {
 				$( element ).css( 'border-color', '#19e4ac' );
+				setTimeout( function() {
+					$( element ).removeAttr( 'style' );
+				}, 5000 );
 			};
 
 			/**
@@ -263,12 +329,15 @@ import { debounce } from '../helpers';
 			 */
 			const invalidBorder = function( element ) {
 				$( element ).css( 'border-color', '#ff1939' );
+				setTimeout( function() {
+					$( element ).removeAttr( 'style' );
+				}, 5000 );
 			};
 
 			// Initialize all required events.
 			const initializePage = function() {
 				bindEvents();
-				// Send GA Event on Page load.
+				// Send GA Event on Dashboard load. (test event)
 				if ( $( $o.rgDashboard ).length > 0 ) {
 					const eventlabel = 'Revenue Generator Dashboard';
 					const eventCategory = 'Revenue Generator Plugin';
