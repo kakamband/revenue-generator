@@ -176,8 +176,8 @@ class Admin {
 			foreach ( $menus as $key => $page_data ) {
 				$slug          = $page_data['url'];
 				$page_callback = (
-					'dashboard' === $page_data['method'] && false === $is_welcome_setup_done ) ?
-					'load_welcome_screen' :
+					'dashboard' === $page_data['method'] && false === $is_paywall_setup_done ) ?
+					'load_welcome_screen_paywall' :
 					'load_' . $page_data['method'];
 
 				add_submenu_page(
