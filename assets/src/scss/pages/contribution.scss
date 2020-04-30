@@ -1,0 +1,261 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/*
+    Created on : Apr 28, 2020, 9:29:10 PM
+    Author     : milind
+*/
+
+$box-text-color:#1d1d1d;
+$box-dark-grey:#333;
+$box-font-helvetica: HelveticaNeue, serif;
+$box-font-worksans:"LaterPay WorkSans", serif;
+$box-white:#fff;
+
+body.revenue-generator_page_revenue-generator-contribution {
+	background-color: #fafafa;
+}
+.amount-text {
+	font-family: $box-font-worksans;
+	font-size: 14px;
+	font-weight: normal;
+	line-height: 1.21;
+	text-align: center;
+	color: $box-dark-grey;
+}
+.rev-gen-contribution-main {
+	width: 380px;
+	margin: 0 auto;
+	position: relative;
+	text-align: center;
+	margin-top: 70px;
+	padding: 20px;
+
+	&--header {
+		font-family: $box-font-helvetica;
+		font-size: 24px;
+		font-weight: 500;
+		line-height: 1.21;
+		letter-spacing: normal;
+		color: $box-text-color;
+		margin-bottom: 32px;
+	}
+	&--box {
+		width: calc(100% - 50px);
+		height: 200px;
+		border-radius: 5px;
+		box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
+		background-color: $box-white;
+		padding: 30px 25px;
+		position: relative;
+
+		&-header {
+			height: 24px;
+			font-family: $box-font-helvetica;
+			font-size: 18px;
+			font-weight: 500;
+			line-height: 1.33;
+			letter-spacing: -0.09px;
+			text-align: center;
+			color: $box-text-color;
+			border: 1px solid transparent;
+		}
+		&-description {
+
+			font-family: $box-font-helvetica;
+			font-size: 14px;
+			font-weight: 500;
+			letter-spacing: -0.07px;
+			text-align: center;
+			color: $box-dark-grey;
+			border: 1px solid transparent;
+		}
+
+		&-donation {
+			border: solid 2px $box-text-color;
+			float: left;
+			border-radius: 5px;
+			margin: 0 5px;
+			padding: 10px;
+
+			&-wrapper {
+				position: relative;
+				display: inline-block;
+			}
+
+			&-currency {
+				@extend .amount-text;
+			}
+
+			&-amount {
+				@extend .amount-text;
+			}
+
+		}
+
+		&-footer-logo {
+			position: absolute;
+			bottom: 18px;
+			width: calc(100% - 50px);
+		}
+	}
+
+	&-inputs-wrapper {
+		margin-top: 32px;
+	}
+	&-input-label {
+		font-family: $box-font-helvetica;
+		font-size: 14px;
+		font-weight: bold;
+		line-height: 1.21;
+		text-align: left;
+		color: $box-text-color;
+		width: 100%;
+		position: relative;
+		display: block;
+		border-radius: 5px;
+		padding: 16px 0;
+	}
+	&-input {
+		width: 100%;
+		display: block;
+		margin-top: 5px;
+		border: solid 1px #ddd;
+		background-color: $box-white;
+	}
+
+	&-generate-button {
+		background-color: #8a8a8a;
+		color: $box-white;
+		width: 100%;
+		height: 32px;
+		border-radius: 5px;
+		font-family: $box-font-helvetica;
+		font-size: 14px;
+		font-weight: bold;
+		line-height: 0.79;
+		letter-spacing: normal;
+		margin: 44px 0;
+		&:disabled {
+			background: $box-white;
+			color: #8a8a8a;
+		}
+	}
+
+	&--help {
+		position: absolute;
+		top: 37px;
+		right: -30px;
+	}
+
+	&-info-modal {
+		width: 392px;
+		left: -1%;
+		top: 15%;
+		height: auto;
+		position: absolute;
+		transform: translate(0, 0);
+	}
+}
+
+/* Dashboard Styling */
+.rev-gen-dashboard-content-contribution {
+	margin-bottom: 20px;
+	cursor: pointer;
+
+	&-wrapper {
+		margin: 40px 20px;
+	}
+	&--box {
+		width: 320px;
+		height: 158px;
+		border-radius: 5px;
+		border: solid 2px $box-text-color;
+		background-color: $box-white;
+		text-align: center;
+		float: left;
+		padding: 30px 25px;
+
+		&-header {
+			width: 100%;
+			height: 24px;
+			font-family: $box-font-helvetica;
+			font-size: 16px;
+			font-weight: 500;
+			line-height: 1.5;
+			letter-spacing: -0.08px;
+			text-align: center;
+			color: $box-text-color;
+		}
+		&-description {
+			width: 100%;
+			height: 15px;
+			font-family: $box-font-helvetica;
+			font-size: 12px;
+			font-weight: 500;
+			line-height: 1.25;
+			letter-spacing: -0.06px;
+			text-align: center;
+			color: $box-text-color;
+			margin-bottom: 20px;
+		}
+
+		&-donation-wrapper {
+			text-align: center;
+			position: relative;
+			display: inline-block;
+		}
+
+		&-donation {
+			border: solid 2px $box-text-color;
+			float: left;
+			border-radius: 5px;
+			margin: 0 5px;
+			padding: 10px;
+		}
+
+	}
+
+	&--info {
+		position: relative;
+		display: block;
+		float: left;
+		padding: 25px 30px;
+		width: 325px;
+		&-title {
+			height: 28px;
+			font-family: $box-font-helvetica;
+			font-size: 21px;
+			font-weight: 500;
+			line-height: 1.24;
+			letter-spacing: normal;
+			text-align: left;
+			color: $box-text-color;
+		}
+		&-url {
+			height: 20px;
+			font-family: $box-font-helvetica;
+			font-size: 16px;
+			font-weight: normal;
+			line-height: 1.19;
+			letter-spacing: normal;
+			text-align: left;
+			color: $box-text-color;
+			margin: 10px 0;
+		}
+		&-updated {
+			height: 20px;
+			opacity: 0.6;
+			font-family: $box-font-helvetica;
+			font-size: 14px;
+			font-weight: normal;
+			line-height: 1.36;
+			letter-spacing: normal;
+			text-align: left;
+			color: $box-text-color;
+			margin: 10px 0;
+		}
+	}
+}

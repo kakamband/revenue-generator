@@ -5,12 +5,26 @@
   "type": "wordpress-plugin",
   "version": "1.0.0-beta1",
   "license": "MIT",
+   "config": {
+        "vendor-dir": "laterpay/vendor",
+        "secure-http": true
+   },
+  "repositories": [
+	{
+            "type": "git",
+            "url": "https://github.com/laterpay/laterpay-client-php.git"
+        }
+   ],
   "require-dev": {
     "automattic/vipwpcs": "^2.0.0",
     "wp-coding-standards/wpcs": "*",
     "dealerdirect/phpcodesniffer-composer-installer": "*",
     "phpcompatibility/phpcompatibility-wp": "*"
   },
+  "require": {
+        "php": ">=5.6",
+        "laterpay/laterpay-client-php": "dev-develop"
+   },
   "scripts": {
     "phpcs": "\"./vendor/bin/phpcs\"",
     "phpcbf": "\"./vendor/bin/phpcbf\"",
