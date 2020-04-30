@@ -5,10 +5,6 @@
   "type": "wordpress-plugin",
   "version": "1.0.0-beta1",
   "license": "MIT",
-   "config": {
-        "vendor-dir": "laterpay/vendor",
-        "secure-http": true
-   },
   "repositories": [
 	{
             "type": "git",
