@@ -47,6 +47,9 @@
 			color: #333;
 			margin: 0;
 		}
+		&-paywall {
+			margin: 65px 0;
+		}
 	}
 
 	.welcome-screen-publish-questionnaire {
@@ -54,6 +57,12 @@
 		&--heading {
 			font-size: 15px;
 			font-weight: 600;
+		}
+		&--description {
+			margin-bottom: 0;
+		}
+		&-paywall {
+			margin-bottom: 40px;
 		}
 	}
 
