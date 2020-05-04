@@ -117,7 +117,7 @@ class Shortcodes {
 						'default_currency' => $this->merchant_region,
 					)
 				);
-				
+
 				// Eneque Scripts.
 				wp_enqueue_script( 'revenue-generator-frontend-js' );
 			}
@@ -148,9 +148,6 @@ class Shortcodes {
 	 * @param array $atts shortcode attributes.
 	 */
 	public function render_contribution_dialog( $atts ) {
-
-		// Enqueue frontend styling.
-		wp_enqueue_style( 'revenue-generator-frontend' );
 
 		$config_data = shortcode_atts(
 			array(
