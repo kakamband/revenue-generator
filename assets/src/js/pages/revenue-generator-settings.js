@@ -25,8 +25,7 @@ import { debounce } from '../helpers';
 				settingsMerchantInputs:
 					'.rev-gen-settings-main-merchant-id, .rev-gen-settings-main-merchant-key',
 				settingsUserRoles: '.rev-gen-settings-main-user-roles',
-				settingsModalClose:
-					'.rev-gen-settings-main-info-modal-cross',
+				settingsModalClose: '.rev-gen-settings-main-info-modal-cross',
 
 				rgDashboard: '.rev-gen-dashboard-main',
 

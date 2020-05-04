@@ -2593,7 +2593,6 @@ import { __, sprintf } from '@wordpress/i18n';
 
 				// Remove the blurry class and allow click events.
 				Shepherd.on( 'complete', function() {
-
 					// Revert to original state.
 					$o.body.removeClass( 'modal-blur' );
 
