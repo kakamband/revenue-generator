@@ -193,7 +193,7 @@ class Contribution extends Base {
 		 */
 		$post_meta_data['thank_you']       = ( isset( $post_meta['_rg_thank_you'][0] ) ) ? $post_meta['_rg_thank_you'][0] : '';
 		$post_meta_data['type']            = ( isset( $post_meta['_rg_type'][0] ) ) ? $post_meta['_rg_type'][0] : '';
-		$post_meta_data['custom_amount']   = ( isset( $post_meta['_rg_custom_amount'][0] ) ) ? $post_meta['_rg_custom_amount'][0] : '';
+		$post_meta_data['custom_amount']   = ( isset( $post_meta['_rg_custom_amount'][0] ) ) ? $post_meta['_rg_custom_amount'][0] : '0';
 		$post_meta_data['all_amounts']     = ( isset( $post_meta['_rg_all_amounts'][0] ) ) ? $post_meta['_rg_all_amounts'][0] : '';
 		$post_meta_data['dialog_header']   = ( isset( $post_meta['_rg_dialog_header'][0] ) ) ? $post_meta['_rg_dialog_header'][0] : '';
 		$post_meta_data['all_revenues']    = ( isset( $post_meta['_rg_all_revenues'][0] ) ) ? $post_meta['_rg_all_revenues'][0] : '';

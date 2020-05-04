@@ -250,7 +250,7 @@ class Admin {
 			'name'            => sanitize_text_field( $campaing_name ),
 			'thank_you'       => esc_url_raw( $thank_you_page ),
 			'type'            => 'multiple',
-			'custom_amount'   => isset( $custom_amount ) ? (float) $custom_amount * 100 : 'none',
+			'custom_amount'   => isset( $custom_amount ) ? (float) $custom_amount * 100 : '0',
 			'all_amounts'     => array_column( $filtered_prices, 'price' ),
 			'all_revenues'    => array_column( $filtered_prices, 'revenue' ),
 			'selected_amount' => $selected_amount,
@@ -272,18 +272,21 @@ class Admin {
 		// Insert contribution to post type.
 		$contribution_id = $contribution_instace->update_contribution( $shortcode_data );
 
+		$message              = esc_html__( 'Something went wrong!', 'revenue-generator' );
+		$generate_button_text = esc_html__( 'Generate and copy code', 'revenue-generator' );
+
 		if ( ! empty( $contribution_id ) && ! is_wp_error( $contribution_id ) && $result['success'] ) {
 
-			$message = esc_html__( 'Successfully generated code, please paste at desired location.', 'revenue-generator' );
-		} else {
-			$message = esc_html__( 'Something went wrong!', 'revenue-generator' );
+			$message              = esc_html__( 'Successfully generated code, please paste at desired location.', 'revenue-generator' );
+			$generate_button_text = esc_html__( 'Code copied in your clipboard!', 'revenue-generator' );
 		}
 
 		wp_send_json(
 			[
-				'success' => $result['success'],
-				'msg'     => ( true === $result['success'] ) ? $message : $result['message'],
-				'code'    => $generated_shortcode,
+				'success'     => $result['success'],
+				'msg'         => ( true === $result['success'] ) ? $message : $result['message'],
+				'code'        => $generated_shortcode,
+				'button_text' => $generate_button_text,
 			]
 		);
 	}

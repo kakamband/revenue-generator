@@ -46,6 +46,9 @@ class Plugin {
 		// Initialize settigns class.
 		Settings::get_instance();
 
+		// Intialize Shortcode class.
+		Shortcodes::get_instance();
+
 		// Setup required hooks.
 		$this->setup_hooks();
 	}

@@ -1,4 +1,4 @@
-/* global revenueGeneratorGlobalOptions */
+/* global revenueGeneratorGlobalOptions tippy */
 /**
  * JS to handle plugin settings screen interactions.
  *
@@ -38,6 +38,10 @@ import { debounce } from '../helpers';
 
 				helpGAModal: '.rev-gen-settings-main-info-modal',
 
+				// Tooltip
+				contributionRightTooltip: '.rev-gen-contribution-tooltip-right',
+				contributionTopTooltip: '.rev-gen-contribution-tooltip-top',
+
 				laterpayLoader: $( '.laterpay-loader-wrapper' ),
 				rgLayoutWrapper: $( '.rev-gen-layout-wrapper' ),
 				rgContributionWrapper: $( '.rev-gen-contribution-main' ),
@@ -59,6 +63,10 @@ import { debounce } from '../helpers';
 					'.rev-gen-contribution-main-generate-button'
 				),
 
+				contributionCopyMessage: $(
+					'.rev-gen-contribution-main-copy-message'
+				),
+
 				// Popup.
 				snackBar: $( '#rg_js_SnackBar' ),
 			};
@@ -66,6 +74,34 @@ import { debounce } from '../helpers';
 			// Initialize all required events.
 			const initializePage = function() {
 				bindEvents();
+			};
+
+			/**
+			 * Initialized the tooltip on given element.
+			 *
+			 * @param {string} elementIdentifier Selector matching elements on the document
+			 */
+			const TooltipTop = function( elementIdentifier ) {
+				tippy( elementIdentifier, {
+					arrow: tippy.roundArrow,
+					placement: 'top',
+					delay: 0,
+					inlinePositioning: true,
+				} );
+			};
+
+			/**
+			 * Initialized the tooltip on given element.
+			 *
+			 * @param {string} elementIdentifier Selector matching elements on the document
+			 */
+			const TooltipRight = function( elementIdentifier ) {
+				tippy( elementIdentifier, {
+					arrow: tippy.roundArrow,
+					placement: 'right',
+					delay: 0,
+					inlinePositioning: true,
+				} );
 			};
 
 			/**
@@ -114,6 +150,13 @@ import { debounce } from '../helpers';
 
 								if ( r.success ) {
 									copyToClipboard( r.code );
+									$o.contributionGnerateCode.text(
+										r.button_text
+									);
+									$o.contributionCopyMessage.show();
+									$o.contributionGnerateCode.removeAttr(
+										'style'
+									);
 									$o.contributionGnerateCode.prop(
 										'disabled',
 										true
@@ -129,9 +172,7 @@ import { debounce } from '../helpers';
 				// Validate URL.
 				$o.contributionThankYouPage.on( 'focusout', function() {
 					const url = $( this ).val();
-					if ( isValidURL( url ) ) {
-						validBorder( $( this ) );
-					} else {
+					if ( ! isValidURL( url ) ) {
 						invalidBorder( $( this ) );
 					}
 				} );
@@ -152,9 +193,7 @@ import { debounce } from '../helpers';
 						: $( this )
 								.text()
 								.trim();
-					if ( val ) {
-						validBorder( $( this ) );
-					} else {
+					if ( ! val ) {
 						invalidBorder( $( this ) );
 					}
 				} );
@@ -238,6 +277,28 @@ import { debounce } from '../helpers';
 					);
 					$o.body.find( 'input' ).removeClass( 'input-blur' );
 				} );
+
+				// Tooltip on direction to right.
+				$( $o.contributionRightTooltip ).on( 'hover', function() {
+					TooltipRight( $o.contributionRightTooltip );
+				} );
+
+				// Tooltip on direction to top.
+				$( $o.contributionTopTooltip ).on( 'hover', function() {
+					TooltipTop( $o.contributionTopTooltip );
+				} );
+
+				$o.contributionCampaignName.on( 'focusout', function() {
+					// validate fields.
+					const isValid = validateAllfields();
+
+					if ( 'valid' === isValid ) {
+						$o.contributionGnerateCode.css(
+							'background-color',
+							'#1d1d1d'
+						);
+					}
+				} );
 			};
 
 			/**
@@ -265,19 +326,6 @@ import { debounce } from '../helpers';
 				$temp.val( codeText ).select();
 				document.execCommand( 'copy' );
 				$temp.remove();
-			};
-
-			/**
-			 * Adds valid Border.
-			 *
-			 * @param {string} element
-			 * @return {void}
-			 */
-			const validBorder = function( element ) {
-				$( element ).css( 'border', '1px solid #19e4ac' );
-				setTimeout( function() {
-					$( element ).removeAttr( 'style' );
-				}, 5000 );
 			};
 
 			/**
