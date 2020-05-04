@@ -223,6 +223,12 @@ class Shortcodes {
 			$this->merchant_api_key = $merchant_credentials['merchant_key'];
 		}
 
+		// Display Error Message if there are no credrentails.
+		if ( empty( $this->merchant_id ) || empty( $this->merchant_api_key ) ) {
+			// Display Shortcode error.
+			return sprintf( '<div class="rg-shortcode-error">%s</div>', esc_html__( 'Something went wrong, if you are a site admin please add merchant credentials in settings.', 'revenue-generator' ) );
+		}
+
 		// Configure contribution values.
 		$payment_config    = [];
 		$contribution_urls = '';
