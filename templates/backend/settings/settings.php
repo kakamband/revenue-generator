@@ -113,6 +113,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <!-- Template for User info modal -->
 <script type="text/template" id="tmpl-revgen-info-user">
 	<div class="rev-gen-settings-main-info-modal rev-gen-preview-main-info-modal user-info-modal">
+	<span class="rev-gen-settings-main-info-modal-cross">X</span>
 		<h4 class="rev-gen-preview-main-info-modal-title rev-gen-settings-main-info-modal-title"><?php esc_html_e( 'Your Google Analytics', 'revenue-generator' ); ?></h4>
 		<p class="rev-gen-preview-main-info-modal-message">
 			<?php
@@ -154,6 +155,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 </script>
 <script type="text/template" id="tmpl-revgen-info-laterpay">
 	<div class="rev-gen-settings-main-info-modal rev-gen-preview-main-info-modal laterpay-info-modal">
+	<span class="rev-gen-settings-main-info-modal-cross">X</span>
 		<h4 class="rev-gen-preview-main-info-modal-title rev-gen-settings-main-info-modal-title"><?php esc_html_e( 'LaterPay Google Analytics', 'revenue-generator' ); ?></h4>
 		<p class="rev-gen-preview-main-info-modal-message">
 			<?php

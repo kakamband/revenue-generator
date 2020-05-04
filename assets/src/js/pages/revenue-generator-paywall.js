@@ -2564,7 +2564,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				} );
 
 				// Blur out the wrapper and disable events, to highlight the tour elements.
-				$o.layoutWrapper.addClass( 'modal-blur' );
+				$o.body.addClass( 'modal-blur' );
 				$o.layoutWrapper.css( {
 					'pointer-events': 'none',
 				} );
@@ -2593,10 +2593,17 @@ import { __, sprintf } from '@wordpress/i18n';
 
 				// Remove the blurry class and allow click events.
 				Shepherd.on( 'complete', function() {
+
 					// Revert to original state.
-					$o.layoutWrapper.removeClass( 'modal-blur' );
+					$o.body.removeClass( 'modal-blur' );
+
 					$o.layoutWrapper.css( {
 						'pointer-events': 'unset',
+					} );
+
+					// Removed background from search bar.
+					$o.searchContentWrapper.css( {
+						'background-color': '#fff',
 					} );
 
 					// Revert to original theme.

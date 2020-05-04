@@ -67,7 +67,6 @@ class Admin {
 	protected static function load_assets() {
 		// Localize required data.
 		$current_global_options = Config::get_global_options();
-		$settings_options       = Settings::get_settings_options();
 
 		$currency_limits   = Config::get_currency_limits();
 		$merchant_currency = '';

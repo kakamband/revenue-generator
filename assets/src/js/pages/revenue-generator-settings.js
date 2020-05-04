@@ -25,6 +25,8 @@ import { debounce } from '../helpers';
 				settingsMerchantInputs:
 					'.rev-gen-settings-main-merchant-id, .rev-gen-settings-main-merchant-key',
 				settingsUserRoles: '.rev-gen-settings-main-user-roles',
+				settingsModalClose:
+					'.rev-gen-settings-main-info-modal-cross',
 
 				rgDashboard: '.rev-gen-dashboard-main',
 
@@ -163,93 +165,101 @@ import { debounce } from '../helpers';
 						}
 					}, 500 )
 				);
-			};
 
-			/**
-			 * Stores Users GA id.
-			 */
-			$o.settingsGAUserID.on(
-				'focusout',
-				debounce( function() {
-					// check Lock
-					if ( ! $o.requestSent ) {
-						// Add lock.
-						$o.requestSent = true;
+				/**
+				 * Stores Users GA id.
+				 */
+				$o.settingsGAUserID.on(
+					'focusout',
+					debounce( function() {
+						// check Lock
+						if ( ! $o.requestSent ) {
+							// Add lock.
+							$o.requestSent = true;
 
-						const gaPersonlID = $( this ).val();
+							const gaPersonlID = $( this ).val();
 
-						// Create form Data.
-						const formData = {
-							action: 'rg_update_settings_options',
-							config_key: 'rg_personal_ga_ua_id',
-							config_value: gaPersonlID,
-							security:
-								revenueGeneratorGlobalOptions.rg_setting_nonce,
-						};
+							// Create form Data.
+							const formData = {
+								action: 'rg_update_settings_options',
+								config_key: 'rg_personal_ga_ua_id',
+								config_value: gaPersonlID,
+								security:
+									revenueGeneratorGlobalOptions.rg_setting_nonce,
+							};
 
-						// Display Loader.
-						showLoader();
-						// Update Global Configurations.
-						updateGloablConfig( formData );
+							// Display Loader.
+							showLoader();
+							// Update Global Configurations.
+							updateGloablConfig( formData );
 
-						// Release request lock.
-						$o.requestSent = false;
-					}
-				}, 500 )
-			);
+							// Release request lock.
+							$o.requestSent = false;
+						}
+					}, 500 )
+				);
 
-			/**
-			 * Handle tooltip button events for info modals.
-			 */
-			$o.body.on( 'click', $o.helpGAButton, function() {
-				const infoButton = $( this );
-				const modalType = infoButton.attr( 'data-info-for' );
-				const existingModal = $o.settingsWrapper.find( $o.helpGAModal );
-
-				// Remove any existing modal.
-				if ( existingModal.length ) {
-					$o.body.removeClass( 'modal-blur' );
-					$o.body.find( 'input' ).removeClass( 'input-blur' );
-					existingModal.remove();
-				} else {
-					const template = wp.template(
-						`revgen-info-${ modalType }`
+				/**
+				 * Handle tooltip button events for info modals.
+				 */
+				$o.body.on( 'click', $o.helpGAButton, function() {
+					const infoButton = $( this );
+					const modalType = infoButton.attr( 'data-info-for' );
+					const existingModal = $o.settingsWrapper.find(
+						$o.helpGAModal
 					);
-					$o.settingsWrapper.append( template );
 
-					// Change background color and highlight the clicked parent.
-					$o.body.addClass( 'modal-blur' );
-					$o.body.find( 'input' ).addClass( 'input-blur' );
-					// Highlight selected info modal parent based on type.
-					if ( 'user' === modalType ) {
-						$( $o.rgGAUserRow )
-							.find( 'input' )
-							.removeClass( 'input-blur' );
-						$( $o.rgGALaterpayRow ).removeAttr( 'style' );
-						$( $o.rgGAUserRow ).css( 'background-color', '#fff' );
+					// Remove any existing modal.
+					if ( existingModal.length ) {
+						$o.body.removeClass( 'modal-blur' );
+						$o.body.find( 'input' ).removeClass( 'input-blur' );
+						existingModal.remove();
 					} else {
-						$( $o.rgGALaterpayRow )
-							.find( 'input' )
-							.removeClass( 'input-blur' );
-						$( $o.rgGAUserRow ).removeAttr( 'style' );
-						$( $o.rgGALaterpayRow ).css(
-							'background-color',
-							'#fff'
+						const template = wp.template(
+							`revgen-info-${ modalType }`
 						);
-					}
-				}
-			} );
+						$o.settingsWrapper.append( template );
 
-			/**
-			 * Hide the existing help popup.
-			 */
-			$o.rgLayoutWrapper.on( 'click', function() {
-				$( $o.helpGAModal ).remove();
-				$o.body.removeClass( 'modal-blur' );
-				$( $o.rgGAUserRow ).css( 'background-color', 'inherit' );
-				$( $o.rgGALaterpayRow ).css( 'background-color', 'inherit' );
-				$o.body.find( 'input' ).removeClass( 'input-blur' );
-			} );
+						// Change background color and highlight the clicked parent.
+						$o.body.addClass( 'modal-blur' );
+						$o.body.find( 'input' ).addClass( 'input-blur' );
+						// Highlight selected info modal parent based on type.
+						if ( 'user' === modalType ) {
+							$( $o.rgGAUserRow )
+								.find( 'input' )
+								.removeClass( 'input-blur' );
+							$( $o.rgGALaterpayRow ).removeAttr( 'style' );
+							$( $o.rgGAUserRow ).css(
+								'background-color',
+								'#fff'
+							);
+						} else {
+							$( $o.rgGALaterpayRow )
+								.find( 'input' )
+								.removeClass( 'input-blur' );
+							$( $o.rgGAUserRow ).removeAttr( 'style' );
+							$( $o.rgGALaterpayRow ).css(
+								'background-color',
+								'#fff'
+							);
+						}
+					}
+				} );
+
+				/**
+				 * Hide the existing help popup.
+				 */
+				$o.body.on( 'click', $o.settingsModalClose, function() {
+					$( $o.helpGAModal ).remove();
+					$o.body.removeClass( 'modal-blur' );
+					$( $o.rgGAUserRow ).css( 'background-color', 'inherit' );
+					$( $o.rgGALaterpayRow ).css(
+						'background-color',
+						'inherit'
+					);
+					$o.body.find( 'input' ).removeClass( 'input-blur' );
+				} );
+			};
 
 			/**
 			 * Show the loader.

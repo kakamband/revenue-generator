@@ -162,6 +162,16 @@ body.revenue-generator_page_revenue-generator-contribution {
 		height: auto;
 		position: absolute;
 		transform: translate(0, 0);
+		
+		&-cross {
+			position: absolute;
+			right: 10px;
+			top: 10px;
+			font-weight: 700;
+			font-size: 15px;
+			color: #a9a9a9;
+			cursor: pointer;
+		}
 	}
 
 	&-copy-message {
