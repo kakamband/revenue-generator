@@ -96,8 +96,8 @@ class Admin {
 			'paywallPageBase'       => $paywall_base,
 			'rg_code_copy_msg'      => esc_html__( 'Code copied to clipboard', 'revenue-generator' ),
 			'signupURL'             => [
-				'US' => 'https://web.uselaterpay.com/dialog/entry/?redirect_to=/merchant/add/#/signup',
-				'EU' => 'https://web.laterpay.net/dialog/entry/?redirect_to=/merchant/add/#/signup',
+				'US' => 'https://xd.adobe.com/view/d15a531b-de98-4894-603b-626ce12385f2-a76b/screen/a75236e0-c031-4c74-ac6e-e2e5e8587097/Sign-In?fullscreen&hints=off',
+				'EU' => 'https://xd.adobe.com/view/d15a531b-de98-4894-603b-626ce12385f2-a76b/screen/a75236e0-c031-4c74-ac6e-e2e5e8587097/Sign-In?fullscreen&hints=off',
 			],
 			'defaultConfig'         => [
 				'timepass'     => [
