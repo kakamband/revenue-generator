@@ -223,7 +223,7 @@ class Shortcodes {
 		// Display Error Message if there are no credrentails.
 		if ( empty( $this->merchant_id ) || empty( $this->merchant_api_key ) ) {
 			// Display Shortcode error.
-			return sprintf( '<div class="rg-shortcode-error">%s</div>', esc_html__( 'Something went wrong, if you are a site admin please add merchant credentials in settings.', 'revenue-generator' ) );
+			return sprintf( '<div class="rg-shortcode-error">%s</div>', __( 'Something went wrong, if you are a site admin please add merchant credentials in settings.', 'revenue-generator' ) );
 		}
 
 		// Configure contribution values.
@@ -324,7 +324,7 @@ class Shortcodes {
 		if ( empty( $config_array['name'] ) ) {
 			return [
 				'success' => false,
-				'message' => esc_html__( 'Please enter a Campaign Name above.', 'revenue-generator' ),
+				'message' => __( 'Please enter a campaign name above.', 'revenue-generator' ),
 			];
 		}
 
@@ -333,10 +333,9 @@ class Shortcodes {
 			if ( floatval( $config_array['single_amount'] ) === floatval( 0.0 ) ) {
 				return [
 					'success' => false,
-					'message' => esc_html__( 'Please enter a valid contribution amount above.', 'revenue-generator' ),
+					'message' => __( 'Please enter a valid contribution amount above.', 'revenue-generator' ),
 				];
 			}
-			return true;
 		}
 
 		return true;
