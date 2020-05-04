@@ -50,6 +50,7 @@ class Config {
 			update_option(
 				'lp_rg_global_options',
 				[
+					'is_welcome_done'            => '',
 					'average_post_publish_count' => '',
 					'merchant_currency'          => 'USD',
 					'merchant_region'            => 'US',

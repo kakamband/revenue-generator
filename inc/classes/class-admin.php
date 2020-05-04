@@ -8,6 +8,7 @@
 namespace LaterPay\Revenue_Generator\Inc;
 
 use \LaterPay\Revenue_Generator\Inc\Post_Types\Paywall;
+use LaterPay\Revenue_Generator\Inc\Post_Types\Contribution;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Subscription;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Time_Pass;
 use LaterPay\Revenue_Generator\Inc\Settings;
@@ -57,6 +58,7 @@ class Admin {
 		add_action( 'wp_ajax_rg_set_paywall_order', [ $this, 'set_paywall_sort_order' ] );
 		add_action( 'wp_ajax_rg_search_paywall', [ $this, 'search_paywall' ] );
 		add_action( 'wp_ajax_rg_set_paywall_name', [ $this, 'rg_set_paywall_name' ] );
+		add_action( 'wp_ajax_rg_contribution_shortcode_generator', [ $this, 'rg_contribution_shortcode_generator' ] );
 	}
 
 	/**
@@ -82,20 +84,22 @@ class Admin {
 
 		// Script date required for operations.
 		$rg_script_data = [
-			'globalOptions'       => $current_global_options,
-			'ajaxUrl'             => admin_url( 'admin-ajax.php' ),
-			'rg_paywall_nonce'    => wp_create_nonce( 'rg_paywall_nonce' ),
-			'rg_setting_nonce'    => wp_create_nonce( 'rg_setting_nonce' ),
-			'rg_tracking_id'      => ( ! empty( $lp_config_id ) ) ? esc_html( $lp_config_id ) : '',
-			'rg_user_tracking_id' => ( ! empty( $lp_user_tracking_id ) ) ? esc_html( $lp_user_tracking_id ) : '',
-			'currency'            => $merchant_currency,
-			'locale'              => get_locale(),
-			'paywallPageBase'     => $paywall_base,
-			'signupURL'           => [
+			'globalOptions'         => $current_global_options,
+			'ajaxUrl'               => admin_url( 'admin-ajax.php' ),
+			'rg_paywall_nonce'      => wp_create_nonce( 'rg_paywall_nonce' ),
+			'rg_setting_nonce'      => wp_create_nonce( 'rg_setting_nonce' ),
+			'rg_contribution_nonce' => wp_create_nonce( 'rg_contribution_nonce' ),
+			'rg_tracking_id'        => ( ! empty( $lp_config_id ) ) ? esc_html( $lp_config_id ) : '',
+			'rg_user_tracking_id'   => ( ! empty( $lp_user_tracking_id ) ) ? esc_html( $lp_user_tracking_id ) : '',
+			'currency'              => $merchant_currency,
+			'locale'                => get_locale(),
+			'paywallPageBase'       => $paywall_base,
+			'rg_code_copy_msg'      => esc_html__( 'Code copied to clipboard', 'revenue-generator' ),
+			'signupURL'             => [
 				'US' => 'https://web.uselaterpay.com/dialog/entry/?redirect_to=/merchant/add/#/signup',
 				'EU' => 'https://web.laterpay.net/dialog/entry/?redirect_to=/merchant/add/#/signup',
 			],
-			'defaultConfig'       => [
+			'defaultConfig'         => [
 				'timepass'     => [
 					'title'       => esc_html__( '24 Hour Pass', 'revenue-generator' ),
 					'description' => esc_html__( 'Enjoy unlimited access to all our content for 24 hours.', 'revenue-generator' ),
@@ -133,6 +137,7 @@ class Admin {
 		// Hide paywall menu from submenu of plugin.
 		remove_submenu_page( 'revenue-generator', 'revenue-generator-paywall' );
 		remove_submenu_page( 'revenue-generator', 'revenue-generator' );
+		remove_submenu_page( 'revenue-generator', 'revenue-generator-contribution' );
 	}
 
 	/**
@@ -142,8 +147,17 @@ class Admin {
 		$current_global_options = Config::get_global_options();
 
 		// Check if setup is done, and load page accordingly.
-		$is_welcome_setup_done = empty( $current_global_options['average_post_publish_count'] ) ? false : true;
-		$dashboard_callback    = $is_welcome_setup_done ? 'load_dashboard' : 'load_welcome_screen';
+		$is_paywall_setup_done = empty( $current_global_options['average_post_publish_count'] ) ? false : true;
+		$is_welcome_setup_done = ( ! empty( $current_global_options['is_welcome_done'] ) ) ? $current_global_options['is_welcome_done'] : false;
+		$dashboard_callback    = '';
+
+		if ( ! empty( $is_welcome_setup_done ) && 'contribution' === $is_welcome_setup_done ) {
+			$dashboard_callback = 'load_contribution';
+		} elseif ( ! empty( $is_welcome_setup_done ) && 'paywall' === $is_welcome_setup_done ) {
+			$dashboard_callback = ( ! empty( $is_paywall_setup_done ) ) ? 'load_dashboard' : 'load_welcome_screen_paywall';
+		} else {
+			$dashboard_callback = 'load_welcome_screen';
+		}
 
 		// Add main menu page.
 		add_menu_page(
@@ -162,8 +176,8 @@ class Admin {
 			foreach ( $menus as $key => $page_data ) {
 				$slug          = $page_data['url'];
 				$page_callback = (
-					'dashboard' === $page_data['method'] && false === $is_welcome_setup_done ) ?
-					'load_welcome_screen' :
+					'dashboard' === $page_data['method'] && false === $is_paywall_setup_done ) ?
+					'load_welcome_screen_paywall' :
 					'load_' . $page_data['method'];
 
 				add_submenu_page(
@@ -179,6 +193,205 @@ class Admin {
 	}
 
 	/**
+	 * Generates Contribution short code.
+	 */
+	public function rg_contribution_shortcode_generator() {
+
+		// Verify authenticity.
+		check_ajax_referer( 'rg_contribution_nonce', 'security' );
+
+		$contribution_instace = Contribution::get_instance();
+
+		$campaing_name      = filter_input( INPUT_POST, 'title', FILTER_SANITIZE_STRING );
+		$thank_you_page     = filter_input( INPUT_POST, 'thank_you', FILTER_SANITIZE_URL );
+		$dialog_header      = filter_input( INPUT_POST, 'heading', FILTER_SANITIZE_STRING );
+		$dialog_description = filter_input( INPUT_POST, 'description', FILTER_SANITIZE_STRING );
+		$custom_amount      = filter_input( INPUT_POST, 'custom_amount', FILTER_SANITIZE_NUMBER_FLOAT );
+
+		// Get all amounts.
+		$amounts = filter_input( INPUT_POST, 'amounts' );
+
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Each value is sanitized below.
+		$all_amounts     = ( ! empty( $amounts ) ) ? json_decode( wp_unslash( $amounts ), true ) : array();
+		$filtered_prices = array();
+
+		// Sanitize the all amounts input.
+		$filters = [
+			'price'       => FILTER_SANITIZE_STRING,
+			'revenue'     => FILTER_SANITIZE_STRING,
+			'is_selected' => FILTER_VALIDATE_BOOLEAN,
+		];
+
+		$options = [
+			'price'       => [
+				'flags' => FILTER_NULL_ON_FAILURE,
+			],
+			'revenue'     => [
+				'flags' => FILTER_NULL_ON_FAILURE,
+			],
+			'is_selected' => [
+				'flags' => FILTER_NULL_ON_FAILURE,
+			],
+		];
+
+		$selected_amount = 1;
+		// Loop through the user input an build an array to be processed by shortcode generator.
+		foreach ( $all_amounts as $id => $amount_array ) {
+			foreach ( $amount_array as $key => $value ) {
+				$filtered_prices[ $id ][ $key ] = filter_var( $value, $filters[ $key ], $options[ $key ] );
+				if ( true === $amount_array['is_selected'] ) {
+					$selected_amount = $id + 1;
+				}
+			}
+		}
+
+		// Generate the shortcode.
+		$shortcode_data = [
+			'name'            => sanitize_text_field( $campaing_name ),
+			'thank_you'       => esc_url_raw( $thank_you_page ),
+			'type'            => 'multiple',
+			'custom_amount'   => isset( $custom_amount ) ? (float) $custom_amount * 100 : '0',
+			'all_amounts'     => array_column( $filtered_prices, 'price' ),
+			'all_revenues'    => array_column( $filtered_prices, 'revenue' ),
+			'selected_amount' => $selected_amount,
+		];
+
+		if ( ! empty( $dialog_header ) ) {
+			$shortcode_data['dialog_header'] = wp_strip_all_tags( $dialog_header );
+		}
+
+		if ( ! empty( $dialog_description ) ) {
+			$shortcode_data['dialog_description'] = wp_strip_all_tags( $dialog_description );
+		}
+
+		$result = Contribution::shortcode_generator( 'contribution', $shortcode_data );
+
+		$generated_shortcode    = isset( $result['code'] ) ? $result['code'] : '';
+		$shortcode_data['code'] = $generated_shortcode;
+
+		// Insert contribution to post type.
+		$contribution_id = $contribution_instace->update_contribution( $shortcode_data );
+
+		$message              = esc_html__( 'Something went wrong!', 'revenue-generator' );
+		$generate_button_text = esc_html__( 'Generate and copy code', 'revenue-generator' );
+
+		if ( ! empty( $contribution_id ) && ! is_wp_error( $contribution_id ) && $result['success'] ) {
+
+			$message              = esc_html__( 'Successfully generated code, please paste at desired location.', 'revenue-generator' );
+			$generate_button_text = esc_html__( 'Code copied in your clipboard!', 'revenue-generator' );
+		}
+
+		wp_send_json(
+			[
+				'success'     => $result['success'],
+				'msg'         => ( true === $result['success'] ) ? $message : $result['message'],
+				'code'        => $generated_shortcode,
+				'button_text' => $generate_button_text,
+			]
+		);
+	}
+
+	/**
+	 * Load Contribution Dashboard.
+	 */
+	public function load_contributions() {
+		self::load_assets();
+
+		$admin_menus           = self::get_admin_menus();
+		$contribution_instance = Contribution::get_instance();
+
+		// Contributions sorting orders.
+		$sort_order               = filter_input( INPUT_GET, 'sort_by', FILTER_SANITIZE_STRING );
+		$contribution_filter_args = array( 'order' => 'DESC' );
+		$allowed_sort_order       = array( 'ASC', 'DESC' );
+
+		// Contributions sorting orders.
+		$sort_order = filter_input( INPUT_GET, 'sort_by', FILTER_SANITIZE_STRING );
+		// If no sort param is set default to DESC.
+		if ( empty( $sort_order ) ) {
+			$new_sort_order = 'DESC';
+			$sort_order     = 'priority';
+		} else {
+			$new_sort_order = in_array( strtoupper( $sort_order ), $allowed_sort_order, true ) ? strtoupper( $sort_order ) : 'DESC';
+		}
+
+		$contribution_filter_args['order'] = $new_sort_order;
+
+		// Paywall Search Term.
+		$search_term = filter_input( INPUT_GET, 'search_term', FILTER_SANITIZE_STRING );
+
+		if ( ! empty( $search_term ) ) {
+			$contribution_filter_args['rg_contribution_title'] = $search_term;
+		}
+
+		// Adds filter posts by title.
+		add_filter( 'posts_where', [ $contribution_instance, 'rg_contribution_title_filter' ], 10, 2 );
+
+		$dashboard_contributions = $contribution_instance->get_all_contributions( $contribution_filter_args );
+
+		// Removes post filter by title.
+		remove_filter( 'posts_where', [ $contribution_instance, 'rg_contribution_title_filter' ], 10 );
+
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
+		$dashboard_page_data = [
+			'new_contribution_url' => add_query_arg( [ 'page' => $admin_menus['contribution']['url'] ], admin_url( 'admin.php' ) ),
+			'current_sort_order'   => $sort_order,
+			'search_term'          => $search_term,
+			'contributions'        => $dashboard_contributions,
+			'action_icons'         => [
+				'lp_icon' => Config::$plugin_defaults['img_dir'] . 'lp-logo-icon.svg',
+			],
+		];
+
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
+		echo View::render_template( 'backend/contribution/dashboard', $dashboard_page_data );
+
+		return '';
+	}
+
+	/**
+	 * Create Contribution.
+	 */
+	public function load_contribution() {
+		self::load_assets();
+
+		$admin_menus = self::get_admin_menus();
+
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
+		$dashboard_page_data = [
+			'new_contribution_url' => add_query_arg( [ 'page' => $admin_menus['contribution']['url'] ], admin_url( 'admin.php' ) ),
+			'action_icons'         => [
+				'lp_icon'     => Config::$plugin_defaults['img_dir'] . 'lp-logo-icon.svg',
+				'option_info' => Config::$plugin_defaults['img_dir'] . 'option-info.svg',
+			],
+		];
+
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
+		echo View::render_template( 'backend/contribution/create', $dashboard_page_data );
+
+		return '';
+	}
+
+	/**
+	 * Load admin welcome screen.
+	 *
+	 * @return string
+	 *
+	 * @codeCoverageIgnore -- Test will be covered in e2e tests.
+	 */
+	public function load_welcome_screen_paywall() {
+		self::load_assets();
+		$welcome_page_data = [
+			'low_count_icon'  => Config::$plugin_defaults['img_dir'] . 'low-publish.svg',
+			'high_count_icon' => Config::$plugin_defaults['img_dir'] . 'high-publish.svg',
+		];
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
+		echo View::render_template( 'backend/welcome/welcome-paywall', $welcome_page_data );
+
+		return '';
+	}
+
+	/**
 	 * Load admin welcome screen.
 	 *
 	 * @return string
@@ -188,8 +401,8 @@ class Admin {
 	public function load_welcome_screen() {
 		self::load_assets();
 		$welcome_page_data = [
-			'low_count_icon'  => Config::$plugin_defaults['img_dir'] . 'low-publish.svg',
-			'high_count_icon' => Config::$plugin_defaults['img_dir'] . 'high-publish.svg',
+			'welcome_contribution_icon' => Config::$plugin_defaults['img_dir'] . 'welcome-contribution.svg',
+			'welcome_paywall_icon'      => Config::$plugin_defaults['img_dir'] . 'welcome-paywall.svg',
 		];
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
 		echo View::render_template( 'backend/welcome/welcome', $welcome_page_data );
@@ -538,14 +751,29 @@ class Admin {
 		$current_global_options = Config::get_global_options();
 
 		// Check if tutorial is completed, and load page accordingly.
-		$is_welcome_setup_done = empty( $current_global_options['average_post_publish_count'] ) ? false : true;
+		$is_welcome_setup_done = ( ! empty( $current_global_options['is_welcome_done'] ) ) ? $current_global_options['is_welcome_done'] : false;
+		$is_paywall_setup_done = empty( $current_global_options['average_post_publish_count'] ) ? false : true;
 
-		if ( $is_welcome_setup_done ) {
+		if ( $is_paywall_setup_done || ( ! empty( $is_welcome_setup_done ) && 'contribution' === $is_welcome_setup_done ) ) {
 			$menus['dashboard'] = [
 				'url'    => 'revenue-generator-dashboard',
-				'title'  => __( 'Dashboard', 'revenue-generator' ),
+				'title'  => __( 'Paywall', 'revenue-generator' ),
 				'cap'    => 'manage_options',
 				'method' => 'dashboard',
+			];
+
+			$menus['contributions'] = [
+				'url'    => 'revenue-generator-contributions',
+				'title'  => __( 'Contributions', 'revenue-generator' ),
+				'cap'    => 'manage_options',
+				'method' => 'contributions',
+			];
+
+			$menus['contribution'] = [
+				'url'    => 'revenue-generator-contribution',
+				'title'  => __( 'Contribution', 'revenue-generator' ),
+				'cap'    => 'manage_options',
+				'method' => 'contribution',
 			];
 
 			$menus['paywall'] = [

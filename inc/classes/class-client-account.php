@@ -93,6 +93,16 @@ class Client_Account {
 	];
 
 	/**
+	 * Web API endpoints.
+	 *
+	 * @var array Common values used for web related info throughout the plugin.
+	 */
+	public static $web_endpoints = [
+		'sandbox' => 'https://web.sandbox.uselaterpaytest.com',
+		'live'    => 'https://web.uselaterpay.com',
+	];
+
+	/**
 	 * Class Client_Account construct method.
 	 */
 	protected function __construct() {

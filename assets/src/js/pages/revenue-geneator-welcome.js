@@ -21,9 +21,13 @@ import '../utils';
 				// Welcome screen wrapper.
 				welcomeScreenWrapper: $( '.welcome-screen-wrapper' ),
 
-				// Cards.
+				// Welcome Paywall Cards.
 				lowPostCard: $( '#rg_js_lowPostCard' ),
 				highPostCard: $( '#rg_js_highPostCard' ),
+
+				// Welcome Cards.
+				isContribution: $( '#rg_Contribution' ),
+				isPaywall: $( '#rg_Paywall' ),
 
 				snackBar: $( '#rg_js_SnackBar' ),
 			};
@@ -39,6 +43,34 @@ import '../utils';
 				$o.highPostCard.on( 'click', function() {
 					storePostPublishCount( 'high' );
 				} );
+
+				$o.isContribution.on( 'click', function() {
+					storeWelcomePage( 'contribution' );
+				} );
+
+				$o.isPaywall.on( 'click', function() {
+					storeWelcomePage( 'paywall' );
+				} );
+			};
+
+			/*
+			 * Update and Store Welcome Page setup done.
+			 *
+			 * @param {string} is_welcome_done value.
+			 * @return {void}
+			 */
+			const storeWelcomePage = function( isWelcomeDone ) {
+				const formData = {
+					action: 'rg_update_global_config',
+					config_key: 'is_welcome_done',
+					config_value: isWelcomeDone,
+					security:
+						revenueGeneratorGlobalOptions.rg_global_config_nonce,
+				};
+				updateGlobalConfig(
+					revenueGeneratorGlobalOptions.ajaxUrl,
+					formData
+				);
 			};
 
 			/*

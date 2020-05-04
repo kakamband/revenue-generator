@@ -493,7 +493,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 			<?php esc_html_e( 'You don’t have a paywall on this page - all content will be publicly visible.', 'revenue-generator' ); ?>
 		</p>
 		<button id="rg_js_gotoDashboard" class="goto-dashboard-button" data-dashboard-url="<?php echo esc_url( $dashboard_url ); ?>">
-			<?php esc_html_e( 'View Dashboard', 'revenue-generator' ); ?>
+			<?php esc_html_e( 'View Paywalls', 'revenue-generator' ); ?>
 		</button>
 		<button id="rj_js_addNewPaywall" data-preview-id="">
 			<?php esc_html_e( 'Add Paywall', 'revenue-generator' ); ?>

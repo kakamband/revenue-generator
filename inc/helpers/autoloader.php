@@ -33,7 +33,6 @@ function autoloader( $resource = '' ) {
 		str_replace( '_', '-', strtolower( $resource ) )
 	);
 
-
 	/**
 	 * Time to determine which type of resource path it is,
 	 * so that we can deduce the correct file path for it.
@@ -84,4 +83,4 @@ function autoloader( $resource = '' ) {
 
 }
 
-spl_autoload_register( '\LaterPay\Revenue_Generator\Inc\Helpers\autoloader' );
+spl_autoload_register( __NAMESPACE__ . '\autoloader' );

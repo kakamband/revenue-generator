@@ -62,5 +62,33 @@ class View {
 		// phpcs:ignore -- WordPress.Security.EscapeOutput.OutputNotEscaped, template escaped in templates/backend/common/footer.php
 		echo self::render_template( 'backend/common/footer', $footer_data );
 	}
+	
+	/**
+	 * Format number based on its type.
+	 *
+	 * @param mixed $number Number.
+	 * @param bool  $is_monetary place.
+	 *
+	 * @return string $formatted
+	 */
+	public static function format_number( $number, $is_monetary = true ) {
+		// convert value to float if incorrect type passed.
+		$number = (float) $number;
+
+		if ( $is_monetary ) {
+			// format value with 2 digits.
+			$formatted = number_format_i18n( $number, 2 );
+		} else {
+			// format count values.
+			if ( $number < 10000 ) {
+				$formatted = number_format( $number );
+			} else {
+				// reduce values above 10,000 to thousands and format them with one digit.
+				$formatted = number_format( $number / 1000, 1 ) . __( 'k', 'laterpay' ); // k -> short for kilo (thousands).
+			}
+		}
+
+		return $formatted;
+	}
 
 }

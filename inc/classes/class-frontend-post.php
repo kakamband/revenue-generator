@@ -145,6 +145,11 @@ class Frontend_Post {
 			$this->current_post_id = ( ! empty( $this->current_post_id ) ) ? $this->current_post_id : get_the_ID();
 			$paywall_data          = $this->get_connected_paywall_id( $this->current_post_id );
 
+			// Don't add connector to every page.
+			if ( empty( $paywall_data ) ) {
+				wp_dequeue_script( 'revenue-generator-classic-connector' );
+				return;
+			}
 			?>
 			<!-- LaterPay Connector In-Page Configuration for appearance layout and deleted purchase options. -->
 			<script type="application/json" id="laterpay-connector">
@@ -253,6 +258,13 @@ class Frontend_Post {
 	public function revenue_generator_post_content( $post_content ) {
 		// Bail early, if unsupported post type.
 		if ( ! is_singular( Post_Types::get_allowed_post_types() ) ) {
+			return $post_content;
+		}
+
+		$this->current_post_id = ( ! empty( $this->current_post_id ) ) ? $this->current_post_id : get_the_ID();
+		$paywall_data          = $this->get_connected_paywall_id( $this->current_post_id );
+
+		if ( empty( $paywall_data ) ) {
 			return $post_content;
 		}
 
