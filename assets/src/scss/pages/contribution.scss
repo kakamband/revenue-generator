@@ -44,15 +44,15 @@ body.revenue-generator_page_revenue-generator-contribution {
 	}
 	&--box {
 		width: calc(100% - 50px);
-		height: 200px;
+		min-height: 200px;
 		border-radius: 5px;
 		box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
 		background-color: $box-white;
-		padding: 30px 25px;
+		padding: 30px 25px 18px;
 		position: relative;
 
 		&-header {
-			height: 24px;
+			min-height: 24px;
 			font-family: $box-font-helvetica;
 			font-size: 18px;
 			font-weight: 500;
@@ -62,9 +62,10 @@ body.revenue-generator_page_revenue-generator-contribution {
 			color: $box-text-color;
 			border: 1px solid transparent;
 			display: inline-block;
+			min-width: 80%;
 		}
 		&-description {
-
+			min-height: 17px;
 			font-family: $box-font-helvetica;
 			font-size: 14px;
 			font-weight: 500;
@@ -73,6 +74,7 @@ body.revenue-generator_page_revenue-generator-contribution {
 			color: $box-dark-grey;
 			border: 1px solid transparent;
 			display: inline-block;
+			min-width: 80%;
 		}
 
 		&-donation {
@@ -98,9 +100,10 @@ body.revenue-generator_page_revenue-generator-contribution {
 		}
 
 		&-footer-logo {
-			position: absolute;
-			bottom: 18px;
-			width: calc(100% - 50px);
+			position: relative;
+			bottom: 0;
+			width: 100%;
+			margin-top: 37px;
 		}
 	}
 
@@ -140,12 +143,11 @@ body.revenue-generator_page_revenue-generator-contribution {
 		line-height: 0.79;
 		letter-spacing: normal;
 		margin: 44px 0 0;
-		border-width: 2px;
-		border-style: solid;
+		border: 0;
 		&:disabled {
 			background: transparent;
 			color: $box-text-color;
-			border-color: $box-text-color;
+			border: 2px solid $box-text-color;
 		}
 	}
 
@@ -192,7 +194,7 @@ body.revenue-generator_page_revenue-generator-contribution {
 	}
 	&--box {
 		width: 320px;
-		height: 158px;
+		min-height: 158px;
 		border-radius: 5px;
 		border: solid 2px $box-text-color;
 		background-color: $box-white;
@@ -202,7 +204,7 @@ body.revenue-generator_page_revenue-generator-contribution {
 
 		&-header {
 			width: 100%;
-			height: 24px;
+			min-height: 24px;
 			font-family: $box-font-helvetica;
 			font-size: 16px;
 			font-weight: 500;
@@ -213,7 +215,7 @@ body.revenue-generator_page_revenue-generator-contribution {
 		}
 		&-description {
 			width: 100%;
-			height: 15px;
+			min-height: 15px;
 			font-family: $box-font-helvetica;
 			font-size: 12px;
 			font-weight: 500;
@@ -247,7 +249,7 @@ body.revenue-generator_page_revenue-generator-contribution {
 		padding: 25px 30px;
 		width: 325px;
 		&-title {
-			height: 28px;
+			min-height: 28px;
 			font-family: $box-font-helvetica;
 			font-size: 21px;
 			font-weight: 500;
@@ -257,7 +259,7 @@ body.revenue-generator_page_revenue-generator-contribution {
 			color: $box-text-color;
 		}
 		&-url {
-			height: 20px;
+			min-height: 20px;
 			font-family: $box-font-helvetica;
 			font-size: 16px;
 			font-weight: normal;
@@ -268,7 +270,7 @@ body.revenue-generator_page_revenue-generator-contribution {
 			margin: 10px 0;
 		}
 		&-updated {
-			height: 20px;
+			min-height: 20px;
 			opacity: 0.6;
 			font-family: $box-font-helvetica;
 			font-size: 14px;
