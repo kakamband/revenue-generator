@@ -140,6 +140,16 @@ body.revenue-generator_page_revenue-generator-settings {
 		&-title {
 			padding: 10px;
 		}
+
+		&-cross {
+			position: absolute;
+			right: 10px;
+			top: 10px;
+			font-weight: 700;
+			font-size: 15px;
+			color: #a9a9a9;
+			cursor: pointer;
+		}
 	}
 }
 // Input Blur.

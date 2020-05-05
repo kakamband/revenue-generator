@@ -26,6 +26,8 @@ import { debounce } from '../helpers';
 				// Contribution Help.
 				contributionHelpButton: '.rev-gen-contribution-main--help',
 				contributionHelpModal: '.rev-gen-contribution-main-info-modal',
+				contributionModalClose:
+					'.rev-gen-contribution-main-info-modal-cross',
 				contributionCampaignNameLabel: '#rg_contribution_campaign_name',
 				contributionThankYouPageLabel:
 					'#rg_contribution_thankyou_label',
@@ -264,7 +266,7 @@ import { debounce } from '../helpers';
 				/**
 				 * Hide the existing help popup.
 				 */
-				$o.rgLayoutWrapper.on( 'click', function() {
+				$o.body.on( 'click', $o.contributionModalClose, function() {
 					$( $o.contributionHelpModal ).remove();
 					$o.body.removeClass( 'modal-blur' );
 					$( $o.contributionCampaignNameLabel ).css(
