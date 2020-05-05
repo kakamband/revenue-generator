@@ -5,7 +5,6 @@
  * @package revenue-generator
  */
 
-use LaterPay\Revenue_Generator\Inc\Post_Types\Contribution;
 use LaterPay\Revenue_Generator\Inc\View;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -25,7 +24,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<select id="rg_js_filterPaywalls">
 					<option <?php selected( strtolower( $current_sort_order ), 'desc', true ); ?> value="desc"><?php esc_attr_e( 'Newest First', 'revenue-generator' ); ?></option>
 					<option <?php selected( strtolower( $current_sort_order ), 'asc', true ); ?> value="asc"><?php esc_attr_e( 'Oldest First', 'revenue-generator' ); ?></option>
-					<option <?php selected( strtolower( $current_sort_order ), 'priority', true ); ?> value="priority"><?php esc_attr_e( 'Priority', 'revenue-generator' ); ?></option>
 				</select>
 			</div>
 			<div class="rev-gen-dashboard-bar--item rev-gen-dashboard-bar--search">

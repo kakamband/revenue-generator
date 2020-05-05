@@ -309,7 +309,7 @@ class Admin {
 		// If no sort param is set default to DESC.
 		if ( empty( $sort_order ) ) {
 			$new_sort_order = 'DESC';
-			$sort_order     = 'priority';
+			$sort_order     = 'desc';
 		} else {
 			$new_sort_order = in_array( strtoupper( $sort_order ), $allowed_sort_order, true ) ? strtoupper( $sort_order ) : 'DESC';
 		}
