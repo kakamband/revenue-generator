@@ -26,7 +26,6 @@ if ( ! defined( 'REVENUE_GENERATOR_PLUGIN_DIR' ) ) {
 
 // Register the autoloader.
 require_once REVENUE_GENERATOR_PLUGIN_DIR . '/inc/helpers/autoloader.php';
-require_once REVENUE_GENERATOR_PLUGIN_DIR . '/vendor/laterpay/laterpay-client-php/autoload.php';
 
 use \LaterPay\Revenue_Generator\Inc\Plugin;
 

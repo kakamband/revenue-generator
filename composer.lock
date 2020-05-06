@@ -4,31 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f24504bb0b33bb11c8af3e32b29aaa9a",
-    "packages": [
-        {
-            "name": "laterpay/laterpay-client-php",
-            "version": "dev-develop",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/laterpay/laterpay-client-php.git",
-                "reference": "714fce9b46a2843da58e45ab673f627fae17672c"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "LaterPay_": "",
-                    "Crypt_": "",
-                    "Math_": ""
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "LaterPay PHP Client",
-            "time": "2019-10-21T15:56:56+00:00"
-        }
-    ],
+    "content-hash": "f1f8bc750197197dd45d7e152751fc93",
+    "packages": [],
     "packages-dev": [
         {
             "name": "automattic/vipwpcs",
@@ -401,14 +378,10 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "laterpay/laterpay-client-php": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": {
-        "php": ">=5.6"
-    },
+    "platform": [],
     "platform-dev": [],
     "plugin-api-version": "1.1.0"
 }
