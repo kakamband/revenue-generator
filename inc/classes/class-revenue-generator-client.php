@@ -55,20 +55,6 @@ class Revenue_Generator_Client {
 	protected $cp_key;
 
 	/**
-	 * Lptoken value
-	 *
-	 * @var null|string
-	 */
-	protected $lptoken = null;
-
-	/**
-	 * Lptoken toke name
-	 *
-	 * @var string
-	 */
-	protected $token_name = 'laterpay_token';
-
-	/**
 	 * POST method.
 	 *
 	 * @var string
@@ -89,20 +75,12 @@ class Revenue_Generator_Client {
 	 * @param string $api_key  Merchant Key.
 	 * @param string $api_root API Root.
 	 * @param string $web_root Web Root.
-	 * @param null   $token_name Token Name.
 	 */
-	public function __construct( $cp_key, $api_key, $api_root, $web_root, $token_name = null ) {
+	public function __construct( $cp_key, $api_key, $api_root, $web_root ) {
 		$this->cp_key   = $cp_key;
 		$this->api_key  = $api_key;
 		$this->api_root = $api_root;
 		$this->web_root = $web_root;
-
-		if ( ! empty( $token_name ) ) {
-			$this->token_name = $token_name;
-		}
-		if ( isset( $_COOKIE[ $this->token_name ] ) ) {
-			$this->lptoken = sanitize_textarea_field( wp_unslash( $_COOKIE[ $this->token_name ] ) );
-		}
 	}
 
 	/**
@@ -141,16 +119,6 @@ class Revenue_Generator_Client {
 		// add merchant id if not specified.
 		if ( ! isset( $data['cp'] ) ) {
 			$data['cp'] = $this->cp_key;
-		}
-
-		// Only add return_lptoken if endpoint is not for contribution.
-		if ( false === strpos( $endpoint, 'contribute' ) ) {
-			// force to return lptoken.
-			$data['return_lptoken'] = 1;
-		} else {
-			// If contribution endpoint make the payment url permanent.
-			$data['permalink'] = 1;
-			unset( $data['revenue'] );
 		}
 
 		// jsevent for dialog if specified.

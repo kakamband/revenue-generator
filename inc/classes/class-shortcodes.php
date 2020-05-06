@@ -239,7 +239,6 @@ class Shortcodes {
 			$this->merchant_api_key,
 			$this->api_root,
 			$this->web_endpoints,
-			'revenue_generator_token'
 		);
 
 		if ( 'single' === $config_data['type'] ) {
