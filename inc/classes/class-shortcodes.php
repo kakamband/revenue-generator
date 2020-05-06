@@ -238,7 +238,7 @@ class Shortcodes {
 			$this->merchant_id,
 			$this->merchant_api_key,
 			$this->api_root,
-			$this->web_endpoints,
+			$this->web_endpoints
 		);
 
 		if ( 'single' === $config_data['type'] ) {
