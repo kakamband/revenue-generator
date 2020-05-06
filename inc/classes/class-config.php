@@ -96,7 +96,7 @@ class Config {
 			'low'  => [
 				'single_article' => [
 					'tier_1' => [ // 0-250 content length.
-						'price'   => 1.49,
+						'price'   => 1.99,
 						'revenue' => 'sis',
 					],
 					'tier_2' => [ // 251-500 content length.
