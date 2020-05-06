@@ -8,7 +8,8 @@
 namespace LaterPay\Revenue_Generator\Inc;
 
 use \LaterPay\Revenue_Generator\Inc\Traits\Singleton;
-use LaterPay_Client;
+use \LaterPay\Revenue_Generator\Inc\Revenue_Generator_Client;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -233,12 +234,11 @@ class Shortcodes {
 		$campaign_name     = $config_data['name'];
 		$campaign_id       = str_replace( ' ', '-', strtolower( $campaign_name ) ) . '-' . (string) time();
 
-		$client = new LaterPay_Client(
+		$client = new Revenue_Generator_Client(
 			$this->merchant_id,
 			$this->merchant_api_key,
 			$this->api_root,
-			$this->web_endpoints,
-			'laterpay_token'
+			$this->web_endpoints
 		);
 
 		if ( 'single' === $config_data['type'] ) {
