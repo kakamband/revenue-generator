@@ -79,6 +79,28 @@ while ( $paywall_query->have_posts() ) {
 
 wp_reset_postdata();
 
+/**
+ * 4.Get all Contributions for deletion.
+ */
+$contribution_args = [
+	'post_type'      => [ 'rg_contribution' ],
+	'posts_per_page' => 100,
+	'no_found_rows'  => true,
+	'post_status'    => [ 'publish' ],
+];
+
+$contribution_query = new WP_Query( $contribution_args );
+
+// Don't keep contribution info upon deletion.
+while ( $contribution_query->have_posts() ) {
+	// Get custom post data created by plugin and delete it.
+	$contribution_query->the_post();
+	$rg_contribution_id = get_the_ID();
+	wp_delete_post( $rg_contribution_id, true );
+}
+
+wp_reset_postdata();
+
 // Get all active Time Passes and Subscriptions and set to draft, make sure to check user access based on these options.
 $pass_sub_args = [
 	'post_type'      => [ 'rg_pass', 'rg_subscription' ],
