@@ -304,6 +304,9 @@ class Shortcodes {
 			'thank_you'          => empty( $config_data['thank_you'] ) ? '' : $config_data['thank_you'],
 			'contribution_urls'  => $contribution_urls,
 			'payment_config'     => $payment_config,
+			'action_icons'       => [
+				'back_arrow_icon' => Config::$plugin_defaults['img_dir'] . 'back-arrow.svg',
+			],
 		);
 
 		// Load the contributions dialog for User.

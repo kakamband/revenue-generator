@@ -33,77 +33,49 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	</div>
 <?php } else { ?>
-	<div class="rg-multiple-wrapper">
-		<div class="rg-dialog-wrapper">
-			<div class="rg-dialog">
-				<div class="rg-header-wrapper">
-					<div class="rg-header-padding"></div>
-					<div class="rg-header-text">
-						<span><?php echo esc_html( $dialog_header ); ?></span>
+	<div class="rev-gen-contribution-main is-style-wide"">
+			<div class="rev-gen-contribution-main--box">
+				<div class="rev-gen-contribution-main--box-header rev-gen-contribution-tooltip-right"><?php echo esc_html( $dialog_header ); ?></div>
+				<div class="rev-gen-contribution-main--box-description rev-gen-contribution-tooltip-right"><?php echo esc_html( $dialog_description ); ?></div>
+				<div class="rev-gen-contribution-main--box-donation-wrapper">
+					<?php
+					foreach ( $payment_config['amounts'] as $amount_info ) {
+						if ( true === $amount_info['selected'] ) {
+							$selected_button = true;
+						} else {
+							$selected_button = false;
+						}
+						$lp_amount = $currency_symbol . View::format_number( floatval( $amount_info['amount'] / 100 ), 2 );
+						?>
+						<a target="_blank" href="<?php echo esc_url( $amount_info['url'] ); ?>" data-revenue="<?php echo esc_attr( $amount_info['revenue'] ); ?>" data-campid="<?php echo esc_attr( $campaign_id ); ?>" class="rev-gen-contribution-main--box-donation">
+							<?php echo esc_html( $lp_amount ); ?>
+						</a>
+						<?php
+					}
+					?>
+					<div class="rev-gen-contribution-main--box-donation rev-gen-contribution-main-custom">
+						<?php esc_html_e( 'Custom', 'revenue-generator' ); ?>
 					</div>
 				</div>
-				<div class="rg-body-wrapper">
-					<div>
-						<span class="rg-amount-text"><?php echo esc_html( $dialog_description ); ?></span>
-					</div>
-					<div class="rg-amount-presets-wrapper">
-						<div class="rg-amount-presets">
-							<?php
-							foreach ( $payment_config['amounts'] as $amount_info ) {
-								if ( true === $amount_info['selected'] ) {
-									$selected_button = true;
-								} else {
-									$selected_button = false;
-								}
-								$lp_amount = $currency_symbol . View::format_number( floatval( $amount_info['amount'] / 100 ), 2 );
-								?>
-								<div class="rg-amount-preset-wrapper">
-									<div class="rg-amount-preset-button <?php echo true === $selected_button ? 'rg-amount-preset-button-selected' : ''; ?>"
-										data-revenue="<?php echo esc_attr( $amount_info['revenue'] ); ?>"
-										data-campid="<?php echo esc_attr( $campaign_id ); ?>"
-										data-url="<?php echo esc_url( $amount_info['url'] ); ?>"
-										><?php echo esc_html( $lp_amount ); ?></div>
-								</div>
-								<?php
-							}
-							?>
+				<div class="rg-custom-amount-wrapper" data-ppu-url="<?php echo esc_url( $contribution_urls['ppu'] ); ?>" data-sis-url="<?php echo esc_url( $contribution_urls['sis'] ); ?>">
+					<div class="rg-custom-amount fade-in">
+						<div class="rg-custom-amount-title"><?php esc_html_e( 'Enter custom Tip amount', 'revenue-generator' ); ?></div>
+						<div class="rg-custom-amount-goback">
+							<img src="<?php echo esc_url( $action_icons['back_arrow_icon'] ); ?>" class="arrow" />
 						</div>
-						<span class="rg-amount-tip">
-							<?php esc_html_e( 'Contribute Now, Pay Later with your Tab?', 'revenue-generator' ); ?>
-						</span>
-					</div>
-					<?php if ( isset( $payment_config['custom_amount'] ) ) : ?>
-						<div class="rg-custom-amount-wrapper">
-							<div class="rg-custom-amount">
-								<label for="lp_custom_amount_input" class="rg-custom-amount-label">
-									<span class="rg-custom-amount-text"><?php esc_html_e( 'Custom Amount', 'revenue-generator' ); ?>:</span>
-								</label>
-								<div class="rg-custom-input-wrapper" data-ppu-url="<?php echo esc_url( $contribution_urls['ppu'] ); ?>" data-sis-url="<?php echo esc_url( $contribution_urls['sis'] ); ?>">
-									<input class="rg-custom-amount-input" type="number" step="0.10" value="<?php echo ( ! empty( $payment_config['custom_amount'] ) ) ? esc_attr( View::format_number( floatval( $payment_config['custom_amount'] / 100 ), 2 ) ) : ''; ?>" />
-									<i><?php echo esc_html( $currency_symbol ); ?></i>
-								</div>
-							</div>
-						</div>
-					<?php endif; ?>
-					<div class="rg-dialog-button-wrapper">
-						<div class="rg-button-wrapper">
-							<div data-url="" class="rg-button rg-contribution-button">
-								<div class="rg-cart"></div>
-								<div class="rg-link">
-									<?php esc_html_e( 'Contribute now', 'revenue-generator' ); ?>
-								</div>
-							</div>
+						<input class="rg-custom-amount-input" id="rg-custom-tip-amount" name="tip" type="number" value="" step="0.01" min="0" placeholder="$20.00" onfocus="this.placeholder = ''; this.value = (this.value?this.value:20);" onblur="this.placeholder = '$20.00'">
+						<div class="rg-custom-amount-send">
+							<?php esc_html_e( 'Send Tip', 'revenue-generator' ); ?>
 						</div>
 					</div>
 				</div>
-				<div class="rg-powered-by">
-					<span><?php esc_html_e( 'Powered by', 'revenue-generator' ); ?></span>
-					<a class="rg-powered-by-link" href="https://www.laterpay.net/" target="_blank" rel="noopener">
-						<img alt="LaterPay Logo" src="https://revgen.test/wp-content/plugins/revenue-generator/assets/build/img/lp-logo.svg">
-					</a>
+				<span class="rg-amount-tip">
+						<?php esc_html_e( 'Contribute Now, Pay Later with your Tab', 'revenue-generator' ); ?>
+					</span>
+				<div class="rev-gen-contribution-main--box-footer-logo">
+					<?php View::render_footer_backend(); ?>
 				</div>
 			</div>
-		</div>
-	</div>
+	</div>	
 	<?php
 }

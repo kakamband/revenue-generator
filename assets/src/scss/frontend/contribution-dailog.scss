@@ -8,246 +8,204 @@ $box-dark-grey:#333;
 $box-font-helvetica: HelveticaNeue, serif;
 $box-font-worksans:"LaterPay WorkSans", serif;
 $box-white:#fff;
-// LaterPay contribution elements
 
-.rg-cart {
-	height: 19px;
-	width: 19px;
-	z-index: 1;
-	transform: translate(16px, 19.5px);
-	float: left;
-	position: relative;
-	top: -5px;
-	background-image: url(../img/icon-contribute.svg);
+@keyframes
+	animateright {
+	from {
+		right: -300px;
+		opacity: 0;
+	}
+	to {
+		right: 0;
+		opacity: 1;
+	}
 }
 
-.rg-button-wrapper {
-	display: flex;
-	flex-flow: row nowrap;
-	flex: 1 1 0;
-	align-items: center;
-	justify-content: center;
-	-webkit-box-align: center;
-	-webkit-box-pack: center;
+@keyframes
+	animateleft {
+	from {
+		left: 0;
+		opacity: 1;
+	}
+	to {
+		left: 300px;
+		opacity: 0;
+	}
 }
 
-.rg-button {
-	margin-top: 0.5em;
-	cursor: pointer;
-	color: rgb(255, 255, 255);
-	background-color: #01a99d;
-	border-radius: 8px;
-	padding: 0 8px;
+.rev-gen-powered-by-footer {
+	color: #808080;
+	margin-left: 15px;
+	position: absolute;
+	bottom: 20px;
+	font: 10px/20px $box-font-helvetica;
 }
 
-.rg-link {
-	text-decoration: none;
-	padding: 13px 18px 13px 40px;
+.amount-text {
+	font-family: $box-font-helvetica;
+	font-size: 14px;
 	font-weight: 600;
-	font-size: 16px;
+	line-height: 1.21;
+	text-align: center;
+	color: $box-dark-grey;
+}
+.rg-amount-tip {
+	margin-top: 0.7em;
+	font-size: 12px;
+	text-align: center;
+	position: relative;
+	visibility: hidden;
+	display: inline-block;
+	font-family: $box-font-helvetica;
 }
 
-.rg-dialog-wrapper {
-	z-index: 2;
-	-webkit-font-smoothing: antialiased;
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, $box-font-helvetica, Arial, sans-serif;
-	font-size: 16px;
+.rev-gen-contribution-main {
+	width: 380px;
+	margin: 0 auto;
+	position: relative;
+	margin-top: 70px;
 
-	.rg-dialog {
-		background: rgb(255, 255, 255);
-		border-radius: 8px;
-		box-shadow: rgba(0, 0, 0, 0.25) 0 0 10px -1px;
-		box-sizing: border-box;
-		color: rgb(34, 34, 34);
-		font-size: 14px;
-		font-style: normal;
-		font-weight: normal;
-		line-height: 1.2;
-		margin: 1em auto;
-		max-width: calc(448px);
-		padding: 0;
+	&-custom {
+		cursor: pointer;
+	}
+
+	&--box {
+		min-width: 380px;
+		min-height: 227px;
+		border-radius: 5px;
+		box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
+		background-color: $box-white;
+		padding: 30px 25px 18px;
+		position: relative;
 		text-align: center;
-		text-decoration: none;
-		text-shadow: none;
-		text-transform: none;
-	}
+		overflow: hidden;
 
-	.rg-header-wrapper {
-		border-radius: 8px 15px 0 0;
-		padding-bottom: calc(10.5px);
-		box-sizing: inherit;
-		font-family: inherit;
-		color: rgb(34, 34, 34);
-		background-color: #fff;
-
-		.rg-header-padding {
-			background-color: transparent;
-			max-width: 100%;
-			height: auto;
-			padding: calc(10.5px) calc(10.5px) 0;
-			font-weight: normal;
-			margin-left: auto;
-			margin-right: auto;
-			box-sizing: inherit;
-			font-family: inherit;
+		&-header {
+			min-height: 24px;
+			font-family: $box-font-helvetica;
+			font-size: 18px;
+			font-weight: 500;
+			line-height: 1.33;
+			letter-spacing: -0.09px;
+			text-align: center;
+			color: $box-text-color;
+			border: 1px solid transparent;
+			display: inline-block;
+			min-width: 80%;
+		}
+		&-description {
+			min-height: 17px;
+			font-family: $box-font-helvetica;
+			font-size: 14px;
+			font-weight: 500;
+			letter-spacing: -0.07px;
+			text-align: center;
+			color: $box-dark-grey;
+			border: 1px solid transparent;
+			display: inline-block;
+			min-width: 80%;
+			margin-bottom: 14px;
 		}
 
-		.rg-header-text {
-			font-size: calc(26.25px);
-			font-weight: 600;
-			letter-spacing: -0.015em;
-			line-height: 1.4;
-			padding: 32px 21px 0;
-			box-sizing: inherit;
-			font-family: inherit;
-		}
-	}
+		&-donation {
+			border: solid 2px $box-text-color;
+			float: left;
+			border-radius: 5px;
+			margin: 0 3px;
+			height: 50px;
+			padding: 16px 0;
+			text-decoration: none;
+			min-width: 72px;
+			@extend .amount-text;
 
-	.rg-body-wrapper {
-		.rg-amount-text {
-			display: block;
-			font-size: 17px;
-			color: #888;
-			font-weight: 600;
-			letter-spacing: 0.15px;
-			margin: 0 0 30px 0;
-		}
-
-		.rg-amount-presets-wrapper {
-			position: relative;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			flex-wrap: wrap;
-			max-width: 320px;
-			margin: 0 auto;
-
-			.rg-amount-presets {
-				border: thin solid rgb(238, 239, 238);
-				border-radius: 8px;
-
-				.rg-amount-preset-wrapper {
-					cursor: pointer;
-					box-sizing: border-box;
-					display: block;
-					float: left;
-					padding: 0 5px;
-
-					&:first-child,
-					&:last-child {
-						padding: 0;
-					}
-
-					.rg-amount-preset-button {
-						text-align: center;
-						line-height: 50px;
-						width: 55px;
-						font-size: 16px;
-						border-radius: 8px;
-						color: rgb(93, 93, 93);
-					}
-
-					.rg-amount-preset-button-selected {
-						background-color: rgb(1, 169, 157);
-						font-weight: 600;
-						color: rgb(255, 255, 255);
-					}
-				}
+			&:hover {
+				background: $box-text-color;
+				color: $box-white;
 			}
-			.rg-amount-tip {
-				margin-top: 0.7em;
-				font-size: 80%;
-				text-align: center;
+			&-wrapper {
 				position: relative;
-				visibility: hidden;
-			}
-		}
-
-		.rg-custom-amount-wrapper {
-
-			.rg-custom-amount {
 				display: inline-block;
-				font-size: 16px;
-				margin: 0.3em auto;
-				float: none;
-				left: 0;
-				right: 0;
-
-				.rg-custom-input-wrapper {
-					position: relative;
-
-					i {
-						position: absolute;
-						display: block;
-						top: 11px;
-						pointer-events: none;
-						width: 30px;
-						text-align: center;
-						font-style: normal;
-						left: 5px;
-					}
-				}
-
-				.rg-custom-amount-label {
-					width: 100%;
-					line-height: inherit;
-					margin: auto;
-					padding: 4px 6px;
-					box-sizing: border-box;
-					color: rgb(74, 74, 74);
-					vertical-align: middle;
-					font-weight: 700;
-					font-size: 0.95em;
-					display: block;
-					cursor: default;
-
-					.rg-custom-amount-text {
-						font-size: 14px;
-						margin-top: 2px;
-						margin-bottom: 5px;
-						color: #888;
-						font-weight: 600;
-						letter-spacing: 0.15px;
-					}
-				}
-
-				.rg-custom-amount-input {
-					font-family: inherit;
-					line-height: inherit;
-					font-size: 16px;
-					width: 120px;
-					text-align: left;
-					border: thin solid rgb(238, 239, 238);
-					border-radius: 8px;
-					padding-left: 30px;
-					height: 40px;
-				}
+				padding: 0 4px;
+				max-width: 320px;
+				margin: 0 auto;
 			}
+
 		}
 
-		.rg-dialog-button-wrapper {
-			display: inline-flex;
-			margin-top: 10px;
+		&-footer-logo {
+			position: relative;
+			bottom: 0;
+			width: 100%;
+		}
+
+		.rev-gen-powered-by-footer {
+			clear: both;
+			position: relative;
+			bottom: 0;
+			a {
+				display: inline-block;
+			}
 		}
 	}
+}
 
-	.rg-powered-by {
-		padding-bottom: 18px;
-		color: rgb(65, 65, 65);
-		font-size: 14px;
-		text-align: center;
-		vertical-align: top;
+/* Custom Amount Sliding Panel */
+.rg-custom-amount {
+	&-wrapper {
+		position: relative;
+		display: none;
+	}
+
+	&-title {
+		font-size: 10px;
+		font-family: $box-font-helvetica;
+		margin: 0;
+	}
+
+	&-goback {
 		position: relative;
 		display: inline-block;
-		margin: 73px 0 35px;
-
-		.rg-powered-by-link {
-			position: relative;
-			display: inline-block;
-			img {
-				height: 12px;
-				width: 105px;
-			}
+		height: 50px;
+		width: 5%;
+		float: left;
+		cursor: pointer;
+		img {
+			height: 50px;
 		}
 	}
+
+	&-input#rg-custom-tip-amount {
+		width: 55%;
+		position: relative;
+		display: inline-block;
+		float: left;
+		border: 2px solid $box-text-color;
+		height: 50px;
+		margin: 0 5px;
+		border-radius: 5px;
+	}
+	&-send {
+		height: 50px;
+		border-radius: 5px;
+		border: 2px solid $box-text-color;
+		background: $box-text-color;
+		width: 35%;
+		padding: 9px 0;
+		font-family: $box-font-worksans, $box-font-helvetica, sans-serif;
+		font-weight: 500;
+		font-size: 20px;
+		color: #fff;
+		float: left;
+	}
+}
+
+.slide-out {
+	animation: animateleft 2s;
+	display: inline-block;
+	position: relative;
+}
+.slide-in {
+	animation: animateright 2s;
+	display: inline-block;
+	position: relative;
 }

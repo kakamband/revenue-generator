@@ -20,43 +20,26 @@ import { debounce } from '../helpers';
 				body: $( 'body' ),
 
 				// Contribution Element.
-				rgAmountSelected: '.rg-amount-preset-button-selected',
 				rgAmountTip: '.rg-amount-tip',
 
 				// Action element.
-				rg_preset_buttons: '.rg-amount-preset-button',
+				rg_preset_buttons: '.rev-gen-contribution-main--box-donation',
+				rg_contribution_amounts:
+					'.rev-gen-contribution-main--box-donation-wrapper',
+
 				rg_custom_amount: $( '.rg-custom-amount-input' ),
-				rg_custom_amount_wrapper: $( '.rg-custom-input-wrapper' ),
+				rg_custom_amount_wrapper: $( '.rg-custom-amount-wrapper' ),
+				rg_custom_amout_goBack: $( '.rg-custom-amount-goback' ),
 				rg_singleContribution: $( '.rg-link-single' ),
+				rg_customAmountButton: $( '.rev-gen-contribution-main-custom' ),
 
 				snackBar: $( '#rg_js_SnackBar' ),
 			};
 
 			// Binding events for contribution dialog.
 			const bindContributionEvents = function() {
-				// On ready.
-				$( document ).ready( function() {
-					if ( $( $o.rgAmountSelected ).length > 0 ) {
-						const revenueType = $( $o.rgAmountSelected ).data(
-							'revenue'
-						);
-
-						if ( 'ppu' === revenueType ) {
-							$( $o.rgAmountTip ).css( 'visibility', 'visible' );
-						} else {
-							$( $o.rgAmountTip ).css( 'visibility', 'hidden' );
-						}
-					}
-				} );
-
 				// Event handler for clicking on the amounts in contribution dialog.
-				$( $o.rg_preset_buttons ).on( 'click', function() {
-					$( this )
-						.parents( '.rg-amount-presets' )
-						.find( '.rg-amount-preset-button' )
-						.removeClass( 'rg-amount-preset-button-selected' );
-					$( this ).addClass( 'rg-amount-preset-button-selected' );
-
+				$( $o.rg_preset_buttons ).on( 'mouseover', function() {
 					const revenueType = $( this ).data( 'revenue' );
 
 					if ( 'ppu' === revenueType ) {
@@ -66,14 +49,17 @@ import { debounce } from '../helpers';
 					}
 				} );
 
+				/**
+				 * Removes tip message on mouseout.
+				 */
+				$( $o.rg_preset_buttons ).on( 'mouseout', function() {
+					$( $o.rgAmountTip ).css( 'visibility', 'hidden' );
+				} );
+
 				// Handle custom amount input.
 				$o.rg_custom_amount.on(
 					'change',
 					debounce( function() {
-						$( this )
-							.parents( '.rg-body-wrapper' )
-							.find( '.rg-amount-preset-button' )
-							.removeClass( 'rg-amount-preset-button-selected' );
 						const validatedPrice = validatePrice( $( this ).val() );
 						$( this ).val( validatedPrice );
 
@@ -81,7 +67,7 @@ import { debounce } from '../helpers';
 						const lpAmount = Math.round( $( this ).val() * 100 );
 
 						// Compare price amount.
-						if ( lpAmount > 199 ) {
+						if ( lpAmount <= 199 ) {
 							$( $o.rgAmountTip ).css( 'visibility', 'visible' );
 						} else {
 							$( $o.rgAmountTip ).css( 'visibility', 'hidden' );
@@ -90,32 +76,53 @@ import { debounce } from '../helpers';
 				);
 
 				// Handle multiple contribution button click.
-				$( '.rg-contribution-button' ).on( 'click', function() {
-					const currentAmount = $( this )
-						.parents( '.rg-body-wrapper' )
-						.find( '.rg-amount-preset-button-selected' );
+				$( '.rg-custom-amount-send' ).on( 'click', function() {
 					let payurl = '';
 
-					if ( currentAmount.length ) {
-						payurl = currentAmount.data( 'url' );
+					const customAmount = $o.rg_custom_amount.val() * 100;
+					if ( customAmount > 199 ) {
+						payurl =
+							$o.rg_custom_amount_wrapper.data( 'sis-url' ) +
+							'&custom_pricing=' +
+							rgVars.default_currency +
+							customAmount;
 					} else {
-						const customAmount = $o.rg_custom_amount.val() * 100;
-						if ( customAmount > 199 ) {
-							payurl =
-								$o.rg_custom_amount_wrapper.data( 'sis-url' ) +
-								'&custom_pricing=' +
-								rgVars.default_currency +
-								customAmount;
-						} else {
-							payurl =
-								$o.rg_custom_amount_wrapper.data( 'ppu-url' ) +
-								'&custom_pricing=' +
-								rgVars.default_currency +
-								customAmount;
-						}
+						payurl =
+							$o.rg_custom_amount_wrapper.data( 'ppu-url' ) +
+							'&custom_pricing=' +
+							rgVars.default_currency +
+							customAmount;
 					}
 					// Open payment url in new tab.
 					window.open( payurl );
+				} );
+
+				/**
+				 * Handles custom button click.
+				 */
+				$o.rg_customAmountButton.on( 'click', function() {
+					$( $o.rg_contribution_amounts ).fadeOut(
+						'slow',
+						function() {
+							$o.rg_custom_amount_wrapper.show();
+							$o.rg_custom_amount_wrapper
+								.removeClass( 'slide-out' )
+								.addClass( 'slide-in' );
+						}
+					);
+				} );
+
+				/**
+				 * Handles back button event on custom amount box.
+				 */
+				$o.rg_custom_amout_goBack.on( 'click', function() {
+					$o.rg_custom_amount_wrapper
+						.removeClass( 'slide-in' )
+						.addClass( 'slide-out' );
+					setTimeout( function() {
+						$o.rg_custom_amount_wrapper.hide();
+						$( $o.rg_contribution_amounts ).fadeIn( 'slow' );
+					}, 1900 );
 				} );
 
 				// Handle multiple contribution button click.
