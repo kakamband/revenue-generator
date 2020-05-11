@@ -104,8 +104,9 @@ body {
 .rev-gen-powered-by-footer {
 	color: #808080;
 	margin-left: 15px;
-	position: absolute;
+	position: fixed;
 	bottom: 20px;
+	z-index: -1;
 }
 
 .shepherd-modal-overlay-container {
