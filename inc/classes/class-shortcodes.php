@@ -200,9 +200,10 @@ class Shortcodes {
 
 		$region_connector_endpoints = Client_Account::$connector_endpoints[ $region ];
 		$region_api_endpoints       = Client_Account::$api_endpoints[ $region ];
-		$web_endpoints              = Client_Account::$web_endpoints;
+		$web_endpoints              = Client_Account::$web_endpoints[ $region ];
 		$this->connector_root       = $region_connector_endpoints['live'];
 		$this->api_root             = $region_api_endpoints['live'];
+		$this->web_endpoints        = $web_endpoints['live'];
 
 		// If development mode is enabled use snbox environment.
 		if ( defined( 'REVENUE_GENERATOR_ENABLE_SANDBOX' ) && true === REVENUE_GENERATOR_ENABLE_SANDBOX ) {

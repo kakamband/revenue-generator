@@ -98,8 +98,14 @@ class Client_Account {
 	 * @var array Common values used for web related info throughout the plugin.
 	 */
 	public static $web_endpoints = [
-		'sandbox' => 'https://web.sandbox.uselaterpaytest.com',
-		'live'    => 'https://web.uselaterpay.com',
+		'EU' => [
+			'sandbox' => 'https://web.sandbox.laterpaytest.net',
+			'live'    => 'https://web.laterpay.net',
+		],
+		'US' => [
+			'sandbox' => 'https://web.sandbox.uselaterpaytest.com',
+			'live'    => 'https://web.uselaterpay.com',
+		],
 	];
 
 	/**
