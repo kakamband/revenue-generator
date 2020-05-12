@@ -137,6 +137,7 @@ class Admin {
 		remove_submenu_page( 'revenue-generator', 'revenue-generator-paywall' );
 		remove_submenu_page( 'revenue-generator', 'revenue-generator' );
 		remove_submenu_page( 'revenue-generator', 'revenue-generator-contribution' );
+		remove_submenu_page( 'revenue-generator', 'revenue-generator-settings' );
 	}
 
 	/**
