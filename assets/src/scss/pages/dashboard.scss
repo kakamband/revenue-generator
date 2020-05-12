@@ -322,7 +322,6 @@
 			width: 75%;
 
 			&-preview {
-				width: 50%;
 
 				&-purchase-options {
 
@@ -345,7 +344,6 @@
 			width: 70%;
 
 			&-preview {
-				width: 50%;
 
 				&-purchase-options {
 
@@ -367,10 +365,6 @@
 		&-paywall {
 			width: 75%;
 
-			&-preview {
-				width: 40%;
-			}
-
 			&-info {
 				width: 60%;
 			}
@@ -381,9 +375,6 @@
 @media only screen and (min-width: 1280px) and (max-width: 1300px) {
 	.rev-gen-dashboard-content {
 		&-paywall {
-			&-preview {
-				width: 35%;
-			}
 
 			&-info {
 				width: 65%;
@@ -395,9 +386,6 @@
 @media only screen and (min-width: 1600px) and (max-width: 2048px) {
 	.rev-gen-dashboard-content {
 		&-paywall {
-			&-preview {
-				width: 25%;
-			}
 
 			&-info {
 				width: 75%;
