@@ -47,9 +47,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 						}
 						$lp_amount = $currency_symbol . View::format_number( floatval( $amount_info['amount'] / 100 ), 2 );
 						?>
-						<a target="_blank" href="<?php echo esc_url( $amount_info['url'] ); ?>" data-revenue="<?php echo esc_attr( $amount_info['revenue'] ); ?>" data-campid="<?php echo esc_attr( $campaign_id ); ?>" class="rev-gen-contribution-main--box-donation">
+						<div data-href="<?php echo esc_url( $amount_info['url'] ); ?>" data-revenue="<?php echo esc_attr( $amount_info['revenue'] ); ?>" data-campid="<?php echo esc_attr( $campaign_id ); ?>" class="rev-gen-contribution-main--box-donation">
 							<?php echo esc_html( $lp_amount ); ?>
-						</a>
+						</div>
 						<?php
 					}
 					?>

@@ -26,12 +26,12 @@ import { debounce } from '../helpers';
 				rg_preset_buttons: '.rev-gen-contribution-main--box-donation',
 				rg_contribution_amounts:
 					'.rev-gen-contribution-main--box-donation-wrapper',
+				rg_customAmountButton: '.rev-gen-contribution-main-custom',
 
 				rg_custom_amount: $( '.rg-custom-amount-input' ),
 				rg_custom_amount_wrapper: $( '.rg-custom-amount-wrapper' ),
 				rg_custom_amout_goBack: $( '.rg-custom-amount-goback' ),
 				rg_singleContribution: $( '.rg-link-single' ),
-				rg_customAmountButton: $( '.rev-gen-contribution-main-custom' ),
 
 				snackBar: $( '#rg_js_SnackBar' ),
 			};
@@ -55,6 +55,16 @@ import { debounce } from '../helpers';
 				$( $o.rg_preset_buttons ).on( 'mouseout', function() {
 					$( $o.rgAmountTip ).css( 'visibility', 'hidden' );
 				} );
+
+				/**
+				 * Open up Contribution Payment URL.
+				 */
+				$( $o.rg_preset_buttons )
+					.not( $o.rg_customAmountButton )
+					.on( 'click', function() {
+						const contributionURL = $( this ).data( 'href' );
+						window.open( contributionURL );
+					} );
 
 				// Handle custom amount input.
 				$o.rg_custom_amount.on(
@@ -100,7 +110,7 @@ import { debounce } from '../helpers';
 				/**
 				 * Handles custom button click.
 				 */
-				$o.rg_customAmountButton.on( 'click', function() {
+				$( $o.rg_customAmountButton ).on( 'click', function() {
 					$( $o.rg_contribution_amounts ).fadeOut(
 						'slow',
 						function() {

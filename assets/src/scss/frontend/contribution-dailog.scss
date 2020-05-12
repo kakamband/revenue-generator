@@ -116,6 +116,7 @@ $box-white:#fff;
 			padding: 16px 0;
 			text-decoration: none;
 			min-width: 72px;
+			cursor: pointer;
 			@extend .amount-text;
 
 			&:hover {
@@ -142,6 +143,10 @@ $box-white:#fff;
 			clear: both;
 			position: relative;
 			bottom: 0;
+			span {
+				position: relative;
+				display: inline-block;
+			}
 			a {
 				display: inline-block;
 			}
