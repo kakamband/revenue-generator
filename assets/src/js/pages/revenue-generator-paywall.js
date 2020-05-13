@@ -22,11 +22,16 @@ import { __, sprintf } from '@wordpress/i18n';
 				requestSent: false,
 				isPublish: false,
 
-				// Preview wrapper.
-				previewWrapper: $( '.rev-gen-preview-main' ),
+				// Preview wrapper and Contribution Wrapper.
+				previewWrapper: $(
+					'.rev-gen-preview-main, .rev-gen-contribution-main'
+				),
 				layoutWrapper: $( '.rev-gen-layout-wrapper' ),
 				laterpayLoader: $( '.laterpay-loader-wrapper' ),
 				noResultsWrapper: '.rev-gen-preview-main-no-result',
+
+				// Contribution elements for account modal.
+				contributionBox: $( '.rev-gen-contribution-main--box' ),
 
 				// Search elements.
 				searchContentWrapper: $( '.rev-gen-preview-main--search' ),
@@ -1909,6 +1914,8 @@ import { __, sprintf } from '@wordpress/i18n';
 					//Blur out the body and disable events.
 					$o.previewWrapper.find( $o.activationModal ).remove();
 					$o.body.removeClass( 'modal-blur' );
+					$o.contributionBox.removeClass( 'modal-blur' );
+					$o.body.find( 'input' ).removeClass( 'input-blur' );
 					$o.purchaseOverlay.css( {
 						filter: 'unset',
 						'pointer-events': 'unset',
@@ -2254,38 +2261,75 @@ import { __, sprintf } from '@wordpress/i18n';
 					} ).done( function( r ) {
 						$o.requestSent = false;
 						activationModal.find( $o.accountActionsFields ).hide();
-						if ( true === r.success ) {
-							// Get all purchase options and check paywall id.
-							const allPurchaseOptions = $(
-								$o.purchaseOptionItems
-							);
-							const paywallId = allPurchaseOptions.attr(
-								'data-paywall-id'
-							);
+						// Get all purchase options and check paywall id.
+						const allPurchaseOptions = $( $o.purchaseOptionItems );
 
-							/**
-							 * If paywall id exists, then publish directly, else wait to save paywall data to
-							 * get new paywall id and wait for some time to publish the paywall.
-							 */
-							if ( paywallId.length ) {
-								publishPaywall();
+						// Check for Screen to perform actions paywall.
+						if (
+							allPurchaseOptions &&
+							allPurchaseOptions.length > 0
+						) {
+							if ( true === r.success ) {
+								const paywallId = allPurchaseOptions.attr(
+									'data-paywall-id'
+								);
+
+								/**
+								 * If paywall id exists, then publish directly, else wait to save paywall data to
+								 * get new paywall id and wait for some time to publish the paywall.
+								 */
+								if ( paywallId.length ) {
+									publishPaywall();
+								} else {
+									// Save the paywall as well, so that we don't miss any new changes if merchant as done any.
+									$o.isPublish = true;
+									$o.savePaywall.trigger( 'click' );
+									showLoader();
+									setTimeout( function() {
+										// Explicitly change loclized data.
+										revenueGeneratorGlobalOptions.globalOptions.is_merchant_verified =
+											'1';
+										publishPaywall();
+										hideLoader();
+									}, 2000 );
+								}
 							} else {
-								// Save the paywall as well, so that we don't miss any new changes if merchant as done any.
+								// Save paywall even if verification fails.
 								$o.isPublish = true;
 								$o.savePaywall.trigger( 'click' );
+								activationModal
+									.find( $o.activationModalError )
+									.css( { display: 'flex' } );
+							}
+
+							// Check for Screen to perform actions Contribution.
+						} else if (
+							$o.contributionBox &&
+							$o.contributionBox.length > 0
+						) {
+							if ( true === r.success ) {
+								$o.isPublish = true;
 								showLoader();
+								$( $o.activationModalClose ).trigger( 'click' );
+
 								setTimeout( function() {
 									// Explicitly change loclized data.
 									revenueGeneratorGlobalOptions.globalOptions.is_merchant_verified =
 										'1';
-									publishPaywall();
 									hideLoader();
+									// Display message about Credentails.
+									$o.snackBar.showSnackbar( r.msg, 1500 );
 								}, 2000 );
+							} else {
+								// If there is error show Modal Error.
+								$o.isPublish = true;
+								activationModal
+									.find( $o.activationModalError )
+									.css( { display: 'flex' } );
 							}
 						} else {
-							// Save paywall even if verification fails.
+							// If there is error show Modal Error.
 							$o.isPublish = true;
-							$o.savePaywall.trigger( 'click' );
 							activationModal
 								.find( $o.activationModalError )
 								.css( { display: 'flex' } );

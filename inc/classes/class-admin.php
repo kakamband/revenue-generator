@@ -355,12 +355,20 @@ class Admin {
 	public function load_contribution() {
 		self::load_assets();
 
+		$config_data = Config::get_global_options();
 		$admin_menus = self::get_admin_menus();
+
+		// Set merchant verification status.
+		$is_merchant_verified = false;
+		if ( 1 === absint( $config_data['is_merchant_verified'] ) ) {
+			$is_merchant_verified = true;
+		}
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
 		$dashboard_page_data = [
-			'new_contribution_url' => add_query_arg( [ 'page' => $admin_menus['contribution']['url'] ], admin_url( 'admin.php' ) ),
-			'action_icons'         => [
+			'contributions_dashboard_url' => add_query_arg( [ 'page' => $admin_menus['contributions']['url'] ], admin_url( 'admin.php' ) ),
+			'is_merchant_verified'        => $is_merchant_verified,
+			'action_icons'                => [
 				'lp_icon'     => Config::$plugin_defaults['img_dir'] . 'lp-logo-icon.svg',
 				'option_info' => Config::$plugin_defaults['img_dir'] . 'option-info.svg',
 			],
