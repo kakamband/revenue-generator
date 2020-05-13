@@ -2294,7 +2294,7 @@ import { __, sprintf } from '@wordpress/i18n';
 									}, 2000 );
 								}
 							} else {
-								// Save paywall even if verification fails.
+								// Save the paywall as well, so that we don't miss any new changes if merchant as done any.
 								$o.isPublish = true;
 								$o.savePaywall.trigger( 'click' );
 								activationModal
