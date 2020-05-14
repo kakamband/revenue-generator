@@ -199,8 +199,11 @@ import { debounce } from '../helpers';
 				// Validate URL.
 				$o.contributionThankYouPage.on( 'focusout', function() {
 					const url = $( this ).val();
-					if ( ! isValidURL( url ) ) {
+					// Check only if there is some input in the field.
+					if ( '' !== url ) {
+					    if ( ! isValidURL( url ) ) {
 						invalidBorder( $( this ) );
+					    }
 					}
 				} );
 
