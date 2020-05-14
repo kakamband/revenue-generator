@@ -81,8 +81,10 @@ body.revenue-generator_page_revenue-generator-contribution {
 			border: solid 2px $box-text-color;
 			float: left;
 			border-radius: 5px;
-			margin: 0 5px;
-			padding: 10px;
+			margin: 0 2px;
+			height: 42px;
+			min-width: 72px;
+			line-height: 3;
 
 			&-wrapper {
 				position: relative;
@@ -91,6 +93,8 @@ body.revenue-generator_page_revenue-generator-contribution {
 
 			&-currency {
 				@extend .amount-text;
+				width: 5px;
+				display: inline-block;
 			}
 
 			&-amount {
