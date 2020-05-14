@@ -20,6 +20,7 @@ import { debounce } from '../helpers';
 				requestSent: false,
 
 				// Contribution Elements.
+				contributionBox: '.rev-gen-contribution-main--box',
 				contributionRequiredField:
 					'h3[contenteditable], p[contenteditable], #rg_contribution_title',
 
@@ -43,6 +44,13 @@ import { debounce } from '../helpers';
 				// Tooltip
 				contributionRightTooltip: '.rev-gen-contribution-tooltip-right',
 				contributionTopTooltip: '.rev-gen-contribution-tooltip-top',
+
+				// Account Activation Modal.
+				activationModal: '.rev-gen-preview-main-account-modal',
+				accountActionId:
+					'.rev-gen-preview-main-account-modal-fields-merchant-id',
+				accountActionKey:
+					'.rev-gen-preview-main-account-modal-fields-merchant-key',
 
 				laterpayLoader: $( '.laterpay-loader-wrapper' ),
 				rgLayoutWrapper: $( '.rev-gen-layout-wrapper' ),
@@ -122,6 +130,19 @@ import { debounce } from '../helpers';
 							return false;
 						}
 
+						// Check for non verfied merchant.
+						if (
+							0 ===
+							parseInt(
+								revenueGeneratorGlobalOptions.globalOptions
+									.is_merchant_verified
+							)
+						) {
+							showAccountActivationModal();
+							e.preventDefault();
+							return false;
+						}
+
 						// check Lock.
 						if ( ! $o.requestSent ) {
 							// Add lock.
@@ -163,6 +184,10 @@ import { debounce } from '../helpers';
 										'disabled',
 										true
 									);
+									$o.body.removeClass( 'modal-blur' );
+									$o.body
+										.find( 'input' )
+										.removeClass( 'input-blur' );
 								}
 								// Release request lock.
 								$o.requestSent = false;
@@ -304,6 +329,27 @@ import { debounce } from '../helpers';
 			};
 
 			/**
+			 * Display account activation modal for new merchant.
+			 */
+			const showAccountActivationModal = function() {
+				$o.rgContributionWrapper.find( $o.activationModal ).remove();
+
+				// Get the template for account verification.
+				const template = wp.template(
+					'revgen-account-activation-modal'
+				);
+				$o.rgContributionWrapper.append( template );
+
+				// Blur out the background.
+				$o.body.addClass( 'modal-blur' );
+				$( $o.contributionBox ).addClass( 'modal-blur' );
+				$o.body
+					.find( 'input' )
+					.not( $o.accountActionId + ',' + $o.accountActionKey )
+					.addClass( 'input-blur' );
+			};
+
+			/**
 			 * Check if provided URL is valid or not.
 			 *
 			 * @param {string} url URL to validate
@@ -324,7 +370,7 @@ import { debounce } from '../helpers';
 			 */
 			const copyToClipboard = function( codeText ) {
 				const $temp = $( '<input>' );
-				$( 'body' ).append( $temp );
+				$o.body.append( $temp );
 				$temp.val( codeText ).select();
 				document.execCommand( 'copy' );
 				$temp.remove();
