@@ -58,7 +58,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 										?>
 									<div class="rev-gen-dashboard-content-contribution--box-donation">
 										<span class="rev-gen-dashboard-content-contribution--box-donation-currency">
-											<?php esc_html_e( '$', 'revenue-generator' ); ?>
+											<?php echo esc_html( $currency_symbol ); ?>
 										</span>
 										<span class="rev-gen-dashboard-content-contribution--box-donation-amount">
 											<?php echo esc_html( View::format_number( $amount, 2 ) ); ?>
@@ -70,7 +70,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 								?>
 								<div class="rev-gen-dashboard-content-contribution--box-donation">
 									<span class="rev-gen-dashboard-content-contribution--box-donation-currency">
-										<?php esc_html_e( '$', 'revenue-generator' ); ?>
+										<?php echo esc_html( $currency_symbol ); ?>
 									</span>
 									<span class="rev-gen-dashboard-content-contribution--box-donation-amount">
 										<?php esc_html_e( 'custom', 'revenue-generator' ); ?>
