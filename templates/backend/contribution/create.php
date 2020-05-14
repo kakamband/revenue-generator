@@ -24,19 +24,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<p class="rev-gen-contribution-main--box-description rev-gen-contribution-tooltip-right" contenteditable="true" data-tippy-content="<?php esc_attr_e( 'Click to edit', 'revenue-generator' ); ?>"><?php esc_html_e( 'Pick your contribution below:' ); ?></p>
 				<div class="rev-gen-contribution-main--box-donation-wrapper">
 					<div class="rev-gen-contribution-main--box-donation">
-						<span class="rev-gen-contribution-main--box-donation-currency"><?php esc_html_e( '$', 'revenue-generator' ); ?></span>
+						<span class="rev-gen-contribution-main--box-donation-currency"><?php echo esc_html( $currency_symbol ); ?></span>
 						<span class="rev-gen-contribution-main--box-donation-amount rev-gen-contribution-tooltip-top" contenteditable="true" data-tippy-content="<?php esc_attr_e( 'Click to edit', 'revenue-generator' ); ?>"><?php esc_html_e( '0.50', 'revenue-generator' ); ?></span>
 					</div>
 					<div class="rev-gen-contribution-main--box-donation">
-						<span class="rev-gen-contribution-main--box-donation-currency"><?php esc_html_e( '$', 'revenue-generator' ); ?></span>
+						<span class="rev-gen-contribution-main--box-donation-currency"><?php echo esc_html( $currency_symbol ); ?></span>
 						<span class="rev-gen-contribution-main--box-donation-amount rev-gen-contribution-tooltip-top" contenteditable="true" data-tippy-content="<?php esc_attr_e( 'Click to edit', 'revenue-generator' ); ?>"><?php esc_html_e( '1.00', 'revenue-generator' ); ?></span>
 					</div>
 					<div class="rev-gen-contribution-main--box-donation">
-						<span class="rev-gen-contribution-main--box-donation-currency"><?php esc_html_e( '$', 'revenue-generator' ); ?></span>
+						<span class="rev-gen-contribution-main--box-donation-currency"><?php echo esc_html( $currency_symbol ); ?></span>
 						<span class="rev-gen-contribution-main--box-donation-amount rev-gen-contribution-tooltip-top" contenteditable="true" data-tippy-content="<?php esc_attr_e( 'Click to edit', 'revenue-generator' ); ?>"><?php esc_html_e( '5.00', 'revenue-generator' ); ?></span>
 					</div>
 					<div class="rev-gen-contribution-main--box-donation"">
-						<span class="rev-gen-contribution-main--box-donation-currency"><?php esc_html_e( '$', 'revenue-generator' ); ?></span>
+						<span class="rev-gen-contribution-main--box-donation-currency"><?php echo esc_html( $currency_symbol ); ?></span>
 						<span class="rev-gen-contribution-main--box-donation-amount"><?php esc_html_e( 'custom', 'revenue-generator' ); ?></span>
 					</div>
 				</div>
@@ -59,9 +59,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
 					</button>
 				</label>
-				<button class="rev-gen-contribution-main-generate-button">
-					<?php esc_html_e( 'Generate and copy code', 'revenue-generator' ); ?>
-				</button>
+				<div id="rg_contribution_generate" class="rev-gen-contribution-main-button">
+					<button class="rev-gen-contribution-main-generate-button">
+						<?php esc_html_e( 'Generate and copy code', 'revenue-generator' ); ?>
+					</button>
+					<a target="_blank" href="https://wordpress.com/support/shortcodes/" id="rev-gen-contribution-help-generate" class="rev-gen-contribution-main--help-button">
+							<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
+					</a>
+				</div>	
 				<p class="rev-gen-contribution-main-copy-message"><?php esc_html_e( 'To include the Contribution Box on your site, paste the code where you would like it to appear.', 'revenue-generator' ); ?></p>
 			</div>
 		</div>
