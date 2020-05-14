@@ -240,7 +240,8 @@ import { __, sprintf } from '@wordpress/i18n';
 							parseInt(
 								revenueGeneratorGlobalOptions.globalOptions
 									.is_tutorial_completed
-							)
+							) &&
+						allPurchaseOptions && allPurchaseOptions.length > 0
 					) {
 						const tour = initializeTour();
 						addTourSteps( tour );

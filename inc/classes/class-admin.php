@@ -299,6 +299,13 @@ class Admin {
 
 		$admin_menus           = self::get_admin_menus();
 		$contribution_instance = Contribution::get_instance();
+		$config_data           = Config::get_global_options();
+		
+		// Ge Currencey Symbol.
+		$symbol = '';
+		if ( ! empty( $config_data['merchant_currency'] ) ) {
+			$symbol = 'USD' === $config_data['merchant_currency'] ? '$' : '€';
+		}
 
 		// Contributions sorting orders.
 		$sort_order               = filter_input( INPUT_GET, 'sort_by', FILTER_SANITIZE_STRING );
@@ -338,6 +345,7 @@ class Admin {
 			'current_sort_order'   => $sort_order,
 			'search_term'          => $search_term,
 			'contributions'        => $dashboard_contributions,
+			'currency_symbol'      => $symbol,
 			'action_icons'         => [
 				'lp_icon' => Config::$plugin_defaults['img_dir'] . 'lp-logo-icon.svg',
 			],
@@ -358,6 +366,12 @@ class Admin {
 		$config_data = Config::get_global_options();
 		$admin_menus = self::get_admin_menus();
 
+		// Ge Currencey Symbol.
+		$symbol = '';
+		if ( ! empty( $config_data['merchant_currency'] ) ) {
+			$symbol = 'USD' === $config_data['merchant_currency'] ? '$' : '€';
+		}
+
 		// Set merchant verification status.
 		$is_merchant_verified = false;
 		if ( 1 === absint( $config_data['is_merchant_verified'] ) ) {
@@ -368,6 +382,7 @@ class Admin {
 		$dashboard_page_data = [
 			'contributions_dashboard_url' => add_query_arg( [ 'page' => $admin_menus['contributions']['url'] ], admin_url( 'admin.php' ) ),
 			'is_merchant_verified'        => $is_merchant_verified,
+			'currency_symbol'             => $symbol,
 			'action_icons'                => [
 				'lp_icon'     => Config::$plugin_defaults['img_dir'] . 'lp-logo-icon.svg',
 				'option_info' => Config::$plugin_defaults['img_dir'] . 'option-info.svg',
