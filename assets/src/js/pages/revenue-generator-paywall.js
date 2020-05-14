@@ -232,8 +232,6 @@ import { __, sprintf } from '@wordpress/i18n';
 						}
 					}
 
-					console.log( allPurchaseOptions.length );
-
 					// Start the welcome tour.
 					if (
 						revenueGeneratorGlobalOptions.globalOptions
