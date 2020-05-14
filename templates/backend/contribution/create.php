@@ -64,7 +64,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<?php esc_html_e( 'Generate and copy code', 'revenue-generator' ); ?>
 					</button>
 					<a target="_blank" href="https://wordpress.com/support/shortcodes/" id="rev-gen-contribution-help-generate" class="rev-gen-contribution-main--help-button">
-							<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
+						<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
 					</a>
 				</div>	
 				<p class="rev-gen-contribution-main-copy-message"><?php esc_html_e( 'To include the Contribution Box on your site, paste the code where you would like it to appear.', 'revenue-generator' ); ?></p>

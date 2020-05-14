@@ -63,8 +63,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<div class="rg-custom-amount-goback">
 							<img src="<?php echo esc_url( $action_icons['back_arrow_icon'] ); ?>" class="arrow" />
 						</div>
-						<?php $default_amount = $currency_symbol . '20'; ?>
-						<input class="rg-custom-amount-input" id="rg-custom-tip-amount" name="tip" type="number" value="" step="0.01" min="0" placeholder="<?php echo esc_attr( $default_amount ); ?>" onfocus="this.placeholder = ''; this.value = (this.value?this.value:20);" onblur="this.placeholder = '<?php echo esc_attr( $default_amount ); ?>'">
+						<?php
+
+							$default_amount = $currency_symbol . '20';
+
+							$onblur = sprintf(
+								'if ( "" === this.value ) { this.placeholder = %s; }',
+								wp_json_encode( $default_amount )
+							);
+
+						?>
+						<input class="rg-custom-amount-input" id="rg-custom-tip-amount" name="tip" type="number" value="" step="0.01" min="0" placeholder="<?php echo esc_attr( $default_amount ); ?>" onfocus="this.placeholder = ''; this.value = (this.value?this.value:20);" onblur="<?php echo esc_attr( $onblur ); ?>">
 						<div class="rg-custom-amount-send">
 							<?php esc_html_e( 'Send Tip', 'revenue-generator' ); ?>
 						</div>
