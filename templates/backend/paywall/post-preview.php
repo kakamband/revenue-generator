@@ -84,9 +84,13 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 						);
 						?>
 					</p>
+					<?php
+						/* translators: %1s post type. */
+						$supported_label = ( ! empty( $rg_preview_post['type'] ) ) ? sprintf( __( 'this %1s only', 'revenue-generator' ), esc_html( $rg_preview_post['type'] ) ) : __( 'selected post or page', 'revenue-generator' );
+					?>
 					<select class="rev-gen-preview-main-paywall-applies-to">
 						<option <?php selected( $paywall_access_to, 'all', true ); ?> value="all"><?php esc_html_e( 'all posts and pages', 'revenue-generator' ); ?></option>
-						<option <?php selected( $paywall_access_to, 'supported', true ); ?> value="supported"><?php esc_html_e( 'selected post or page', 'revenue-generator' ); ?></option>
+						<option <?php selected( $paywall_access_to, 'supported', true ); ?> value="supported"><?php echo esc_html( $supported_label ); ?></option>
 						<option <?php selected( $paywall_access_to, 'category', true ); ?> value="category"><?php esc_html_e( 'category', 'revenue-generator' ); ?></option>
 						<option <?php selected( $paywall_access_to, 'exclude_category', true ); ?> value="exclude_category"><?php esc_html_e( 'except for category', 'revenue-generator' ); ?></option>
 					</select>
