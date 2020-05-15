@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<span class="rev-gen-contribution-main--box-donation-currency"><?php echo esc_html( $currency_symbol ); ?></span>
 						<span class="rev-gen-contribution-main--box-donation-amount rev-gen-contribution-tooltip-top" contenteditable="true" data-tippy-content="<?php esc_attr_e( 'Click to edit', 'revenue-generator' ); ?>"><?php esc_html_e( '5.00', 'revenue-generator' ); ?></span>
 					</div>
-					<div class="rev-gen-contribution-main--box-donation"">
+					<div class="rev-gen-contribution-main--box-donation">
 						<span class="rev-gen-contribution-main--box-donation-currency"><?php echo esc_html( $currency_symbol ); ?></span>
 						<span class="rev-gen-contribution-main--box-donation-amount"><?php esc_html_e( 'custom', 'revenue-generator' ); ?></span>
 					</div>
