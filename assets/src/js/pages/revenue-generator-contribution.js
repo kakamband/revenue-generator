@@ -201,9 +201,9 @@ import { debounce } from '../helpers';
 					const url = $( this ).val();
 					// Check only if there is some input in the field.
 					if ( '' !== url ) {
-					    if ( ! isValidURL( url ) ) {
-						invalidBorder( $( this ) );
-					    }
+						if ( ! isValidURL( url ) ) {
+							invalidBorder( $( this ) );
+						}
 					}
 				} );
 

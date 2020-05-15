@@ -241,7 +241,8 @@ import { __, sprintf } from '@wordpress/i18n';
 								revenueGeneratorGlobalOptions.globalOptions
 									.is_tutorial_completed
 							) &&
-						allPurchaseOptions && allPurchaseOptions.length > 0
+						allPurchaseOptions &&
+						allPurchaseOptions.length > 0
 					) {
 						const tour = initializeTour();
 						addTourSteps( tour );
@@ -447,6 +448,7 @@ import { __, sprintf } from '@wordpress/i18n';
 							categoryId
 						);
 						$o.savePaywall.removeAttr( 'disabled' );
+						$o.activatePaywall.removeAttr( 'disabled' );
 					}
 				} );
 
@@ -1197,6 +1199,7 @@ import { __, sprintf } from '@wordpress/i18n';
 							null === $o.searchPaywallContent.val()
 						) {
 							$o.savePaywall.attr( 'disabled', true );
+							$o.activatePaywall.attr( 'disabled', true );
 						}
 						$o.postPreviewWrapper.attr(
 							'data-access-id',
@@ -1204,6 +1207,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						);
 					} else {
 						$o.savePaywall.removeAttr( 'disabled' );
+						$o.activatePaywall.removeAttr('disabled');
 						$o.searchPaywallWrapper.hide();
 						$o.postPreviewWrapper.attr(
 							'data-access-id',
