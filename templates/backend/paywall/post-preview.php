@@ -268,12 +268,9 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 							<?php echo esc_html( $purchase_option_price ); ?>
 						</span>	
 						<?php if ( ! empty( $individual_type ) ) : ?>
-							<button
-								data-tippy-content="<?php esc_attr_e( 'You’re using Dynamic Pricing. The revenue generator automatically assigns a price to each article this paywall is applied to based on the amount of content the article contains. The price for this specific article is shown here.', 'revenue-generator' ); ?>"
-								class="rg-purchase-overlay-purchase-options-item-price-icon"
-							>
-								<img alt="<?php esc_attr_e( 'Dynamic Option', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['option_dynamic'] ); ?>" />
-							</button>
+						<button data-tippy-content="<?php esc_attr_e( 'You’re using Dynamic Pricing. The revenue generator automatically assigns a price to each article this paywall is applied to based on the amount of content the article contains. The price for this specific article is shown here.', 'revenue-generator' ); ?>" class="rg-purchase-overlay-purchase-options-item-price-icon">
+							<img alt="<?php esc_attr_e( 'Dynamic Option', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['option_dynamic'] ); ?>" />
+						</button>
 						<?php endif; ?>
 					</div>
 				</div>
