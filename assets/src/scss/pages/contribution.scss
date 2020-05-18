@@ -83,18 +83,21 @@ body.revenue-generator_page_revenue-generator-contribution {
 			border-radius: 5px;
 			margin: 0 2px;
 			height: 42px;
-			min-width: 72px;
-			line-height: 3;
+			width: 72px;
+			display: flex;
+			align-items: center;
+			text-align: center;
+			justify-content: center;
+			overflow: hidden;
 
 			&-wrapper {
 				position: relative;
-				display: inline-block;
+				display: flex;
+				justify-content: center;
 			}
 
 			&-currency {
 				@extend .amount-text;
-				width: 5px;
-				display: inline-block;
 			}
 
 			&-amount {

@@ -177,6 +177,7 @@ class Post_Types {
 			'title'        => $post_data->post_title,
 			'excerpt'      => $post_data->post_excerpt,
 			'teaser'       => $teaser_content,
+			'type'         => $post_data->post_type,
 			'post_content' => empty( $post_data->post_excerpt ) ? $post_content_for_preview : $post_data->post_excerpt,
 		];
 	}

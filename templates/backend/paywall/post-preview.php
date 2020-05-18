@@ -84,9 +84,13 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 						);
 						?>
 					</p>
+					<?php
+						/* translators: %1s post type. */
+						$supported_label = ( ! empty( $rg_preview_post['type'] ) ) ? sprintf( __( 'this %1s only', 'revenue-generator' ), esc_html( $rg_preview_post['type'] ) ) : __( 'selected post or page', 'revenue-generator' );
+					?>
 					<select class="rev-gen-preview-main-paywall-applies-to">
 						<option <?php selected( $paywall_access_to, 'all', true ); ?> value="all"><?php esc_html_e( 'all posts and pages', 'revenue-generator' ); ?></option>
-						<option <?php selected( $paywall_access_to, 'supported', true ); ?> value="supported"><?php esc_html_e( 'selected post or page', 'revenue-generator' ); ?></option>
+						<option <?php selected( $paywall_access_to, 'supported', true ); ?> value="supported"><?php echo esc_html( $supported_label ); ?></option>
 						<option <?php selected( $paywall_access_to, 'category', true ); ?> value="category"><?php esc_html_e( 'category', 'revenue-generator' ); ?></option>
 						<option <?php selected( $paywall_access_to, 'exclude_category', true ); ?> value="exclude_category"><?php esc_html_e( 'except for category', 'revenue-generator' ); ?></option>
 					</select>
@@ -103,7 +107,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 				</div>
 				<div class="rev-gen-preview-main--paywall-actions-update">
 					<button id="rg_js_savePaywall" class="rev-gen-preview-main-paywall-actions-update-save">
-						<?php esc_html_e( 'Save', 'revenue-generator' ); ?>
+						<?php esc_html_e( 'Save Draft', 'revenue-generator' ); ?>
 					</button>
 					<button id="rg_js_activatePaywall" class="rev-gen-preview-main--paywall-actions-update-publish">
 						<?php esc_html_e( 'Publish', 'revenue-generator' ); ?>
@@ -265,16 +269,13 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 					<div class="rg-purchase-overlay-purchase-options-item-price">
 						<span class="rg-purchase-overlay-purchase-options-item-price-symbol"><?php echo esc_html( $merchant_symbol ); ?></span>
 						<span class="rg-purchase-overlay-purchase-options-item-price-span" data-pay-model="<?php echo esc_attr( $purchase_option_revenue ); ?>" contenteditable="true">
-						<?php echo esc_html( $purchase_option_price ); ?>
-							<?php if ( ! empty( $individual_type ) ) : ?>
-								<button
-									data-tippy-content="<?php esc_attr_e( 'You’re using Dynamic Pricing. The revenue generator automatically assigns a price to each article this paywall is applied to based on the amount of content the article contains. The price for this specific article is shown here.', 'revenue-generator' ); ?>"
-									class="rg-purchase-overlay-purchase-options-item-price-icon"
-								>
-									<img alt="<?php echo esc_attr( 'Dynamic Option', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['option_dynamic'] ); ?>" />
-								</button>
-							<?php endif; ?>
-					</span>
+							<?php echo esc_html( $purchase_option_price ); ?>
+						</span>	
+						<?php if ( ! empty( $individual_type ) ) : ?>
+						<button data-tippy-content="<?php esc_attr_e( 'You’re using Dynamic Pricing. The revenue generator automatically assigns a price to each article this paywall is applied to based on the amount of content the article contains. The price for this specific article is shown here.', 'revenue-generator' ); ?>" class="rg-purchase-overlay-purchase-options-item-price-icon">
+							<img alt="<?php esc_attr_e( 'Dynamic Option', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['option_dynamic'] ); ?>" />
+						</button>
+						<?php endif; ?>
 					</div>
 				</div>
 				<?php
