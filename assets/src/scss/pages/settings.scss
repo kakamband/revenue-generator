@@ -157,3 +157,21 @@ input.input-blur.input-blur {
 	background-color: #a9a9a9;
 	border-color: #000;
 }
+
+/* Shepherd custom styling */
+input.shepherd-enabled.shepherd-target.input-blur.input-blur {
+	background-color: #fff;
+}
+
+.rev-gen-contribution-main-generate-button.shepherd-enabled.shepherd-target {
+	background-color: #8a8a8a;
+}
+#rev-gen-contribution-main-header-section.shepherd-enabled.shepherd-target {
+	background-color: #8a8a8a;
+	.rev-gen-contribution-main--box-header {
+		background-color: #fff;
+	}
+	.rev-gen-contribution-main--box-description {
+		background-color: #fff;
+	}
+}

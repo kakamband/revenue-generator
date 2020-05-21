@@ -20,8 +20,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="rev-gen-contribution-main">
 			<h2 class="rev-gen-contribution-main--header"><?php esc_html_e( 'Create your Contribution box', 'revenue-generator' ); ?></h2>
 			<div class="rev-gen-contribution-main--box">
-				<h3 class="rev-gen-contribution-main--box-header" contenteditable="true"><?php esc_html_e( 'Support the Author', 'revenue-generator' ); ?></h3>
-				<p class="rev-gen-contribution-main--box-description" contenteditable="true"><?php esc_html_e( 'Pick your contribution below:' ); ?></p>
+				<div id="rev-gen-contribution-main-header-section">
+					<h3 class="rev-gen-contribution-main--box-header" contenteditable="true"><?php esc_html_e( 'Support the Author', 'revenue-generator' ); ?></h3>
+					<p class="rev-gen-contribution-main--box-description" contenteditable="true"><?php esc_html_e( 'Pick your contribution below:' ); ?></p>
+				</div>
 				<div class="rev-gen-contribution-main--box-donation-wrapper">
 					<div class="rev-gen-contribution-main--box-donation">
 						<span class="rev-gen-contribution-main--box-donation-currency"><?php echo esc_html( $currency_symbol ); ?></span>
@@ -71,6 +73,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 		</div>
 		<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
+		<div class="rev-gen-exit-tour"><?php esc_html_e( 'Exit Tour', 'revenue-generator' ); ?></div>
 	</div>	
 </div>
 <?php View::render_footer_backend(); ?>

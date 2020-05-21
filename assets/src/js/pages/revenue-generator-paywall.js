@@ -1207,7 +1207,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						);
 					} else {
 						$o.savePaywall.removeAttr( 'disabled' );
-						$o.activatePaywall.removeAttr('disabled');
+						$o.activatePaywall.removeAttr( 'disabled' );
 						$o.searchPaywallWrapper.hide();
 						$o.postPreviewWrapper.attr(
 							'data-access-id',

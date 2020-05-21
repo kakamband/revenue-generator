@@ -25,7 +25,7 @@ import '../utils';
 
 				// Dashboard bar action items.
 				newPaywall: $( '#rg_js_newPaywall' ),
-				newContribution : $('#rg_js_newContribution'),
+				newContribution: $( '#rg_js_newContribution' ),
 				sortPaywalls: $( '#rg_js_filterPaywalls' ),
 				searchPaywall: $( '#rg_js_searchPaywall' ),
 				editPayWallName: $( '.rev-gen-dashboard-paywall-name' ),
@@ -34,7 +34,9 @@ import '../utils';
 
 				// Dashboard footer area.
 				restartTour: $( '#rg_js_RestartTutorial' ),
-				restartTourContribution : $('#rg_js_RestartTutorial_Contribution'),
+				restartTourContribution: $(
+					'#rg_js_RestartTutorial_Contribution'
+				),
 				snackBar: $( '#rg_js_SnackBar' ),
 			};
 
@@ -64,7 +66,7 @@ import '../utils';
 					// Create form data.
 					const formData = {
 						action: 'rg_restart_tour',
-						tour_type : 'is_paywall_tutorial_completed',
+						tour_type: 'is_paywall_tutorial_completed',
 						restart_tour: '1',
 						security:
 							revenueGeneratorGlobalOptions.rg_paywall_nonce,
@@ -82,20 +84,20 @@ import '../utils';
 						}
 					} );
 				} );
-				
+
 				/**
 				 * Restart the contribution tour from Contribution Dashboard.
 				 */
-				$o.restartTourContribution.on('click', function () {
+				$o.restartTourContribution.on( 'click', function() {
 					// Create form Data.
 					const formData = {
-					    action: 'rg_restart_tour',
-						tour_type : 'is_contribution_tutorial_completed',
+						action: 'rg_restart_tour',
+						tour_type: 'is_contribution_tutorial_completed',
 						restart_tour: '1',
 						security:
 							revenueGeneratorGlobalOptions.rg_paywall_nonce,
 					};
-					
+
 					// Delete the option.
 					$.ajax( {
 						url: revenueGeneratorGlobalOptions.ajaxUrl,

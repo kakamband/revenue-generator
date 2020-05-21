@@ -1,4 +1,4 @@
-/* global revenueGeneratorGlobalOptions tippy */
+/* global revenueGeneratorGlobalOptions, Shepherd */
 /**
  * JS to handle plugin settings screen interactions.
  *
@@ -49,6 +49,9 @@ import { __, sprintf } from '@wordpress/i18n';
 				accountActionKey:
 					'.rev-gen-preview-main-account-modal-fields-merchant-key',
 
+				// Tour elements.
+				exitTour: '.rev-gen-exit-tour',
+
 				laterpayLoader: $( '.laterpay-loader-wrapper' ),
 				rgLayoutWrapper: $( '.rev-gen-layout-wrapper' ),
 				rgContributionWrapper: $( '.rev-gen-contribution-main' ),
@@ -87,215 +90,35 @@ import { __, sprintf } from '@wordpress/i18n';
 			 * Bind all element events.
 			 */
 			const bindEvents = function() {
-			    
 				/**
 				 * When the page has loaded, load the post content.
 				 */
 				$( document ).ready( function() {
-					
-					if ( $o.rgContributionWrapper.length > 0 && 0 === parseInt( revenueGeneratorGlobalOptions.globalOptions.is_contribution_tutorial_completed ) ) {
+					if (
+						$o.rgContributionWrapper.length > 0 &&
+						0 ===
+							parseInt(
+								revenueGeneratorGlobalOptions.globalOptions
+									.is_contribution_tutorial_completed
+							)
+					) {
 						const tour = initializeTour();
 						addTourSteps( tour );
 						startWelcomeTour( tour );
 					}
 				} );
-				
+
 				/**
-				* Initialize the tour object.
-				*
-				* @return {Shepherd.Tour} Shepherd tour object.
-				*/
-			       const initializeTour = function() {
-				       return new Shepherd.Tour( {
-					       defaultStepOptions: {
-						       classes: 'rev-gen-tutorial-card',
-						       scrollTo: { behavior: 'smooth', block: 'center' },
-					       },
-				       } );
-			       };
-			       
-
-			       /**
-				* Add required info steps for the merchant.
-				*
-				* @param {Shepherd.Tour} tour Tour object.
-				*/
-			       const addTourSteps = function( tour ) {
-				       const skipTourButton = {
-					       text: __( 'Skip Tour', 'revenue-generator' ),
-					       action: tour.complete,
-					       classes: 'shepherd-content-skip-tour',
-				       };
-
-				       const nextButton = {
-					       text: __( 'Next >', 'revenue-generator' ),
-					       action: tour.next,
-					       classes: 'shepherd-content-next-tour-element',
-				       };
-
-				       // Add tutorial step for main search.
-				       tour.addStep( {
-					       id: 'rg-main-search-input',
-					       text: __(
-						       "Search for the page or post you'd like to preview with Revenue Generator here.",
-						       'revenue-generator'
-					       ),
-					       attachTo: {
-						       element: '.rev-gen-preview-main--search',
-						       on: 'bottom',
-					       },
-					       arrow: true,
-					       classes: 'shepherd-content-add-space-top',
-					       buttons: [ skipTourButton, nextButton ],
-				       } );
-
-				       // Add tutorial step for editing header title
-				       tour.addStep( {
-					       id: 'rg-purchase-overlay-header',
-					       text: __( 'Click to Edit', 'revenue-generator' ),
-					       attachTo: {
-						       element: '.rg-purchase-overlay-title',
-						       on: 'bottom',
-					       },
-					       arrow: true,
-					       classes: 'rev-gen-tutorial-title',
-					       buttons: [ nextButton ],
-				       } );
-
-				       // Add tutorial step for option item.
-				       tour.addStep( {
-					       id: 'rg-purchase-option-item',
-					       text: __(
-						       'Hover over each element to see the available options.',
-						       'revenue-generator'
-					       ),
-					       attachTo: {
-						       element:
-							       '.rg-purchase-overlay-purchase-options .option-item-second',
-						       on: 'top',
-					       },
-					       arrow: true,
-					       classes: 'shepherd-content-add-space-bottom',
-					       buttons: [ nextButton ],
-				       } );
-
-				       // Add tutorial step for option item edit button.
-				       tour.addStep( {
-					       id: 'rg-purchase-option-item-edit',
-					       text: __(
-						       'Click on the ‘more options’ icon to set the product type (single item purchase, time pass, or subscription).',
-						       'revenue-generator'
-					       ),
-					       attachTo: {
-						       element:
-							       '.rg-purchase-overlay-purchase-options .option-item-second .rg-purchase-overlay-option-edit',
-						       on: 'left',
-					       },
-					       arrow: true,
-					       buttons: [ nextButton ],
-				       } );
-
-				       // Add tutorial step for paywall actions publish.
-				       tour.addStep( {
-					       id: 'rg-purchase-option-paywall-publish',
-					       text: __(
-						       'When you’re ready to activate your paywall, connect your LaterPay account.',
-						       'revenue-generator'
-					       ),
-					       attachTo: {
-						       element:
-							       '.rev-gen-preview-main--paywall-actions-update .rev-gen-preview-main--paywall-actions-update-publish',
-						       on: 'bottom',
-					       },
-					       arrow: true,
-					       classes: 'shepherd-content-add-space-bottom',
-					       buttons: [
-						       {
-							       text: __( 'Complete', 'revenue-generator' ),
-							       action: tour.next,
-							       classes: 'shepherd-content-complete-tour-element',
-						       },
-					       ],
-				       } );
-			       };
-			       
-			       /**
-				* Handle the tour of the paywall elements.
-				*
-				* @param {Shepherd.Tour} tour Tour object.
-				*/
-			       const startWelcomeTour = function( tour ) {
-				       // Show exit tour button.
-				       $( $o.exitTour ).css( {
-					       visibility: 'visible',
-					       'pointer-events': 'all',
-					       cursor: 'pointer',
-				       } );
-
-				       // Blur out the wrapper and disable events, to highlight the tour elements.
-				       $o.body.addClass( 'modal-blur' );
-				       $o.rgContributionWrapper.css( {
-					       'pointer-events': 'none',
-				       } );
-				       $( $o.purchaseOptionItem ).css( {
-					       'background-color': 'darkgray',
-				       } );
-				       $( $o.purchaseOptionItemInfo ).css( {
-					       'border-right': '1px solid #928d8d',
-				       } );
-
-				       const directionalKeys = [
-					       'ArrowUp',
-					       'ArrowDown',
-					       'ArrowRight',
-					       'ArrowLeft',
-				       ];
-				       const disableArrowKeys = function( e ) {
-					       if ( directionalKeys.includes( e.key ) ) {
-						       e.preventDefault();
-						       return false;
-					       }
-				       };
-
-				       // Disable arrow events.
-				       $( document ).keydown( disableArrowKeys );
-
-				       // Remove the blurry class and allow click events.
-				       Shepherd.on( 'complete', function() {
-					       // Revert to original state.
-					       $o.body.removeClass( 'modal-blur' );
-
-					       $o.layoutWrapper.css( {
-						       'pointer-events': 'unset',
-					       } );
-
-					       // Removed background from search bar.
-					       $o.searchContentWrapper.css( {
-						       'background-color': '#fff',
-					       } );
-
-					       // Revert to original theme.
-					       $( $o.purchaseOptionItem ).css( {
-						       'background-color': '#fff',
-					       } );
-					       $( $o.purchaseOptionItemInfo ).css( {
-						       'border-right': '1px solid #e3e4e6',
-					       } );
-
-					       // Hide exit tour button.
-					       $( $o.exitTour ).remove();
-
-					       // Enable arrow events.
-					       $( document ).unbind( 'keydown', disableArrowKeys );
-
-					       // Complete the tour, and update plugin option.
-					       completeTheTour();
-				       } );
-
-				       // Start the tour.
-				       tour.start();
-			       };
-
+				 * Complete the tour when exit tour is clicked.
+				 */
+				$o.body.on( 'click', $o.exitTour, function() {
+					if (
+						typeof Shepherd !== 'undefined' &&
+						typeof Shepherd.activeTour !== 'undefined'
+					) {
+						Shepherd.activeTour.complete();
+					}
+				} );
 
 				// Generate Contribution Code.
 				$o.contributionGnerateCode.on(
@@ -496,6 +319,218 @@ import { __, sprintf } from '@wordpress/i18n';
 							'background-color',
 							'#1d1d1d'
 						);
+					}
+				} );
+			};
+
+			/**
+			 * Initialize the tour object.
+			 *
+			 * @return {Shepherd.Tour} Shepherd tour object.
+			 */
+			const initializeTour = function() {
+				return new Shepherd.Tour( {
+					defaultStepOptions: {
+						classes: 'rev-gen-tutorial-card',
+						scrollTo: { behavior: 'smooth', block: 'center' },
+					},
+				} );
+			};
+
+			/**
+			 * Add required info steps for the merchant.
+			 *
+			 * @param {Shepherd.Tour} tour Tour object.
+			 */
+			const addTourSteps = function( tour ) {
+				const skipTourButton = {
+					text: __( 'Skip Tour', 'revenue-generator' ),
+					action: tour.complete,
+					classes: 'shepherd-content-skip-tour',
+				};
+
+				const nextButton = {
+					text: __( 'Next >', 'revenue-generator' ),
+					action: tour.next,
+					classes: 'shepherd-content-next-tour-element',
+				};
+
+				// Add tutorial step for main search.
+				tour.addStep( {
+					id: 'rg-contribution-header-description',
+					text: __( 'Click to edit', 'revenue-generator' ),
+					attachTo: {
+						element: '#rev-gen-contribution-main-header-section',
+						on: 'top',
+					},
+					arrow: true,
+					classes: 'shepherd-content-add-space-bottom',
+					buttons: [ skipTourButton, nextButton ],
+				} );
+
+				// Add tutorial step for editing header title
+				tour.addStep( {
+					id: 'rg-contribution-amount-first',
+					text: __(
+						'Click to edit each amount',
+						'revenue-generator'
+					),
+					attachTo: {
+						element:
+							'.rev-gen-contribution-main--box-donation:first-child .rev-gen-contribution-main--box-donation-amount',
+						on: 'top',
+					},
+					arrow: true,
+					classes: 'rev-gen-tutorial-contribution-title',
+					buttons: [ nextButton ],
+				} );
+
+				// Add tutorial step for option item.
+				tour.addStep( {
+					id: 'rg-contribution-amount-second',
+					text: sprintf(
+						__(
+							'Amounts less than $5 will default to %1$s pay later %2$s',
+							'revenue-generator'
+						),
+						'<a target="_blank" href="https://www.laterpay.net/academy/getting-started-with-laterpay-the-difference-between-pay-now-pay-later">',
+						'</a>'
+					),
+					attachTo: {
+						element:
+							'.rev-gen-contribution-main--box-donation:nth-child(2) .rev-gen-contribution-main--box-donation-amount',
+						on: 'top',
+					},
+					arrow: true,
+					classes: 'rev-gen-tutorial-contribution-title',
+					buttons: [ nextButton ],
+				} );
+
+				// Add tutorial step for option item edit button.
+				tour.addStep( {
+					id: 'rg-contribution-campaign-name',
+					text: __(
+						"Enter the description that you would like to appear on your customer's invoice.",
+						'revenue-generator'
+					),
+					attachTo: {
+						element: '.rev-gen-contribution-main-input',
+						on: 'top',
+					},
+					arrow: true,
+					classes: 'rev-gen-tutorial-contribution-title',
+					buttons: [ nextButton ],
+				} );
+
+				// Add tutorial step for paywall actions publish.
+				tour.addStep( {
+					id: 'rg-contribution-generate-button',
+					text: sprintf(
+						__(
+							'When you’re ready, click here to copy your customized %1$s shortcode. %2$s',
+							'revenue-generator'
+						),
+						'<a target="_blank" href="https://wordpress.com/support/shortcodes/">',
+						'</a>'
+					),
+					attachTo: {
+						element: '.rev-gen-contribution-main-generate-button',
+						on: 'right',
+					},
+					arrow: true,
+					buttons: [
+						{
+							text: __( 'Complete', 'revenue-generator' ),
+							action: tour.next,
+							classes: 'shepherd-content-complete-tour-element',
+						},
+					],
+				} );
+			};
+
+			/**
+			 * Handle the tour of the paywall elements.
+			 *
+			 * @param {Shepherd.Tour} tour Tour object.
+			 */
+			const startWelcomeTour = function( tour ) {
+				// Show exit tour button.
+				$( $o.exitTour ).css( {
+					visibility: 'visible',
+					'pointer-events': 'all',
+					cursor: 'pointer',
+				} );
+
+				// Blur out the wrapper and disable events, to highlight the tour elements.
+				$o.body.addClass( 'modal-blur' );
+				$o.body.find( 'input' ).addClass( 'input-blur' );
+				$( $o.contributionBox ).css( 'background-color', 'darkgray' );
+				$o.rgContributionWrapper.css( {
+					'pointer-events': 'none',
+				} );
+
+				const directionalKeys = [
+					'ArrowUp',
+					'ArrowDown',
+					'ArrowRight',
+					'ArrowLeft',
+				];
+				const disableArrowKeys = function( e ) {
+					if ( directionalKeys.includes( e.key ) ) {
+						e.preventDefault();
+						return false;
+					}
+				};
+
+				// Disable arrow events.
+				$( document ).keydown( disableArrowKeys );
+
+				// Remove the blurry class and allow click events.
+				Shepherd.on( 'complete', function() {
+					// Revert to original state.
+					$o.body.removeClass( 'modal-blur' );
+					$o.body.find( 'input' ).removeClass( 'input-blur' );
+					$( $o.contributionBox ).css( 'background-color', '#fff' );
+
+					$o.rgContributionWrapper.css( {
+						'pointer-events': 'unset',
+					} );
+
+					// Hide exit tour button.
+					$( $o.exitTour ).remove();
+
+					// Enable arrow events.
+					$( document ).unbind( 'keydown', disableArrowKeys );
+
+					// Complete the tour, and update plugin option.
+					completeTheTour();
+				} );
+
+				// Start the tour.
+				tour.start();
+			};
+
+			/**
+			 * Complete the tour.
+			 */
+			const completeTheTour = function() {
+				// Create form data.
+				const formData = {
+					action: 'rg_complete_tour',
+					config_key: 'is_contribution_tutorial_completed',
+					config_value: 1,
+					security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
+				};
+
+				// Delete the option.
+				$.ajax( {
+					url: revenueGeneratorGlobalOptions.ajaxUrl,
+					method: 'POST',
+					data: formData,
+					dataType: 'json',
+				} ).done( function( r ) {
+					if ( r.success ) {
+						//window.location.reload();
 					}
 				} );
 			};
