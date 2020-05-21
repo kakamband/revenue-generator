@@ -106,7 +106,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 					<i class="rev-gen-preview-main--paywall-actions-search-icon"></i>
 				</div>
 				<div class="rev-gen-preview-main--paywall-actions-update">
-					<button id="rg_js_savePaywall" class="rev-gen-preview-main-paywall-actions-update-save">
+					<button id="rg_js_savePaywall" class="rev-gen-preview-main--paywall-actions-update-save">
 						<?php esc_html_e( 'Save Draft', 'revenue-generator' ); ?>
 					</button>
 					<button id="rg_js_activatePaywall" class="rev-gen-preview-main--paywall-actions-update-publish">
