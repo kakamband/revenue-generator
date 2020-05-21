@@ -20,20 +20,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="rev-gen-contribution-main">
 			<h2 class="rev-gen-contribution-main--header"><?php esc_html_e( 'Create your Contribution box', 'revenue-generator' ); ?></h2>
 			<div class="rev-gen-contribution-main--box">
-				<h3 class="rev-gen-contribution-main--box-header rev-gen-contribution-tooltip-right" data-tippy-content="<?php esc_attr_e( 'Click to edit', 'revenue-generator' ); ?>" contenteditable="true"><?php esc_html_e( 'Support the Author', 'revenue-generator' ); ?></h3>
-				<p class="rev-gen-contribution-main--box-description rev-gen-contribution-tooltip-right" contenteditable="true" data-tippy-content="<?php esc_attr_e( 'Click to edit', 'revenue-generator' ); ?>"><?php esc_html_e( 'Pick your contribution below:' ); ?></p>
+				<h3 class="rev-gen-contribution-main--box-header" contenteditable="true"><?php esc_html_e( 'Support the Author', 'revenue-generator' ); ?></h3>
+				<p class="rev-gen-contribution-main--box-description" contenteditable="true"><?php esc_html_e( 'Pick your contribution below:' ); ?></p>
 				<div class="rev-gen-contribution-main--box-donation-wrapper">
 					<div class="rev-gen-contribution-main--box-donation">
 						<span class="rev-gen-contribution-main--box-donation-currency"><?php echo esc_html( $currency_symbol ); ?></span>
-						<span class="rev-gen-contribution-main--box-donation-amount rev-gen-contribution-tooltip-top" contenteditable="true" data-tippy-content="<?php esc_attr_e( 'Click to edit', 'revenue-generator' ); ?>"><?php esc_html_e( '0.50', 'revenue-generator' ); ?></span>
+						<span class="rev-gen-contribution-main--box-donation-amount" contenteditable="true"><?php esc_html_e( '0.50', 'revenue-generator' ); ?></span>
 					</div>
 					<div class="rev-gen-contribution-main--box-donation">
 						<span class="rev-gen-contribution-main--box-donation-currency"><?php echo esc_html( $currency_symbol ); ?></span>
-						<span class="rev-gen-contribution-main--box-donation-amount rev-gen-contribution-tooltip-top" contenteditable="true" data-tippy-content="<?php esc_attr_e( 'Click to edit', 'revenue-generator' ); ?>"><?php esc_html_e( '1.00', 'revenue-generator' ); ?></span>
+						<span class="rev-gen-contribution-main--box-donation-amount" contenteditable="true"><?php esc_html_e( '1.00', 'revenue-generator' ); ?></span>
 					</div>
 					<div class="rev-gen-contribution-main--box-donation">
 						<span class="rev-gen-contribution-main--box-donation-currency"><?php echo esc_html( $currency_symbol ); ?></span>
-						<span class="rev-gen-contribution-main--box-donation-amount rev-gen-contribution-tooltip-top" contenteditable="true" data-tippy-content="<?php esc_attr_e( 'Click to edit', 'revenue-generator' ); ?>"><?php esc_html_e( '5.00', 'revenue-generator' ); ?></span>
+						<span class="rev-gen-contribution-main--box-donation-amount" contenteditable="true"><?php esc_html_e( '5.00', 'revenue-generator' ); ?></span>
 					</div>
 					<div class="rev-gen-contribution-main--box-donation">
 						<span class="rev-gen-contribution-main--box-donation-currency"><?php echo esc_html( $currency_symbol ); ?></span>

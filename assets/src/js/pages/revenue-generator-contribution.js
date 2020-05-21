@@ -10,6 +10,7 @@
  */
 import '../utils';
 import { debounce } from '../helpers';
+import { __, sprintf } from '@wordpress/i18n';
 
 ( function( $ ) {
 	$( function() {
@@ -40,10 +41,6 @@ import { debounce } from '../helpers';
 					'.rev-gen-dashboard-content-contribution-code',
 
 				helpGAModal: '.rev-gen-settings-main-info-modal',
-
-				// Tooltip
-				contributionRightTooltip: '.rev-gen-contribution-tooltip-right',
-				contributionTopTooltip: '.rev-gen-contribution-tooltip-top',
 
 				// Account Activation Modal.
 				activationModal: '.rev-gen-preview-main-account-modal',
@@ -87,37 +84,219 @@ import { debounce } from '../helpers';
 			};
 
 			/**
-			 * Initialized the tooltip on given element.
-			 *
-			 * @param {string} elementIdentifier Selector matching elements on the document
-			 */
-			const TooltipTop = function( elementIdentifier ) {
-				tippy( elementIdentifier, {
-					arrow: tippy.roundArrow,
-					placement: 'top',
-					delay: 0,
-					inlinePositioning: true,
-				} );
-			};
-
-			/**
-			 * Initialized the tooltip on given element.
-			 *
-			 * @param {string} elementIdentifier Selector matching elements on the document
-			 */
-			const TooltipRight = function( elementIdentifier ) {
-				tippy( elementIdentifier, {
-					arrow: tippy.roundArrow,
-					placement: 'right',
-					delay: 0,
-					inlinePositioning: true,
-				} );
-			};
-
-			/**
 			 * Bind all element events.
 			 */
 			const bindEvents = function() {
+			    
+				/**
+				 * When the page has loaded, load the post content.
+				 */
+				$( document ).ready( function() {
+					
+					if ( $o.rgContributionWrapper.length > 0 && 0 === parseInt( revenueGeneratorGlobalOptions.globalOptions.is_contribution_tutorial_completed ) ) {
+						const tour = initializeTour();
+						addTourSteps( tour );
+						startWelcomeTour( tour );
+					}
+				} );
+				
+				/**
+				* Initialize the tour object.
+				*
+				* @return {Shepherd.Tour} Shepherd tour object.
+				*/
+			       const initializeTour = function() {
+				       return new Shepherd.Tour( {
+					       defaultStepOptions: {
+						       classes: 'rev-gen-tutorial-card',
+						       scrollTo: { behavior: 'smooth', block: 'center' },
+					       },
+				       } );
+			       };
+			       
+
+			       /**
+				* Add required info steps for the merchant.
+				*
+				* @param {Shepherd.Tour} tour Tour object.
+				*/
+			       const addTourSteps = function( tour ) {
+				       const skipTourButton = {
+					       text: __( 'Skip Tour', 'revenue-generator' ),
+					       action: tour.complete,
+					       classes: 'shepherd-content-skip-tour',
+				       };
+
+				       const nextButton = {
+					       text: __( 'Next >', 'revenue-generator' ),
+					       action: tour.next,
+					       classes: 'shepherd-content-next-tour-element',
+				       };
+
+				       // Add tutorial step for main search.
+				       tour.addStep( {
+					       id: 'rg-main-search-input',
+					       text: __(
+						       "Search for the page or post you'd like to preview with Revenue Generator here.",
+						       'revenue-generator'
+					       ),
+					       attachTo: {
+						       element: '.rev-gen-preview-main--search',
+						       on: 'bottom',
+					       },
+					       arrow: true,
+					       classes: 'shepherd-content-add-space-top',
+					       buttons: [ skipTourButton, nextButton ],
+				       } );
+
+				       // Add tutorial step for editing header title
+				       tour.addStep( {
+					       id: 'rg-purchase-overlay-header',
+					       text: __( 'Click to Edit', 'revenue-generator' ),
+					       attachTo: {
+						       element: '.rg-purchase-overlay-title',
+						       on: 'bottom',
+					       },
+					       arrow: true,
+					       classes: 'rev-gen-tutorial-title',
+					       buttons: [ nextButton ],
+				       } );
+
+				       // Add tutorial step for option item.
+				       tour.addStep( {
+					       id: 'rg-purchase-option-item',
+					       text: __(
+						       'Hover over each element to see the available options.',
+						       'revenue-generator'
+					       ),
+					       attachTo: {
+						       element:
+							       '.rg-purchase-overlay-purchase-options .option-item-second',
+						       on: 'top',
+					       },
+					       arrow: true,
+					       classes: 'shepherd-content-add-space-bottom',
+					       buttons: [ nextButton ],
+				       } );
+
+				       // Add tutorial step for option item edit button.
+				       tour.addStep( {
+					       id: 'rg-purchase-option-item-edit',
+					       text: __(
+						       'Click on the ‘more options’ icon to set the product type (single item purchase, time pass, or subscription).',
+						       'revenue-generator'
+					       ),
+					       attachTo: {
+						       element:
+							       '.rg-purchase-overlay-purchase-options .option-item-second .rg-purchase-overlay-option-edit',
+						       on: 'left',
+					       },
+					       arrow: true,
+					       buttons: [ nextButton ],
+				       } );
+
+				       // Add tutorial step for paywall actions publish.
+				       tour.addStep( {
+					       id: 'rg-purchase-option-paywall-publish',
+					       text: __(
+						       'When you’re ready to activate your paywall, connect your LaterPay account.',
+						       'revenue-generator'
+					       ),
+					       attachTo: {
+						       element:
+							       '.rev-gen-preview-main--paywall-actions-update .rev-gen-preview-main--paywall-actions-update-publish',
+						       on: 'bottom',
+					       },
+					       arrow: true,
+					       classes: 'shepherd-content-add-space-bottom',
+					       buttons: [
+						       {
+							       text: __( 'Complete', 'revenue-generator' ),
+							       action: tour.next,
+							       classes: 'shepherd-content-complete-tour-element',
+						       },
+					       ],
+				       } );
+			       };
+			       
+			       /**
+				* Handle the tour of the paywall elements.
+				*
+				* @param {Shepherd.Tour} tour Tour object.
+				*/
+			       const startWelcomeTour = function( tour ) {
+				       // Show exit tour button.
+				       $( $o.exitTour ).css( {
+					       visibility: 'visible',
+					       'pointer-events': 'all',
+					       cursor: 'pointer',
+				       } );
+
+				       // Blur out the wrapper and disable events, to highlight the tour elements.
+				       $o.body.addClass( 'modal-blur' );
+				       $o.rgContributionWrapper.css( {
+					       'pointer-events': 'none',
+				       } );
+				       $( $o.purchaseOptionItem ).css( {
+					       'background-color': 'darkgray',
+				       } );
+				       $( $o.purchaseOptionItemInfo ).css( {
+					       'border-right': '1px solid #928d8d',
+				       } );
+
+				       const directionalKeys = [
+					       'ArrowUp',
+					       'ArrowDown',
+					       'ArrowRight',
+					       'ArrowLeft',
+				       ];
+				       const disableArrowKeys = function( e ) {
+					       if ( directionalKeys.includes( e.key ) ) {
+						       e.preventDefault();
+						       return false;
+					       }
+				       };
+
+				       // Disable arrow events.
+				       $( document ).keydown( disableArrowKeys );
+
+				       // Remove the blurry class and allow click events.
+				       Shepherd.on( 'complete', function() {
+					       // Revert to original state.
+					       $o.body.removeClass( 'modal-blur' );
+
+					       $o.layoutWrapper.css( {
+						       'pointer-events': 'unset',
+					       } );
+
+					       // Removed background from search bar.
+					       $o.searchContentWrapper.css( {
+						       'background-color': '#fff',
+					       } );
+
+					       // Revert to original theme.
+					       $( $o.purchaseOptionItem ).css( {
+						       'background-color': '#fff',
+					       } );
+					       $( $o.purchaseOptionItemInfo ).css( {
+						       'border-right': '1px solid #e3e4e6',
+					       } );
+
+					       // Hide exit tour button.
+					       $( $o.exitTour ).remove();
+
+					       // Enable arrow events.
+					       $( document ).unbind( 'keydown', disableArrowKeys );
+
+					       // Complete the tour, and update plugin option.
+					       completeTheTour();
+				       } );
+
+				       // Start the tour.
+				       tour.start();
+			       };
+
+
 				// Generate Contribution Code.
 				$o.contributionGnerateCode.on(
 					'click',
@@ -306,16 +485,6 @@ import { debounce } from '../helpers';
 						'inherit'
 					);
 					$o.body.find( 'input' ).removeClass( 'input-blur' );
-				} );
-
-				// Tooltip on direction to right.
-				$( $o.contributionRightTooltip ).on( 'hover', function() {
-					TooltipRight( $o.contributionRightTooltip );
-				} );
-
-				// Tooltip on direction to top.
-				$( $o.contributionTopTooltip ).on( 'hover', function() {
-					TooltipTop( $o.contributionTopTooltip );
 				} );
 
 				$o.contributionCampaignName.on( 'focusout', function() {
