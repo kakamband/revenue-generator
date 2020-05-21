@@ -223,6 +223,12 @@
 					cursor: not-allowed;
 				}
 			}
+			
+			&-save {
+				&:disabled {
+					border: 2px solid #d6d6d6;
+				}
+			}
 
 			&-publish {
 				background-color: #000;
