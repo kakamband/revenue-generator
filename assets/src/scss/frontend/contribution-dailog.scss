@@ -60,17 +60,15 @@ $box-white:#fff;
 }
 
 .rev-gen-contribution-main {
-	width: 380px;
-	margin: 0 auto;
-	position: relative;
-	margin-top: 70px;
+	display: flex;
+	justify-content: center;
 
 	&-custom {
 		cursor: pointer;
 	}
 
 	&--box {
-		min-width: 380px;
+		max-width: 380px;
 		min-height: 227px;
 		border-radius: 5px;
 		box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
@@ -111,12 +109,16 @@ $box-white:#fff;
 			border: solid 2px $box-text-color;
 			float: left;
 			border-radius: 5px;
-			margin: 0 3px;
 			height: 50px;
-			padding: 16px 0;
-			text-decoration: none;
-			min-width: 72px;
+			margin: 0 2px;
+			width: 72px;
+			display: flex;
+			align-items: center;
+			text-align: center;
+			justify-content: center;
+			overflow: hidden;
 			cursor: pointer;
+			word-break: normal;
 			@extend .amount-text;
 
 			&:hover {
@@ -125,10 +127,8 @@ $box-white:#fff;
 			}
 			&-wrapper {
 				position: relative;
-				display: inline-block;
-				padding: 0 4px;
-				max-width: 320px;
-				margin: 0 auto;
+				display: flex;
+				justify-content: center;
 			}
 
 		}
