@@ -1,4 +1,4 @@
-/* global revenueGeneratorGlobalOptions tippy */
+/* global revenueGeneratorGlobalOptions, Shepherd */
 /**
  * JS to handle plugin settings screen interactions.
  *
@@ -10,6 +10,7 @@
  */
 import '../utils';
 import { debounce } from '../helpers';
+import { __, sprintf } from '@wordpress/i18n';
 
 ( function( $ ) {
 	$( function() {
@@ -41,16 +42,15 @@ import { debounce } from '../helpers';
 
 				helpGAModal: '.rev-gen-settings-main-info-modal',
 
-				// Tooltip
-				contributionRightTooltip: '.rev-gen-contribution-tooltip-right',
-				contributionTopTooltip: '.rev-gen-contribution-tooltip-top',
-
 				// Account Activation Modal.
 				activationModal: '.rev-gen-preview-main-account-modal',
 				accountActionId:
 					'.rev-gen-preview-main-account-modal-fields-merchant-id',
 				accountActionKey:
 					'.rev-gen-preview-main-account-modal-fields-merchant-key',
+
+				// Tour elements.
+				exitTour: '.rev-gen-exit-tour',
 
 				laterpayLoader: $( '.laterpay-loader-wrapper' ),
 				rgLayoutWrapper: $( '.rev-gen-layout-wrapper' ),
@@ -87,37 +87,39 @@ import { debounce } from '../helpers';
 			};
 
 			/**
-			 * Initialized the tooltip on given element.
-			 *
-			 * @param {string} elementIdentifier Selector matching elements on the document
-			 */
-			const TooltipTop = function( elementIdentifier ) {
-				tippy( elementIdentifier, {
-					arrow: tippy.roundArrow,
-					placement: 'top',
-					delay: 0,
-					inlinePositioning: true,
-				} );
-			};
-
-			/**
-			 * Initialized the tooltip on given element.
-			 *
-			 * @param {string} elementIdentifier Selector matching elements on the document
-			 */
-			const TooltipRight = function( elementIdentifier ) {
-				tippy( elementIdentifier, {
-					arrow: tippy.roundArrow,
-					placement: 'right',
-					delay: 0,
-					inlinePositioning: true,
-				} );
-			};
-
-			/**
 			 * Bind all element events.
 			 */
 			const bindEvents = function() {
+				/**
+				 * When the page has loaded, load the post content.
+				 */
+				$( document ).ready( function() {
+					if (
+						$o.rgContributionWrapper.length > 0 &&
+						0 ===
+							parseInt(
+								revenueGeneratorGlobalOptions.globalOptions
+									.is_contribution_tutorial_completed
+							)
+					) {
+						const tour = initializeTour();
+						addTourSteps( tour );
+						startWelcomeTour( tour );
+					}
+				} );
+
+				/**
+				 * Complete the tour when exit tour is clicked.
+				 */
+				$o.body.on( 'click', $o.exitTour, function() {
+					if (
+						typeof Shepherd !== 'undefined' &&
+						typeof Shepherd.activeTour !== 'undefined'
+					) {
+						Shepherd.activeTour.complete();
+					}
+				} );
+
 				// Generate Contribution Code.
 				$o.contributionGnerateCode.on(
 					'click',
@@ -308,16 +310,6 @@ import { debounce } from '../helpers';
 					$o.body.find( 'input' ).removeClass( 'input-blur' );
 				} );
 
-				// Tooltip on direction to right.
-				$( $o.contributionRightTooltip ).on( 'hover', function() {
-					TooltipRight( $o.contributionRightTooltip );
-				} );
-
-				// Tooltip on direction to top.
-				$( $o.contributionTopTooltip ).on( 'hover', function() {
-					TooltipTop( $o.contributionTopTooltip );
-				} );
-
 				$o.contributionCampaignName.on( 'focusout', function() {
 					// validate fields.
 					const isValid = validateAllfields();
@@ -327,6 +319,218 @@ import { debounce } from '../helpers';
 							'background-color',
 							'#1d1d1d'
 						);
+					}
+				} );
+			};
+
+			/**
+			 * Initialize the tour object.
+			 *
+			 * @return {Shepherd.Tour} Shepherd tour object.
+			 */
+			const initializeTour = function() {
+				return new Shepherd.Tour( {
+					defaultStepOptions: {
+						classes: 'rev-gen-tutorial-card',
+						scrollTo: { behavior: 'smooth', block: 'center' },
+					},
+				} );
+			};
+
+			/**
+			 * Add required info steps for the merchant.
+			 *
+			 * @param {Shepherd.Tour} tour Tour object.
+			 */
+			const addTourSteps = function( tour ) {
+				const skipTourButton = {
+					text: __( 'Skip Tour', 'revenue-generator' ),
+					action: tour.complete,
+					classes: 'shepherd-content-skip-tour',
+				};
+
+				const nextButton = {
+					text: __( 'Next >', 'revenue-generator' ),
+					action: tour.next,
+					classes: 'shepherd-content-next-tour-element',
+				};
+
+				// Add tutorial step for main search.
+				tour.addStep( {
+					id: 'rg-contribution-header-description',
+					text: __( 'Click to edit', 'revenue-generator' ),
+					attachTo: {
+						element: '#rev-gen-contribution-main-header-section',
+						on: 'top',
+					},
+					arrow: true,
+					classes: 'shepherd-content-add-space-bottom',
+					buttons: [ skipTourButton, nextButton ],
+				} );
+
+				// Add tutorial step for editing header title
+				tour.addStep( {
+					id: 'rg-contribution-amount-first',
+					text: __(
+						'Click to edit each amount',
+						'revenue-generator'
+					),
+					attachTo: {
+						element:
+							'.rev-gen-contribution-main--box-donation:first-child .rev-gen-contribution-main--box-donation-amount',
+						on: 'top',
+					},
+					arrow: true,
+					classes: 'rev-gen-tutorial-contribution-title',
+					buttons: [ nextButton ],
+				} );
+
+				// Add tutorial step for option item.
+				tour.addStep( {
+					id: 'rg-contribution-amount-second',
+					text: sprintf(
+						__(
+							'Amounts less than $5 will default to %1$s pay later %2$s',
+							'revenue-generator'
+						),
+						'<a target="_blank" href="https://www.laterpay.net/academy/getting-started-with-laterpay-the-difference-between-pay-now-pay-later">',
+						'</a>'
+					),
+					attachTo: {
+						element:
+							'.rev-gen-contribution-main--box-donation:nth-child(2) .rev-gen-contribution-main--box-donation-amount',
+						on: 'top',
+					},
+					arrow: true,
+					classes: 'rev-gen-tutorial-contribution-title',
+					buttons: [ nextButton ],
+				} );
+
+				// Add tutorial step for option item edit button.
+				tour.addStep( {
+					id: 'rg-contribution-campaign-name',
+					text: __(
+						"Enter the description that you would like to appear on your customer's invoice.",
+						'revenue-generator'
+					),
+					attachTo: {
+						element: '.rev-gen-contribution-main-input',
+						on: 'top',
+					},
+					arrow: true,
+					classes: 'rev-gen-tutorial-contribution-title',
+					buttons: [ nextButton ],
+				} );
+
+				// Add tutorial step for paywall actions publish.
+				tour.addStep( {
+					id: 'rg-contribution-generate-button',
+					text: sprintf(
+						__(
+							'When you’re ready, click here to copy your customized %1$s shortcode. %2$s',
+							'revenue-generator'
+						),
+						'<a target="_blank" href="https://wordpress.com/support/shortcodes/">',
+						'</a>'
+					),
+					attachTo: {
+						element: '.rev-gen-contribution-main-generate-button',
+						on: 'right',
+					},
+					arrow: true,
+					buttons: [
+						{
+							text: __( 'Complete', 'revenue-generator' ),
+							action: tour.next,
+							classes: 'shepherd-content-complete-tour-element',
+						},
+					],
+				} );
+			};
+
+			/**
+			 * Handle the tour of the paywall elements.
+			 *
+			 * @param {Shepherd.Tour} tour Tour object.
+			 */
+			const startWelcomeTour = function( tour ) {
+				// Show exit tour button.
+				$( $o.exitTour ).css( {
+					visibility: 'visible',
+					'pointer-events': 'all',
+					cursor: 'pointer',
+				} );
+
+				// Blur out the wrapper and disable events, to highlight the tour elements.
+				$o.body.addClass( 'modal-blur' );
+				$o.body.find( 'input' ).addClass( 'input-blur' );
+				$( $o.contributionBox ).css( 'background-color', 'darkgray' );
+				$o.rgContributionWrapper.css( {
+					'pointer-events': 'none',
+				} );
+
+				const directionalKeys = [
+					'ArrowUp',
+					'ArrowDown',
+					'ArrowRight',
+					'ArrowLeft',
+				];
+				const disableArrowKeys = function( e ) {
+					if ( directionalKeys.includes( e.key ) ) {
+						e.preventDefault();
+						return false;
+					}
+				};
+
+				// Disable arrow events.
+				$( document ).keydown( disableArrowKeys );
+
+				// Remove the blurry class and allow click events.
+				Shepherd.on( 'complete', function() {
+					// Revert to original state.
+					$o.body.removeClass( 'modal-blur' );
+					$o.body.find( 'input' ).removeClass( 'input-blur' );
+					$( $o.contributionBox ).css( 'background-color', '#fff' );
+
+					$o.rgContributionWrapper.css( {
+						'pointer-events': 'unset',
+					} );
+
+					// Hide exit tour button.
+					$( $o.exitTour ).remove();
+
+					// Enable arrow events.
+					$( document ).unbind( 'keydown', disableArrowKeys );
+
+					// Complete the tour, and update plugin option.
+					completeTheTour();
+				} );
+
+				// Start the tour.
+				tour.start();
+			};
+
+			/**
+			 * Complete the tour.
+			 */
+			const completeTheTour = function() {
+				// Create form data.
+				const formData = {
+					action: 'rg_complete_tour',
+					config_key: 'is_contribution_tutorial_completed',
+					config_value: 1,
+					security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
+				};
+
+				// Delete the option.
+				$.ajax( {
+					url: revenueGeneratorGlobalOptions.ajaxUrl,
+					method: 'POST',
+					data: formData,
+					dataType: 'json',
+				} ).done( function( r ) {
+					if ( r.success ) {
+						//window.location.reload();
 					}
 				} );
 			};

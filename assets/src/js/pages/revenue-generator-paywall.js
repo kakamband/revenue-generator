@@ -239,7 +239,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						0 ===
 							parseInt(
 								revenueGeneratorGlobalOptions.globalOptions
-									.is_tutorial_completed
+									.is_paywall_tutorial_completed
 							) &&
 						allPurchaseOptions &&
 						allPurchaseOptions.length > 0
@@ -1207,7 +1207,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						);
 					} else {
 						$o.savePaywall.removeAttr( 'disabled' );
-						$o.activatePaywall.removeAttr('disabled');
+						$o.activatePaywall.removeAttr( 'disabled' );
 						$o.searchPaywallWrapper.hide();
 						$o.postPreviewWrapper.attr(
 							'data-access-id',
@@ -2683,7 +2683,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				// Create form data.
 				const formData = {
 					action: 'rg_complete_tour',
-					config_key: 'is_tutorial_completed',
+					config_key: 'is_paywall_tutorial_completed',
 					config_value: 1,
 					security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
 				};

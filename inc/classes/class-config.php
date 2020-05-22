@@ -50,12 +50,13 @@ class Config {
 			update_option(
 				'lp_rg_global_options',
 				[
-					'is_welcome_done'            => '',
-					'average_post_publish_count' => '',
-					'merchant_currency'          => 'USD',
-					'merchant_region'            => 'US',
-					'is_tutorial_completed'      => 0,
-					'is_merchant_verified'       => 0,
+					'is_welcome_done'                    => '',
+					'average_post_publish_count'         => '',
+					'merchant_currency'                  => 'USD',
+					'merchant_region'                    => 'US',
+					'is_paywall_tutorial_completed'      => 0,
+					'is_contribution_tutorial_completed' => 0,
+					'is_merchant_verified'               => 0,
 				]
 			);
 		}
