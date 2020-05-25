@@ -377,7 +377,7 @@ import { __, sprintf } from '@wordpress/i18n';
 					),
 					attachTo: {
 						element:
-							'.rev-gen-contribution-main--box-donation:first-child .rev-gen-contribution-main--box-donation-amount',
+							'.rev-gen-contribution-main--box-donation:first-child',
 						on: 'top',
 					},
 					arrow: true,
@@ -398,7 +398,7 @@ import { __, sprintf } from '@wordpress/i18n';
 					),
 					attachTo: {
 						element:
-							'.rev-gen-contribution-main--box-donation:nth-child(2) .rev-gen-contribution-main--box-donation-amount',
+							'.rev-gen-contribution-main--box-donation:nth-child(2)',
 						on: 'top',
 					},
 					arrow: true,
@@ -410,11 +410,11 @@ import { __, sprintf } from '@wordpress/i18n';
 				tour.addStep( {
 					id: 'rg-contribution-campaign-name',
 					text: __(
-						"Enter the description that you would like to appear on your customer's invoice.",
+						"Enter the description that you would like to appear on your customer's invoice",
 						'revenue-generator'
 					),
 					attachTo: {
-						element: '.rev-gen-contribution-main-input',
+						element: '#rg_contribution_campaign_name',
 						on: 'top',
 					},
 					arrow: true,
@@ -427,7 +427,7 @@ import { __, sprintf } from '@wordpress/i18n';
 					id: 'rg-contribution-generate-button',
 					text: sprintf(
 						__(
-							'When you’re ready, click here to copy your customized %1$s shortcode. %2$s',
+							'When you’re ready, click here to copy your customized %1$s shortcode %2$s',
 							'revenue-generator'
 						),
 						'<a target="_blank" href="https://wordpress.com/support/shortcodes/">',
@@ -530,7 +530,7 @@ import { __, sprintf } from '@wordpress/i18n';
 					dataType: 'json',
 				} ).done( function( r ) {
 					if ( r.success ) {
-						//window.location.reload();
+						window.location.reload();
 					}
 				} );
 			};
