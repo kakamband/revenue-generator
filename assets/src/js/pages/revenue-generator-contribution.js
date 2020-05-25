@@ -530,7 +530,7 @@ import { __, sprintf } from '@wordpress/i18n';
 					dataType: 'json',
 				} ).done( function( r ) {
 					if ( r.success ) {
-						window.location.reload();
+						location.reload();
 					}
 				} );
 			};
