@@ -103,8 +103,8 @@ import '../utils';
 					data: formData,
 					dataType: 'json',
 				} ).done( function( r ) {
-					$o.snackBar.showSnackbar( r.msg, 1500 );
-					$o.welcomeScreenWrapper.fadeOut( 1500, function() {
+					$o.snackBar.showSnackbar( r.msg, 500 );
+					$o.welcomeScreenWrapper.fadeOut( 500, function() {
 						window.location.reload();
 					} );
 				} );
