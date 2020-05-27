@@ -153,9 +153,12 @@ body.revenue-generator_page_revenue-generator-settings {
 	}
 }
 // Input Blur.
-input.input-blur.input-blur {
+input.input-blur.input-blur,
+select.input-blur.input-blur,
+button.input-blur.input-blur {
 	background-color: #a9a9a9;
 	border-color: #000;
+	color: #000;
 }
 
 /* Shepherd custom styling */

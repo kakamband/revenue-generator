@@ -36,6 +36,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				// Search elements.
 				searchContentWrapper: $( '.rev-gen-preview-main--search' ),
 				searchContent: $( '#rg_js_searchContent' ),
+				currentPaywall: $( '#rg_currentPaywall' ),
 				searchResultWrapper: $(
 					'.rev-gen-preview-main--search-results'
 				),
@@ -125,6 +126,10 @@ import { __, sprintf } from '@wordpress/i18n';
 					'.rev-gen-preview-main-option-update-message',
 				purchaseOperationContinue: '#rg_js_continueOperation',
 				purchaseOperationCancel: '#rg_js_cancelOperation',
+
+				// Paywall warnning modal.
+				newPaywallWarningContinue: '#rg_js_continueSearch',
+				newPaywallWarningCancel: '#rg_js_cancelSearch',
 
 				// Purchase options info modal.
 				purchaseOptionInfoButton: '.rg-purchase-overlay-option-info',
@@ -340,6 +345,82 @@ import { __, sprintf } from '@wordpress/i18n';
 					$o.body.css( {
 						overflow: 'hidden',
 						height: '100%',
+					} );
+				} );
+
+				/**
+				 * When merchant click in the search box blur out the rest of the area and prompt if existing.
+				 */
+				$o.searchContent.on( 'click', function() {
+
+					// Check for existing paywall.
+					const paywallId = $o.currentPaywall.val();
+					if ( ! paywallId ) {
+						return false;
+					}
+					
+					// take promise for popupbox.
+					return new Promise( ( complete ) => {
+						const template = wp.template(
+							'revgen-new-paywall-warning'
+						);
+						$o.previewWrapper.append( template );
+
+						$o.body.addClass( 'modal-blur' );
+						$o.actionsWrapper.css( 'background-color', '#a9a9a9' );
+						$o.layoutWrapper.css( {
+							'pointer-events': 'unset',
+						} );
+						$o.body
+							.find( 'input, select, button' )
+							.not(
+								'#rg_js_searchContent,' +
+									$o.newPaywallWarningContinue +
+									',' +
+									$o.newPaywallWarningCancel
+							)
+							.addClass( 'input-blur' );
+
+						$( $o.newPaywallWarningContinue ).off( 'click' );
+						$( $o.newPaywallWarningCancel ).off( 'click' );
+
+						// On Continue button click.
+						$( $o.newPaywallWarningContinue ).on( 'click', () => {
+							$o.postPreviewWrapper.addClass( 'blury' );
+							$( 'html, body' ).animate(
+								{ scrollTop: 0 },
+								'slow'
+							);
+							$o.body.css( {
+								overflow: 'hidden',
+								height: '100%',
+							} );
+							$o.body.removeClass( 'modal-blur' );
+							$o.body
+								.find( 'input, select, button' )
+								.removeClass( 'input-blur' );
+							$o.layoutWrapper.css( {
+								'pointer-events': 'unset',
+							} );
+							$o.actionsWrapper.css( 'background-color', '#fff' );
+							$( '.search-paywall-warning-modal' ).remove();
+							$( this ).focus();
+							complete( true );
+						} );
+						
+						// On Cancel button click.
+						$( $o.newPaywallWarningCancel ).on( 'click', () => {
+							$o.body.removeClass( 'modal-blur' );
+							$o.body
+								.find( 'input, select, button' )
+								.removeClass( 'input-blur' );
+							$o.actionsWrapper.css( 'background-color', '#fff' );
+							$o.layoutWrapper.css( {
+								'pointer-events': 'unset',
+							} );
+							$( '.search-paywall-warning-modal' ).remove();
+							complete( false );
+						} );
 					} );
 				} );
 
