@@ -45,6 +45,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 				<label for="rg_js_searchContent"><?php esc_html_e( 'Previewing', 'revenue-generator' ); ?>:</label>
 			<?php endif; ?>
 			<input type="text" id="rg_js_searchContent" placeholder="<?php esc_attr_e( 'search for the page or post you\'d like to preview here', 'revenue-generator' ); ?>" value="<?php echo esc_attr( $rg_preview_post_title ); ?>" />
+			<input type="hidden" id="rg_currentPaywall" value="<?php echo esc_attr( $paywall_id ); ?>" />
 			<i class="rev-gen-preview-main--search-icon"></i>
 			<div class="rev-gen-preview-main--search-results"></div>
 		</div>
@@ -594,6 +595,27 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 				</button>
 				<a href="<?php echo esc_url( $dashboard_url ); ?>"><?php esc_html_e( 'Go to the Paywall Dashboard', 'revenue-generator' ); ?></a>
 			</div>
+		</div>
+	</div>
+</script>
+
+<!-- Template for option update warning modal -->
+<script type="text/template" id="tmpl-revgen-new-paywall-warning">
+	<div class="rev-gen-preview-main-option-update search-paywall-warning-modal">
+		<h4 class="rev-gen-preview-main-option-update-title"><?php esc_html_e( 'This will create a new paywall.', 'revenue-generator' ); ?></h4>
+		<span class="rev-gen-preview-main-option-update-warning">!</span>
+		<p class="rev-gen-preview-main-option-update-message">
+			<?php
+			esc_html_e( 'By choosing to preview on a different article, you will create a new paywall. Would you like to proceed?', 'revenue-generator' );
+			?>
+		</p>
+		<div class="rev-gen-preview-main-option-update-buttons">
+			<button id="rg_js_continueSearch" class="rev-gen-preview-main-option-update-buttons-dark">
+				<?php esc_html_e( 'Continue', 'revenue-generator' ); ?>
+			</button>
+			<button id="rg_js_cancelSearch" class="rev-gen-preview-main-option-update-buttons-light">
+				<?php esc_html_e( 'Cancel', 'revenue-generator' ); ?>
+			</button>
 		</div>
 	</div>
 </script>
