@@ -352,13 +352,12 @@ import { __, sprintf } from '@wordpress/i18n';
 				 * When merchant click in the search box blur out the rest of the area and prompt if existing.
 				 */
 				$o.searchContent.on( 'click', function() {
-
 					// Check for existing paywall.
 					const paywallId = $o.currentPaywall.val();
 					if ( ! paywallId ) {
 						return false;
 					}
-					
+
 					// take promise for popupbox.
 					return new Promise( ( complete ) => {
 						const template = wp.template(
@@ -407,7 +406,7 @@ import { __, sprintf } from '@wordpress/i18n';
 							$( this ).focus();
 							complete( true );
 						} );
-						
+
 						// On Cancel button click.
 						$( $o.newPaywallWarningCancel ).on( 'click', () => {
 							$o.body.removeClass( 'modal-blur' );
@@ -2078,8 +2077,9 @@ import { __, sprintf } from '@wordpress/i18n';
 				 */
 				$o.body.on( 'click', $o.viewPost, function() {
 					const targetPostId = $( this ).attr( 'data-target-id' );
+					const selectedCategoryId = $o.searchPaywallContent.val();
 					if ( targetPostId ) {
-						viewPost( targetPostId );
+						viewPost( targetPostId, selectedCategoryId );
 					}
 				} );
 
@@ -2098,12 +2098,14 @@ import { __, sprintf } from '@wordpress/i18n';
 			 * Get permalink for preview post id and take merchant to the post.
 			 *
 			 * @param {number} previewPostId Post Preview ID.
+			 * @param {number} selectedCategoryId Selected Category ID.
 			 */
-			const viewPost = function( previewPostId ) {
+			const viewPost = function( previewPostId, selectedCategoryId = 0 ) {
 				// Create form data.
 				const formData = {
 					action: 'rg_post_permalink',
 					preview_post_id: previewPostId,
+					category_id: selectedCategoryId,
 					security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
 				};
 

@@ -1271,6 +1271,26 @@ class Admin {
 
 		// Get all data and sanitize it.
 		$preview_post_id = sanitize_text_field( filter_input( INPUT_POST, 'preview_post_id', FILTER_SANITIZE_NUMBER_INT ) );
+		$category_id     = sanitize_text_field( filter_input( INPUT_POST, 'category_id', FILTER_SANITIZE_NUMBER_INT ) );
+
+		// Check if there is category id and current post has that category.
+		if ( ! empty( $category_id ) && ! has_category( $category_id, $preview_post_id ) ) {
+
+			// If Preview post is post assigned to category, fetch post that has category.
+			$category_post = get_posts(
+				array(
+					'numberposts'      => 1,
+					'category'         => $category_id,
+					'suppress_filters' => false,
+				)
+			);
+
+			// If category post exists assign for preview.
+			if ( ! empty( $category_post ) ) {
+				// Set preview post id.
+				$preview_post_id = $category_post[0]->ID;
+			}
+		}
 
 		// Check and verify data exits.
 		if ( ! empty( $preview_post_id ) ) {
