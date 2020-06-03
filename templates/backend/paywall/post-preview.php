@@ -590,10 +590,10 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 				<button id="rg_js_viewPost" data-target-id="" class="rev-gen-preview-main-account-modal-actions-dark">
 					<?php esc_html_e( 'View on live post', 'revenue-generator' ); ?>
 				</button>
-				<button id="rg_js_disablePaywall" data-paywall-id="" class="rev-gen-preview-main-account-modal-actions-light">
-					<?php esc_html_e( 'Disable paywall', 'revenue-generator' ); ?>
+				<button id="rg_js_viewDashboard" data-dashboard-url="<?php echo esc_url( $dashboard_url ); ?>" class="rev-gen-preview-main-account-modal-actions-light">
+					<?php esc_html_e( 'View paywall dashboard', 'revenue-generator' ); ?>
 				</button>
-				<a href="<?php echo esc_url( $dashboard_url ); ?>"><?php esc_html_e( 'Go to the Paywall Dashboard', 'revenue-generator' ); ?></a>
+				<a href="<?php echo esc_url( $new_paywall_url ); ?>"><?php esc_html_e( 'Create another paywall', 'revenue-generator' ); ?></a>
 			</div>
 		</div>
 	</div>
