@@ -176,8 +176,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				activateSignup: '#rg_js_activateSignup',
 				warningSignup: '#rg_js_warningSignup',
 				viewPost: '#rg_js_viewPost',
-				disablePaywall: '#rg_js_disablePaywall',
-
+				viewDashboard: '#rg_js_viewDashboard',
 				// Tour elements.
 				exitTour: '.rev-gen-exit-tour',
 
@@ -2103,12 +2102,13 @@ import { __, sprintf } from '@wordpress/i18n';
 				} );
 
 				/**
-				 * Disable paywall.
+				 * View Dashboard on click.
 				 */
-				$o.body.on( 'click', $o.disablePaywall, function() {
-					const paywallId = $( this ).attr( 'data-paywall-id' );
-					if ( paywallId ) {
-						disablePaywall( paywallId );
+				$o.body.on( 'click', $o.viewDashboard, function() {
+					const dashboardURL = $( this ).attr( 'data-dashboard-url' );
+
+					if ( dashboardURL ) {
+						location.href = dashboardURL;
 					}
 				} );
 			};
@@ -2138,31 +2138,6 @@ import { __, sprintf } from '@wordpress/i18n';
 					if ( r.redirect_to ) {
 						window.open( r.redirect_to, '_blank' );
 					}
-				} );
-			};
-
-			/**
-			 * Disable the paywall.
-			 *
-			 * @param {number} paywallId Paywall Id.
-			 */
-			const disablePaywall = function( paywallId ) {
-				// Create form data.
-				const formData = {
-					action: 'rg_disable_paywall',
-					paywall_id: paywallId,
-					security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
-				};
-
-				// Delete the option.
-				$.ajax( {
-					url: revenueGeneratorGlobalOptions.ajaxUrl,
-					method: 'POST',
-					data: formData,
-					dataType: 'json',
-				} ).done( function( r ) {
-					$( $o.activationModalClose ).trigger( 'click' );
-					$o.snackBar.showSnackbar( r.msg, 1000 );
 				} );
 			};
 
@@ -2295,9 +2270,6 @@ import { __, sprintf } from '@wordpress/i18n';
 						activationSuccess
 							.find( $o.viewPost )
 							.attr( 'data-target-id', postPreviewId );
-						activationSuccess
-							.find( $o.disablePaywall )
-							.attr( 'data-paywall-id', paywallId );
 						activationModal
 							.find( $o.activationModalError )
 							.remove();

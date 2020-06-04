@@ -623,6 +623,7 @@ class Admin {
 			'merchant_symbol'       => $symbol,
 			'rg_category_data'      => $rg_category_data,
 			'is_merchant_verified'  => $is_merchant_verified,
+			'new_paywall_url'       => add_query_arg( [ 'page' => $admin_menus['paywall']['url'] ], admin_url( 'admin.php' ) ),
 			'dashboard_url'         => add_query_arg( [ 'page' => $admin_menus['dashboard']['url'] ], admin_url( 'admin.php' ) ),
 			'action_icons'          => [
 				'high_count_icon'    => Config::$plugin_defaults['img_dir'] . 'high-publish.svg',
