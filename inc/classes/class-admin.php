@@ -596,7 +596,7 @@ class Admin {
 		$default_option_data = $post_types->get_default_purchase_option();
 		$symbol              = '';
 		if ( ! empty( $config_data['merchant_currency'] ) ) {
-			$symbol = 'USD' === $config_data['merchant_currency'] ? '$' : '€';
+			$symbol = $config_data['merchant_currency'];
 		}
 
 		// Set merchant verification status.
