@@ -1070,6 +1070,13 @@ import { __, sprintf } from '@wordpress/i18n';
 					if ( revenueSelection.prop( 'checked' ) ) {
 						priceItem.attr( 'data-pay-model', 'ppu' );
 						revenueSelection.val( 1 );
+						const newmsg = __(
+							"You'll only be charged once you've reached $5.",
+							'revenue-generator'
+						);
+						$( optionItem )
+							.find( $o.purchaseOptionItemDesc )
+							.text( newmsg );
 						validatePricingRevenue( optionItem, true );
 						revenueWrapper
 							.find( '.pay-later' )
@@ -1080,6 +1087,18 @@ import { __, sprintf } from '@wordpress/i18n';
 					} else {
 						priceItem.attr( 'data-pay-model', 'sis' );
 						revenueSelection.val( 0 );
+						const previewPostTitle = $o.searchContent.val();
+						const newmsg = sprintf(
+							__(
+								'Get lifetime access to %1$s now!',
+								'revenue-generator'
+							),
+							previewPostTitle
+						);
+						$( optionItem )
+							.find( $o.purchaseOptionItemDesc )
+							.text( newmsg );
+
 						validatePricingRevenue( optionItem, false );
 						revenueWrapper
 							.find( '.pay-later' )
