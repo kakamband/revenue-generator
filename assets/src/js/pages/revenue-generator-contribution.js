@@ -319,6 +319,11 @@ import { __, sprintf } from '@wordpress/i18n';
 							'background-color',
 							'#1d1d1d'
 						);
+						$o.contributionGnerateCode.css( 'color', '#ffffff' );
+						$o.contributionGnerateCode.text(
+							__( 'Generate and copy code', 'revenue-generator' )
+						);
+						$o.contributionGnerateCode.prop( 'disabled', false );
 					}
 				} );
 			};
