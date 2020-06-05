@@ -1930,6 +1930,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						 */
 						$o.isPublish = true;
 						$o.savePaywall.trigger( 'click' );
+						$o.savePaywall.addClass( 'hide' );
 						showLoader();
 						setTimeout( function() {
 							publishPaywall();
