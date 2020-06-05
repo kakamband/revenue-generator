@@ -149,7 +149,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						if ( ! $o.requestSent ) {
 							// Add lock.
 							$o.requestSent = true;
-							
+
 							// show loader.
 							showLoader();
 
@@ -197,7 +197,7 @@ import { __, sprintf } from '@wordpress/i18n';
 								}
 								// Release request lock.
 								$o.requestSent = false;
-								
+
 								// Hide Loader.
 								hideLoader();
 							} );
