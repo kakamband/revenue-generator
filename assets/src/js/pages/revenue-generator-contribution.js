@@ -149,6 +149,10 @@ import { __, sprintf } from '@wordpress/i18n';
 						if ( ! $o.requestSent ) {
 							// Add lock.
 							$o.requestSent = true;
+
+							// show loader.
+							showLoader();
+
 							const allAmountJson = getContributionAmounts();
 
 							const formData = {
@@ -193,6 +197,9 @@ import { __, sprintf } from '@wordpress/i18n';
 								}
 								// Release request lock.
 								$o.requestSent = false;
+
+								// Hide Loader.
+								hideLoader();
 							} );
 						}
 					}, 500 )
@@ -335,6 +342,20 @@ import { __, sprintf } from '@wordpress/i18n';
 						scrollTo: { behavior: 'smooth', block: 'center' },
 					},
 				} );
+			};
+
+			/**
+			 * Show the loader.
+			 */
+			const showLoader = function() {
+				$o.laterpayLoader.css( { display: 'flex' } );
+			};
+
+			/**
+			 * Hide the loader.
+			 */
+			const hideLoader = function() {
+				$o.laterpayLoader.hide();
 			};
 
 			/**
