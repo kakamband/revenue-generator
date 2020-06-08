@@ -33,6 +33,7 @@ $purchase_option_items   = empty( $purchase_options_data['options'] ) ? [] : $pu
 $rg_preview_post_title   = empty( $rg_preview_post['title'] ) ? '' : $rg_preview_post['title'];
 $dynamic_pricing_price   = $dynamic_pricing_data['price'];
 $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
+$paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'hide' : '';
 ?>
 
 <div class="rev-gen-layout-wrapper">
@@ -107,7 +108,7 @@ $dynamic_pricing_revenue = $dynamic_pricing_data['revenue'];
 					<i class="rev-gen-preview-main--paywall-actions-search-icon"></i>
 				</div>
 				<div class="rev-gen-preview-main--paywall-actions-update">
-					<button id="rg_js_savePaywall" class="rev-gen-preview-main--paywall-actions-update-save">
+					<button id="rg_js_savePaywall" class="rev-gen-preview-main--paywall-actions-update-save <?php echo esc_attr( sanitize_html_class( $paywall_hide_class ) ); ?>">
 						<?php esc_html_e( 'Save Draft', 'revenue-generator' ); ?>
 					</button>
 					<button id="rg_js_activatePaywall" class="rev-gen-preview-main--paywall-actions-update-publish">
