@@ -939,14 +939,12 @@ import { __, sprintf } from '@wordpress/i18n';
 								$o.purchaseOptionItemPrice
 							);
 							priceItem.attr( 'data-pay-model', dynamicRevenue );
-							const dynamicStar = priceItem.children();
+							const dynamicStar = $( $o.purchaseItemPriceIcon );
 							const validatedPrice = validatePrice(
 								dynamicPrice
 							);
 							dynamicStar.css( { display: 'none' } );
-							priceItem
-								.text( validatedPrice )
-								.append( dynamicStar );
+							priceItem.text( validatedPrice );
 							optionItem.attr( 'data-pricing-type', 'dynamic' );
 							optionItem.find( $o.purchaseItemPriceIcon ).show();
 							pricingSelection.val( 1 );
@@ -1233,11 +1231,11 @@ import { __, sprintf } from '@wordpress/i18n';
 									newPrice,
 									'subscription' === optionType
 								);
-								const dynamicStar = $( this ).children();
+								const dynamicStar = $(
+									$o.purchaseItemPriceIcon
+								);
 								dynamicStar.css( { display: 'none' } );
-								$( this )
-									.text( validatedPrice )
-									.append( dynamicStar );
+								$( this ).text( validatedPrice );
 								validateRevenue( validatedPrice, optionItem );
 							}
 
@@ -3339,9 +3337,9 @@ import { __, sprintf } from '@wordpress/i18n';
 					);
 
 					if ( 'individual' === optionType ) {
-						const dynamicStar = priceItem.children();
+						const dynamicStar = $( $o.purchaseItemPriceIcon );
 						dynamicStar.css( { display: 'none' } );
-						priceItem.text( validatedPrice ).append( dynamicStar );
+						priceItem.text( validatedPrice );
 					} else {
 						priceItem.empty().text( validatedPrice );
 					}
@@ -3362,9 +3360,9 @@ import { __, sprintf } from '@wordpress/i18n';
 					);
 
 					if ( 'individual' === optionType ) {
-						const dynamicStar = priceItem.children();
+						const dynamicStar = $( $o.purchaseItemPriceIcon );
 						dynamicStar.css( { display: 'none' } );
-						priceItem.text( validatedPrice ).append( dynamicStar );
+						priceItem.text( validatedPrice );
 					} else {
 						priceItem.empty().text( validatedPrice );
 					}
