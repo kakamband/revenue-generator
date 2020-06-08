@@ -96,7 +96,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<div class="rev-gen-dashboard-content-nopaywall--title">
 					<?php
 					$empty_contribution_button_text = ( ! empty( $search_term ) ) ? __( 'Create a new Contribution', 'revenue-generator' ) : __( 'Create your first Contribution Dialog', 'revenue-generator' );
-					$empty_contribution_message     = ( ! empty( $search_term ) ) ? __( 'No Contribution matched your search, <br /> try again or', 'revenue-generator' ) : __( 'Welcome back! <br /> Are you ready to get started?.', 'revenue-generator' );
+					$empty_contribution_message     = ( ! empty( $search_term ) ) ? __( 'No Contribution matched your search, <br /> try again or', 'revenue-generator' ) : __( 'Welcome back! <br /> Are you ready to get started?', 'revenue-generator' );
 
 					printf(
 						wp_kses(
