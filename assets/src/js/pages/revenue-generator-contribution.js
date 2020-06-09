@@ -301,6 +301,31 @@ import { __, sprintf } from '@wordpress/i18n';
 				} );
 
 				/**
+				 * Close Popup by clicking on wrapper.
+				 */
+				$o.rgLayoutWrapper.on( 'click', function( e ) {
+					if (
+						$( $o.contributionHelpModal ) &&
+						$( $o.contributionHelpModal ).length > 0
+					) {
+						e.preventDefault();
+
+						// This may seem duplicate but modal is inside wrapper and needed to avoid call stack.
+						$( $o.contributionHelpModal ).remove();
+						$o.body.removeClass( 'modal-blur' );
+						$( $o.contributionCampaignNameLabel ).css(
+							'background-color',
+							'inherit'
+						);
+						$( $o.contributionThankYouPageLabel ).css(
+							'background-color',
+							'inherit'
+						);
+						$o.body.find( 'input' ).removeClass( 'input-blur' );
+					}
+				} );
+
+				/**
 				 * Hide the existing help popup.
 				 */
 				$o.body.on( 'click', $o.contributionModalClose, function() {
