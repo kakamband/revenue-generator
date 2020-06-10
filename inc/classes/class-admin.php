@@ -386,6 +386,7 @@ class Admin {
 			'action_icons'                => [
 				'lp_icon'     => Config::$plugin_defaults['img_dir'] . 'lp-logo-icon.svg',
 				'option_info' => Config::$plugin_defaults['img_dir'] . 'option-info.svg',
+				'icon_close'  => Config::$plugin_defaults['img_dir'] . 'icon-close.svg',
 			],
 		];
 
