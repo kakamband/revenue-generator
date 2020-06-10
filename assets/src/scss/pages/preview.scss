@@ -835,6 +835,14 @@
 	background-color: #a9a9a9;
 	overflow: hidden;
 	height: 100%;
+	button.rev-gen-contribution-main-generate-button,
+	button.rev-gen-settings-main-option-info,
+	a.rev-gen-contribution-main--help-button {
+		color: #000;
+		img {
+			opacity: 0.6;
+		}
+	}
 }
 
 .rev-gen-snackbar {
