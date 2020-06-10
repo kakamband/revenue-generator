@@ -80,7 +80,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <!-- Template for Campaign Name modal -->
 <script type="text/template" id="tmpl-revgen-info-campaignName">
 	<div class="rev-gen-contribution-main-info-modal rev-gen-preview-main-info-modal campaign-name-info-modal">
-	<span class="rev-gen-contribution-main-info-modal-cross">X</span>
+	<span class="rev-gen-contribution-main-info-modal-cross"><img alt="<?php esc_attr_e( 'close', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['icon_close'] ); ?>" /></span>
 		<h4 class="rev-gen-preview-main-info-modal-title rev-gen-settings-main-info-modal-title"><?php esc_html_e( 'Campaign Name', 'revenue-generator' ); ?></h4>
 		<p class="rev-gen-preview-main-info-modal-message">
 			<?php esc_html_e( "Enter the name you would like to appear on your customers' invoice. We recommend including your organization's name as well as something to remind them of this specific contribution.", 'revenue-generator' ); ?>
@@ -90,7 +90,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <!-- Template for Thank you modal -->
 <script type="text/template" id="tmpl-revgen-info-thankYouPage">
 	<div class="rev-gen-contribution-main-info-modal rev-gen-preview-main-info-modal thankyoupage-info-modal">
-	<span class="rev-gen-contribution-main-info-modal-cross">X</span>
+	<span class="rev-gen-contribution-main-info-modal-cross"><img alt="<?php esc_attr_e( 'close', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['icon_close'] ); ?>" /></span>
 		<h4 class="rev-gen-preview-main-info-modal-title rev-gen-settings-main-info-modal-title"><?php esc_html_e( 'Thank You Page', 'revenue-generator' ); ?></h4>
 		<p class="rev-gen-preview-main-info-modal-message">
 			<?php esc_html_e( 'After your customer has contributed, we can redirect them to a page of your choice (for example, a dedicated "thank you" page on your website). If no thank you page is provided, they will be redirected to the page which initiated their contribution.', 'revenue-generator' ); ?>
@@ -100,7 +100,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <!-- Template for account activation modal. -->
 <script type="text/template" id="tmpl-revgen-account-activation-modal">
 	<div class="rev-gen-preview-main-account-modal">
-		<span class="rev-gen-preview-main-account-modal-cross">X</span>
+		<span class="rev-gen-preview-main-account-modal-cross"><img alt="<?php esc_attr_e( 'close', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['icon_close'] ); ?>" /></span>
 		<?php if ( false === $is_merchant_verified ) : ?>
 			<div class="rev-gen-preview-main-account-modal-action">
 				<h4 class="rev-gen-preview-main-account-modal-action-title"><?php esc_html_e( 'You’re almost done!', 'revenue-generator' ); ?></h4>
