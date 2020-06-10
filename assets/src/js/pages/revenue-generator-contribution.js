@@ -490,6 +490,9 @@ import { __, sprintf } from '@wordpress/i18n';
 				// Blur out the wrapper and disable events, to highlight the tour elements.
 				$o.body.addClass( 'modal-blur' );
 				$o.body.find( 'input' ).addClass( 'input-blur' );
+				$o.body
+					.find( '*[contenteditable="true"]' )
+					.removeAttr( 'contenteditable' );
 				$( $o.contributionBox ).css( 'background-color', 'darkgray' );
 				$o.rgContributionWrapper.css( {
 					'pointer-events': 'none',
