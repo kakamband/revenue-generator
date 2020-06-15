@@ -273,6 +273,11 @@ import { __, sprintf } from '@wordpress/i18n';
 						// Change background color and highlight the clicked parent.
 						$o.body.addClass( 'modal-blur' );
 						$o.body.find( 'input' ).addClass( 'input-blur' );
+						$( $o.contributionBox ).css(
+							'background-color',
+							'darkgray'
+						);
+
 						// Highlight selected info modal parent based on type.
 						if ( 'campaignName' === modalType ) {
 							$( $o.contributionCampaignNameLabel )
@@ -316,6 +321,10 @@ import { __, sprintf } from '@wordpress/i18n';
 						$( $o.contributionCampaignNameLabel ).css(
 							'background-color',
 							'inherit'
+						);
+						$( $o.contributionBox ).css(
+							'background-color',
+							'#fff'
 						);
 						$( $o.contributionThankYouPageLabel ).css(
 							'background-color',
