@@ -415,7 +415,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						on: 'top',
 					},
 					arrow: true,
-					classes: 'shepherd-content-add-space-bottom',
+					classes: 'rev-gen-tutorial-contribution-title',
 					buttons: [ skipTourButton, nextButton ],
 				} );
 
