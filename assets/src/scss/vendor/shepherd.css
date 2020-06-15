@@ -9,7 +9,7 @@
 .shepherd-arrow:before {
 	content: "";
 	transform: rotate(45deg);
-	background: #000;
+	background: #1e1e1e;
 }
 
 .shepherd-element[data-popper-placement^=top] > .shepherd-arrow {
