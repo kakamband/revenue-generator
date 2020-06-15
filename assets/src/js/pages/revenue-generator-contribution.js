@@ -703,6 +703,19 @@ import { __, sprintf } from '@wordpress/i18n';
 					price = 0;
 				}
 
+				const minPrice = parseFloat( 0.0 );
+				const maxPrice = parseFloat( 1000.0 );
+
+				// Validate maximum amount.
+				if (
+					parseFloat( price ) < minPrice ||
+					isNaN( parseFloat( price ) )
+				) {
+					price = minPrice;
+				} else if ( parseFloat( price ) > maxPrice ) {
+					price = maxPrice;
+				}
+
 				// prevent negative prices
 				price = Math.abs( price );
 
