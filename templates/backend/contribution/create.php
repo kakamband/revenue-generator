@@ -45,32 +45,33 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<div class="rev-gen-contribution-main--box-footer-logo">
 					<?php View::render_footer_backend(); ?>
 				</div>
-			</div>	
-			<div class="rev-gen-contribution-main-inputs-wrapper">
-				<label id="rg_contribution_campaign_name"  class="rev-gen-contribution-main-input-label">
-					<?php esc_html_e( 'Campaign name', 'revenue-generator' ); ?>
-					<input type="text" class="rev-gen-contribution-main-input" id="rg_contribution_title" />
-					<button data-info-for="campaignName" id="rev-gen-contribution-help-campaign-name" class="rev-gen-settings-main-option-info rev-gen-contribution-main--help">
-						<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
-					</button>
-				</label>
-				<label id="rg_contribution_thankyou_label" class="rev-gen-contribution-main-input-label">
-					<?php esc_html_e( 'Thank you Page (optional)', 'revenue-generator' ); ?>
-					<input type="text" class="rev-gen-contribution-main-input" id="rg_contribution_thankyou" />
-					<button data-info-for="thankYouPage" id="rev-gen-contribution-help-thank-you" class="rev-gen-settings-main-option-info rev-gen-contribution-main--help">
-						<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
-					</button>
-				</label>
-				<div id="rg_contribution_generate" class="rev-gen-contribution-main-button">
-					<button class="rev-gen-contribution-main-generate-button">
-						<?php esc_html_e( 'Generate and copy code', 'revenue-generator' ); ?>
-					</button>
-					<a target="_blank" href="https://wordpress.com/support/shortcodes/" id="rev-gen-contribution-help-generate" class="rev-gen-contribution-main--help-button">
-						<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
-					</a>
-				</div>	
-				<p class="rev-gen-contribution-main-copy-message"><?php esc_html_e( 'To include the Contribution Box on your site, paste the code where you would like it to appear.', 'revenue-generator' ); ?></p>
 			</div>
+		</div>
+		<div class="rev-gen-contribution-main-inputs-wrapper">
+			<label id="rg_contribution_campaign_name"  class="rev-gen-contribution-main-input-label">
+				<?php esc_html_e( 'Campaign name', 'revenue-generator' ); ?>
+				<input type="text" class="rev-gen-contribution-main-input" id="rg_contribution_title" />
+				<button data-info-for="campaignName" id="rev-gen-contribution-help-campaign-name" class="rev-gen-settings-main-option-info rev-gen-contribution-main--help">
+					<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
+				</button>
+			</label>
+			<label id="rg_contribution_thankyou_label" class="rev-gen-contribution-main-input-label">
+				<?php esc_html_e( 'Thank you Page (optional)', 'revenue-generator' ); ?>
+				<input type="text" class="rev-gen-contribution-main-input" id="rg_contribution_thankyou" />
+				<button data-info-for="thankYouPage" id="rev-gen-contribution-help-thank-you" class="rev-gen-settings-main-option-info rev-gen-contribution-main--help">
+					<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
+				</button>
+			</label>
+			<div id="rg_contribution_generate" class="rev-gen-contribution-main-button">
+				<button class="rev-gen-contribution-main-generate-button">
+					<?php esc_html_e( 'Generate and copy code', 'revenue-generator' ); ?>
+				</button>
+				<a target="_blank" href="https://wordpress.com/support/shortcodes/" id="rev-gen-contribution-help-generate" class="rev-gen-contribution-main--help-button">
+					<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
+				</a>
+			</div>	
+			<p class="rev-gen-contribution-main-copy-message"><?php esc_html_e( 'To include the Contribution Box on your site, paste the code where you would like it to appear.', 'revenue-generator' ); ?></p>
+		</div>
 		</div>
 		<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
 		<div class="rev-gen-exit-tour"><?php esc_html_e( 'Exit Tour', 'revenue-generator' ); ?></div>
