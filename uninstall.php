@@ -114,12 +114,8 @@ $pass_sub_query = new WP_Query( $pass_sub_args );
 while ( $pass_sub_query->have_posts() ) {
 	// Get custom post data created by plugin and delete it.
 	$pass_sub_query->the_post();
-	$rg_pass_sub_id   = get_the_ID();
-	$rg_pass_sub_post = [
-		'ID' => $rg_pass_sub_id,
-		'post_status' => 'draft',
-	];
-	wp_update_post( $rg_pass_sub_post );
+	$rg_pass_sub_id = get_the_ID();
+	wp_delete_post( $rg_pass_sub_id, true );
 }
 
 wp_reset_postdata();
