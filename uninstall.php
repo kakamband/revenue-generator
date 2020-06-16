@@ -64,7 +64,7 @@ $paywall_args = [
 	'post_type'      => [ 'rg_paywall' ],
 	'posts_per_page' => 100,
 	'no_found_rows'  => true,
-	'post_status'    => [ 'publish' ],
+	'post_status'    => [ 'any' ],
 ];
 
 $paywall_query = new WP_Query( $paywall_args );
@@ -86,7 +86,7 @@ $contribution_args = [
 	'post_type'      => [ 'rg_contribution' ],
 	'posts_per_page' => 100,
 	'no_found_rows'  => true,
-	'post_status'    => [ 'publish' ],
+	'post_status'    => [ 'any' ],
 ];
 
 $contribution_query = new WP_Query( $contribution_args );
@@ -106,7 +106,7 @@ $pass_sub_args = [
 	'post_type'      => [ 'rg_pass', 'rg_subscription' ],
 	'posts_per_page' => 100,
 	'no_found_rows'  => true,
-	'post_status'    => [ 'publish' ],
+	'post_status'    => [ 'any' ],
 ];
 
 $pass_sub_query = new WP_Query( $pass_sub_args );
