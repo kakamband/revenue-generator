@@ -165,6 +165,11 @@ button.input-blur.input-blur {
 .shepherd-enabled.shepherd-target .input-blur.input-blur {
 	background-color: #fff;
 }
+.shepherd-target.shepherd-enabled {
+    i {
+	background-color: #fff;
+    }
+}
 
 .rev-gen-contribution-main-generate-button.shepherd-enabled.shepherd-target.shepherd-target {
 	background-color: #8a8a8a;
