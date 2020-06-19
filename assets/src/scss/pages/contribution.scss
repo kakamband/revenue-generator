@@ -117,11 +117,13 @@ body.revenue-generator_page_revenue-generator-contribution {
 		.rev-gen-powered-by-footer {
 			position: relative;
 			bottom: 0;
+			z-index: 1;
 		}
 	}
 
 	&-inputs-wrapper {
-		margin-top: 32px;
+		margin: 32px auto;
+		width: 415px;
 	}
 	&-input-label {
 		font-family: $box-font-helvetica;
@@ -130,11 +132,11 @@ body.revenue-generator_page_revenue-generator-contribution {
 		line-height: 1.21;
 		text-align: left;
 		color: $box-text-color;
-		width: 100%;
+		width: 92%;
 		position: relative;
 		display: block;
 		border-radius: 5px;
-		padding: 16px 0;
+		padding: 16px 30px 16px 16px;
 	}
 	&-input {
 		width: 100%;
@@ -167,12 +169,12 @@ body.revenue-generator_page_revenue-generator-contribution {
 	&--help {
 		position: absolute;
 		top: 37px;
-		right: -30px;
+		right: 0;
 
 		&-button {
 			position: absolute;
 			top: 48px;
-			right: -25px;
+			right: -8px;
 			height: 20px;
 			width: 20px;
 			img {
@@ -209,6 +211,7 @@ body.revenue-generator_page_revenue-generator-contribution {
 	}
 
 	&-button {
+		padding: 0 16px;
 		position: relative;
 	}
 

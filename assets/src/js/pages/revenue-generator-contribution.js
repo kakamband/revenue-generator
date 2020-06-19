@@ -79,6 +79,8 @@ import { __, sprintf } from '@wordpress/i18n';
 
 				// Popup.
 				snackBar: $( '#rg_js_SnackBar' ),
+
+				emailSupportButton : $( '.rev-gen-email-support' ),
 			};
 
 			// Initialize all required events.
@@ -273,6 +275,11 @@ import { __, sprintf } from '@wordpress/i18n';
 						// Change background color and highlight the clicked parent.
 						$o.body.addClass( 'modal-blur' );
 						$o.body.find( 'input' ).addClass( 'input-blur' );
+						$( $o.contributionBox ).css(
+							'background-color',
+							'darkgray'
+						);
+
 						// Highlight selected info modal parent based on type.
 						if ( 'campaignName' === modalType ) {
 							$( $o.contributionCampaignNameLabel )
@@ -316,6 +323,10 @@ import { __, sprintf } from '@wordpress/i18n';
 						$( $o.contributionCampaignNameLabel ).css(
 							'background-color',
 							'inherit'
+						);
+						$( $o.contributionBox ).css(
+							'background-color',
+							'#fff'
 						);
 						$( $o.contributionThankYouPageLabel ).css(
 							'background-color',
@@ -415,7 +426,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						on: 'top',
 					},
 					arrow: true,
-					classes: 'shepherd-content-add-space-bottom',
+					classes: 'rev-gen-tutorial-contribution-title',
 					buttons: [ skipTourButton, nextButton ],
 				} );
 
@@ -522,6 +533,8 @@ import { __, sprintf } from '@wordpress/i18n';
 				$o.rgContributionWrapper.css( {
 					'pointer-events': 'none',
 				} );
+				
+				$o.emailSupportButton.hide();
 
 				const directionalKeys = [
 					'ArrowUp',
@@ -552,6 +565,8 @@ import { __, sprintf } from '@wordpress/i18n';
 
 					// Hide exit tour button.
 					$( $o.exitTour ).remove();
+					
+					$o.emailSupportButton.hide();
 
 					// Enable arrow events.
 					$( document ).unbind( 'keydown', disableArrowKeys );
@@ -701,6 +716,19 @@ import { __, sprintf } from '@wordpress/i18n';
 				// prevent non-number prices
 				if ( isNaN( price ) ) {
 					price = 0;
+				}
+
+				const minPrice = parseFloat( 0.0 );
+				const maxPrice = parseFloat( 1000.0 );
+
+				// Validate maximum amount.
+				if (
+					parseFloat( price ) < minPrice ||
+					isNaN( parseFloat( price ) )
+				) {
+					price = minPrice;
+				} else if ( parseFloat( price ) > maxPrice ) {
+					price = maxPrice;
 				}
 
 				// prevent negative prices

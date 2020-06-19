@@ -464,6 +464,12 @@
 
 }
 
+.border-blur-after {
+	&::after {
+		border-left-color: #a9a9a9;
+	}
+}
+
 @media (max-width: 1279px) {
 	.rg-purchase-overlay {
 		&-option-manager {
