@@ -181,6 +181,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				exitTour: '.rev-gen-exit-tour',
 
 				snackBar: $( '#rg_js_SnackBar' ),
+				emailSupportButton : $( '.rev-gen-email-support' ),
 			};
 
 			/**
@@ -1437,6 +1438,11 @@ import { __, sprintf } from '@wordpress/i18n';
 						$( $o.purchaseOptionItem ).css( {
 							'background-color': '#fff',
 						} );
+
+						$( $o.optionManager ).removeClass(
+							'border-blur-after'
+						);
+
 						$o.actionsWrapper.css( {
 							'background-color': '#fff',
 						} );
@@ -1477,6 +1483,8 @@ import { __, sprintf } from '@wordpress/i18n';
 						$( $o.purchaseOptionItem ).css( {
 							'background-color': '#a9a9a9',
 						} );
+
+						$( $o.optionManager ).addClass( 'border-blur-after' );
 
 						// Grey out the paywall actions and change position.
 						$o.actionsWrapper.css( {
@@ -2696,6 +2704,8 @@ import { __, sprintf } from '@wordpress/i18n';
 				$( $o.purchaseOptionItemInfo ).css( {
 					'border-right': '1px solid #928d8d',
 				} );
+				
+				$o.emailSupportButton.hide();
 
 				const directionalKeys = [
 					'ArrowUp',
@@ -2737,6 +2747,8 @@ import { __, sprintf } from '@wordpress/i18n';
 
 					// Hide exit tour button.
 					$( $o.exitTour ).remove();
+
+					$o.emailSupportButton.show();
 
 					// Enable arrow events.
 					$( document ).unbind( 'keydown', disableArrowKeys );
