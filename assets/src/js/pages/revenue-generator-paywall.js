@@ -1438,6 +1438,11 @@ import { __, sprintf } from '@wordpress/i18n';
 						$( $o.purchaseOptionItem ).css( {
 							'background-color': '#fff',
 						} );
+
+						$( $o.optionManager ).removeClass(
+							'border-blur-after'
+						);
+
 						$o.actionsWrapper.css( {
 							'background-color': '#fff',
 						} );
@@ -1478,6 +1483,8 @@ import { __, sprintf } from '@wordpress/i18n';
 						$( $o.purchaseOptionItem ).css( {
 							'background-color': '#a9a9a9',
 						} );
+
+						$( $o.optionManager ).addClass( 'border-blur-after' );
 
 						// Grey out the paywall actions and change position.
 						$o.actionsWrapper.css( {
