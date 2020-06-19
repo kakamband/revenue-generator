@@ -154,10 +154,74 @@ class Time_Pass extends Base {
 		$time_passes = [];
 
 		foreach ( $posts as $key => $post ) {
+			if ( 'draft' === $post->post_status ) {
+				$is_expired = $this->is_expired_duration( $post );
+				if ( ! $is_expired ) {
+					continue;
+				}
+			}
 			$time_passes[ $key ] = $this->formatted_time_pass( $post );
 		}
 
 		return $time_passes;
+	}
+
+
+	/**
+	 * Compares modfied post with current date time and checks for expired post.
+	 *
+	 * @param object $post Post to check.
+	 *
+	 * @return boolean returns false if exipred else true.
+	 */
+	public function is_expired_duration( $post ) {
+
+		$post_meta    = get_post_meta( $post->ID );
+		$post_meta    = $this->formatted_post_meta( $post_meta );
+		$duration     = $post_meta['duration'];
+		$period       = $post_meta['period'];
+		$post_modifed = strtotime( $post->post_modified );
+
+		// Verify duration and period exists.
+		if ( empty( $duration ) && empty( $period ) ) {
+			return false;
+		}
+
+		$expired_period = '';
+		$current_date   = gmdate( 'Y-m-d H:i:s' );
+
+		// Get Expired duration.
+		switch ( $duration ) {
+			case 'h':
+				$duration_string = '+' . $period . ' Hour';
+				$expired_period  = gmdate( 'Y-m-d H:i:s', strtotime( $duration_string, $post_modifed ) );
+				break;
+			case 'd':
+				$duration_string = '+' . $period . ' Day';
+				$expired_period  = gmdate( 'Y-m-d H:i:s', strtotime( $duration_string, $post_modifed ) );
+				break;
+			case 'm':
+				$duration_string = '+' . $period . ' Month';
+				$expired_period  = gmdate( 'Y-m-d H:i:s', strtotime( $duration_string, $post_modifed ) );
+				break;
+			case 'w':
+				$duration_string = '+' . $period . ' Week';
+				$expired_period  = gmdate( 'Y-m-d H:i:s', strtotime( $duration_string, $post_modifed ) );
+				break;
+			case 'y':
+				$duration_string = '+' . $period . ' Year';
+				$expired_period  = gmdate( 'Y-m-d H:i:s', strtotime( $duration_string, $post_modifed ) );
+				break;
+		}
+
+		// Compare Expired period with current date time and return true or false.
+		if ( ! empty( $current_date ) && ! empty( $expired_period ) && $current_date > $expired_period ) {
+			return false;
+		} else {
+
+			return true;
+		}
+
 	}
 
 	/**
