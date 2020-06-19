@@ -442,8 +442,8 @@
 		align-items: center;
 		flex-direction: column;
 		position: fixed;
-		left: 45%;
-		top: 20%;
+		left: 50%;
+		top: 50%;
 		overflow: hidden;
 		width: 392px;
 		height: 506px;
@@ -455,7 +455,8 @@
 		box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
 		text-align: center;
 		padding-bottom: 55px;
-
+		margin-left: -115px;
+		margin-top: -253px;
 		&-title {
 			font-family: HelveticaNeue, serif;
 			font-size: 26px;
@@ -486,12 +487,13 @@
 		align-items: center;
 		flex-direction: column;
 		position: fixed;
-		left: 60%;
+		left: 50%;
 		overflow: hidden;
-		top: 25%;
+		top: 50%;
 		height: 360px;
 		width: 300px;
-		margin: 0 0 0 -190px;
+		margin-top: -180px;
+		margin-left: -70px;
 		padding: 25px 0 0;
 		background-color: #fff;
 		z-index: 999;
@@ -860,6 +862,7 @@
 	height: 25px;
 	position: fixed;
 	transform: translate(-50%, 0);
+	margin-left: 75px;
 }
 
 .rev-gen-exit-tour {
