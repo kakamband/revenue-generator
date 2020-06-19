@@ -79,6 +79,8 @@ import { __, sprintf } from '@wordpress/i18n';
 
 				// Popup.
 				snackBar: $( '#rg_js_SnackBar' ),
+
+				emailSupportButton : $( '.rev-gen-email-support' ),
 			};
 
 			// Initialize all required events.
@@ -531,6 +533,8 @@ import { __, sprintf } from '@wordpress/i18n';
 				$o.rgContributionWrapper.css( {
 					'pointer-events': 'none',
 				} );
+				
+				$o.emailSupportButton.hide();
 
 				const directionalKeys = [
 					'ArrowUp',
@@ -561,6 +565,8 @@ import { __, sprintf } from '@wordpress/i18n';
 
 					// Hide exit tour button.
 					$( $o.exitTour ).remove();
+					
+					$o.emailSupportButton.hide();
 
 					// Enable arrow events.
 					$( document ).unbind( 'keydown', disableArrowKeys );
