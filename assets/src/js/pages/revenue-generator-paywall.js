@@ -181,7 +181,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				exitTour: '.rev-gen-exit-tour',
 
 				snackBar: $( '#rg_js_SnackBar' ),
-				emailSupportButton : $( '.rev-gen-email-support' ),
+				emailSupportButton: $( '.rev-gen-email-support' ),
 			};
 
 			/**
@@ -2704,7 +2704,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				$( $o.purchaseOptionItemInfo ).css( {
 					'border-right': '1px solid #928d8d',
 				} );
-				
+
 				$o.emailSupportButton.hide();
 
 				const directionalKeys = [
