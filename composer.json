@@ -3,7 +3,7 @@
   "description": "Monetize your blog and content with LaterPay's Revenue Generator",
   "homepage": "https://github.com/laterpay/revenue-generator/",
   "type": "wordpress-plugin",
-  "version": "1.0.0-beta1",
+  "version": "1.0.0",
   "license": "MIT",
   "require-dev": {
     "automattic/vipwpcs": "^2.0.0",

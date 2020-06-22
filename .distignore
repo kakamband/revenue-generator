@@ -3,7 +3,6 @@ Thumbs.db
 .DS_Store
 *.zip
 .idea
-assets/src
 .gitignore
 bin
 tests
