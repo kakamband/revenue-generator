@@ -54,6 +54,18 @@ LaterPay is performance-based and works on a revenue sharing basis - for a limit
 * No licensing fees
 * No maintenance fees
 
+== Frequently Asked Questions ==
+
+= What is LaterPay? =
+LaterPay is a service that simplifies payments on the Internet. In addition to the classic immediate purchase option, LaterPay also allows you to buy digital content such as articles or videos now and pay later.
+
+= How does LaterPay work? =
+
+Merchants can sell articles and blog posts, as well as accept contributions and donations, for as little as five cents online. All you have to do is agree to pay later.
+
+= What does LaterPay cost? =
+
+LaterPay’s fee amounts to 15% of the revenues that it collects for its Merchants. There are no other fees to the Merchants or the Users.
 
 == Screenshots ==
 
@@ -71,4 +83,3 @@ LaterPay is performance-based and works on a revenue sharing basis - for a limit
 
 = 1.0.0 =
 Initial Release.
-
