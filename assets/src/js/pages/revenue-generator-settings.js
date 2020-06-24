@@ -37,7 +37,7 @@ import { debounce } from '../helpers';
 
 				// Settings Action items.
 				laterpayLoader: $( '.laterpay-loader-wrapper' ),
-
+				rgLayoutWrapper: $( '.rev-gen-layout-wrapper' ),
 				settingsWrapper: $( '.rev-gen-settings-main' ),
 				settingsPerMonth: $( '.rev-gen-settings-main-post-per-month' ),
 				settingsGAUserID: $( '.rev-gen-settings-main-ga-code-user' ),
@@ -112,21 +112,47 @@ import { debounce } from '../helpers';
 					}, 500 )
 				);
 
-				// Toggles checked attribute on click event.
+				/**
+				 * Toggles checked attribute on click event.
+				 */
 				$o.settingsPerMonth.on( 'click', function() {
 					$o.settingsPerMonth.removeAttr( 'checked' );
 					$( this ).prop( 'checked', true );
 				} );
 
-				// Check if anything changed.
+				/**
+				 * Check if anything changed.
+				 */
 				$o.everyInput.on( 'change', function() {
 					$o.somethingChanged = true;
 				} );
 
+				/**
+				 * Prevent User from leaving if there is unsaved changes.
+				 */
 				$( window ).on( 'beforeunload', function( e ) {
 					if ( $o.somethingChanged ) {
 						e.preventDefault();
 						return false;
+					}
+				} );
+
+				/**
+				 * Hide Help Modal on click of wrapper.
+				 */
+				$o.rgLayoutWrapper.on( 'click', function() {
+					if ( $o.helpGAModal && $o.helpGAModal.length > 0 ) {
+						$( $o.helpGAModal ).remove();
+						$o.body.removeClass( 'modal-blur' );
+						$( $o.rgGAUserRow ).css(
+							'background-color',
+							'inherit'
+						);
+						$( $o.rgGALaterpayRow ).css(
+							'background-color',
+							'inherit'
+						);
+						$o.body.find( 'input' ).removeClass( 'input-blur' );
 					}
 				} );
 

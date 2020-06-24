@@ -133,10 +133,11 @@ body.revenue-generator_page_revenue-generator-settings {
 	// Modal modifications
 	&-info-modal {
 		left: 50%;
-		top: 15%;
+		top: 50%;
 		height: auto;
 		position: absolute;
 		transform: translate(10%, 0);
+		margin-left: 0;
 		&-title {
 			padding: 10px;
 		}
