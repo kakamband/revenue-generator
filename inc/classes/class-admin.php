@@ -7,6 +7,7 @@
 
 namespace LaterPay\Revenue_Generator\Inc;
 
+use LaterPay\Revenue_Generator\Inc\Config;
 use \LaterPay\Revenue_Generator\Inc\Post_Types\Paywall;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Contribution;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Subscription;
@@ -68,6 +69,10 @@ class Admin {
 
 		// Verify authenticity.
 		check_ajax_referer( 'rg_global_config_nonce', 'security' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Cheating huh?', 'revenue-generator' ) );
+		}
 
 		$average_post_publish_count    = filter_input( INPUT_POST, 'average_post_publish_count', FILTER_SANITIZE_STRING );
 		$merchant_id                   = filter_input( INPUT_POST, 'merchant_id', FILTER_SANITIZE_STRING );
