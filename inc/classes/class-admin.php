@@ -41,16 +41,16 @@ class Admin {
 		add_action( 'admin_head', [ $this, 'hide_paywall' ] );
 		add_action( 'current_screen', [ $this, 'redirect_merchant' ] );
 		add_action( 'wp_ajax_rg_update_global_config', [ $this, 'update_global_config' ] );
+		add_action( 'wp_ajax_rg_update_settings', [ $this, 'rg_update_settings' ] );
 		add_action( 'wp_ajax_rg_update_paywall', [ $this, 'update_paywall' ] );
 		add_action( 'wp_ajax_rg_update_currency_selection', [ $this, 'update_currency_selection' ] );
 		add_action( 'wp_ajax_rg_remove_purchase_option', [ $this, 'remove_purchase_option' ] );
 		add_action( 'wp_ajax_rg_remove_paywall', [ $this, 'remove_paywall' ] );
-		add_action( 'wp_ajax_rg_search_preview_content', [ $this, 'search_preview_content' ] );
+		add_action( 'wp_ajax_rg_search_preview_content', [ $this, 'serg_update_settingsarch_preview_content' ] );
 		add_action( 'wp_ajax_rg_select_preview_content', [ $this, 'select_preview_content' ] );
 		add_action( 'wp_ajax_rg_search_term', [ $this, 'select_search_term' ] );
 		add_action( 'wp_ajax_rg_clear_category_meta', [ $this, 'clear_category_meta' ] );
 		add_action( 'wp_ajax_rg_complete_tour', [ $this, 'complete_tour' ] );
-		add_action( 'wp_ajax_rg_verify_account_credentials', [ $this, 'verify_account_credentials' ] );
 		add_action( 'wp_ajax_rg_post_permalink', [ $this, 'get_post_permalink' ] );
 		add_action( 'wp_ajax_rg_activate_paywall', [ $this, 'activate_paywall' ] );
 		add_action( 'wp_ajax_rg_disable_paywall', [ $this, 'disable_paywall' ] );
@@ -59,6 +59,58 @@ class Admin {
 		add_action( 'wp_ajax_rg_search_paywall', [ $this, 'search_paywall' ] );
 		add_action( 'wp_ajax_rg_set_paywall_name', [ $this, 'rg_set_paywall_name' ] );
 		add_action( 'wp_ajax_rg_contribution_shortcode_generator', [ $this, 'rg_contribution_shortcode_generator' ] );
+	}
+
+	/**
+	 * Handles Ajax Request for settings.
+	 */
+	public function rg_update_settings() {
+
+		// Verify authenticity.
+		check_ajax_referer( 'rg_global_config_nonce', 'security' );
+
+		$average_post_publish_count    = filter_input( INPUT_POST, 'average_post_publish_count', FILTER_SANITIZE_STRING );
+		$merchant_id                   = filter_input( INPUT_POST, 'merchant_id', FILTER_SANITIZE_STRING );
+		$merchant_key                  = filter_input( INPUT_POST, 'merchant_key', FILTER_SANITIZE_STRING );
+		$rg_personal_ga_ua_id          = filter_input( INPUT_POST, 'rg_personal_ga_ua_id', FILTER_SANITIZE_STRING );
+		$rg_ga_personal_enabled_status = filter_input( INPUT_POST, 'rg_ga_personal_enabled_status', FILTER_SANITIZE_NUMBER_INT );
+		$rg_ga_enabled_status          = filter_input( INPUT_POST, 'rg_ga_enabled_status', FILTER_SANITIZE_NUMBER_INT );
+
+		$rg_global_options = Config::get_global_options();
+
+		$response = array();
+
+		// Check and verify updated option.
+		if ( ! empty( $average_post_publish_count ) ) {
+			$rg_global_options['average_post_publish_count'] = $average_post_publish_count;
+
+			update_option( 'lp_rg_global_options', $rg_global_options );
+		}
+
+		if ( ! empty( $rg_personal_ga_ua_id ) ) {
+			Settings::update_settings_options( 'rg_personal_ga_ua_id', $rg_personal_ga_ua_id );
+		}
+
+		if ( ! empty( $rg_ga_personal_enabled_status ) ) {
+			Settings::update_settings_options( 'rg_ga_personal_enabled_status', $rg_ga_personal_enabled_status );
+		}
+
+		if ( ! empty( $rg_ga_enabled_status ) ) {
+			Settings::update_settings_options( 'rg_ga_enabled_status', $rg_ga_enabled_status );
+		}
+
+		if ( ! empty( $merchant_id ) && ! empty( $merchant_key ) ) {
+			$response['merchant'] = $this->verify_account_credentials( $merchant_id, $merchant_key );
+		}
+
+		if ( $response['merchant'] ) {
+			$response['msg'] = esc_html__( 'Settings Saved!', 'revenue-generator' );
+		} else {
+			$response['msg'] = esc_html__( 'Wrong Merchant Crendetials', 'revenue-generator' );
+		}
+
+		wp_send_json_success( $response );
+
 	}
 
 	/**
@@ -137,7 +189,6 @@ class Admin {
 		remove_submenu_page( 'revenue-generator', 'revenue-generator-paywall' );
 		remove_submenu_page( 'revenue-generator', 'revenue-generator' );
 		remove_submenu_page( 'revenue-generator', 'revenue-generator-contribution' );
-		remove_submenu_page( 'revenue-generator', 'revenue-generator-settings' );
 	}
 
 	/**
@@ -1214,14 +1265,12 @@ class Admin {
 
 	/**
 	 * Verify account credentials and do a test purchase.
+	 *
+	 * @param string $merchant_id  Merchant ID.
+	 * @param string $merchant_key Merchant Key.
+	 * @return boolean return true if verfied else false.
 	 */
-	public function verify_account_credentials() {
-		// Verify authenticity.
-		check_ajax_referer( 'rg_paywall_nonce', 'security' );
-
-		// Get all data and sanitize it.
-		$merchant_id  = sanitize_text_field( filter_input( INPUT_POST, 'merchant_id', FILTER_SANITIZE_STRING ) );
-		$merchant_key = sanitize_text_field( filter_input( INPUT_POST, 'merchant_key', FILTER_SANITIZE_STRING ) );
+	public static function verify_account_credentials( $merchant_id, $merchant_key ) {
 
 		$client_account_instance = Client_Account::get_instance();
 		$rg_merchant_credentials = Client_Account::get_merchant_credentials();
@@ -1249,19 +1298,10 @@ class Admin {
 		}
 
 		if ( $is_valid ) {
-			$response = array(
-				'success' => true,
-				'msg'     => esc_html__( 'Saved valid crendetials!', 'revenue-generator' ),
-			);
-		} else {
-			$response = array(
-				'success' => false,
-				'msg'     => esc_html__( 'Invalid credentials!', 'revenue-generator' ),
-			);
+			return true;
 		}
 
-		// Send success message.
-		wp_send_json( $response );
+		return false;
 	}
 
 	/**

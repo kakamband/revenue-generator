@@ -70,18 +70,13 @@ class Settings {
 	/**
 	 * Update the settings with provided data.
 	 *
-	 * @codeCoverageIgnore -- @todo add AJAX test base class to cover this.
+	 * @param string $config_key settings configuration key.
+	 * @param string $config_value settings configuration value.
+	 * @return boolean
 	 */
-	public function update_settings_options() {
+	public static function update_settings_options( $config_key, $config_value ) {
 
-		// Verify authenticity.
-		check_ajax_referer( 'rg_setting_nonce', 'security' );
-
-		// Get all data and sanitize it.
-		$config_key   = sanitize_text_field( filter_input( INPUT_POST, 'config_key', FILTER_SANITIZE_STRING ) );
-		$config_value = sanitize_text_field( filter_input( INPUT_POST, 'config_value', FILTER_SANITIZE_STRING ) );
-
-		$rg_settings_options = $this->get_settings_options();
+		$rg_settings_options = self::get_settings_options();
 
 		// Check if the settings exists already.
 		if ( ! isset( $rg_settings_options[ $config_key ] ) ) {
@@ -103,15 +98,11 @@ class Settings {
 		}
 
 		// Update the option value.
-		update_option( 'lp_rg_settings_options', $rg_settings_options );
+		if ( update_option( 'lp_rg_settings_options', $rg_settings_options ) ) {
+			return true;
+		}
 
-		// Send success message.
-		wp_send_json(
-			[
-				'success' => true,
-				'msg'     => __( 'Settings saved successfully!', 'revenue-generator' ),
-			]
-		);
+		return false;
 
 	}
 
