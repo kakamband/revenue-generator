@@ -18,12 +18,18 @@ body.revenue-generator_page_revenue-generator-settings {
 
 	//Formt table
 	&-table {
-		width: 615px;
+		width: 605px;
+		margin: 50px 0;
 		tr {
+			&:first-child {
+				td {
+					padding: 15px 10px;
+				}
+			}
 			td {
+				padding: 5px 10px;
 				&:first-child {
 					width: 176px;
-					padding-left: 15px;
 					padding-bottom: 0;
 				}
 
@@ -38,10 +44,9 @@ body.revenue-generator_page_revenue-generator-settings {
 
 			}
 			th {
+				padding: 10px;
 				&:first-child {
 					width: 176px;
-					padding-left: 15px;
-					padding-bottom: 0;
 				}
 			}
 
@@ -63,10 +68,20 @@ body.revenue-generator_page_revenue-generator-settings {
 			}
 			td {
 				&:first-child {
+					text-align: left;
+					font-family: HelveticaNeue, serif;
+					font-size: 16px;
+					letter-spacing: 0;
+					color: #1d1d1d;
 					border-top-left-radius: 10px;
 					border-bottom-left-radius: 10px;
 				}
 				&:last-child {
+					text-align: left;
+					font-family: HelveticaNeue, serif;
+					font-size: 16px;
+					letter-spacing: 0;
+					color: #1d1d1d;
 					border-top-right-radius: 10px;
 					border-bottom-right-radius: 10px;
 				}
