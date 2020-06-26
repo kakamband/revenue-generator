@@ -13,6 +13,7 @@ use LaterPay\Revenue_Generator\Inc\Post_Types\Contribution;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Subscription;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Time_Pass;
 use LaterPay\Revenue_Generator\Inc\Settings;
+use LaterPay\Revenue_Generator\Inc\Client_Account;
 use \LaterPay\Revenue_Generator\Inc\Traits\Singleton;
 
 defined( 'ABSPATH' ) || exit;
@@ -47,7 +48,7 @@ class Admin {
 		add_action( 'wp_ajax_rg_update_currency_selection', [ $this, 'update_currency_selection' ] );
 		add_action( 'wp_ajax_rg_remove_purchase_option', [ $this, 'remove_purchase_option' ] );
 		add_action( 'wp_ajax_rg_remove_paywall', [ $this, 'remove_paywall' ] );
-		add_action( 'wp_ajax_rg_search_preview_content', [ $this, 'serg_update_settingsarch_preview_content' ] );
+		add_action( 'wp_ajax_rg_search_preview_content', [ $this, 'search_preview_content' ] );
 		add_action( 'wp_ajax_rg_select_preview_content', [ $this, 'select_preview_content' ] );
 		add_action( 'wp_ajax_rg_search_term', [ $this, 'select_search_term' ] );
 		add_action( 'wp_ajax_rg_clear_category_meta', [ $this, 'clear_category_meta' ] );
@@ -132,8 +133,9 @@ class Admin {
 			$merchant_currency = $currency_limits[ $current_global_options['merchant_currency'] ];
 		}
 
-		$lp_config_id        = Settings::get_tracking_id();
-		$lp_user_tracking_id = Settings::get_tracking_id( 'user' );
+		$lp_config_id            = Settings::get_tracking_id();
+		$lp_user_tracking_id     = Settings::get_tracking_id( 'user' );
+		$rg_merchant_credentials = Client_Account::get_merchant_credentials();
 
 		$admin_menus  = self::get_admin_menus();
 		$paywall_base = empty( $admin_menus['paywall'] ) ? '' : add_query_arg( [ 'page' => $admin_menus['paywall']['url'] ], admin_url( 'admin.php' ) );
@@ -176,6 +178,11 @@ class Admin {
 		];
 
 		$rg_script_data['rg_global_config_nonce'] = wp_create_nonce( 'rg_global_config_nonce' );
+
+		// Add Merchant ID for backend.
+		if ( ! empty( $rg_merchant_credentials['merchant_id'] ) && is_admin() ) {
+			$rg_script_data['merchant_id'] = $rg_merchant_credentials['merchant_id'];
+		}
 
 		// Create variable and add data.
 		$rg_global_data = 'var revenueGeneratorGlobalOptions = ' . wp_json_encode( $rg_script_data ) . '; ';
