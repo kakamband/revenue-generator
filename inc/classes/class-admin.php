@@ -7,6 +7,7 @@
 
 namespace LaterPay\Revenue_Generator\Inc;
 
+use LaterPay\Revenue_Generator\Inc\Config;
 use \LaterPay\Revenue_Generator\Inc\Post_Types\Paywall;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Contribution;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Subscription;
@@ -41,6 +42,7 @@ class Admin {
 		add_action( 'admin_head', [ $this, 'hide_paywall' ] );
 		add_action( 'current_screen', [ $this, 'redirect_merchant' ] );
 		add_action( 'wp_ajax_rg_update_global_config', [ $this, 'update_global_config' ] );
+		add_action( 'wp_ajax_rg_update_settings', [ $this, 'rg_update_settings' ] );
 		add_action( 'wp_ajax_rg_update_paywall', [ $this, 'update_paywall' ] );
 		add_action( 'wp_ajax_rg_update_currency_selection', [ $this, 'update_currency_selection' ] );
 		add_action( 'wp_ajax_rg_remove_purchase_option', [ $this, 'remove_purchase_option' ] );
@@ -59,6 +61,87 @@ class Admin {
 		add_action( 'wp_ajax_rg_search_paywall', [ $this, 'search_paywall' ] );
 		add_action( 'wp_ajax_rg_set_paywall_name', [ $this, 'rg_set_paywall_name' ] );
 		add_action( 'wp_ajax_rg_contribution_shortcode_generator', [ $this, 'rg_contribution_shortcode_generator' ] );
+	}
+
+	/**
+	 * Handles Ajax Request for settings.
+	 */
+	public function rg_update_settings() {
+
+		// Verify authenticity.
+		check_ajax_referer( 'rg_global_config_nonce', 'security' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Cheating huh?', 'revenue-generator' ) );
+		}
+
+		$average_post_publish_count    = filter_input( INPUT_POST, 'average_post_publish_count', FILTER_SANITIZE_STRING );
+		$merchant_id                   = filter_input( INPUT_POST, 'merchant_id', FILTER_SANITIZE_STRING );
+		$merchant_key                  = filter_input( INPUT_POST, 'merchant_key', FILTER_SANITIZE_STRING );
+		$rg_personal_ga_ua_id          = filter_input( INPUT_POST, 'rg_personal_ga_ua_id', FILTER_SANITIZE_STRING );
+		$rg_ga_personal_enabled_status = filter_input( INPUT_POST, 'rg_ga_personal_enabled_status', FILTER_SANITIZE_NUMBER_INT );
+		$rg_ga_enabled_status          = filter_input( INPUT_POST, 'rg_ga_enabled_status', FILTER_SANITIZE_NUMBER_INT );
+
+		$rg_global_options = Config::get_global_options();
+
+		$response = array();
+
+		// Check and verify updated option.
+		if ( ! empty( $average_post_publish_count ) ) {
+			$rg_global_options['average_post_publish_count'] = $average_post_publish_count;
+
+			update_option( 'lp_rg_global_options', $rg_global_options );
+		}
+
+		if ( ! empty( $rg_personal_ga_ua_id ) ) {
+			Settings::update_settings_options( 'rg_personal_ga_ua_id', $rg_personal_ga_ua_id );
+		}
+
+		if ( ! empty( $rg_ga_personal_enabled_status ) ) {
+			Settings::update_settings_options( 'rg_ga_personal_enabled_status', $rg_ga_personal_enabled_status );
+		}
+
+		if ( ! empty( $rg_ga_enabled_status ) ) {
+			Settings::update_settings_options( 'rg_ga_enabled_status', $rg_ga_enabled_status );
+		}
+
+		// Verify Merchant Credentials.
+		if ( ! empty( $merchant_id ) && ! empty( $merchant_key ) ) {
+
+			$client_account_instance = Client_Account::get_instance();
+			$rg_merchant_credentials = Client_Account::get_merchant_credentials();
+
+			// Check and verify merchant id data.
+			if ( ! empty( $merchant_id ) ) {
+					$rg_merchant_credentials['merchant_id'] = $merchant_id;
+			}
+
+			// Check and verify merchant id data.
+			if ( ! empty( $merchant_key ) ) {
+					$rg_merchant_credentials['merchant_key'] = $merchant_key;
+			}
+
+			// Update the option value.
+			update_option( 'lp_rg_merchant_credentials', $rg_merchant_credentials );
+
+			$response['merchant'] = $client_account_instance->validate_merchant_account();
+
+			// Set merchant status to verified.
+			if ( true === $response['merchant'] ) {
+				$rg_global_options                         = Config::get_global_options();
+				$rg_global_options['is_merchant_verified'] = '1';
+				update_option( 'lp_rg_global_options', $rg_global_options );
+			}
+		}
+
+		if ( $response['merchant'] ) {
+			$response['msg'] = esc_html__( 'Settings Saved!', 'revenue-generator' );
+		} else {
+			$response['msg'] = esc_html__( 'Wrong Merchant Crendetials', 'revenue-generator' );
+		}
+
+		wp_send_json_success( $response );
+
 	}
 
 	/**
@@ -137,7 +220,6 @@ class Admin {
 		remove_submenu_page( 'revenue-generator', 'revenue-generator-paywall' );
 		remove_submenu_page( 'revenue-generator', 'revenue-generator' );
 		remove_submenu_page( 'revenue-generator', 'revenue-generator-contribution' );
-		remove_submenu_page( 'revenue-generator', 'revenue-generator-settings' );
 	}
 
 	/**

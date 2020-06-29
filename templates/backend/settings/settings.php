@@ -102,6 +102,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 							</div>
 						</td>
 					</tr>
+					<tr>
+						<td>
+							<button type="button" class="button button-primary rev-gen-settings-main-save-settings">
+								<?php esc_html_e( 'Save Settings', 'revenue-generator' ); ?>
+							</button>
+						</td>
+						<td></td>
+						<td></td>
+					</tr>
 				</table>
 
 			</div>

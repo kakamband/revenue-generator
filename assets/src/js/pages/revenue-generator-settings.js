@@ -18,13 +18,11 @@ import { debounce } from '../helpers';
 			const $o = {
 				body: $( 'body' ),
 				requestSent: false,
+				somethingChanged: false,
 
 				// Settings Elements
 				settingsMerchantID: '.rev-gen-settings-main-merchant-id',
 				settingsMerchantKey: '.rev-gen-settings-main-merchant-key',
-				settingsMerchantInputs:
-					'.rev-gen-settings-main-merchant-id, .rev-gen-settings-main-merchant-key',
-				settingsUserRoles: '.rev-gen-settings-main-user-roles',
 				settingsModalClose: '.rev-gen-settings-main-info-modal-cross',
 
 				rgDashboard: '.rev-gen-dashboard-main',
@@ -40,38 +38,65 @@ import { debounce } from '../helpers';
 				// Settings Action items.
 				laterpayLoader: $( '.laterpay-loader-wrapper' ),
 				rgLayoutWrapper: $( '.rev-gen-layout-wrapper' ),
-
 				settingsWrapper: $( '.rev-gen-settings-main' ),
-				settingsGAUserStatus: $( '.rg-settings-ga-status' ),
 				settingsPerMonth: $( '.rev-gen-settings-main-post-per-month' ),
 				settingsGAUserID: $( '.rev-gen-settings-main-ga-code-user' ),
-
+				settingsSaveButton: $( '.rev-gen-settings-main-save-settings' ),
+				rgGAUserStatus: $( '#rgGAUserStatus' ),
+				rgGALaterPayStatus: $( 'rgGALaterPayStatus' ),
 				// Popup.
 				snackBar: $( '#rg_js_SnackBar' ),
+				everyInput: $( 'table.rev-gen-settings-main-table input' ),
+				triggerPopup: $( '.triggerPopup' ),
 			};
 
 			/**
 			 * Bind all element events.
 			 */
 			const bindEvents = function() {
-				/**
-				 * Handle Settings Post Per Page radio button switch.
-				 */
-				$o.settingsPerMonth.on(
-					'change',
+				$o.settingsSaveButton.on(
+					'click',
 					debounce( function() {
 						// check Lock
 						if ( ! $o.requestSent ) {
 							// Add lock.
 							$o.requestSent = true;
+							let UserStatus = 0;
+							let LaterPayStatus = 0;
+							let perMonth = 'low';
 
-							const perMonth = $( this ).val();
+							$.each( $o.settingsPerMonth, function(
+								i,
+								element
+							) {
+								if ( $( element ).is( ':checked' ) ) {
+									perMonth = $( element ).val();
+								}
+							} );
+
+							const merchantID = $( $o.settingsMerchantID ).val();
+							const merchantKey = $(
+								$o.settingsMerchantKey
+							).val();
+							const gaUserId = $o.settingsGAUserID.val();
+
+							if ( $o.rgGAUserStatus.is( ':checked' ) ) {
+								UserStatus = $o.rgGAUserStatus.val();
+							}
+
+							if ( $o.rgGALaterPayStatus.is( ':checked' ) ) {
+								LaterPayStatus = $o.rgGALaterPayStatus.val();
+							}
 
 							// Create form Data.
 							const formData = {
-								action: 'rg_update_global_config',
-								config_key: 'average_post_publish_count',
-								config_value: perMonth,
+								action: 'rg_update_settings',
+								average_post_publish_count: perMonth,
+								merchant_id: merchantID,
+								merchant_key: merchantKey,
+								rg_personal_ga_ua_id: gaUserId,
+								rg_ga_personal_enabled_status: UserStatus,
+								rg_ga_enabled_status: LaterPayStatus,
 								security:
 									revenueGeneratorGlobalOptions.rg_global_config_nonce,
 							};
@@ -80,123 +105,56 @@ import { debounce } from '../helpers';
 							showLoader();
 							// Update Global Configurations.
 							updateGloablConfig( formData );
-
 							// Release request lock.
 							$o.requestSent = false;
+							$o.somethingChanged = false;
 						}
 					}, 500 )
 				);
 
 				/**
-				 * Validate and Store Merchant Credentials.
+				 * Toggles checked attribute on click event.
 				 */
-				$( $o.settingsMerchantInputs ).on(
-					'focusout',
-					debounce( function() {
-						if ( ! $o.requestSent ) {
-							const merchantID = $( $o.settingsMerchantID ).val();
-							const merchantKey = $(
-								$o.settingsMerchantKey
-							).val();
-
-							if ( merchantID.length && merchantKey.length ) {
-								const formData = {
-									action: 'rg_verify_account_credentials',
-									merchant_id: merchantID,
-									merchant_key: merchantKey,
-									security:
-										revenueGeneratorGlobalOptions.rg_paywall_nonce,
-								};
-
-								showLoader();
-
-								// Validate Merchant Credentials.
-								validateMerchant( formData );
-							}
-						}
-					}, 500 )
-				);
+				$o.settingsPerMonth.on( 'click', function() {
+					$o.settingsPerMonth.removeAttr( 'checked' );
+					$( this ).prop( 'checked', true );
+				} );
 
 				/**
-				 * Stores GA Perfrence.
+				 * Check if anything changed.
 				 */
-				$o.settingsGAUserStatus.on(
-					'click',
-					debounce( function() {
-						// check Lock
-						if ( ! $o.requestSent ) {
-							// Add lock.
-							$o.requestSent = true;
-
-							let gaUserStatus = 0;
-							if ( $( this ).is( ':checked' ) ) {
-								gaUserStatus = $( this ).val();
-							}
-
-							// get Config type.
-							const gaUserStatusType = $( this ).attr( 'id' );
-
-							let gaConfigKey;
-							if ( 'rgGAUserStatus' === gaUserStatusType ) {
-								gaConfigKey = 'rg_ga_personal_enabled_status';
-							} else if (
-								'rgGALaterPayStatus' === gaUserStatusType
-							) {
-								gaConfigKey = 'rg_ga_enabled_status';
-							}
-
-							// Create form Data.
-							const formData = {
-								action: 'rg_update_settings_options',
-								config_key: gaConfigKey,
-								config_value: gaUserStatus,
-								security:
-									revenueGeneratorGlobalOptions.rg_setting_nonce,
-							};
-
-							// Display Loader.
-							showLoader();
-							// Update Global Configurations.
-							updateGloablConfig( formData );
-
-							// Release request lock.
-							$o.requestSent = false;
-						}
-					}, 500 )
-				);
+				$o.everyInput.on( 'change', function() {
+					$o.somethingChanged = true;
+				} );
 
 				/**
-				 * Stores Users GA id.
+				 * Prevent User from leaving if there is unsaved changes.
 				 */
-				$o.settingsGAUserID.on(
-					'focusout',
-					debounce( function() {
-						// check Lock
-						if ( ! $o.requestSent ) {
-							// Add lock.
-							$o.requestSent = true;
+				$( window ).on( 'beforeunload', function( e ) {
+					if ( $o.somethingChanged ) {
+						e.preventDefault();
+						return false;
+					}
+				} );
 
-							const gaPersonlID = $( this ).val();
-
-							// Create form Data.
-							const formData = {
-								action: 'rg_update_settings_options',
-								config_key: 'rg_personal_ga_ua_id',
-								config_value: gaPersonlID,
-								security:
-									revenueGeneratorGlobalOptions.rg_setting_nonce,
-							};
-
-							// Display Loader.
-							showLoader();
-							// Update Global Configurations.
-							updateGloablConfig( formData );
-
-							// Release request lock.
-							$o.requestSent = false;
-						}
-					}, 500 )
-				);
+				/**
+				 * Hide Help Modal on click of wrapper.
+				 */
+				$o.rgLayoutWrapper.on( 'click', function() {
+					if ( $o.helpGAModal && $o.helpGAModal.length > 0 ) {
+						$( $o.helpGAModal ).remove();
+						$o.body.removeClass( 'modal-blur' );
+						$( $o.rgGAUserRow ).css(
+							'background-color',
+							'inherit'
+						);
+						$( $o.rgGALaterpayRow ).css(
+							'background-color',
+							'inherit'
+						);
+						$o.body.find( 'input' ).removeClass( 'input-blur' );
+					}
+				} );
 
 				/**
 				 * Handle tooltip button events for info modals.
@@ -274,28 +232,6 @@ import { debounce } from '../helpers';
 				$o.laterpayLoader.hide();
 			};
 
-			const validateMerchant = function( formData ) {
-				// Check Validation.
-				$.ajax( {
-					url: revenueGeneratorGlobalOptions.ajaxUrl,
-					method: 'POST',
-					data: formData,
-					dataType: 'json',
-				} ).done( function( r ) {
-					hideLoader();
-					$o.snackBar.showSnackbar( r.msg, 1500 );
-
-					// Release request lock.
-					$o.requestSent = false;
-
-					if ( true === r.success ) {
-						validBorder( $o.settingsMerchantInputs );
-					} else {
-						invalidBorder( $o.settingsMerchantInputs );
-					}
-				} );
-			};
-
 			/**
 			 * Updates global configuration and display message popup.
 			 *
@@ -311,7 +247,15 @@ import { debounce } from '../helpers';
 					dataType: 'json',
 				} ).done( function( r ) {
 					hideLoader();
-					$o.snackBar.showSnackbar( r.msg, 1500 );
+					$o.snackBar.showSnackbar( r.data.msg, 1500 );
+
+					if ( r.data.merchant ) {
+						validBorder( $o.settingsMerchantID );
+						validBorder( $o.settingsMerchantKey );
+					} else {
+						invalidBorder( $o.settingsMerchantID );
+						invalidBorder( $o.settingsMerchantKey );
+					}
 					// Release request lock.
 					$o.requestSent = false;
 				} );
