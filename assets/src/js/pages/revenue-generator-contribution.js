@@ -1,4 +1,4 @@
-/* global revenueGeneratorGlobalOptions, Shepherd */
+/* global revenueGeneratorGlobalOptions, Shepherd, rgGlobal */
 /**
  * JS to handle plugin settings screen interactions.
  *
@@ -33,6 +33,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				contributionCampaignNameLabel: '#rg_contribution_campaign_name',
 				contributionThankYouPageLabel:
 					'#rg_contribution_thankyou_label',
+				contributionHelpGenerate: '#rev-gen-contribution-help-generate',
 
 				// Dashboard elements.
 				contributionDashboardList:
@@ -110,18 +111,6 @@ import { __, sprintf } from '@wordpress/i18n';
 					}
 				} );
 
-				/**
-				 * Complete the tour when exit tour is clicked.
-				 */
-				$o.body.on( 'click', $o.exitTour, function() {
-					if (
-						typeof Shepherd !== 'undefined' &&
-						typeof Shepherd.activeTour !== 'undefined'
-					) {
-						Shepherd.activeTour.complete();
-					}
-				} );
-
 				// Generate Contribution Code.
 				$o.contributionGnerateCode.on(
 					'click',
@@ -196,6 +185,40 @@ import { __, sprintf } from '@wordpress/i18n';
 									$o.body
 										.find( 'input' )
 										.removeClass( 'input-blur' );
+									let merchantId =
+										revenueGeneratorGlobalOptions.merchant_id;
+									if (
+										! merchantId &&
+										$( $o.accountActionId ).val()
+									) {
+										merchantId = $(
+											$o.accountActionId
+										).val();
+									}
+
+									const eventAction = 'New ShortCode	';
+									const eventCategory =
+										'LP RevGen Contributions';
+									let eventLabel =
+										merchantId + ' - ' + formData.heading;
+									const amounts = $o.contributionAmounts;
+									amounts.each( function() {
+										const price = $( this )
+											.text()
+											.trim();
+										if ( 'custom' === price ) {
+											return true;
+										}
+										eventLabel += ' - ' + price;
+									} );
+
+									rgGlobal.sendLPGAEvent(
+										eventAction,
+										eventCategory,
+										eventLabel,
+										0,
+										true
+									);
 								}
 								// Release request lock.
 								$o.requestSent = false;
@@ -304,6 +327,25 @@ import { __, sprintf } from '@wordpress/i18n';
 								'#fff'
 							);
 						}
+
+						let eventLabel = '';
+
+						if ( 'campaignName' === modalType ) {
+							eventLabel = 'Campaign name';
+						} else if ( 'thankYouPage' === modalType ) {
+							eventLabel = 'Thank you page';
+						}
+
+						// Send GA Event.
+						const eventCategory = 'LP RevGen Contributions';
+						const eventAction = 'Help';
+						rgGlobal.sendLPGAEvent(
+							eventAction,
+							eventCategory,
+							eventLabel,
+							0,
+							true
+						);
 					}
 				} );
 
@@ -369,6 +411,19 @@ import { __, sprintf } from '@wordpress/i18n';
 						$o.contributionGnerateCode.prop( 'disabled', false );
 					}
 				} );
+
+				$( $o.contributionHelpGenerate ).on( 'click', function() {
+					// Send GA Event.
+					const eventCategory = 'LP RevGen Contributions';
+					const eventAction = 'Help';
+					const eventLabel = 'Generate code';
+					rgGlobal.sendLPGAEvent(
+						eventAction,
+						eventCategory,
+						eventLabel,
+						0
+					);
+				} );
 			};
 
 			/**
@@ -417,6 +472,11 @@ import { __, sprintf } from '@wordpress/i18n';
 					classes: 'shepherd-content-next-tour-element',
 				};
 
+				const tutorialEventCategory =
+					'LP RevGen Contributions Tutorial';
+				const tutorialEventLabelContinue = 'Continue';
+				const tutorialEventLabelComplete = 'Complete';
+
 				// Add tutorial step for main search.
 				tour.addStep( {
 					id: 'rg-contribution-header-description',
@@ -428,6 +488,17 @@ import { __, sprintf } from '@wordpress/i18n';
 					arrow: true,
 					classes: 'rev-gen-tutorial-contribution-title',
 					buttons: [ skipTourButton, nextButton ],
+					when: {
+						hide() {
+							rgGlobal.sendLPGAEvent(
+								'1 - Text Edit',
+								tutorialEventCategory,
+								tutorialEventLabelContinue,
+								0,
+								true
+							);
+						},
+					},
 				} );
 
 				// Add tutorial step for editing header title
@@ -445,6 +516,17 @@ import { __, sprintf } from '@wordpress/i18n';
 					arrow: true,
 					classes: 'rev-gen-tutorial-contribution-title',
 					buttons: [ nextButton ],
+					when: {
+						hide() {
+							rgGlobal.sendLPGAEvent(
+								'2 - Amount Edit',
+								tutorialEventCategory,
+								tutorialEventLabelContinue,
+								0,
+								true
+							);
+						},
+					},
 				} );
 
 				// Add tutorial step for option item.
@@ -466,6 +548,17 @@ import { __, sprintf } from '@wordpress/i18n';
 					arrow: true,
 					classes: 'rev-gen-tutorial-contribution-title',
 					buttons: [ nextButton ],
+					when: {
+						hide() {
+							rgGlobal.sendLPGAEvent(
+								'3 - PN v PL',
+								tutorialEventCategory,
+								tutorialEventLabelContinue,
+								0,
+								true
+							);
+						},
+					},
 				} );
 
 				// Add tutorial step for option item edit button.
@@ -482,6 +575,17 @@ import { __, sprintf } from '@wordpress/i18n';
 					arrow: true,
 					classes: 'rev-gen-tutorial-contribution-title',
 					buttons: [ nextButton ],
+					when: {
+						hide() {
+							rgGlobal.sendLPGAEvent(
+								'4 - Campaign Name',
+								tutorialEventCategory,
+								tutorialEventLabelContinue,
+								0,
+								true
+							);
+						},
+					},
 				} );
 
 				// Add tutorial step for paywall actions publish.
@@ -507,6 +611,17 @@ import { __, sprintf } from '@wordpress/i18n';
 							classes: 'shepherd-content-complete-tour-element',
 						},
 					],
+					when: {
+						hide() {
+							rgGlobal.sendLPGAEvent(
+								'5 - Generate Code',
+								tutorialEventCategory,
+								tutorialEventLabelComplete,
+								0,
+								true
+							);
+						},
+					},
 				} );
 			};
 
@@ -571,8 +686,46 @@ import { __, sprintf } from '@wordpress/i18n';
 					// Enable arrow events.
 					$( document ).unbind( 'keydown', disableArrowKeys );
 
-					// Complete the tour, and update plugin option.
-					completeTheTour();
+					const currentStep = Shepherd.activeTour.getCurrentStep();
+					let tutorialEventAction = '';
+					let tutorialEventLabel = 'Exit Tour';
+
+					switch ( currentStep.id ) {
+						case 'rg-contribution-header-description':
+							tutorialEventAction = '1 - Text Edit';
+							break;
+						case 'rg-contribution-amount-first':
+							tutorialEventAction = '2 - Amount Edit';
+							break;
+						case 'rg-contribution-amount-second':
+							tutorialEventAction = '3 - PN v PL';
+							break;
+						case 'rg-contribution-campaign-name':
+							tutorialEventAction = '4 - Campaign Name';
+							break;
+						case 'rg-contribution-generate-button':
+							tutorialEventAction = '5 - Generate Code';
+							tutorialEventLabel = 'Complete';
+							break;
+					}
+
+					const tutorialEventCategory = 'LP RevGen Paywall Tutorial';
+					
+					console.log( tutorialEventLabel );
+
+					// Send GA exit event.
+					rgGlobal.sendLPGAEvent(
+						tutorialEventAction,
+						tutorialEventCategory,
+						tutorialEventLabel,
+						0,
+						true
+					);
+
+					setTimeout( function() {
+						// Complete the tour, and update plugin option.
+						completeTheTour();
+					}, 500 );
 				} );
 
 				// Start the tour.
@@ -598,6 +751,16 @@ import { __, sprintf } from '@wordpress/i18n';
 					data: formData,
 					dataType: 'json',
 				} ).done( function( r ) {
+					const tutorialEventCategory =
+						'LP RevGen Contributions Tutorial';
+					const tutorialEventLabelComplete = 'Complete';
+					rgGlobal.sendLPGAEvent(
+						'5 - Generate Code',
+						tutorialEventCategory,
+						tutorialEventLabelComplete,
+						0,
+						true
+					);
 					if ( r.success ) {
 						location.reload();
 					}
