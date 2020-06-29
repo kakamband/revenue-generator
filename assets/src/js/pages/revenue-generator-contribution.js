@@ -709,10 +709,8 @@ import { __, sprintf } from '@wordpress/i18n';
 							break;
 					}
 
-					const tutorialEventCategory = 'LP RevGen Paywall Tutorial';
+					const tutorialEventCategory = 'LP RevGen Contributions Tutorial';
 					
-					console.log( tutorialEventLabel );
-
 					// Send GA exit event.
 					rgGlobal.sendLPGAEvent(
 						tutorialEventAction,
