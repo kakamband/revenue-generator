@@ -1,4 +1,4 @@
-/* global revenueGeneratorGlobalOptions */
+/* global revenueGeneratorGlobalOptions rgGlobal*/
 
 /**
  * JS to handle plugin welcome screen interactions.
@@ -36,20 +36,57 @@ import '../utils';
 			 * Bind all element events.
 			 */
 			const bindEvents = function() {
+				const WelcomeEventCategory = 'LP RevGen';
+				const PostCountEventCategory = 'LP RevGen Paywall Tutorial';
+				const WelcomeEventAction = 'Welcome Landing Page';
+				const PostCoutEventAction = 'Paywall Landing Page';
+
 				$o.lowPostCard.on( 'click', function() {
 					storePostPublishCount( 'low' );
+
+					rgGlobal.sendLPGAEvent(
+						PostCoutEventAction,
+						PostCountEventCategory,
+						'Fewer than 10',
+						0,
+						true
+					);
 				} );
 
 				$o.highPostCard.on( 'click', function() {
 					storePostPublishCount( 'high' );
+
+					rgGlobal.sendLPGAEvent(
+						PostCoutEventAction,
+						PostCountEventCategory,
+						'10+',
+						0,
+						true
+					);
 				} );
 
 				$o.isContribution.on( 'click', function() {
 					storeWelcomePage( 'contribution' );
+
+					rgGlobal.sendLPGAEvent(
+						WelcomeEventAction,
+						WelcomeEventCategory,
+						'Contributions',
+						0,
+						true
+					);
 				} );
 
 				$o.isPaywall.on( 'click', function() {
 					storeWelcomePage( 'paywall' );
+
+					rgGlobal.sendLPGAEvent(
+						WelcomeEventAction,
+						WelcomeEventCategory,
+						'Paywall',
+						0,
+						true
+					);
 				} );
 			};
 

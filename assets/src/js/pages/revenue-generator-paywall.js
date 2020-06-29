@@ -1,4 +1,4 @@
-/* global revenueGeneratorGlobalOptions, Shepherd, tippy */
+/* global revenueGeneratorGlobalOptions, Shepherd, tippy, rgGlobal */
 /**
  * JS to handle plugin paywall preview screen interactions.
  *
@@ -107,6 +107,12 @@ import { __, sprintf } from '@wordpress/i18n';
 					'.rev-gen-preview-main--paywall-actions-search'
 				),
 				paywallName: $( '.rev-gen-preview-main-paywall-name' ),
+
+				// Keep orginal paywall name in record for GA edit event.
+				paywallNameData: $( '.rev-gen-preview-main-paywall-name' )
+					.text()
+					.trim(),
+
 				paywallTitle: '.rg-purchase-overlay-title',
 				paywallDesc: '.rg-purchase-overlay-description',
 				paywallAppliesTo: '.rev-gen-preview-main-paywall-applies-to',
@@ -1515,6 +1521,26 @@ import { __, sprintf } from '@wordpress/i18n';
 								'background-color': '#a9a9a9',
 							} );
 						}
+
+						let eventLabel = '';
+
+						if ( 'revenue' === modalType ) {
+							eventLabel = 'Pay Now v Pay Later';
+						} else if ( 'pricing' === modalType ) {
+							eventLabel = 'Static Pricing v Dynamic Pricing';
+						}
+
+						// Send GA Event.
+						const eventCategory =
+							'LP RevGen Configure Paywall Purchase Options';
+						const eventAction = 'Help';
+						rgGlobal.sendLPGAEvent(
+							eventAction,
+							eventCategory,
+							eventLabel,
+							0,
+							true
+						);
 					}
 				} );
 
@@ -1573,6 +1599,41 @@ import { __, sprintf } from '@wordpress/i18n';
 
 					if ( dashboardURL ) {
 						window.location.href = dashboardURL;
+					}
+				} );
+
+				/**
+				 * Send Google Anayltics Event on Paywall Name edit.
+				 */
+				$o.paywallName.on( 'focusout', function() {
+					if (
+						$o.paywallNameData !==
+						$( this )
+							.text()
+							.trim()
+					) {
+						// Send GA Event.
+						const eventCategory = 'LP RevGen Configure Paywall';
+						const eventAction = 'Edit Title';
+						const eventLabel =
+							$( this )
+								.text()
+								.trim() +
+							' - ' +
+							$( $o.paywallTitle )
+								.text()
+								.trim();
+						rgGlobal.sendLPGAEvent(
+							eventAction,
+							eventCategory,
+							eventLabel,
+							0,
+							true
+						);
+
+						$o.paywallNameData = $( this )
+							.text()
+							.trim();
 					}
 				} );
 
@@ -1951,6 +2012,17 @@ import { __, sprintf } from '@wordpress/i18n';
 				 */
 				$o.body.on( 'click', $o.connectAccount, function() {
 					showAccountVerificationFields();
+					// Send GA Event.
+					const eventCategory = 'LP RevGen Account';
+					const eventLabel = 'Connect Account';
+					const eventAction = 'Connect Account';
+					rgGlobal.sendLPGAEvent(
+						eventAction,
+						eventCategory,
+						eventLabel,
+						0,
+						true
+					);
 				} );
 
 				/**
@@ -1973,6 +2045,17 @@ import { __, sprintf } from '@wordpress/i18n';
 						}
 						showAccountVerificationFields();
 					}
+					// Send GA Event.
+					const eventCategory = 'LP RevGen Account';
+					const eventLabel = 'Signup';
+					const eventAction = 'Connect Account';
+					rgGlobal.sendLPGAEvent(
+						eventAction,
+						eventCategory,
+						eventLabel,
+						0,
+						true
+					);
 				} );
 
 				/**
@@ -2325,6 +2408,8 @@ import { __, sprintf } from '@wordpress/i18n';
 							revenueGeneratorGlobalOptions.rg_paywall_nonce,
 					};
 
+					let eventLabel = '';
+
 					// Remove merchant credential fields and show the loader.
 					const activationModal = $o.previewWrapper.find(
 						$o.activationModal
@@ -2349,6 +2434,10 @@ import { __, sprintf } from '@wordpress/i18n';
 						activationModal.find( $o.accountActionsFields ).hide();
 						// Get all purchase options and check paywall id.
 						const allPurchaseOptions = $( $o.purchaseOptionItems );
+
+						// set connecting merchant ID.
+						revenueGeneratorGlobalOptions.merchant_id =
+							r.merchant_id;
 
 						// Check for Screen to perform actions paywall.
 						if (
@@ -2379,6 +2468,7 @@ import { __, sprintf } from '@wordpress/i18n';
 										hideLoader();
 									}, 2000 );
 								}
+								eventLabel = 'Success';
 							} else {
 								// Save the paywall as well, so that we don't miss any new changes if merchant as done any.
 								$o.isPublish = true;
@@ -2386,6 +2476,7 @@ import { __, sprintf } from '@wordpress/i18n';
 								activationModal
 									.find( $o.activationModalError )
 									.css( { display: 'flex' } );
+								eventLabel = 'Failure - ' + r.msg;
 							}
 
 							// Check for Screen to perform actions Contribution.
@@ -2406,12 +2497,14 @@ import { __, sprintf } from '@wordpress/i18n';
 									// Display message about Credentails.
 									$o.snackBar.showSnackbar( r.msg, 1500 );
 								}, 2000 );
+								eventLabel = 'Success';
 							} else {
 								// If there is error show Modal Error.
 								$o.isPublish = true;
 								activationModal
 									.find( $o.activationModalError )
 									.css( { display: 'flex' } );
+								eventLabel = 'Failure - ' + r.msg;
 							}
 						} else {
 							// If there is error show Modal Error.
@@ -2419,7 +2512,19 @@ import { __, sprintf } from '@wordpress/i18n';
 							activationModal
 								.find( $o.activationModalError )
 								.css( { display: 'flex' } );
+							eventLabel = 'Failure - Unknow Error';
 						}
+
+						// Send GA Event.
+						const eventCategory = 'LP RevGen Account';
+						const eventAction = 'Connect Account';
+						rgGlobal.sendLPGAEvent(
+							eventAction,
+							eventCategory,
+							eventLabel,
+							0,
+							true
+						);
 					} );
 				}
 			};
@@ -2505,6 +2610,10 @@ import { __, sprintf } from '@wordpress/i18n';
 					classes: 'shepherd-content-next-tour-element',
 				};
 
+				const tutorialEventCategory = 'LP RevGen Paywall Tutorial';
+				const tutorialEventLabelContinue = 'Continue';
+				const tutorialEventLabelComplete = 'Complete';
+
 				// Add tutorial step for main search.
 				tour.addStep( {
 					id: 'rg-main-search-input',
@@ -2519,6 +2628,17 @@ import { __, sprintf } from '@wordpress/i18n';
 					arrow: true,
 					classes: 'shepherd-content-add-space-top',
 					buttons: [ skipTourButton, nextButton ],
+					when: {
+						hide() {
+							rgGlobal.sendLPGAEvent(
+								'1 - Article Search',
+								tutorialEventCategory,
+								tutorialEventLabelContinue,
+								0,
+								true
+							);
+						},
+					},
 				} );
 
 				// Add tutorial step for editing header title
@@ -2532,6 +2652,17 @@ import { __, sprintf } from '@wordpress/i18n';
 					arrow: true,
 					classes: 'rev-gen-tutorial-title',
 					buttons: [ nextButton ],
+					when: {
+						hide() {
+							rgGlobal.sendLPGAEvent(
+								'2 - Name Paywall',
+								tutorialEventCategory,
+								tutorialEventLabelContinue,
+								0,
+								true
+							);
+						},
+					},
 				} );
 
 				// Add tutorial step for option item.
@@ -2549,6 +2680,17 @@ import { __, sprintf } from '@wordpress/i18n';
 					arrow: true,
 					classes: 'shepherd-content-add-space-bottom',
 					buttons: [ nextButton ],
+					when: {
+						hide() {
+							rgGlobal.sendLPGAEvent(
+								'3 - Element Hover',
+								tutorialEventCategory,
+								tutorialEventLabelContinue,
+								0,
+								true
+							);
+						},
+					},
 				} );
 
 				// Add tutorial step for option item edit button.
@@ -2565,6 +2707,17 @@ import { __, sprintf } from '@wordpress/i18n';
 					},
 					arrow: true,
 					buttons: [ nextButton ],
+					when: {
+						hide() {
+							rgGlobal.sendLPGAEvent(
+								'4 - More Options',
+								tutorialEventCategory,
+								tutorialEventLabelContinue,
+								0,
+								true
+							);
+						},
+					},
 				} );
 
 				// Add tutorial step for option item title area.
@@ -2582,6 +2735,17 @@ import { __, sprintf } from '@wordpress/i18n';
 					arrow: true,
 					classes: 'shepherd-content-add-space-bottom',
 					buttons: [ nextButton ],
+					when: {
+						hide() {
+							rgGlobal.sendLPGAEvent(
+								'5 - Text Edit',
+								tutorialEventCategory,
+								tutorialEventLabelContinue,
+								0,
+								true
+							);
+						},
+					},
 				} );
 
 				// Add tutorial step for option item price area.
@@ -2605,6 +2769,17 @@ import { __, sprintf } from '@wordpress/i18n';
 					arrow: true,
 					classes: 'shepherd-content-add-space-bottom',
 					buttons: [ nextButton ],
+					when: {
+						hide() {
+							rgGlobal.sendLPGAEvent(
+								'6 - Pricing',
+								tutorialEventCategory,
+								tutorialEventLabelContinue,
+								0,
+								true
+							);
+						},
+					},
 				} );
 
 				// Add tutorial step for option item add.
@@ -2621,6 +2796,17 @@ import { __, sprintf } from '@wordpress/i18n';
 					arrow: true,
 					classes: 'shepherd-content-add-space-bottom',
 					buttons: [ nextButton ],
+					when: {
+						hide() {
+							rgGlobal.sendLPGAEvent(
+								'7 - Add Purchase Option',
+								tutorialEventCategory,
+								tutorialEventLabelContinue,
+								0,
+								true
+							);
+						},
+					},
 				} );
 
 				// Add tutorial step for paywall name.
@@ -2637,6 +2823,17 @@ import { __, sprintf } from '@wordpress/i18n';
 					arrow: true,
 					classes: 'shepherd-content-add-space-bottom',
 					buttons: [ nextButton ],
+					when: {
+						hide() {
+							rgGlobal.sendLPGAEvent(
+								'8 - Name Paywall',
+								tutorialEventCategory,
+								tutorialEventLabelContinue,
+								0,
+								true
+							);
+						},
+					},
 				} );
 
 				// Add tutorial step for paywall actions search.
@@ -2654,6 +2851,17 @@ import { __, sprintf } from '@wordpress/i18n';
 					arrow: true,
 					classes: 'shepherd-content-add-space-bottom',
 					buttons: [ nextButton ],
+					when: {
+						hide() {
+							rgGlobal.sendLPGAEvent(
+								'9 - Select Content',
+								tutorialEventCategory,
+								tutorialEventLabelContinue,
+								0,
+								true
+							);
+						},
+					},
 				} );
 
 				// Add tutorial step for paywall actions publish.
@@ -2677,6 +2885,17 @@ import { __, sprintf } from '@wordpress/i18n';
 							classes: 'shepherd-content-complete-tour-element',
 						},
 					],
+					when: {
+						show() {
+							rgGlobal.sendLPGAEvent(
+								'10 - Publish',
+								tutorialEventCategory,
+								tutorialEventLabelComplete,
+								0,
+								true
+							);
+						},
+					},
 				} );
 			};
 
@@ -2753,8 +2972,59 @@ import { __, sprintf } from '@wordpress/i18n';
 					// Enable arrow events.
 					$( document ).unbind( 'keydown', disableArrowKeys );
 
-					// Complete the tour, and update plugin option.
-					completeTheTour();
+					const currentStep = Shepherd.activeTour.getCurrentStep();
+					let tutorialEventAction = '';
+					let tutorialEventLabel = 'Exit Tour';
+
+					switch ( currentStep.id ) {
+						case 'rg-main-search-input':
+							tutorialEventAction = '1 - Article Search';
+							break;
+						case 'rg-purchase-overlay-header':
+							tutorialEventAction = '2 - Name Paywall';
+							break;
+						case 'rg-purchase-option-item':
+							tutorialEventAction = '3 - Element Hover';
+							break;
+						case 'rg-purchase-option-item-edit':
+							tutorialEventAction = '4 - More Options';
+							break;
+						case 'rg-purchase-option-item-title':
+							tutorialEventAction = '5 - Text Edit';
+							break;
+						case 'rg-purchase-option-item-price':
+							tutorialEventAction = '6 - Pricing';
+							break;
+						case 'rg-purchase-option-item-add':
+							tutorialEventAction = '7 - Add Purchase Option';
+							break;
+						case 'rg-purchase-option-paywall-name':
+							tutorialEventAction = '8 - Name Paywall';
+							break;
+						case 'rg-purchase-option-paywall-actions-search':
+							tutorialEventAction = '9 - Select Content';
+							break;
+						case 'rg-purchase-option-paywall-publish':
+							tutorialEventAction = '10 - Publish';
+							tutorialEventLabel = 'Complete';
+							break;
+					}
+
+					const tutorialEventCategory = 'LP RevGen Paywall Tutorial';
+
+					// Send GA exit event.
+					rgGlobal.sendLPGAEvent(
+						tutorialEventAction,
+						tutorialEventCategory,
+						tutorialEventLabel,
+						0,
+						true
+					);
+
+					setTimeout( function() {
+						// Complete the tour, and update plugin option.
+						completeTheTour();
+					}, 500 );
 				} );
 
 				// Start the tour.
@@ -2901,6 +3171,18 @@ import { __, sprintf } from '@wordpress/i18n';
 										display: 'flex',
 									} );
 								} );
+
+								// Send GA Event.
+								const eventCategory =
+									'LP RevGen Paywall Preview';
+								const eventLabel = '';
+								rgGlobal.sendLPGAEvent(
+									'Article Search',
+									eventCategory,
+									eventLabel,
+									0,
+									true
+								);
 							} else {
 								$o.snackBar.showSnackbar( r.msg, 1500 );
 							}
@@ -2944,6 +3226,8 @@ import { __, sprintf } from '@wordpress/i18n';
 					data: formData,
 					dataType: 'json',
 				} ).done( function( r ) {
+					const eventLabel = $o.paywallName.text().trim();
+
 					// Show message and remove the overlay.
 					$o.snackBar.showSnackbar( r.msg, 1500 );
 					$o.purchaseOverlay.remove();
@@ -2966,6 +3250,17 @@ import { __, sprintf } from '@wordpress/i18n';
 							r.preview_id
 						);
 					}
+
+					// Send GA Event.
+					const eventCategory = 'LP RevGen Configure Paywall';
+					const eventAction = 'Paywall Deleted';
+					rgGlobal.sendLPGAEvent(
+						eventAction,
+						eventCategory,
+						eventLabel,
+						0,
+						true
+					);
 				} );
 			};
 
@@ -3481,7 +3776,54 @@ import { __, sprintf } from '@wordpress/i18n';
 					hideLoader();
 					$o.snackBar.showSnackbar( r.msg, 1500 );
 
+					// @todo Add Events here.
+					let eventLabel = '';
+					let eventAction = '';
+					if ( $o.isPublish ) {
+						eventAction = 'Publish';
+					} else {
+						eventAction = 'Save';
+					}
+					let eventCategory = 'LP RevGen Paywall Publish';
+					const paywallName = formData.paywall.name;
+					let merchantId = revenueGeneratorGlobalOptions.merchant_id;
+					if ( ! merchantId && $( $o.accountActionId ).val() ) {
+						merchantId = $( $o.accountActionId ).val();
+					}
+
+					const appliesTo = formData.paywall.applies;
+					const countPostId = formData.post_id;
+					const subscriptionsCount = formData.subscriptions.length;
+					const timePassesCount = formData.time_passes.length;
+					const countPurcahseOption =
+						parseInt( subscriptionsCount ) +
+						parseInt( timePassesCount );
+
+					eventLabel =
+						merchantId +
+						' - ' +
+						r.paywall_id +
+						' - ' +
+						paywallName +
+						' - ' +
+						appliesTo +
+						' - ' +
+						countPostId +
+						' - ' +
+						countPurcahseOption;
+
+					// Send GA Event.
+					rgGlobal.sendLPGAEvent(
+						eventAction,
+						eventCategory,
+						eventLabel,
+						0,
+						true
+					);
+
 					const purchaseOptions = $( $o.purchaseOptionItems );
+
+					eventCategory = 'Paywall Details';
 
 					// Set main paywall id.
 					purchaseOptions.attr( 'data-paywall-id', r.paywall_id );
@@ -3494,6 +3836,33 @@ import { __, sprintf } from '@wordpress/i18n';
 							'data-paywall-id',
 							r.paywall_id
 						);
+
+						let typeEvent = formData.individual.type;
+						if ( 'dynamic' !== typeEvent ) {
+							const revenueType = formData.individual.revenue;
+							if ( 'ppu' === revenueType ) {
+								typeEvent = 'Pay Later';
+							} else if ( 'sis' === revenueType ) {
+								typeEvent = 'Pay now';
+							}
+						}
+						// Send Single GA Event.
+						const price = formData.individual.price;
+						eventLabel =
+							revenueGeneratorGlobalOptions.merchant_id +
+							' - ' +
+							r.paywall_id +
+							' - Single Article - ' +
+							typeEvent +
+							' - ' +
+							price;
+						rgGlobal.sendLPGAEvent(
+							eventAction,
+							eventCategory,
+							eventLabel,
+							0,
+							true
+						);
 					}
 
 					const timePassOptions = purchaseOptions.find(
@@ -3501,11 +3870,40 @@ import { __, sprintf } from '@wordpress/i18n';
 					);
 					if ( timePassOptions.length ) {
 						// Add returned ids to appropriate purchase option.
-						timePassOptions.each( function() {
+						timePassOptions.each( function( i ) {
 							const timePassUID = $( this ).attr( 'data-uid' );
 							$( this ).attr(
 								'data-tlp-id',
 								r.time_passes[ timePassUID ]
+							);
+							const revenueType =
+								formData.time_passes[ i ].revenue;
+							let typeEvent = '';
+							if ( 'ppu' === revenueType ) {
+								typeEvent = 'Pay Later';
+							} else if ( 'sis' === revenueType ) {
+								typeEvent = 'Pay now';
+							}
+							const price = formData.time_passes[ i ].price;
+							const durtion =
+								formData.time_passes[ i ].period +
+								formData.time_passes[ i ].duration;
+							eventLabel =
+								revenueGeneratorGlobalOptions.merchant_id +
+								' - ' +
+								r.paywall_id +
+								' - Time Pass - ' +
+								typeEvent +
+								' - ' +
+								durtion +
+								' - ' +
+								price;
+							rgGlobal.sendLPGAEvent(
+								eventAction,
+								eventCategory,
+								eventLabel,
+								0,
+								true
 							);
 						} );
 					}
@@ -3515,13 +3913,43 @@ import { __, sprintf } from '@wordpress/i18n';
 					);
 					if ( subscriptionOptions.length ) {
 						// Add returned ids to appropriate purchase option.
-						subscriptionOptions.each( function() {
+						subscriptionOptions.each( function( i ) {
 							const subscriptionUID = $( this ).attr(
 								'data-uid'
 							);
 							$( this ).attr(
 								'data-sub-id',
 								r.subscriptions[ subscriptionUID ]
+							);
+
+							const revenueType =
+								formData.subscriptions[ i ].revenue;
+							let typeEvent = '';
+							if ( 'ppu' === revenueType ) {
+								typeEvent = 'Pay Later';
+							} else if ( 'sis' === revenueType ) {
+								typeEvent = 'Pay now';
+							}
+							const price = formData.subscriptions[ i ].price;
+							const durtion =
+								formData.subscriptions[ i ].period +
+								formData.subscriptions[ i ].duration;
+							eventLabel =
+								revenueGeneratorGlobalOptions.merchant_id +
+								' - ' +
+								r.paywall_id +
+								' - Subscription - ' +
+								typeEvent +
+								' - ' +
+								durtion +
+								' - ' +
+								price;
+							rgGlobal.sendLPGAEvent(
+								eventAction,
+								eventCategory,
+								eventLabel,
+								0,
+								true
 							);
 						} );
 					}
