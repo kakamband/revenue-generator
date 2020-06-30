@@ -42,7 +42,7 @@ class Settings {
 				[
 					'rg_ga_personal_enabled_status' => 0,
 					'rg_ga_enabled_status'          => 0,
-					'rg_laterpay_ga_ua_id'          => 'UA-126481240-1',
+					'rg_laterpay_ga_ua_id'          => 'UA-50448165-9',
 					'rg_personal_ga_ua_id'          => '',
 				]
 			);
