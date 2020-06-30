@@ -53,6 +53,7 @@ class Admin {
 		add_action( 'wp_ajax_rg_search_term', [ $this, 'select_search_term' ] );
 		add_action( 'wp_ajax_rg_clear_category_meta', [ $this, 'clear_category_meta' ] );
 		add_action( 'wp_ajax_rg_complete_tour', [ $this, 'complete_tour' ] );
+		add_action( 'wp_ajax_rg_verify_account_credentials', [ $this, 'verify_account_credentials' ] );
 		add_action( 'wp_ajax_rg_post_permalink', [ $this, 'get_post_permalink' ] );
 		add_action( 'wp_ajax_rg_activate_paywall', [ $this, 'activate_paywall' ] );
 		add_action( 'wp_ajax_rg_disable_paywall', [ $this, 'disable_paywall' ] );
@@ -105,8 +106,33 @@ class Admin {
 			Settings::update_settings_options( 'rg_ga_enabled_status', $rg_ga_enabled_status );
 		}
 
+		// Verify Merchant Credentials.
 		if ( ! empty( $merchant_id ) && ! empty( $merchant_key ) ) {
-			$response['merchant'] = $this->verify_account_credentials( $merchant_id, $merchant_key );
+
+			$client_account_instance = Client_Account::get_instance();
+			$rg_merchant_credentials = Client_Account::get_merchant_credentials();
+
+			// Check and verify merchant id data.
+			if ( ! empty( $merchant_id ) ) {
+				$rg_merchant_credentials['merchant_id'] = $merchant_id;
+			}
+
+			// Check and verify merchant id data.
+			if ( ! empty( $merchant_key ) ) {
+				$rg_merchant_credentials['merchant_key'] = $merchant_key;
+			}
+
+			// Update the option value.
+			update_option( 'lp_rg_merchant_credentials', $rg_merchant_credentials );
+
+			$response['merchant'] = $client_account_instance->validate_merchant_account();
+
+			// Set merchant status to verified.
+			if ( true === $response['merchant'] ) {
+				$rg_global_options                         = Config::get_global_options();
+				$rg_global_options['is_merchant_verified'] = '1';
+				update_option( 'lp_rg_global_options', $rg_global_options );
+			}
 		}
 
 		if ( $response['merchant'] ) {
@@ -1277,12 +1303,14 @@ class Admin {
 
 	/**
 	 * Verify account credentials and do a test purchase.
-	 *
-	 * @param string $merchant_id  Merchant ID.
-	 * @param string $merchant_key Merchant Key.
-	 * @return boolean return true if verfied else false.
 	 */
-	public static function verify_account_credentials( $merchant_id, $merchant_key ) {
+	public function verify_account_credentials() {
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Get all data and sanitize it.
+		$merchant_id  = sanitize_text_field( filter_input( INPUT_POST, 'merchant_id', FILTER_SANITIZE_STRING ) );
+		$merchant_key = sanitize_text_field( filter_input( INPUT_POST, 'merchant_key', FILTER_SANITIZE_STRING ) );
 
 		$client_account_instance = Client_Account::get_instance();
 		$rg_merchant_credentials = Client_Account::get_merchant_credentials();
@@ -1310,10 +1338,19 @@ class Admin {
 		}
 
 		if ( $is_valid ) {
-			return true;
+			$response = array(
+				'success' => true,
+				'msg'     => esc_html__( 'Saved valid crendetials!', 'revenue-generator' ),
+			);
+		} else {
+			$response = array(
+				'success' => false,
+				'msg'     => esc_html__( 'Invalid credentials!', 'revenue-generator' ),
+			);
 		}
 
-		return false;
+		// Send success message.
+		wp_send_json( $response );
 	}
 
 	/**
