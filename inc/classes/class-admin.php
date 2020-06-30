@@ -113,12 +113,12 @@ class Admin {
 
 			// Check and verify merchant id data.
 			if ( ! empty( $merchant_id ) ) {
-					$rg_merchant_credentials['merchant_id'] = $merchant_id;
+				$rg_merchant_credentials['merchant_id'] = $merchant_id;
 			}
 
 			// Check and verify merchant id data.
 			if ( ! empty( $merchant_key ) ) {
-					$rg_merchant_credentials['merchant_key'] = $merchant_key;
+				$rg_merchant_credentials['merchant_key'] = $merchant_key;
 			}
 
 			// Update the option value.
