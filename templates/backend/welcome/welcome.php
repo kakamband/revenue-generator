@@ -34,6 +34,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<h5 class="rg-card--title"><?php esc_html_e( 'Create Paywall', 'revenue-generator' ); ?></h5>
 				</div>
 			</div>
+			<div class="welcome-screen-tracking-wrapper">
+				<div class="welcome-screen-tracking">
+					<input type="checkbox" checked="checked" class="welcome-screen-tracking" name="rg_ga_enabled_status" id="welcome-screen-tracking" value="1">
+					<?php esc_html_e( 'Enable usage tracking and help improve Revenue Generator', 'revenue-generator' ); ?>
+				</div>
+			</div>
 		</div>
 		<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
 	</div>
