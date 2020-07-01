@@ -114,12 +114,12 @@ class Admin {
 
 			// Check and verify merchant id data.
 			if ( ! empty( $merchant_id ) ) {
-					$rg_merchant_credentials['merchant_id'] = $merchant_id;
+				$rg_merchant_credentials['merchant_id'] = $merchant_id;
 			}
 
 			// Check and verify merchant id data.
 			if ( ! empty( $merchant_key ) ) {
-					$rg_merchant_credentials['merchant_key'] = $merchant_key;
+				$rg_merchant_credentials['merchant_key'] = $merchant_key;
 			}
 
 			// Update the option value.
@@ -823,10 +823,17 @@ class Admin {
 		check_ajax_referer( 'rg_global_config_nonce', 'security' );
 
 		// Get all data and sanitize it.
-		$config_key   = sanitize_text_field( filter_input( INPUT_POST, 'config_key', FILTER_SANITIZE_STRING ) );
-		$config_value = sanitize_text_field( filter_input( INPUT_POST, 'config_value', FILTER_SANITIZE_STRING ) );
+		$config_key           = sanitize_text_field( filter_input( INPUT_POST, 'config_key', FILTER_SANITIZE_STRING ) );
+		$config_value         = sanitize_text_field( filter_input( INPUT_POST, 'config_value', FILTER_SANITIZE_STRING ) );
+		$rg_ga_enabled_status = filter_input( INPUT_POST, 'rg_ga_enabled_status', FILTER_SANITIZE_NUMBER_INT );
 
-		$rg_global_options = Config::get_global_options();
+		$rg_global_options  = Config::get_global_options();
+		$rg_global_settings = Settings::get_settings_options();
+
+		// Update Tracking Settings.
+		if ( isset( $rg_global_settings['rg_ga_enabled_status'] ) && isset( $rg_ga_enabled_status ) ) {
+			Settings::update_settings_options( 'rg_ga_enabled_status', $rg_ga_enabled_status );
+		}
 
 		// Check if the option exists already.
 		if ( ! isset( $rg_global_options[ $config_key ] ) ) {
