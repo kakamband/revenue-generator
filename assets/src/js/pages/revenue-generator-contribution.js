@@ -709,8 +709,9 @@ import { __, sprintf } from '@wordpress/i18n';
 							break;
 					}
 
-					const tutorialEventCategory = 'LP RevGen Contributions Tutorial';
-					
+					const tutorialEventCategory =
+						'LP RevGen Contributions Tutorial';
+
 					// Send GA exit event.
 					rgGlobal.sendLPGAEvent(
 						tutorialEventAction,
