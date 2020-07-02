@@ -22,6 +22,7 @@ $lp_rg_global_options = [
 	'lp_rg_version',
 	'lp_rg_global_options',
 	'lp_rg_merchant_credentials',
+	'lp_rg_settings_options',
 ];
 
 foreach ( $lp_rg_global_options as $lp_rg_global_option ) {
