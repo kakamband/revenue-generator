@@ -28,6 +28,7 @@ import '../utils';
 				// Welcome Cards.
 				isContribution: $( '#rg_Contribution' ),
 				isPaywall: $( '#rg_Paywall' ),
+				laterpayTrackingStatus: $( '.welcome-screen-tracking' ),
 
 				snackBar: $( '#rg_js_SnackBar' ),
 			};
@@ -41,6 +42,9 @@ import '../utils';
 				const WelcomeEventAction = 'Welcome Landing Page';
 				const PostCoutEventAction = 'Paywall Landing Page';
 
+				/**
+				 * Triggers Low Post card Selection.
+				 */
 				$o.lowPostCard.on( 'click', function() {
 					storePostPublishCount( 'low' );
 
@@ -53,6 +57,9 @@ import '../utils';
 					);
 				} );
 
+				/**
+				 * Triggers High Post card Selection.
+				 */
 				$o.highPostCard.on( 'click', function() {
 					storePostPublishCount( 'high' );
 
@@ -65,8 +72,15 @@ import '../utils';
 					);
 				} );
 
+				/**
+				 * Triggers Contribution card Selection.
+				 */
 				$o.isContribution.on( 'click', function() {
-					storeWelcomePage( 'contribution' );
+					let lpayTrackingStatus = 0;
+					if ( $o.laterpayTrackingStatus.is( ':checked' ) ) {
+						lpayTrackingStatus = 1;
+					}
+					storeWelcomePage( 'contribution', lpayTrackingStatus );
 
 					rgGlobal.sendLPGAEvent(
 						WelcomeEventAction,
@@ -77,8 +91,16 @@ import '../utils';
 					);
 				} );
 
+				/**
+				 * Triggers Paywall card Selection.
+				 */
 				$o.isPaywall.on( 'click', function() {
-					storeWelcomePage( 'paywall' );
+					let lpayTrackingStatus = 0;
+					if ( $o.laterpayTrackingStatus.is( ':checked' ) ) {
+						lpayTrackingStatus = 1;
+					}
+
+					storeWelcomePage( 'paywall', lpayTrackingStatus );
 
 					rgGlobal.sendLPGAEvent(
 						WelcomeEventAction,
@@ -88,19 +110,35 @@ import '../utils';
 						true
 					);
 				} );
+
+				/**
+				 * Toggles checked attribute on click event.
+				 */
+				$o.laterpayTrackingStatus.on( 'click', function() {
+					if ( 'checked' === $( this ).attr( 'checked' ) ) {
+						$( this ).attr( 'checked', 'checked' );
+					} else {
+						$( this ).removeAttr( 'checked' );
+					}
+				} );
 			};
 
 			/*
 			 * Update and Store Welcome Page setup done.
 			 *
 			 * @param {string} is_welcome_done value.
+			 * @param {int} lpayTrackingStatus status of Laterpay Tracking.
 			 * @return {void}
 			 */
-			const storeWelcomePage = function( isWelcomeDone ) {
+			const storeWelcomePage = function(
+				isWelcomeDone,
+				lpayTrackingStatus
+			) {
 				const formData = {
 					action: 'rg_update_global_config',
 					config_key: 'is_welcome_done',
 					config_value: isWelcomeDone,
+					rg_ga_enabled_status: lpayTrackingStatus,
 					security:
 						revenueGeneratorGlobalOptions.rg_global_config_nonce,
 				};
