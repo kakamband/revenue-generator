@@ -217,6 +217,16 @@ body.revenue-generator_page_revenue-generator-contribution {
 
 }
 
+.amount-text-dashborad {
+	font-family: $box-font-worksans;
+	font-size: 12px;
+	font-weight: normal;
+	font-stretch: normal;
+	font-style: normal;
+	letter-spacing: normal;
+	color: $box-dark-grey;
+}
+
 /* Dashboard Styling */
 .rev-gen-dashboard-content-contribution {
 	margin-bottom: 20px;
@@ -278,6 +288,15 @@ body.revenue-generator_page_revenue-generator-contribution {
 			justify-content: center;
 			overflow: hidden;
 			word-break: normal;
+
+			&-currency {
+				@extend .amount-text-dashborad;
+			}
+
+			&-amount {
+				@extend .amount-text-dashborad;
+			}
+
 		}
 
 	}
