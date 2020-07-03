@@ -29,11 +29,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<div class="welcome-screen-wrapper--card">
 				<div id="rg_js_lowPostCard" class="rg-card">
 					<img class="rg-card--icon" alt="<?php esc_attr_e( 'Fewer posts icon', 'revenue-generator' ); ?>" src="<?php echo esc_url( $low_count_icon ); ?>">
-					<h5 class="rg-card--title"><?php esc_html_e( 'Fewer than 10 posts per month', 'revenue-generator' ); ?></h5>
+					<h5 class="rg-card--title">
+						<?php
+							// translators: %1$s Fewer %2$s Bold First Letters.
+							printf( esc_html__( '%1$sFewer%2$s than 10 posts per month', 'revenue-generator' ), '<b>', '</b>' );
+						?>
+					</h5>
 				</div>
 				<div id="rg_js_highPostCard" class="rg-card">
 					<img class="rg-card--icon" alt="<?php esc_attr_e( 'More posts icon', 'revenue-generator' ); ?>" src="<?php echo esc_url( $high_count_icon ); ?>">
-					<h5 class="rg-card--title"><?php esc_html_e( 'More than 10 posts per month', 'revenue-generator' ); ?></h5>
+					<h5 class="rg-card--title">
+						<?php
+							// translators: %1$s More %2$s Bold First Letters.
+							printf( esc_html__( '%1$sMore%2$s than 10 posts per month', 'revenue-generator' ), '<b>', '</b>' );
+						?>
+					</h5>
 				</div>
 			</div>
 		</div>
