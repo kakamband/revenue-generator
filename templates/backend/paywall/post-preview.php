@@ -286,7 +286,7 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 		endif;
 		?>
 	</div>
-	<div class="rg-purchase-overlay-option-area">
+	<div class="rg-purchase-overlay-option-area" <?php echo ( ! empty( $purchase_option_items ) && 5 <= count( $purchase_option_items ) ) ? 'style="display:none;"' : ''; ?>>
 		<div class="rg-purchase-overlay-option-area-add-option">
 			<button>
 				<img alt="<?php echo esc_attr( 'Option add', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['option_add'] ); ?>" />
