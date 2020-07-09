@@ -1579,6 +1579,16 @@ import { __, sprintf } from '@wordpress/i18n';
 						window.location.href = dashboardURL;
 					}
 				} );
+				
+				/**
+				 * Limit paywall name to 20 characters.
+				 */
+				$o.paywallName.on('keydown', function( e ) {
+				      const textlen = $(this).text().trim().length;
+				      if ( 20 === textlen && 8 !== e.keyCode ) {
+					  e.preventDefault();
+				      }
+				} );
 
 				/**
 				 * Send Google Anayltics Event on Paywall Name edit.
