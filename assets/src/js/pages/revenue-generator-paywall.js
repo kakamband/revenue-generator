@@ -293,9 +293,6 @@ import { __, sprintf } from '@wordpress/i18n';
 					} else if ( 'rg-purchase-option-paywall-name' === stepId ) {
 						$( $o.paywallAppliesTo ).val( 'category' );
 						$( $o.paywallAppliesTo ).trigger( 'change' );
-						// Hack to get tooltip on expected place.
-						Shepherd.activeTour.next();
-						Shepherd.activeTour.back();
 					} else if (
 						'rg-purchase-option-paywall-publish' === stepId
 					) {
@@ -1509,8 +1506,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						}
 
 						// Send GA Event.
-						const eventCategory =
-							'LP RevGen Configure Paywall Purchase Options';
+						const eventCategory = 'LP RevGen Configure Paywall';
 						const eventAction = 'Help';
 						rgGlobal.sendLPGAEvent(
 							eventAction,
@@ -2818,12 +2814,12 @@ import { __, sprintf } from '@wordpress/i18n';
 				tour.addStep( {
 					id: 'rg-purchase-option-paywall-actions-search',
 					text: __(
-						'Select the content that  should display this paywall.',
+						'Select the content that should display this paywall.',
 						'revenue-generator'
 					),
 					attachTo: {
 						element:
-							'.rev-gen-preview-main--paywall-actions .rev-gen-preview-main--paywall-actions-search',
+							'.rev-gen-preview-main--paywall-actions-search',
 						on: 'bottom',
 					},
 					arrow: true,
@@ -2850,8 +2846,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						'revenue-generator'
 					),
 					attachTo: {
-						element:
-							'.rev-gen-preview-main--paywall-actions-update .rev-gen-preview-main--paywall-actions-update-publish',
+						element: '#rg_js_activatePaywall',
 						on: 'bottom',
 					},
 					arrow: true,
@@ -2864,7 +2859,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						},
 					],
 					when: {
-						show() {
+						hide() {
 							rgGlobal.sendLPGAEvent(
 								'10 - Publish',
 								tutorialEventCategory,
@@ -3771,7 +3766,7 @@ import { __, sprintf } from '@wordpress/i18n';
 					} else {
 						eventAction = 'Save';
 					}
-					let eventCategory = 'LP RevGen Paywall Publish';
+					const eventCategory = 'LP RevGen Paywall Publish';
 					const paywallName = formData.paywall.name;
 					let merchantId = revenueGeneratorGlobalOptions.merchant_id;
 					if ( ! merchantId && $( $o.accountActionId ).val() ) {
@@ -3810,7 +3805,7 @@ import { __, sprintf } from '@wordpress/i18n';
 
 					const purchaseOptions = $( $o.purchaseOptionItems );
 
-					eventCategory = 'Paywall Details';
+					eventAction = 'Paywall Details';
 
 					// Set main paywall id.
 					purchaseOptions.attr( 'data-paywall-id', r.paywall_id );
