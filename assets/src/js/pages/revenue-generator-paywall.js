@@ -289,12 +289,10 @@ import { __, sprintf } from '@wordpress/i18n';
 								'border-right': '1px solid #e3e4e6',
 							} );
 					} else if ( 'rg-purchase-option-item-price' === stepId ) {
-						$( $o.optionArea ).trigger( 'mouseenter' );
 						$( $o.previewSecondItem ).trigger( 'mouseleave' );
 					} else if ( 'rg-purchase-option-paywall-name' === stepId ) {
 						$( $o.paywallAppliesTo ).val( 'category' );
 						$( $o.paywallAppliesTo ).trigger( 'change' );
-						$( $o.optionArea ).trigger( 'mouseleave' );
 						// Hack to get tooltip on expected place.
 						Shepherd.activeTour.next();
 						Shepherd.activeTour.back();
@@ -1370,32 +1368,6 @@ import { __, sprintf } from '@wordpress/i18n';
 				} );
 
 				/**
-				 * Hide the purchase option add button.
-				 */
-				$o.body.on( 'mouseenter', $o.optionArea, function() {
-					// Hide the paywall border.
-					$o.purchaseOverlay
-						.children( '.rg-purchase-overlay-highlight' )
-						.hide();
-					$( $o.purchaseOverlayRemove ).hide();
-
-					// Only show if total count limit doesn't exceed.
-					const currentOptionCount = $( $o.purchaseOptionItems ).find(
-						$o.purchaseOptionItem
-					).length;
-					if ( currentOptionCount < 5 ) {
-						$( $o.addOptionArea ).css( { display: 'flex' } );
-					}
-				} );
-
-				/**
-				 * Hide the add option button when not in focus.
-				 */
-				$o.body.on( 'mouseleave', $o.optionArea, function() {
-					$( $o.addOptionArea ).hide();
-				} );
-
-				/**
 				 * Add new option handler.
 				 */
 				$o.body.on( 'click', $o.addOptionArea, function() {
@@ -1410,6 +1382,12 @@ import { __, sprintf } from '@wordpress/i18n';
 						);
 						$( $o.purchaseOptionItems ).append( optionItem );
 					}
+
+					// hide if we have added 5 options.
+					if ( 5 <= currentOptionCount + parseInt( 1 ) ) {
+						$( $o.optionArea ).hide();
+					}
+
 					reorderPurchaseItems();
 				} );
 
@@ -1599,6 +1577,39 @@ import { __, sprintf } from '@wordpress/i18n';
 
 					if ( dashboardURL ) {
 						window.location.href = dashboardURL;
+					}
+				} );
+
+				/**
+				 * Limit paywall name to 20 characters.
+				 */
+				$o.paywallName.on( 'keydown', function( e ) {
+					const textlen = $( this )
+						.text()
+						.trim().length;
+					if ( 20 <= textlen ) {
+						// if more than 20 prevent allow following keys execept default case.
+						switch ( e.keyCode ) {
+							case 8: // Backspace
+							case 9: // Tab
+							case 13: // Enter
+							case 37: // Left
+							case 38: // Up
+							case 39: // Right
+							case 40: // Down
+								break;
+							default:
+								const regex = new RegExp(
+									'^[a-zA-Z0-9.,/ $@()]+$'
+								);
+								const key = e.key;
+								// Block All Characters, Numbers and Special Characters.
+								if ( regex.test( key ) ) {
+									e.preventDefault();
+									return false;
+								}
+								break;
+						}
 					}
 				} );
 
@@ -3775,6 +3786,15 @@ import { __, sprintf } from '@wordpress/i18n';
 				} ).done( function( r ) {
 					hideLoader();
 					$o.snackBar.showSnackbar( r.msg, 1500 );
+
+					const currentOptionCount = $( $o.purchaseOptionItems ).find(
+						$o.purchaseOptionItem
+					).length;
+
+					// show if we have less than 5 options.
+					if ( currentOptionCount < 5 ) {
+						$( $o.optionArea ).show();
+					}
 
 					// @todo Add Events here.
 					let eventLabel = '';
