@@ -292,8 +292,8 @@ import { debounce } from '../helpers';
 				bindEvents();
 				// Send GA Event on Dashboard load. (test event)
 				if ( $( $o.rgDashboard ).length > 0 ) {
-					const eventlabel = 'Revenue Generator Dashboard';
-					const eventCategory = 'Revenue Generator Plugin';
+					const eventlabel = $( $o.rgDashboard ).data( 'current' );
+					const eventCategory = 'LP RevGen';
 					rgGlobal.sendLPGAEvent(
 						'View Dashboard',
 						eventCategory,
