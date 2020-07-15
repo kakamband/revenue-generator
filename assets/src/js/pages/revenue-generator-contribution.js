@@ -33,6 +33,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				contributionCampaignNameLabel: '#rg_contribution_campaign_name',
 				contributionThankYouPageLabel:
 					'#rg_contribution_thankyou_label',
+				contributionGenerateButtonLabel: '#rg_contribution_generate',
 				contributionHelpGenerate: '#rev-gen-contribution-help-generate',
 
 				// Dashboard elements.
@@ -308,6 +309,11 @@ import { __, sprintf } from '@wordpress/i18n';
 							$( $o.contributionCampaignNameLabel )
 								.find( 'input' )
 								.removeClass( 'input-blur' );
+
+							$( $o.contributionGenerateButtonLabel ).removeAttr(
+								'style'
+							);
+
 							$( $o.contributionThankYouPageLabel ).removeAttr(
 								'style'
 							);
@@ -315,6 +321,16 @@ import { __, sprintf } from '@wordpress/i18n';
 								'background-color',
 								'#fff'
 							);
+						} else if ( 'shortcode' === modalType ) {
+							$( $o.contributionGenerateButtonLabel )
+								.find( 'input' )
+								.removeClass( 'input-blur' );
+							$o.contributionGnerateCode.removeAttr( 'style' );
+							$( $o.contributionGenerateButtonLabel ).css(
+								'background-color',
+								'#fff'
+							);
+							$o.contributionGnerateCode.css( 'color', '#fff' );
 						} else {
 							$( $o.contributionThankYouPageLabel )
 								.find( 'input' )
@@ -326,6 +342,9 @@ import { __, sprintf } from '@wordpress/i18n';
 								'background-color',
 								'#fff'
 							);
+							$( $o.contributionGenerateButtonLabel ).removeAttr(
+								'style'
+							);
 						}
 
 						let eventLabel = '';
@@ -334,6 +353,8 @@ import { __, sprintf } from '@wordpress/i18n';
 							eventLabel = 'Campaign name';
 						} else if ( 'thankYouPage' === modalType ) {
 							eventLabel = 'Thank you page';
+						} else if ( 'shortcode' === modalType ) {
+							eventLabel = 'Generate Shortcode';
 						}
 
 						// Send GA Event.
@@ -352,13 +373,11 @@ import { __, sprintf } from '@wordpress/i18n';
 				/**
 				 * Close Popup by clicking on wrapper.
 				 */
-				$o.rgLayoutWrapper.on( 'click', function( e ) {
+				$o.rgLayoutWrapper.on( 'click', function() {
 					if (
 						$( $o.contributionHelpModal ) &&
 						$( $o.contributionHelpModal ).length > 0
 					) {
-						e.preventDefault();
-
 						// This may seem duplicate but modal is inside wrapper and needed to avoid call stack.
 						$( $o.contributionHelpModal ).remove();
 						$o.body.removeClass( 'modal-blur' );
@@ -374,6 +393,11 @@ import { __, sprintf } from '@wordpress/i18n';
 							'background-color',
 							'inherit'
 						);
+						$( $o.contributionGenerateButtonLabel ).css(
+							'background-color',
+							'inherit'
+						);
+
 						$o.body.find( 'input' ).removeClass( 'input-blur' );
 					}
 				} );
@@ -389,6 +413,14 @@ import { __, sprintf } from '@wordpress/i18n';
 						'inherit'
 					);
 					$( $o.contributionThankYouPageLabel ).css(
+						'background-color',
+						'inherit'
+					);
+					$( $o.contributionThankYouPageLabel ).css(
+						'background-color',
+						'inherit'
+					);
+					$( $o.contributionGenerateButtonLabel ).css(
 						'background-color',
 						'inherit'
 					);
