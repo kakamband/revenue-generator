@@ -35,8 +35,8 @@ class Settings {
 
 		// Fresh install.
 		if ( false === get_option( 'lp_rg_settings_options' ) ) {
-			// @todo, make region and currency empty and let the merchant choose, once EU is ready on upstream.
-			// Set default global options.
+
+			// Set default settings.
 			update_option(
 				'lp_rg_settings_options',
 				[

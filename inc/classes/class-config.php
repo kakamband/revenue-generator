@@ -38,8 +38,11 @@ class Config {
 	 * Setup plugin options.
 	 */
 	protected function setup_options() {
+
+		$current_version = get_option( 'lp_rg_version' );
+
 		// Check if plugin installation is fresh install.
-		if ( false === get_option( 'lp_rg_version' ) ) {
+		if ( false === $current_version ) {
 			update_option( 'lp_rg_version', REVENUE_GENERATOR_VERSION );
 		}
 
@@ -59,6 +62,20 @@ class Config {
 					'is_merchant_verified'               => 0,
 				]
 			);
+		}
+
+		// Update version.
+		if ( false !== $current_version && REVENUE_GENERATOR_VERSION !== $current_version && REVENUE_GENERATOR_VERSION > $current_version ) {
+
+			// Update new version.
+			update_option( 'lp_rg_version', REVENUE_GENERATOR_VERSION );
+
+			// Update settings on version 1.0.1.
+			if ( '1.0.1' >= $current_version ) {
+				$settings_options                         = get_option( 'lp_rg_settings_options' );
+				$settings_options['rg_laterpay_ga_ua_id'] = 'UA-50448165-8';
+				update_option( 'lp_rg_settings_options', $settings_options );
+			}
 		}
 	}
 
