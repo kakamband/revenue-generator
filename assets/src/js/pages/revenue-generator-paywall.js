@@ -1577,6 +1577,39 @@ import { __, sprintf } from '@wordpress/i18n';
 				} );
 
 				/**
+				 * Limit paywall name to 20 characters.
+				 */
+				$o.paywallName.on( 'keydown', function( e ) {
+					const textlen = $( this )
+						.text()
+						.trim().length;
+					if ( 20 <= textlen ) {
+						// if more than 20 prevent allow following keys execept default case.
+						switch ( e.keyCode ) {
+							case 8: // Backspace
+							case 9: // Tab
+							case 13: // Enter
+							case 37: // Left
+							case 38: // Up
+							case 39: // Right
+							case 40: // Down
+								break;
+							default:
+								const regex = new RegExp(
+									'^[a-zA-Z0-9.,/ $@()]+$'
+								);
+								const key = e.key;
+								// Block All Characters, Numbers and Special Characters.
+								if ( regex.test( key ) ) {
+									e.preventDefault();
+									return false;
+								}
+								break;
+						}
+					}
+				} );
+
+				/**
 				 * Send Google Anayltics Event on Paywall Name edit.
 				 */
 				$o.paywallName.on( 'focusout', function() {

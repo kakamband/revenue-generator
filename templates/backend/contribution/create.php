@@ -62,14 +62,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
 				</button>
 			</label>
-			<div id="rg_contribution_generate" class="rev-gen-contribution-main-button">
+			<label id="rg_contribution_generate" class=" rev-gen-contribution-main-input-label rev-gen-contribution-main-button">
 				<button class="rev-gen-contribution-main-generate-button">
 					<?php esc_html_e( 'Generate and copy code', 'revenue-generator' ); ?>
 				</button>
-				<a target="_blank" href="https://wordpress.com/support/shortcodes/" id="rev-gen-contribution-help-generate" class="rev-gen-contribution-main--help-button">
+				<button data-info-for="shortcode" id="rev-gen-contribution-help-shortcode" class="rev-gen-settings-main-option-info rev-gen-contribution-main--help rev-gen-contribution-main--shortcode">
 					<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
-				</a>
-			</div>	
+				</button>
+			</label>	
 			<p class="rev-gen-contribution-main-copy-message"><?php esc_html_e( 'To include the Contribution Box on your site, paste the code where you would like it to appear.', 'revenue-generator' ); ?></p>
 		</div>
 		</div>
@@ -79,6 +79,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</div>	
 </div>
 <?php View::render_footer_backend(); ?>
+<!-- Template for ShortCode modal -->
+<script type="text/template" id="tmpl-revgen-info-shortcode">
+	<div class="rev-gen-contribution-main-info-modal rev-gen-preview-main-info-modal campaign-name-info-modal">
+	<span class="rev-gen-contribution-main-info-modal-cross"><img alt="<?php esc_attr_e( 'close', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['icon_close'] ); ?>" /></span>
+		<h4 class="rev-gen-preview-main-info-modal-title rev-gen-settings-main-info-modal-title"><?php esc_html_e( 'Contribution Shortcode', 'revenue-generator' ); ?></h4>
+		<p class="rev-gen-preview-main-info-modal-message">
+			<?php
+			echo wp_kses(
+				__(
+					'Once you have completed the information above, simply click "Generate and copy code." This will use the information you have provided to create a customized <a href="https://wordpress.com/support/shortcodes/" target="_blank">shortcode</a>. It will also copy this code to your clipboard so all that you need to do is navigate to where you would like this to appear on your site & paste it in pace.',
+					'revenue-generator'
+				),
+				[
+					'a' => [
+						'href'   => [],
+						'target' => [],
+					],
+				]
+			);
+			?>
+		</p>
+	</div>
+</script>
 <!-- Template for Campaign Name modal -->
 <script type="text/template" id="tmpl-revgen-info-campaignName">
 	<div class="rev-gen-contribution-main-info-modal rev-gen-preview-main-info-modal campaign-name-info-modal">
