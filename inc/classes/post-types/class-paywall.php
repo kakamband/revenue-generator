@@ -406,6 +406,8 @@ class Paywall extends Base {
 			'post_type'      => static::SLUG,
 			'post_status'    => [ 'publish' ],
 			'posts_per_page' => 1,
+			'orderby'        => 'modified',
+			'order'          => 'DESC',
 		];
 
 		$meta_query = [
