@@ -73,7 +73,7 @@ class Config {
 			// Update settings on version 1.0.1.
 			if ( '1.0.1' >= $current_version ) {
 				$settings_options                         = get_option( 'lp_rg_settings_options' );
-				$settings_options['rg_laterpay_ga_ua_id'] = 'UA-50448165-8';
+				$settings_options['rg_laterpay_ga_ua_id'] = 'UA-50448165-9';
 				update_option( 'lp_rg_settings_options', $settings_options );
 			}
 		}
