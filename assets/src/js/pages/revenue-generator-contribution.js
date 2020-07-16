@@ -782,16 +782,6 @@ import { __, sprintf } from '@wordpress/i18n';
 					data: formData,
 					dataType: 'json',
 				} ).done( function( r ) {
-					const tutorialEventCategory =
-						'LP RevGen Contributions Tutorial';
-					const tutorialEventLabelComplete = 'Complete';
-					rgGlobal.sendLPGAEvent(
-						'5 - Generate Code',
-						tutorialEventCategory,
-						tutorialEventLabelComplete,
-						0,
-						true
-					);
 					if ( r.success ) {
 						location.reload();
 					}
