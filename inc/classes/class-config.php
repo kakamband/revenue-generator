@@ -65,10 +65,11 @@ class Config {
 		}
 
 		// Update version.
-		if ( false !== $current_version && REVENUE_GENERATOR_VERSION !== $current_version && REVENUE_GENERATOR_VERSION > $current_version ) {
-
-			// Update new version.
-			update_option( 'lp_rg_version', REVENUE_GENERATOR_VERSION );
+		if (
+			false !== $current_version
+			&& REVENUE_GENERATOR_VERSION !== $current_version
+			&& REVENUE_GENERATOR_VERSION > $current_version
+		) {
 
 			// Update settings on version 1.0.1.
 			if ( '1.0.1' >= $current_version ) {
@@ -76,6 +77,9 @@ class Config {
 				$settings_options['rg_laterpay_ga_ua_id'] = 'UA-50448165-9';
 				update_option( 'lp_rg_settings_options', $settings_options );
 			}
+
+			// Update new version.
+			update_option( 'lp_rg_version', REVENUE_GENERATOR_VERSION );
 		}
 	}
 
