@@ -39,11 +39,12 @@ class Config {
 	 */
 	protected function setup_options() {
 
-		$current_version = get_option( 'lp_rg_version' );
+		// Get version from constant.
+		$version = REVENUE_GENERATOR_VERSION;
 
-		// Check if plugin installation is fresh install.
-		if ( false === $current_version ) {
-			update_option( 'lp_rg_version', REVENUE_GENERATOR_VERSION );
+		// Compare constant version with DB version.
+		if ( $version <= get_option( 'lp_rg_version' ) ) {
+			return;
 		}
 
 		// Fresh install.
@@ -64,19 +65,16 @@ class Config {
 			);
 		}
 
-		// Update version.
-		if ( false !== $current_version && REVENUE_GENERATOR_VERSION !== $current_version && REVENUE_GENERATOR_VERSION > $current_version ) {
+		// Update settings on version 1.0.1.
+		if ( '1.0.1' >= $version ) {
 
-			// Update new version.
-			update_option( 'lp_rg_version', REVENUE_GENERATOR_VERSION );
-
-			// Update settings on version 1.0.1.
-			if ( '1.0.1' >= $current_version ) {
-				$settings_options                         = get_option( 'lp_rg_settings_options' );
-				$settings_options['rg_laterpay_ga_ua_id'] = 'UA-50448165-9';
-				update_option( 'lp_rg_settings_options', $settings_options );
-			}
+			$settings_options                         = get_option( 'lp_rg_settings_options' );
+			$settings_options['rg_laterpay_ga_ua_id'] = 'UA-50448165-9';
+			update_option( 'lp_rg_settings_options', $settings_options );
 		}
+
+		// Update new version.
+		update_option( 'lp_rg_version', REVENUE_GENERATOR_VERSION );
 	}
 
 	/**
