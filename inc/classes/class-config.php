@@ -70,6 +70,8 @@ class Config {
 
 			$settings_options                         = get_option( 'lp_rg_settings_options' );
 			$settings_options['rg_laterpay_ga_ua_id'] = 'UA-50448165-9';
+			// Enables GA for laterpay by default for already installed plugin.
+			$settings_options['rg_ga_enabled_status'] = 1;
 			update_option( 'lp_rg_settings_options', $settings_options );
 		}
 
