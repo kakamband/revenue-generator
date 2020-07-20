@@ -6,7 +6,7 @@ Tags: contribution, conversion, earn-money, micropayment, monetization, monetize
 Requires at least: 5.3
 Tested up to: 5.4.2
 Requires PHP: 5.6
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 Author URI: https://laterpay.net
 Plugin URI: https://github.com/laterpay/revenue-generator/
 License: MIT
@@ -69,17 +69,28 @@ LaterPay’s fee amounts to 15% of the revenues that it collects for its Merchan
 
 == Screenshots ==
 
-1. The Revenue Generator onboarding walkthrough guides you through the process to ensure that your initial setup is as smooth as possible. 
-2. Use our in-line editor to configure your paywall while previewing it on an article so that you know exactly what your followers will see.
-3. On the Paywall Dashboard, you can view all your paywalls in one place to easily manage your site.
-4. With the Revenue Generator, you can also easily request contributions from your followers.
+1. The Revenue Generator leverages LaterPay's extensive experience in the publishing industry to help you create Paywalls and Contributions with a near-frictionless user experience.
+2. The Revenue Generator onboarding walkthrough guides you through the process to ensure that your initial setup is as smooth as possible.
+3. Use our in-line editor to configure your paywall while previewing it on an article so that you know exactly what your followers will see.
+4. LaterPay's Revenue Generator takes the guesswork out of pricing your content by setting default recommended prices based on your user base and providing Dynamic Pricing for individual article prices.
+5. On the Paywall Dashboard, you can view all your paywalls in one place to easily manage your site.
+6. Once you've configured your paywall and clicked "Publish," it is seamlessly applied to your site.
+7. With the Revenue Generator, you can also easily request contributions from your followers.
+8. Simply copy and paste the contributions shortcode onto your site for a frictionless contribution experience.
 
 
 == Changelog ==
-= 1.0.0 =
+
+= 1.0.1 ( 20 July 2020 ) =
+* Added Settings menu option.
+* Minor styling Improvements.
+* Minor Bug fixes.
+* Fixes paywall priority issue when there are more than one paywall on same post.
+
+= 1.0.0 ( 30 June 2020 ) =
 * Initial Release.
 
 == Upgrade notice ==
 
-= 1.0.0 =
-Initial Release.
+= 1.0.1 =
+Added Settings menu option.

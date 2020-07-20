@@ -108,35 +108,35 @@ revenue-generator
 
 ### Welcome screen
 
-![Welcome screen](./wporgassets/screenshot_1.png)
+![Welcome screen](./wporgassets/screenshot-1.png)
 
 ### Onboarding tutorial
 
-![Onboarding tutorial](./wporgassets/screenshot_2.png)
+![Onboarding tutorial](./wporgassets/screenshot-2.png)
 
 ### Paywall preview
 
-![Paywall preview](./wporgassets/screenshot_3.png)
+![Paywall preview](./wporgassets/screenshot-3.png)
 
 ### Add purchase option
 
-![Add purchase option](./wporgassets/screenshot_4.png)
-
-### Edit time pass purchase options
-
-![Edit time pass purchase options](./wporgassets/screenshot_5.png)
-
-### Edit single purchase option
-
-![Edit single purchase option](./wporgassets/screenshot_6.png)
+![Add purchase option](./wporgassets/screenshot-4.png)
 
 ### Paywall Dashboard
 
-![Paywall Dashboard](./wporgassets/screenshot_7.png)
+![Paywall Dashboard](./wporgassets/screenshot-5.png)
 
 ### Published paywall
 
-![Published paywallg](./wporgassets/screenshot_8.png)
+![Published paywall](./wporgassets/screenshot-6.png)
+
+### Create Contribution
+
+![Create Contribution](./wporgassets/screenshot-7.png)
+
+### Published Contribution
+
+![Published Contribution](./wporgassets/screenshot-8.png)
 
 ## Versioning
 
