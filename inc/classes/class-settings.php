@@ -36,7 +36,12 @@ class Settings {
 		$settings_options = get_option( 'lp_rg_settings_options' );
 
 		// Fresh install or We don't have all the options.
-		if ( false === get_option( 'lp_rg_settings_options' ) || ( ! empty( $settings_options ) && is_array( $settings_options ) && count( $settings_options ) < 4 ) ) {
+		if (
+			false === get_option( 'lp_rg_settings_options' )
+			|| ( ! empty( $settings_options )
+			&& is_array( $settings_options )
+			&& count( $settings_options ) < 4 )
+		) {
 
 			// Set default settings.
 			update_option(
