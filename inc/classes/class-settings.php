@@ -33,8 +33,10 @@ class Settings {
 	 */
 	protected function setup_options() {
 
-		// Fresh install.
-		if ( false === get_option( 'lp_rg_settings_options' ) ) {
+		$settings_options = get_option( 'lp_rg_settings_options' );
+
+		// Fresh install or if there are few/missing options.
+		if ( false === $settings_options || ( is_array( $settings_options ) && ! array_key_exists( 'rg_ga_personal_enabled_status', $settings_options ) ) ) {
 
 			// Set default settings.
 			update_option(
