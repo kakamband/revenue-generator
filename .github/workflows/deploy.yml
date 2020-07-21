@@ -11,7 +11,7 @@ jobs:
       - name: WordPress Plugin Deploy
         uses: rtCamp/action-wordpress-org-plugin-deploy@master
         env:
-          EXCLUDE_LIST: .gitignore .distignore README.md phpcs.xml package-lock.json .babelrc bin tests .editorconfig .eslintignore .npmrc .nvmrc .prettierrc.js .stylelintrc.json eslintrc.json composer.json composer.lock phpunit.xml postcss.config.js webpack.config.js
+          EXCLUDE_LIST: .gitignore .distignore README.md phpcs.xml package.json package-lock.json .babelrc bin tests .editorconfig .eslintignore .npmrc .nvmrc .prettierrc.js .stylelintrc.json eslintrc.json composer.json composer.lock phpunit.xml postcss.config.js webpack.config.js
           SLUG: revenue-generator
           WORDPRESS_PASSWORD: ${{ secrets.WORDPRESS_PASSWORD }}
           WORDPRESS_USERNAME: ${{ secrets.WORDPRESS_USERNAME }}
