@@ -157,7 +157,6 @@ body.revenue-generator_page_revenue-generator-contribution {
 		font-weight: bold;
 		line-height: 0.79;
 		letter-spacing: normal;
-		margin: 44px 0 0;
 		border: 0;
 		&:disabled {
 			background: transparent;
@@ -182,6 +181,12 @@ body.revenue-generator_page_revenue-generator-contribution {
 				width: 20px;
 			}
 		}
+	}
+
+	&--shortcode {
+		position: absolute;
+		top: 16px;
+		right: 0;
 	}
 
 	&-info-modal {
@@ -211,10 +216,21 @@ body.revenue-generator_page_revenue-generator-contribution {
 	}
 
 	&-button {
-		padding: 0 16px;
+		padding: 16px 30px 16px 16px;
 		position: relative;
+		margin-top: 45px;
 	}
 
+}
+
+.amount-text-dashborad {
+	font-family: $box-font-worksans;
+	font-size: 12px;
+	font-weight: normal;
+	font-stretch: normal;
+	font-style: normal;
+	letter-spacing: normal;
+	color: $box-dark-grey;
 }
 
 /* Dashboard Styling */
@@ -278,6 +294,15 @@ body.revenue-generator_page_revenue-generator-contribution {
 			justify-content: center;
 			overflow: hidden;
 			word-break: normal;
+
+			&-currency {
+				@extend .amount-text-dashborad;
+			}
+
+			&-amount {
+				@extend .amount-text-dashborad;
+			}
+
 		}
 
 	}

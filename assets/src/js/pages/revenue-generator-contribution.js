@@ -1,4 +1,4 @@
-/* global revenueGeneratorGlobalOptions, Shepherd */
+/* global revenueGeneratorGlobalOptions, Shepherd, rgGlobal */
 /**
  * JS to handle plugin settings screen interactions.
  *
@@ -33,6 +33,8 @@ import { __, sprintf } from '@wordpress/i18n';
 				contributionCampaignNameLabel: '#rg_contribution_campaign_name',
 				contributionThankYouPageLabel:
 					'#rg_contribution_thankyou_label',
+				contributionGenerateButtonLabel: '#rg_contribution_generate',
+				contributionHelpGenerate: '#rev-gen-contribution-help-generate',
 
 				// Dashboard elements.
 				contributionDashboardList:
@@ -110,18 +112,6 @@ import { __, sprintf } from '@wordpress/i18n';
 					}
 				} );
 
-				/**
-				 * Complete the tour when exit tour is clicked.
-				 */
-				$o.body.on( 'click', $o.exitTour, function() {
-					if (
-						typeof Shepherd !== 'undefined' &&
-						typeof Shepherd.activeTour !== 'undefined'
-					) {
-						Shepherd.activeTour.complete();
-					}
-				} );
-
 				// Generate Contribution Code.
 				$o.contributionGnerateCode.on(
 					'click',
@@ -196,6 +186,40 @@ import { __, sprintf } from '@wordpress/i18n';
 									$o.body
 										.find( 'input' )
 										.removeClass( 'input-blur' );
+									let merchantId =
+										revenueGeneratorGlobalOptions.merchant_id;
+									if (
+										! merchantId &&
+										$( $o.accountActionId ).val()
+									) {
+										merchantId = $(
+											$o.accountActionId
+										).val();
+									}
+
+									const eventAction = 'New ShortCode	';
+									const eventCategory =
+										'LP RevGen Contributions';
+									let eventLabel =
+										merchantId + ' - ' + formData.heading;
+									const amounts = $o.contributionAmounts;
+									amounts.each( function() {
+										const price = $( this )
+											.text()
+											.trim();
+										if ( 'custom' === price ) {
+											return true;
+										}
+										eventLabel += ' - ' + price;
+									} );
+
+									rgGlobal.sendLPGAEvent(
+										eventAction,
+										eventCategory,
+										eventLabel,
+										0,
+										true
+									);
 								}
 								// Release request lock.
 								$o.requestSent = false;
@@ -285,6 +309,11 @@ import { __, sprintf } from '@wordpress/i18n';
 							$( $o.contributionCampaignNameLabel )
 								.find( 'input' )
 								.removeClass( 'input-blur' );
+
+							$( $o.contributionGenerateButtonLabel ).removeAttr(
+								'style'
+							);
+
 							$( $o.contributionThankYouPageLabel ).removeAttr(
 								'style'
 							);
@@ -292,6 +321,16 @@ import { __, sprintf } from '@wordpress/i18n';
 								'background-color',
 								'#fff'
 							);
+						} else if ( 'shortcode' === modalType ) {
+							$( $o.contributionGenerateButtonLabel )
+								.find( 'input' )
+								.removeClass( 'input-blur' );
+							$o.contributionGnerateCode.removeAttr( 'style' );
+							$( $o.contributionGenerateButtonLabel ).css(
+								'background-color',
+								'#fff'
+							);
+							$o.contributionGnerateCode.css( 'color', '#fff' );
 						} else {
 							$( $o.contributionThankYouPageLabel )
 								.find( 'input' )
@@ -303,20 +342,42 @@ import { __, sprintf } from '@wordpress/i18n';
 								'background-color',
 								'#fff'
 							);
+							$( $o.contributionGenerateButtonLabel ).removeAttr(
+								'style'
+							);
 						}
+
+						let eventLabel = '';
+
+						if ( 'campaignName' === modalType ) {
+							eventLabel = 'Campaign name';
+						} else if ( 'thankYouPage' === modalType ) {
+							eventLabel = 'Thank you page';
+						} else if ( 'shortcode' === modalType ) {
+							eventLabel = 'Generate Shortcode';
+						}
+
+						// Send GA Event.
+						const eventCategory = 'LP RevGen Contributions';
+						const eventAction = 'Help';
+						rgGlobal.sendLPGAEvent(
+							eventAction,
+							eventCategory,
+							eventLabel,
+							0,
+							true
+						);
 					}
 				} );
 
 				/**
 				 * Close Popup by clicking on wrapper.
 				 */
-				$o.rgLayoutWrapper.on( 'click', function( e ) {
+				$o.rgLayoutWrapper.on( 'click', function() {
 					if (
 						$( $o.contributionHelpModal ) &&
 						$( $o.contributionHelpModal ).length > 0
 					) {
-						e.preventDefault();
-
 						// This may seem duplicate but modal is inside wrapper and needed to avoid call stack.
 						$( $o.contributionHelpModal ).remove();
 						$o.body.removeClass( 'modal-blur' );
@@ -332,6 +393,11 @@ import { __, sprintf } from '@wordpress/i18n';
 							'background-color',
 							'inherit'
 						);
+						$( $o.contributionGenerateButtonLabel ).css(
+							'background-color',
+							'inherit'
+						);
+
 						$o.body.find( 'input' ).removeClass( 'input-blur' );
 					}
 				} );
@@ -347,6 +413,14 @@ import { __, sprintf } from '@wordpress/i18n';
 						'inherit'
 					);
 					$( $o.contributionThankYouPageLabel ).css(
+						'background-color',
+						'inherit'
+					);
+					$( $o.contributionThankYouPageLabel ).css(
+						'background-color',
+						'inherit'
+					);
+					$( $o.contributionGenerateButtonLabel ).css(
 						'background-color',
 						'inherit'
 					);
@@ -368,6 +442,19 @@ import { __, sprintf } from '@wordpress/i18n';
 						);
 						$o.contributionGnerateCode.prop( 'disabled', false );
 					}
+				} );
+
+				$( $o.contributionHelpGenerate ).on( 'click', function() {
+					// Send GA Event.
+					const eventCategory = 'LP RevGen Contributions';
+					const eventAction = 'Help';
+					const eventLabel = 'Generate code';
+					rgGlobal.sendLPGAEvent(
+						eventAction,
+						eventCategory,
+						eventLabel,
+						0
+					);
 				} );
 			};
 
@@ -417,6 +504,11 @@ import { __, sprintf } from '@wordpress/i18n';
 					classes: 'shepherd-content-next-tour-element',
 				};
 
+				const tutorialEventCategory =
+					'LP RevGen Contributions Tutorial';
+				const tutorialEventLabelContinue = 'Continue';
+				const tutorialEventLabelComplete = 'Complete';
+
 				// Add tutorial step for main search.
 				tour.addStep( {
 					id: 'rg-contribution-header-description',
@@ -428,6 +520,17 @@ import { __, sprintf } from '@wordpress/i18n';
 					arrow: true,
 					classes: 'rev-gen-tutorial-contribution-title',
 					buttons: [ skipTourButton, nextButton ],
+					when: {
+						hide() {
+							rgGlobal.sendLPGAEvent(
+								'1 - Text Edit',
+								tutorialEventCategory,
+								tutorialEventLabelContinue,
+								0,
+								true
+							);
+						},
+					},
 				} );
 
 				// Add tutorial step for editing header title
@@ -445,6 +548,17 @@ import { __, sprintf } from '@wordpress/i18n';
 					arrow: true,
 					classes: 'rev-gen-tutorial-contribution-title',
 					buttons: [ nextButton ],
+					when: {
+						hide() {
+							rgGlobal.sendLPGAEvent(
+								'2 - Amount Edit',
+								tutorialEventCategory,
+								tutorialEventLabelContinue,
+								0,
+								true
+							);
+						},
+					},
 				} );
 
 				// Add tutorial step for option item.
@@ -466,6 +580,17 @@ import { __, sprintf } from '@wordpress/i18n';
 					arrow: true,
 					classes: 'rev-gen-tutorial-contribution-title',
 					buttons: [ nextButton ],
+					when: {
+						hide() {
+							rgGlobal.sendLPGAEvent(
+								'3 - PN v PL',
+								tutorialEventCategory,
+								tutorialEventLabelContinue,
+								0,
+								true
+							);
+						},
+					},
 				} );
 
 				// Add tutorial step for option item edit button.
@@ -482,6 +607,17 @@ import { __, sprintf } from '@wordpress/i18n';
 					arrow: true,
 					classes: 'rev-gen-tutorial-contribution-title',
 					buttons: [ nextButton ],
+					when: {
+						hide() {
+							rgGlobal.sendLPGAEvent(
+								'4 - Campaign Name',
+								tutorialEventCategory,
+								tutorialEventLabelContinue,
+								0,
+								true
+							);
+						},
+					},
 				} );
 
 				// Add tutorial step for paywall actions publish.
@@ -507,6 +643,17 @@ import { __, sprintf } from '@wordpress/i18n';
 							classes: 'shepherd-content-complete-tour-element',
 						},
 					],
+					when: {
+						hide() {
+							rgGlobal.sendLPGAEvent(
+								'5 - Generate Code',
+								tutorialEventCategory,
+								tutorialEventLabelComplete,
+								0,
+								true
+							);
+						},
+					},
 				} );
 			};
 
@@ -571,8 +718,45 @@ import { __, sprintf } from '@wordpress/i18n';
 					// Enable arrow events.
 					$( document ).unbind( 'keydown', disableArrowKeys );
 
-					// Complete the tour, and update plugin option.
-					completeTheTour();
+					const currentStep = Shepherd.activeTour.getCurrentStep();
+					let tutorialEventAction = '';
+					let tutorialEventLabel = 'Exit Tour';
+
+					switch ( currentStep.id ) {
+						case 'rg-contribution-header-description':
+							tutorialEventAction = '1 - Text Edit';
+							break;
+						case 'rg-contribution-amount-first':
+							tutorialEventAction = '2 - Amount Edit';
+							break;
+						case 'rg-contribution-amount-second':
+							tutorialEventAction = '3 - PN v PL';
+							break;
+						case 'rg-contribution-campaign-name':
+							tutorialEventAction = '4 - Campaign Name';
+							break;
+						case 'rg-contribution-generate-button':
+							tutorialEventAction = '5 - Generate Code';
+							tutorialEventLabel = 'Complete';
+							break;
+					}
+
+					const tutorialEventCategory =
+						'LP RevGen Contributions Tutorial';
+
+					// Send GA exit event.
+					rgGlobal.sendLPGAEvent(
+						tutorialEventAction,
+						tutorialEventCategory,
+						tutorialEventLabel,
+						0,
+						true
+					);
+
+					setTimeout( function() {
+						// Complete the tour, and update plugin option.
+						completeTheTour();
+					}, 500 );
 				} );
 
 				// Start the tour.

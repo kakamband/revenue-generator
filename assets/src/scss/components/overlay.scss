@@ -419,11 +419,13 @@
 		cursor: pointer;
 		display: flex;
 		justify-content: center;
-
+		opacity: 0.5;
+		&:hover {
+			opacity: 1;
+		}
 		&-add-option {
-			display: none;
+			display: flex;
 			margin-top: 10px;
-
 			button {
 				background: transparent;
 				border: 0;

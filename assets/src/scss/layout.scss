@@ -17,6 +17,15 @@ body {
 	.shepherd-target {
 		background-color: #fff;
 	}
+
+	button,
+	a {
+		&:focus {
+			outline: 0;
+			box-shadow: none;
+		}
+	}
+
 }
 
 .rev-gen-no-data {
