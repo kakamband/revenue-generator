@@ -98,11 +98,11 @@ class Admin {
 			Settings::update_settings_options( 'rg_personal_ga_ua_id', $rg_personal_ga_ua_id );
 		}
 
-		if ( ! empty( $rg_ga_personal_enabled_status ) ) {
+		if ( isset( $rg_ga_personal_enabled_status ) ) {
 			Settings::update_settings_options( 'rg_ga_personal_enabled_status', $rg_ga_personal_enabled_status );
 		}
 
-		if ( ! empty( $rg_ga_enabled_status ) ) {
+		if ( isset( $rg_ga_enabled_status ) ) {
 			Settings::update_settings_options( 'rg_ga_enabled_status', $rg_ga_enabled_status );
 		}
 

@@ -43,7 +43,7 @@ import { debounce } from '../helpers';
 				settingsGAUserID: $( '.rev-gen-settings-main-ga-code-user' ),
 				settingsSaveButton: $( '.rev-gen-settings-main-save-settings' ),
 				rgGAUserStatus: $( '#rgGAUserStatus' ),
-				rgGALaterPayStatus: $( 'rgGALaterPayStatus' ),
+				rgGALaterPayStatus: $( '#rgGALaterPayStatus' ),
 				// Popup.
 				snackBar: $( '#rg_js_SnackBar' ),
 				everyInput: $( 'table.rev-gen-settings-main-table input' ),
