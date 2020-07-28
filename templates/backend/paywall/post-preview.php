@@ -92,13 +92,24 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 					?>
 					<select class="rev-gen-preview-main-paywall-applies-to">
 						<option <?php selected( $paywall_access_to, 'all', true ); ?> value="all"><?php esc_html_e( 'all posts and pages', 'revenue-generator' ); ?></option>
-						<option <?php selected( $paywall_access_to, 'supported', true ); ?> value="supported"><?php echo esc_html( $supported_label ); ?></option>
 						<option <?php selected( $paywall_access_to, 'category', true ); ?> value="category"><?php esc_html_e( 'category', 'revenue-generator' ); ?></option>
 						<option <?php selected( $paywall_access_to, 'exclude_category', true ); ?> value="exclude_category"><?php esc_html_e( 'except for category', 'revenue-generator' ); ?></option>
+						<option <?php selected( $paywall_access_to, 'specific_post', true ); ?> value="specific_post"><?php esc_html_e( 'specific posts or pages', 'revenue-generator' ); ?></option>
+						<option <?php selected( $paywall_access_to, 'supported', true ); ?> value="supported"><?php echo esc_html( $supported_label ); ?></option>
 					</select>
 				</div>
 				<div class="rev-gen-preview-main--paywall-actions-search">
 					<select id="rg_js_searchPaywallContent">
+						<?php if ( ! empty( $rg_category_data ) ) : ?>
+							<option selected="selected" value="<?php echo esc_attr( $rg_category_data->term_id ); ?>">
+								<?php echo esc_html( $rg_category_data->name ); ?>
+							</option>
+						<?php endif; ?>
+					</select>
+					<i class="rev-gen-preview-main--paywall-actions-search-icon"></i>
+				</div>
+				<div class="rev-gen-preview-main--paywall-actions-search-post">
+					<select id="rg_js_searchPost" name="posts[]" multiple="multiple">
 						<?php if ( ! empty( $rg_category_data ) ) : ?>
 							<option selected="selected" value="<?php echo esc_attr( $rg_category_data->term_id ); ?>">
 								<?php echo esc_html( $rg_category_data->name ); ?>

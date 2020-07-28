@@ -51,6 +51,7 @@ class Admin {
 		add_action( 'wp_ajax_rg_search_preview_content', [ $this, 'search_preview_content' ] );
 		add_action( 'wp_ajax_rg_select_preview_content', [ $this, 'select_preview_content' ] );
 		add_action( 'wp_ajax_rg_search_term', [ $this, 'select_search_term' ] );
+		add_action( 'wp_ajax_rg_search_post', [ $this, 'select_search_post' ] );
 		add_action( 'wp_ajax_rg_clear_category_meta', [ $this, 'clear_category_meta' ] );
 		add_action( 'wp_ajax_rg_complete_tour', [ $this, 'complete_tour' ] );
 		add_action( 'wp_ajax_rg_verify_account_credentials', [ $this, 'verify_account_credentials' ] );
@@ -930,14 +931,16 @@ class Admin {
 		$time_passes     = filter_input( INPUT_POST, 'time_passes', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 		$subscriptions   = filter_input( INPUT_POST, 'subscriptions', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 
-		$paywall_instance         = Paywall::get_instance();
-		$paywall['name']          = sanitize_text_field( wp_unslash( $paywall_data['name'] ) );
-		$paywall['description']   = sanitize_text_field( wp_unslash( $paywall_data['desc'] ) );
-		$paywall['title']         = sanitize_text_field( wp_unslash( $paywall_data['title'] ) );
-		$paywall['id']            = sanitize_text_field( $paywall_data['id'] );
-		$paywall['access_to']     = sanitize_text_field( wp_unslash( $paywall_data['applies'] ) );
-		$paywall['preview_id']    = sanitize_text_field( wp_unslash( $paywall_data['preview_id'] ) );
-		$paywall['access_entity'] = $rg_post_id;
+		$paywall_instance          = Paywall::get_instance();
+		$paywall['name']           = sanitize_text_field( wp_unslash( $paywall_data['name'] ) );
+		$paywall['description']    = sanitize_text_field( wp_unslash( $paywall_data['desc'] ) );
+		$paywall['title']          = sanitize_text_field( wp_unslash( $paywall_data['title'] ) );
+		$paywall['id']             = sanitize_text_field( $paywall_data['id'] );
+		$paywall['access_to']      = sanitize_text_field( wp_unslash( $paywall_data['applies'] ) );
+		$paywall['preview_id']     = sanitize_text_field( wp_unslash( $paywall_data['preview_id'] ) );
+		$paywall['access_entity']  = $rg_post_id;
+		$specific_posts            = sanitize_text_field( wp_unslash( $paywall_data['specific_posts'] ) );
+		$paywall['specific_posts'] = json_decode( $specific_posts );
 
 		$order_items = [];
 
@@ -954,6 +957,13 @@ class Admin {
 
 			// Add Individual option to paywall.
 			$paywall_instance->update_paywall_individual_option( $paywall_id, $individual );
+		}
+
+		// Save Paywall ID in selected specific posts meta.
+		if ( ! empty( $paywall['specific_posts'] ) ) {
+			foreach ( $paywall['specific_posts'] as $post_id ) {
+				update_post_meta( $post_id, '_rg_specific_paywall', $paywall_id );
+			}
 		}
 
 		$time_pass_instance = Time_Pass::get_instance();
@@ -1248,6 +1258,61 @@ class Admin {
 				'categories' => $category_instance->get_applicable_categories( $args ),
 			]
 		);
+	}
+
+	/**
+	 * Search Post/page to be added in paywall
+	 */
+	public function select_search_post() {
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Get all data and sanitize it.
+		$post_term = sanitize_text_field( filter_input( INPUT_POST, 'term', FILTER_SANITIZE_STRING ) );
+
+		$args = [
+			'post_type'      => [
+				'post',
+				'page',
+			],
+			'posts_per_page' => 5,
+			'orderby'        => 'relevance',
+		];
+
+		if ( ! empty( $post_term ) ) {
+			$args['s'] = $post_term;
+		}
+
+		add_filter( 'posts_where', [ $this, 'rg_post_title_filter' ], 10, 2 );
+		$posts = new \WP_Query( $args );
+		remove_filter( 'posts_where', [ $this, 'rg_post_title_filter' ], 10, 2 );
+
+		wp_send_json(
+			[
+				'success' => true,
+				'posts'   => $posts->posts,
+			]
+		);
+	}
+
+	/**
+	 * Filter to modify the search of post and search by title.
+	 *
+	 * @param string    $sql   SQL string.
+	 * @param \WP_Query $query Query object.
+	 *
+	 * @return string
+	 */
+	public function rg_post_title_filter( $sql, $query ) {
+		global $wpdb;
+
+		// If our custom query var is set modify the query.
+		if ( ! empty( $query->query['s'] ) ) {
+			$term = $wpdb->esc_like( $query->query['s'] );
+			$sql .= ' AND ' . $wpdb->posts . '.post_title LIKE \'%' . $term . '%\'';
+		}
+
+		return $sql;
 	}
 
 	/**
