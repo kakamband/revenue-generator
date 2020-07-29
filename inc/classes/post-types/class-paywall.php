@@ -248,15 +248,16 @@ class Paywall extends Base {
 		$paywall      = get_post( $paywall_id );
 		if ( ! empty( $paywall ) ) {
 			if ( static::SLUG === $paywall->post_type ) {
-				$paywall_info['id']            = $paywall->ID;
-				$paywall_info['name']          = $paywall->post_title;
-				$paywall_info['description']   = $paywall->post_content;
-				$paywall_info['title']         = get_post_meta( $paywall->ID, '_rg_title', true );
-				$paywall_info['access_to']     = get_post_meta( $paywall->ID, '_rg_access_to', true );
-				$paywall_info['access_entity'] = get_post_meta( $paywall->ID, '_rg_access_entity', true );
-				$paywall_info['preview_id']    = get_post_meta( $paywall->ID, '_rg_preview_id', true );
-				$paywall_info['order']         = get_post_meta( $paywall->ID, '_rg_options_order', true );
-				$paywall_info['is_active']     = get_post_meta( $paywall->ID, '_rg_is_active', true );
+				$paywall_info['id']             = $paywall->ID;
+				$paywall_info['name']           = $paywall->post_title;
+				$paywall_info['description']    = $paywall->post_content;
+				$paywall_info['title']          = get_post_meta( $paywall->ID, '_rg_title', true );
+				$paywall_info['access_to']      = get_post_meta( $paywall->ID, '_rg_access_to', true );
+				$paywall_info['access_entity']  = get_post_meta( $paywall->ID, '_rg_access_entity', true );
+				$paywall_info['preview_id']     = get_post_meta( $paywall->ID, '_rg_preview_id', true );
+				$paywall_info['order']          = get_post_meta( $paywall->ID, '_rg_options_order', true );
+				$paywall_info['is_active']      = get_post_meta( $paywall->ID, '_rg_is_active', true );
+				$paywall_info['specific_posts'] = get_post_meta( $paywall->ID, '_rg_specific_posts', true );
 			}
 		}
 

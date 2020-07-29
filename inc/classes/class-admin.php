@@ -629,8 +629,9 @@ class Admin {
 
 		$post_types = Post_Types::get_instance();
 
-		$current_paywall  = filter_input( INPUT_GET, 'current_paywall', FILTER_SANITIZE_NUMBER_INT );
-		$rg_category_data = '';
+		$current_paywall   = filter_input( INPUT_GET, 'current_paywall', FILTER_SANITIZE_NUMBER_INT );
+		$rg_category_data  = '';
+		$rg_specific_posts = array();
 
 		// Load paywall related content if found else load requested content for new paywall.
 		if ( ! empty( $current_paywall ) ) {
@@ -648,6 +649,16 @@ class Admin {
 					$rg_category_id = $paywall_data['access_entity'];
 					if ( ! empty( $rg_category_id ) ) {
 						$rg_category_data = get_term( $rg_category_id, 'category' );
+					}
+				}
+
+				// Get Specific posts if user has selected type specific posts.
+				if ( 'specific_post' === $paywall_data['access_to'] ) {
+					$rg_specific_posts_ids = $paywall_data['specific_posts'];
+					if ( ! empty( $rg_specific_posts_ids ) ) {
+						foreach ( $rg_specific_posts_ids as $rg_specific_post_id ) {
+							$rg_specific_posts[ $rg_specific_post_id ] = get_the_title( $rg_specific_post_id );
+						}
 					}
 				}
 			}
@@ -713,6 +724,7 @@ class Admin {
 			'dynamic_pricing_data'  => $post_dynamic_pricing_data,
 			'merchant_symbol'       => $symbol,
 			'rg_category_data'      => $rg_category_data,
+			'rg_specific_posts'     => $rg_specific_posts,
 			'is_merchant_verified'  => $is_merchant_verified,
 			'new_paywall_url'       => add_query_arg( [ 'page' => $admin_menus['paywall']['url'] ], admin_url( 'admin.php' ) ),
 			'dashboard_url'         => add_query_arg( [ 'page' => $admin_menus['dashboard']['url'] ], admin_url( 'admin.php' ) ),
