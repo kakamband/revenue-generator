@@ -263,6 +263,18 @@ import { __, sprintf } from '@wordpress/i18n';
 						addTourSteps( tour );
 						startWelcomeTour( tour );
 					}
+
+					// Check if there are already preselected option on mutltiselect and trigger click event twice to reset placeholder.
+					const preSelectedOptions = $o.searchPost.val();
+					if ( preSelectedOptions && preSelectedOptions.length > 0 ) {
+						const mutipleSelect2 = $(
+							'.select2-selection--multiple .select2-search.select2-search--inline'
+						);
+						// Open up search.
+						mutipleSelect2.trigger( 'click' );
+						// Close Search.
+						mutipleSelect2.trigger( 'click' );
+					}
 				} );
 
 				/**
@@ -584,6 +596,27 @@ import { __, sprintf } from '@wordpress/i18n';
 						},
 					},
 					minimumInputLength: 1,
+					closeOnSelect: false,
+				} );
+
+				/*
+				 * Adds Placeholder in select2 on close and hide options.
+				 */
+				$o.searchPost.on( 'select2:close', function() {
+					const parentMutiplediv = $( this )
+						.siblings( 'span.select2' )
+						.find( '.select2-selection--multiple' );
+					const count = $( this ).select2( 'data' ).length;
+					const select2Counter = parentMutiplediv.find(
+						'.select2-selection__rendered .select2-search--inline input'
+					);
+					select2Counter.attr(
+						'placeholder',
+						count + ' items selected'
+					);
+
+					// Setting width dynamically as it has to overwrite default dynamic width.
+					select2Counter.css( 'width', '100%' );
 				} );
 
 				/**
@@ -2281,8 +2314,13 @@ import { __, sprintf } from '@wordpress/i18n';
 				$o.body.on( 'click', $o.viewPost, function() {
 					const targetPostId = $( this ).attr( 'data-target-id' );
 					const selectedCategoryId = $o.searchPaywallContent.val();
+					const specificPostIDs = $o.searchPost.val();
 					if ( targetPostId ) {
-						viewPost( targetPostId, selectedCategoryId );
+						viewPost(
+							targetPostId,
+							selectedCategoryId,
+							specificPostIDs
+						);
 					}
 				} );
 
@@ -2303,13 +2341,19 @@ import { __, sprintf } from '@wordpress/i18n';
 			 *
 			 * @param {number} previewPostId Post Preview ID.
 			 * @param {number} selectedCategoryId Selected Category ID.
+			 * @param {Array} specificPostIDs Array of Specific Post ID's.
 			 */
-			const viewPost = function( previewPostId, selectedCategoryId = 0 ) {
+			const viewPost = function(
+				previewPostId,
+				selectedCategoryId = 0,
+				specificPostIDs = []
+			) {
 				// Create form data.
 				const formData = {
 					action: 'rg_post_permalink',
 					preview_post_id: previewPostId,
 					category_id: selectedCategoryId,
+					specific_posts_ids: specificPostIDs,
 					security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
 				};
 
@@ -2431,6 +2475,11 @@ import { __, sprintf } from '@wordpress/i18n';
 								$( $o.postTitle )
 									.text()
 									.trim()
+							);
+						} else if ( 'specific_post' === appliedTo ) {
+							publishMessage = __(
+								'Has been published on <b>Specific Posts & Pages</b>.',
+								'revenue-generator'
 							);
 						} else {
 							publishMessage = __(

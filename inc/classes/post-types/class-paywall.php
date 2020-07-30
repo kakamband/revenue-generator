@@ -640,6 +640,12 @@ class Paywall extends Base {
 				$saved_message,
 				$rg_post_object->post_title
 			);
+		} elseif ( 'specific_post' === $pay_wall['access_to'] ) {
+			$published_on = sprintf(
+				/* translators: %s static string PUBLISHED/SAVED */
+				__( '<b>%s</b> on <b>specific posts & pages</b>', 'revenue-generator' ),
+				$saved_message
+			);
 		} else {
 			$published_on = sprintf(
 				/* translators: %s static string PUBLISHED/SAVED */

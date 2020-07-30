@@ -1445,8 +1445,9 @@ class Admin {
 		check_ajax_referer( 'rg_paywall_nonce', 'security' );
 
 		// Get all data and sanitize it.
-		$preview_post_id = sanitize_text_field( filter_input( INPUT_POST, 'preview_post_id', FILTER_SANITIZE_NUMBER_INT ) );
-		$category_id     = sanitize_text_field( filter_input( INPUT_POST, 'category_id', FILTER_SANITIZE_NUMBER_INT ) );
+		$preview_post_id    = sanitize_text_field( filter_input( INPUT_POST, 'preview_post_id', FILTER_SANITIZE_NUMBER_INT ) );
+		$category_id        = sanitize_text_field( filter_input( INPUT_POST, 'category_id', FILTER_SANITIZE_NUMBER_INT ) );
+		$specific_posts_ids = filter_input( INPUT_POST, 'specific_posts_ids', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 
 		// Check if there is category id and current post has that category.
 		if ( ! empty( $category_id ) && ! has_category( $category_id, $preview_post_id ) ) {
@@ -1465,6 +1466,12 @@ class Admin {
 				// Set preview post id.
 				$preview_post_id = $category_post[0]->ID;
 			}
+		}
+
+		// Check if preview id exists in selected specific posts id.
+		if ( ! empty( $specific_posts_ids ) && ! in_array( $preview_post_id, $specific_posts_ids, true ) ) {
+			// If not in list use first post id from list for preview post.
+			$preview_post_id = $specific_posts_ids[0];
 		}
 
 		// Check and verify data exits.
