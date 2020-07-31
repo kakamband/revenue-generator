@@ -925,6 +925,7 @@ class Paywall extends Base {
 		if ( ! empty( $dashboard_paywalls ) ) {
 			$all_paywalls       = [
 				'supported'        => [],
+				'specific_post'    => [],
 				'category'         => [],
 				'exclude_category' => [],
 				'all'              => [],
