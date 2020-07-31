@@ -2193,8 +2193,9 @@ import { __, sprintf } from '@wordpress/i18n';
 				$o.body.on( 'click', $o.viewPost, function() {
 					const targetPostId = $( this ).attr( 'data-target-id' );
 					const selectedCategoryId = $o.searchPaywallContent.val();
+					const appliesTo = $( $o.paywallAppliesTo ).val();
 					if ( targetPostId ) {
-						viewPost( targetPostId, selectedCategoryId );
+						viewPost( targetPostId, selectedCategoryId, appliesTo );
 					}
 				} );
 
@@ -2215,13 +2216,19 @@ import { __, sprintf } from '@wordpress/i18n';
 			 *
 			 * @param {number} previewPostId Post Preview ID.
 			 * @param {number} selectedCategoryId Selected Category ID.
+			 * @param {string} appliesTo Applies to Type.
 			 */
-			const viewPost = function( previewPostId, selectedCategoryId = 0 ) {
+			const viewPost = function(
+				previewPostId,
+				selectedCategoryId = 0,
+				appliesTo = ''
+			) {
 				// Create form data.
 				const formData = {
 					action: 'rg_post_permalink',
 					preview_post_id: previewPostId,
 					category_id: selectedCategoryId,
+					applies_to: appliesTo,
 					security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
 				};
 
