@@ -397,6 +397,47 @@ class Paywall extends Base {
 	}
 
 	/**
+	 * Get related Paywall ID for only posts.
+	 *
+	 * @return string|\WP_Post
+	 */
+	public function get_paywall_for_only_posts() {
+		$query_args = [
+			'post_type'      => static::SLUG,
+			'post_status'    => [ 'publish' ],
+			'posts_per_page' => 1,
+			'orderby'        => 'modified',
+			'order'          => 'DESC',
+		];
+
+		$meta_query = [
+			'relation' => 'AND',
+			[
+				'key'     => '_rg_access_to',
+				'value'   => 'posts',
+				'compare' => '=',
+			],
+			[
+				'key'     => '_rg_is_active',
+				'value'   => '1',
+				'compare' => '=',
+			],
+		];
+
+		$query_args['meta_query'] = $meta_query;
+
+		$query = new \WP_Query( $query_args );
+
+		$current_post = $query->posts;
+
+		if ( ! empty( $current_post[0] ) ) {
+			return $current_post[0]->ID;
+		}
+
+		return '';
+	}
+
+	/**
 	 * Get related Paywall ID for all posts.
 	 *
 	 * @return string|\WP_Post

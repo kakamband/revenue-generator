@@ -1370,6 +1370,7 @@ class Admin {
 		// Get all data and sanitize it.
 		$preview_post_id = sanitize_text_field( filter_input( INPUT_POST, 'preview_post_id', FILTER_SANITIZE_NUMBER_INT ) );
 		$category_id     = sanitize_text_field( filter_input( INPUT_POST, 'category_id', FILTER_SANITIZE_NUMBER_INT ) );
+		$applies_to      = sanitize_text_field( filter_input( INPUT_POST, 'applies_to', FILTER_SANITIZE_STRING ) );
 
 		// Check if there is category id and current post has that category.
 		if ( ! empty( $category_id ) && ! has_category( $category_id, $preview_post_id ) ) {
@@ -1387,6 +1388,29 @@ class Admin {
 			if ( ! empty( $category_post ) ) {
 				// Set preview post id.
 				$preview_post_id = $category_post[0]->ID;
+			}
+		}
+
+		// Check Preview post has post type post and it applies to only posts.
+		if (
+			! empty( $applies_to )
+			&& 'posts' === $applies_to
+			&& 'post' !== get_post_type( $preview_post_id )
+		) {
+			// if preview post is not post type "post" then get latest post.
+			$latest_post = get_posts(
+				array(
+					'numberposts'      => 1,
+					'suppress_filters' => false,
+					'post_type'        => 'post',
+					'orderby'          => 'ID',
+					'order'            => 'DESC',
+				)
+			);
+
+			// If we found a post then assing it to preview.
+			if ( ! empty( $latest_post ) ) {
+				$preview_post_id = $latest_post[0]->ID;
 			}
 		}
 
