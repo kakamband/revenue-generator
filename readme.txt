@@ -17,15 +17,15 @@ Monetize your blog and your content with LaterPay’s Revenue Generator. We offe
 == Description ==
 
 = Overview =
-The Revenue Generator plugin by LaterPay is a content monetization solution for your WordPress page. We enable you to request contributions from your followers or sell individual pieces of content, timed access, or recurring subscriptions to your site.
+The Revenue Generator plugin by LaterPay is a content monetization solution for your WordPress page. Our flexible paywall enables you to request contributions from your followers or sell individual pieces of content, timed access, or recurring subscriptions to your site.
 
 Our unique ‘pay later’ model takes the upfront friction out of the transaction and allows your users to access content instantly by agreeing to pay for it later.
 
-You can offer content priced as low as $0.05 and audiences can purchase that content with just a click or two - without having to register or provide payment until they reach a $5 threshold on their LaterPay tab. At this point we ask them to register and pay and we have found that about 85% of users will do so. Once they become registered LaterPay users, the transactions become even more effortless - in fact, repeat purchases are 2-2.5X higher with the ‘pay later’ model over ‘pay now.’
+You can offer content priced as low as $0.05 and audiences can purchase that content with just a click or two - without having to register on the paywall or provide payment until they reach a $5 threshold on their LaterPay tab. At this point we ask them to register and pay and we have found that about 85% of users will do so. Once they become registered LaterPay users, the transactions become even more effortless - in fact, repeat purchases are 2-2.5X higher with the ‘pay later’ model over ‘pay now.’
 
-Although we recommend using the ‘pay later’ model because of the results mentioned above, you are of course free to choose the ‘pay now’ model if it better suits your needs. [Read more about the difference between ‘pay later’ and ‘pay now’.](https://www.laterpay.net/academy/getting-started-with-laterpay-the-difference-between-pay-now-pay-later)
+Although we recommend using the ‘pay later’ model of the paywall because of the results mentioned above, you are of course free to choose the ‘pay now’ model if it better suits your needs. [Read more about the difference between ‘pay later’ and ‘pay now’.](https://www.laterpay.net/academy/getting-started-with-laterpay-the-difference-between-pay-now-pay-later)
 
-The Revenue Generator plugin is easy to implement and offers a user interface that gives you complete control over pricing.
+The Revenue Generator plugin is easy to implement and offers a user interface that gives you complete control over your paywall and pricing.
 
 = Our core features include: =
 * Single post sales
