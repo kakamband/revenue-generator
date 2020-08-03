@@ -2314,11 +2314,14 @@ import { __, sprintf } from '@wordpress/i18n';
 				$o.body.on( 'click', $o.viewPost, function() {
 					const targetPostId = $( this ).attr( 'data-target-id' );
 					const selectedCategoryId = $o.searchPaywallContent.val();
+					const appliesTo = $( $o.paywallAppliesTo ).val();
 					const specificPostIDs = $o.searchPost.val();
+
 					if ( targetPostId ) {
 						viewPost(
 							targetPostId,
 							selectedCategoryId,
+							appliesTo,
 							specificPostIDs
 						);
 					}
@@ -2341,11 +2344,13 @@ import { __, sprintf } from '@wordpress/i18n';
 			 *
 			 * @param {number} previewPostId Post Preview ID.
 			 * @param {number} selectedCategoryId Selected Category ID.
+			 * @param {string} appliesTo Applies to Type.
 			 * @param {Array} specificPostIDs Array of Specific Post ID's.
 			 */
 			const viewPost = function(
 				previewPostId,
 				selectedCategoryId = 0,
+				appliesTo = '',
 				specificPostIDs = []
 			) {
 				// Create form data.
@@ -2353,6 +2358,7 @@ import { __, sprintf } from '@wordpress/i18n';
 					action: 'rg_post_permalink',
 					preview_post_id: previewPostId,
 					category_id: selectedCategoryId,
+					applies_to: appliesTo,
 					specific_posts_ids: specificPostIDs,
 					security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
 				};

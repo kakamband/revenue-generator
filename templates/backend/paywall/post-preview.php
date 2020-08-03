@@ -92,6 +92,7 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 					?>
 					<select class="rev-gen-preview-main-paywall-applies-to">
 						<option <?php selected( $paywall_access_to, 'all', true ); ?> value="all"><?php esc_html_e( 'all posts and pages', 'revenue-generator' ); ?></option>
+						<option <?php selected( $paywall_access_to, 'posts', true ); ?> value="posts"><?php esc_html_e( 'all posts', 'revenue-generator' ); ?></option>
 						<option <?php selected( $paywall_access_to, 'category', true ); ?> value="category"><?php esc_html_e( 'category', 'revenue-generator' ); ?></option>
 						<option <?php selected( $paywall_access_to, 'exclude_category', true ); ?> value="exclude_category"><?php esc_html_e( 'except for category', 'revenue-generator' ); ?></option>
 						<option <?php selected( $paywall_access_to, 'specific_post', true ); ?> value="specific_post"><?php esc_html_e( 'specific posts or pages', 'revenue-generator' ); ?></option>

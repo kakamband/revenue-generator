@@ -657,6 +657,12 @@ class Frontend_Post {
 				}
 			}
 
+			// Get paywall applied for only post_type == post.
+			if ( ! $this->is_paywall_active( $paywall_data ) && 'post' === get_post_type( $post_id ) ) {
+				$paywall_id   = $paywall_instance->get_paywall_for_only_posts();
+				$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
+			}
+
 			// If no paywall found in categories and individual post, check for paywall applied on all posts as last resort.
 			if ( ! $this->is_paywall_active( $paywall_data ) ) {
 				$paywall_id = $paywall_instance->get_paywall_for_all_posts();
