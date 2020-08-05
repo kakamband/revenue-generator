@@ -51,6 +51,7 @@ class Admin {
 		add_action( 'wp_ajax_rg_search_preview_content', [ $this, 'search_preview_content' ] );
 		add_action( 'wp_ajax_rg_select_preview_content', [ $this, 'select_preview_content' ] );
 		add_action( 'wp_ajax_rg_search_term', [ $this, 'select_search_term' ] );
+		add_action( 'wp_ajax_rg_search_post', [ $this, 'select_search_post' ] );
 		add_action( 'wp_ajax_rg_clear_category_meta', [ $this, 'clear_category_meta' ] );
 		add_action( 'wp_ajax_rg_complete_tour', [ $this, 'complete_tour' ] );
 		add_action( 'wp_ajax_rg_verify_account_credentials', [ $this, 'verify_account_credentials' ] );
@@ -628,8 +629,9 @@ class Admin {
 
 		$post_types = Post_Types::get_instance();
 
-		$current_paywall  = filter_input( INPUT_GET, 'current_paywall', FILTER_SANITIZE_NUMBER_INT );
-		$rg_category_data = '';
+		$current_paywall   = filter_input( INPUT_GET, 'current_paywall', FILTER_SANITIZE_NUMBER_INT );
+		$rg_category_data  = '';
+		$rg_specific_posts = array();
 
 		// Load paywall related content if found else load requested content for new paywall.
 		if ( ! empty( $current_paywall ) ) {
@@ -647,6 +649,16 @@ class Admin {
 					$rg_category_id = $paywall_data['access_entity'];
 					if ( ! empty( $rg_category_id ) ) {
 						$rg_category_data = get_term( $rg_category_id, 'category' );
+					}
+				}
+
+				// Get Specific posts if user has selected type specific posts.
+				if ( 'specific_post' === $paywall_data['access_to'] ) {
+					$rg_specific_posts_ids = $paywall_data['specific_posts'];
+					if ( ! empty( $rg_specific_posts_ids ) ) {
+						foreach ( $rg_specific_posts_ids as $rg_specific_post_id ) {
+							$rg_specific_posts[ $rg_specific_post_id ] = get_the_title( $rg_specific_post_id );
+						}
 					}
 				}
 			}
@@ -712,6 +724,7 @@ class Admin {
 			'dynamic_pricing_data'  => $post_dynamic_pricing_data,
 			'merchant_symbol'       => $symbol,
 			'rg_category_data'      => $rg_category_data,
+			'rg_specific_posts'     => $rg_specific_posts,
 			'is_merchant_verified'  => $is_merchant_verified,
 			'new_paywall_url'       => add_query_arg( [ 'page' => $admin_menus['paywall']['url'] ], admin_url( 'admin.php' ) ),
 			'dashboard_url'         => add_query_arg( [ 'page' => $admin_menus['dashboard']['url'] ], admin_url( 'admin.php' ) ),
@@ -930,14 +943,16 @@ class Admin {
 		$time_passes     = filter_input( INPUT_POST, 'time_passes', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 		$subscriptions   = filter_input( INPUT_POST, 'subscriptions', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 
-		$paywall_instance         = Paywall::get_instance();
-		$paywall['name']          = sanitize_text_field( wp_unslash( $paywall_data['name'] ) );
-		$paywall['description']   = sanitize_text_field( wp_unslash( $paywall_data['desc'] ) );
-		$paywall['title']         = sanitize_text_field( wp_unslash( $paywall_data['title'] ) );
-		$paywall['id']            = sanitize_text_field( $paywall_data['id'] );
-		$paywall['access_to']     = sanitize_text_field( wp_unslash( $paywall_data['applies'] ) );
-		$paywall['preview_id']    = sanitize_text_field( wp_unslash( $paywall_data['preview_id'] ) );
-		$paywall['access_entity'] = $rg_post_id;
+		$paywall_instance          = Paywall::get_instance();
+		$paywall['name']           = sanitize_text_field( wp_unslash( $paywall_data['name'] ) );
+		$paywall['description']    = sanitize_text_field( wp_unslash( $paywall_data['desc'] ) );
+		$paywall['title']          = sanitize_text_field( wp_unslash( $paywall_data['title'] ) );
+		$paywall['id']             = sanitize_text_field( $paywall_data['id'] );
+		$paywall['access_to']      = sanitize_text_field( wp_unslash( $paywall_data['applies'] ) );
+		$paywall['preview_id']     = sanitize_text_field( wp_unslash( $paywall_data['preview_id'] ) );
+		$paywall['access_entity']  = $rg_post_id;
+		$specific_posts            = sanitize_text_field( wp_unslash( $paywall_data['specific_posts'] ) );
+		$paywall['specific_posts'] = json_decode( $specific_posts );
 
 		$order_items = [];
 
@@ -954,6 +969,13 @@ class Admin {
 
 			// Add Individual option to paywall.
 			$paywall_instance->update_paywall_individual_option( $paywall_id, $individual );
+		}
+
+		// Save Paywall ID in selected specific posts meta.
+		if ( ! empty( $paywall['specific_posts'] ) ) {
+			foreach ( $paywall['specific_posts'] as $post_id ) {
+				update_post_meta( $post_id, '_rg_specific_paywall', $paywall_id );
+			}
 		}
 
 		$time_pass_instance = Time_Pass::get_instance();
@@ -1251,6 +1273,61 @@ class Admin {
 	}
 
 	/**
+	 * Search Post/page to be added in paywall
+	 */
+	public function select_search_post() {
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Get all data and sanitize it.
+		$post_term = sanitize_text_field( filter_input( INPUT_POST, 'term', FILTER_SANITIZE_STRING ) );
+
+		$args = [
+			'post_type'      => [
+				'post',
+				'page',
+			],
+			'posts_per_page' => 5,
+			'orderby'        => 'relevance',
+		];
+
+		if ( ! empty( $post_term ) ) {
+			$args['s'] = $post_term;
+		}
+
+		add_filter( 'posts_where', [ $this, 'rg_post_title_filter' ], 10, 2 );
+		$posts = new \WP_Query( $args );
+		remove_filter( 'posts_where', [ $this, 'rg_post_title_filter' ], 10, 2 );
+
+		wp_send_json(
+			[
+				'success' => true,
+				'posts'   => $posts->posts,
+			]
+		);
+	}
+
+	/**
+	 * Filter to modify the search of post and search by title.
+	 *
+	 * @param string    $sql   SQL string.
+	 * @param \WP_Query $query Query object.
+	 *
+	 * @return string
+	 */
+	public function rg_post_title_filter( $sql, $query ) {
+		global $wpdb;
+
+		// If our custom query var is set modify the query.
+		if ( ! empty( $query->query['s'] ) ) {
+			$term = $wpdb->esc_like( $query->query['s'] );
+			$sql .= ' AND ' . $wpdb->posts . '.post_title LIKE \'%' . $term . '%\'';
+		}
+
+		return $sql;
+	}
+
+	/**
 	 * Clear category meta data on new selection.
 	 */
 	public function clear_category_meta() {
@@ -1368,9 +1445,10 @@ class Admin {
 		check_ajax_referer( 'rg_paywall_nonce', 'security' );
 
 		// Get all data and sanitize it.
-		$preview_post_id = sanitize_text_field( filter_input( INPUT_POST, 'preview_post_id', FILTER_SANITIZE_NUMBER_INT ) );
-		$category_id     = sanitize_text_field( filter_input( INPUT_POST, 'category_id', FILTER_SANITIZE_NUMBER_INT ) );
-		$applies_to      = sanitize_text_field( filter_input( INPUT_POST, 'applies_to', FILTER_SANITIZE_STRING ) );
+		$preview_post_id    = sanitize_text_field( filter_input( INPUT_POST, 'preview_post_id', FILTER_SANITIZE_NUMBER_INT ) );
+		$category_id        = sanitize_text_field( filter_input( INPUT_POST, 'category_id', FILTER_SANITIZE_NUMBER_INT ) );
+		$applies_to         = sanitize_text_field( filter_input( INPUT_POST, 'applies_to', FILTER_SANITIZE_STRING ) );
+		$specific_posts_ids = filter_input( INPUT_POST, 'specific_posts_ids', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 
 		// Check if there is category id and current post has that category.
 		if ( ! empty( $category_id ) && ! has_category( $category_id, $preview_post_id ) ) {
@@ -1389,6 +1467,12 @@ class Admin {
 				// Set preview post id.
 				$preview_post_id = $category_post[0]->ID;
 			}
+		}
+
+		// Check if preview id exists in selected specific posts id.
+		if ( ! empty( $specific_posts_ids ) && ! in_array( $preview_post_id, $specific_posts_ids, true ) ) {
+			// If not in list use first post id from list for preview post.
+			$preview_post_id = $specific_posts_ids[0];
 		}
 
 		// Check Preview post has post type post and it applies to only posts.

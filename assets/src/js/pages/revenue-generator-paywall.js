@@ -103,8 +103,12 @@ import { __, sprintf } from '@wordpress/i18n';
 				activatePaywall: $( '#rg_js_activatePaywall' ),
 				savePaywall: $( '#rg_js_savePaywall' ),
 				searchPaywallContent: $( '#rg_js_searchPaywallContent' ),
+				searchPost: $( '#rg_js_searchPost' ),
 				searchPaywallWrapper: $(
 					'.rev-gen-preview-main--paywall-actions-search'
+				),
+				searchPostWrapper: $(
+					'.rev-gen-preview-main--paywall-actions-search-post'
 				),
 				paywallName: $( '.rev-gen-preview-main-paywall-name' ),
 
@@ -258,6 +262,18 @@ import { __, sprintf } from '@wordpress/i18n';
 						const tour = initializeTour();
 						addTourSteps( tour );
 						startWelcomeTour( tour );
+					}
+
+					// Check if there are already preselected option on mutltiselect and trigger click event twice to reset placeholder.
+					const preSelectedOptions = $o.searchPost.val();
+					if ( preSelectedOptions && preSelectedOptions.length > 0 ) {
+						const mutipleSelect2 = $(
+							'.select2-selection--multiple .select2-search.select2-search--inline'
+						);
+						// Open up search.
+						mutipleSelect2.trigger( 'click' );
+						// Close Search.
+						mutipleSelect2.trigger( 'click' );
 					}
 				} );
 
@@ -527,6 +543,92 @@ import { __, sprintf } from '@wordpress/i18n';
 						$o.postPreviewWrapper.attr(
 							'data-access-id',
 							categoryId
+						);
+						$o.savePaywall.removeAttr( 'disabled' );
+						$o.activatePaywall.removeAttr( 'disabled' );
+					}
+				} );
+
+				$o.searchPost.select2( {
+					ajax: {
+						url: revenueGeneratorGlobalOptions.ajaxUrl,
+						dataType: 'json',
+						delay: 500,
+						type: 'POST',
+						data( params ) {
+							return {
+								term: params.term,
+								action: 'rg_search_post',
+								security:
+									revenueGeneratorGlobalOptions.rg_paywall_nonce,
+							};
+						},
+						processResults( data ) {
+							const options = [];
+							if ( data ) {
+								$.each( data.posts, function( index ) {
+									const post = data.posts[ index ];
+									options.push( {
+										id: post.ID,
+										text: post.post_title,
+									} );
+								} );
+							}
+							return {
+								results: options,
+							};
+						},
+						cache: true,
+					},
+					placeholder: __( 'search', 'revenue-generator' ),
+					language: {
+						inputTooShort() {
+							return __(
+								'Please enter 1 or more characters.',
+								'revenue-generator'
+							);
+						},
+						noResults() {
+							return __(
+								'No results found.',
+								'revenue-generator'
+							);
+						},
+					},
+					minimumInputLength: 1,
+					closeOnSelect: false,
+				} );
+
+				/*
+				 * Adds Placeholder in select2 on close and hide options.
+				 */
+				$o.searchPost.on( 'select2:close', function() {
+					const parentMutiplediv = $( this )
+						.siblings( 'span.select2' )
+						.find( '.select2-selection--multiple' );
+					const count = $( this ).select2( 'data' ).length;
+					const select2Counter = parentMutiplediv.find(
+						'.select2-selection__rendered .select2-search--inline input'
+					);
+					select2Counter.attr(
+						'placeholder',
+						count + ' items selected'
+					);
+
+					// Setting width dynamically as it has to overwrite default dynamic width.
+					select2Counter.css( 'width', '100%' );
+				} );
+
+				/**
+				 * Handle change of current post.
+				 */
+				$o.searchPost.on( 'change', function() {
+					const specificPosts = $( this ).val();
+					const jsonSpecificPosts = JSON.stringify( specificPosts );
+					if ( specificPosts ) {
+						$o.searchPostWrapper.attr(
+							'data-access-id',
+							jsonSpecificPosts
 						);
 						$o.savePaywall.removeAttr( 'disabled' );
 						$o.activatePaywall.removeAttr( 'disabled' );
@@ -1291,6 +1393,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						'exclude_category' === $( this ).val() ||
 						'category' === $( this ).val()
 					) {
+						$o.searchPostWrapper.hide();
 						$o.searchPaywallWrapper.show();
 						if (
 							$o.searchPaywallContent.length &&
@@ -1303,10 +1406,21 @@ import { __, sprintf } from '@wordpress/i18n';
 							'data-access-id',
 							$o.searchPaywallContent.val()
 						);
+					} else if ( 'specific_post' === $( this ).val() ) {
+						$o.searchPaywallWrapper.hide();
+						$o.searchPostWrapper.show();
+						if (
+							$o.searchPost.length &&
+							null === $o.searchPost.val()
+						) {
+							$o.savePaywall.attr( 'disabled', true );
+							$o.activatePaywall.attr( 'disabled', true );
+						}
 					} else {
 						$o.savePaywall.removeAttr( 'disabled' );
 						$o.activatePaywall.removeAttr( 'disabled' );
 						$o.searchPaywallWrapper.hide();
+						$o.searchPostWrapper.hide();
 						$o.postPreviewWrapper.attr(
 							'data-access-id',
 							$o.postPreviewWrapper.attr( 'data-preview-id' )
@@ -1937,6 +2051,12 @@ import { __, sprintf } from '@wordpress/i18n';
 						subscriptions.push( subscriptionObj );
 					} );
 
+					const specificPosts = $o.searchPost.val();
+					let jsonSpecificPosts = '';
+					if ( specificPosts ) {
+						jsonSpecificPosts = JSON.stringify( specificPosts );
+					}
+
 					/**
 					 * Paywall data.
 					 */
@@ -1952,6 +2072,7 @@ import { __, sprintf } from '@wordpress/i18n';
 							.trim(),
 						name: $o.paywallName.text().trim(),
 						applies: $( $o.paywallAppliesTo ).val(),
+						specific_posts: jsonSpecificPosts,
 						preview_id: $o.postPreviewWrapper.attr(
 							'data-preview-id'
 						),
@@ -2194,8 +2315,15 @@ import { __, sprintf } from '@wordpress/i18n';
 					const targetPostId = $( this ).attr( 'data-target-id' );
 					const selectedCategoryId = $o.searchPaywallContent.val();
 					const appliesTo = $( $o.paywallAppliesTo ).val();
+					const specificPostIDs = $o.searchPost.val();
+
 					if ( targetPostId ) {
-						viewPost( targetPostId, selectedCategoryId, appliesTo );
+						viewPost(
+							targetPostId,
+							selectedCategoryId,
+							appliesTo,
+							specificPostIDs
+						);
 					}
 				} );
 
@@ -2217,11 +2345,13 @@ import { __, sprintf } from '@wordpress/i18n';
 			 * @param {number} previewPostId Post Preview ID.
 			 * @param {number} selectedCategoryId Selected Category ID.
 			 * @param {string} appliesTo Applies to Type.
+			 * @param {Array} specificPostIDs Array of Specific Post ID's.
 			 */
 			const viewPost = function(
 				previewPostId,
 				selectedCategoryId = 0,
-				appliesTo = ''
+				appliesTo = '',
+				specificPostIDs = []
 			) {
 				// Create form data.
 				const formData = {
@@ -2229,6 +2359,7 @@ import { __, sprintf } from '@wordpress/i18n';
 					preview_post_id: previewPostId,
 					category_id: selectedCategoryId,
 					applies_to: appliesTo,
+					specific_posts_ids: specificPostIDs,
 					security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
 				};
 
@@ -2350,6 +2481,11 @@ import { __, sprintf } from '@wordpress/i18n';
 								$( $o.postTitle )
 									.text()
 									.trim()
+							);
+						} else if ( 'specific_post' === appliedTo ) {
+							publishMessage = __(
+								'Has been published on <b>Specific Posts & Pages</b>.',
+								'revenue-generator'
 							);
 						} else {
 							publishMessage = __(

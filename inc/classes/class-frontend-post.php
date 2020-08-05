@@ -635,6 +635,12 @@ class Frontend_Post {
 			$paywall_id   = $paywall_instance->get_connected_paywall_by_post( $post_id );
 			$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
 
+			// Check for Specific Post Paywall.
+			if ( ! $this->is_paywall_active( $paywall_data ) ) {
+				$paywall_id   = $paywall_instance->get_paywall_for_specific_post( $post_id );
+				$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
+			}
+
 			// If post doesn't have an individual paywall, check for paywall on categories.
 			if ( ! $this->is_paywall_active( $paywall_data ) ) {
 				// Check if paywall is found on post categories.
