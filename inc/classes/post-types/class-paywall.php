@@ -186,7 +186,7 @@ class Paywall extends Base {
 			[
 				'key'     => '_rg_specific_posts',
 				'compare' => 'LIKE',
-				'value'   => $post_id,
+				'value'   => '"' . $post_id . '"',
 			],
 			[
 				'key'     => '_rg_access_to',
@@ -543,8 +543,8 @@ class Paywall extends Base {
 			'relation' => 'AND',
 			[
 				'key'     => '_rg_access_entity',
-				'compare' => '=',
-				'value'   => $category_id,
+				'compare' => 'LIKE',
+				'value'   => '"' . $category_id . '"',
 			],
 			[
 				'key'     => '_rg_access_to',
@@ -656,21 +656,40 @@ class Paywall extends Base {
 
 		// Compose message based on paywall attributes.
 		if ( 'category' === $pay_wall['access_to'] || 'exclude_category' === $pay_wall['access_to'] ) {
-			$category_id     = $pay_wall['access_entity'];
-			$category_object = get_category( $category_id );
+
+			$categories_id = '';
+
+			// backward compatibility.
+			if ( isset( $pay_wall['access_entity'] ) && is_serialized( $pay_wall['access_entity'] ) ) {
+				$categories_id = maybe_unserialize( $pay_wall['access_entity'] );
+			} else {
+				$categories_id = array( $pay_wall['access_entity'] );
+			}
+
+			$categories_message = '';
+
+			if ( ! empty( $categories_id ) && is_array( $categories_id ) ) {
+				$categories_in_message = array();
+				foreach ( $categories_id as $category_id ) {
+					$category_object         = get_category( $category_id );
+					$categories_in_message[] = $category_object->name;
+				}
+				$categories_message = implode( ', ', $categories_in_message );
+			}
+
 			if ( 'category' === $pay_wall['access_to'] ) {
 				$published_on = sprintf(
 					/* translators: %1$s static string PUBLISHED/SAVED, %2$s category name */
 					__( '<b>%1$s</b> on <b>all posts</b> in the category <b>%2$s</b>', 'revenue-generator' ),
 					$saved_message,
-					$category_object->name
+					$categories_message
 				);
 			} else {
 				$published_on = sprintf(
 					/* translators: %1$s static string PUBLISHED/SAVED, %2$s category name */
 					__( '<b>%1$s</b> on <b>all posts</b> except the category <b>%2$s</b>', 'revenue-generator' ),
 					$saved_message,
-					$category_object->name
+					$categories_message
 				);
 			}
 		} elseif ( 'supported' === $pay_wall['access_to'] ) {

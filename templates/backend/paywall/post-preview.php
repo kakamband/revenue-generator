@@ -100,11 +100,13 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 					</select>
 				</div>
 				<div class="rev-gen-preview-main--paywall-actions-search">
-					<select id="rg_js_searchPaywallContent">
-						<?php if ( ! empty( $rg_category_data ) ) : ?>
-							<option selected="selected" value="<?php echo esc_attr( $rg_category_data->term_id ); ?>">
-								<?php echo esc_html( $rg_category_data->name ); ?>
-							</option>
+					<select id="rg_js_searchPaywallContent" multiple="multiple">
+						<?php if ( ! empty( $rg_categories_data ) && is_array( $rg_categories_data ) ) : ?>
+							<?php foreach ( $rg_categories_data as $rg_category_data ) : ?>
+								<option selected="selected" value="<?php echo esc_attr( $rg_category_data->term_id ); ?>">
+									<?php echo esc_html( $rg_category_data->name ); ?>
+								</option>
+							<?php endforeach; ?>
 						<?php endif; ?>
 					</select>
 					<i class="rev-gen-preview-main--paywall-actions-search-icon"></i>
