@@ -1483,6 +1483,7 @@ class Admin {
 			if ( ! $has_category ) {
 
 				$category_post_args = array(
+					'post_type'        => 'post',
 					'numberposts'      => 1,
 					'suppress_filters' => false,
 				);
