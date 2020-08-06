@@ -1479,17 +1479,23 @@ class Admin {
 				}
 			}
 
-			// If Preview post has no category.
+			// If Preview post has not category assigned.
 			if ( ! $has_category ) {
 
-				// If Preview post is post assigned to category, fetch post that has category.
-				$category_post = get_posts(
-					array(
-						'numberposts'      => 1,
-						'category__in'     => $categories_id,
-						'suppress_filters' => false,
-					)
+				$category_post_args = array(
+					'numberposts'      => 1,
+					'suppress_filters' => false,
 				);
+
+				// If it applies to category include them else exclude them.
+				if ( 'category' === $applies_to ) {
+					$category_post_args['category__in'] = $categories_id;
+				} elseif ( 'category_exclude' === $applies_to ) {
+					$category_post_args['category__not_in'] = $categories_id;
+				}
+
+				// If Preview post is post assigned to category, fetch post that has category.
+				$category_post = get_posts( $category_post_args );
 
 				// If category post exists assign for preview.
 				if ( ! empty( $category_post ) ) {
