@@ -1463,26 +1463,39 @@ class Admin {
 
 		// Get all data and sanitize it.
 		$preview_post_id    = sanitize_text_field( filter_input( INPUT_POST, 'preview_post_id', FILTER_SANITIZE_NUMBER_INT ) );
-		$category_id        = sanitize_text_field( filter_input( INPUT_POST, 'category_id', FILTER_SANITIZE_NUMBER_INT ) );
+		$categories_id      = filter_input( INPUT_POST, 'category_id', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 		$applies_to         = sanitize_text_field( filter_input( INPUT_POST, 'applies_to', FILTER_SANITIZE_STRING ) );
 		$specific_posts_ids = filter_input( INPUT_POST, 'specific_posts_ids', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 
 		// Check if there is category id and current post has that category.
-		if ( ! empty( $category_id ) && ! has_category( $category_id, $preview_post_id ) ) {
+		if ( ! empty( $categories_id ) && is_array( $categories_id ) ) {
 
-			// If Preview post is post assigned to category, fetch post that has category.
-			$category_post = get_posts(
-				array(
-					'numberposts'      => 1,
-					'category'         => $category_id,
-					'suppress_filters' => false,
-				)
-			);
+			// flag to check if post has category.
+			$has_category = false;
 
-			// If category post exists assign for preview.
-			if ( ! empty( $category_post ) ) {
-				// Set preview post id.
-				$preview_post_id = $category_post[0]->ID;
+			foreach ( $categories_id as $category_id ) {
+				if ( has_category( $category_id, $preview_post_id ) ) {
+					$has_category = true;
+				}
+			}
+
+			// If Preview post has no category.
+			if ( ! $has_category ) {
+
+				// If Preview post is post assigned to category, fetch post that has category.
+				$category_post = get_posts(
+					array(
+						'numberposts'      => 1,
+						'category__in'     => $categories_id,
+						'suppress_filters' => false,
+					)
+				);
+
+				// If category post exists assign for preview.
+				if ( ! empty( $category_post ) ) {
+					// Set preview post id.
+					$preview_post_id = $category_post[0]->ID;
+				}
 			}
 		}
 
