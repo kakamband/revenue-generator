@@ -984,11 +984,14 @@ class Paywall extends Base {
 	public function sort_paywall_by_priority( $dashboard_paywalls ) {
 		if ( ! empty( $dashboard_paywalls ) ) {
 			$all_paywalls       = [
-				'supported'        => [],
-				'specific_post'    => [],
-				'category'         => [],
-				'exclude_category' => [],
-				'all'              => [],
+				'supported'          => [],
+				'specific_post'      => [],
+				'category'           => [],
+				'categories'         => [],
+				'exclude_category'   => [],
+				'exclude_categories' => [],
+				'posts'              => [],
+				'all'                => [],
 			];
 			$published_paywalls = [];
 			$saved_paywalls     = [];
@@ -996,7 +999,25 @@ class Paywall extends Base {
 			// Store all paywall data in one place for easier udpates.
 			foreach ( $dashboard_paywalls as $paywall ) {
 				if ( ! empty( $paywall ) ) {
-					$all_paywalls[ $paywall['access_to'] ][] = $paywall;
+
+					// Sort by Number of categories and execept categories.
+					if ( ! empty( $paywall['access_to'] ) && 'category' === $paywall['access_to'] && ! empty( $paywall['access_entity'] ) ) {
+						$access_entity = maybe_unserialize( $paywall['access_entity'] );
+						if ( count( $access_entity ) > 1 ) {
+							$all_paywalls['categories'][] = $paywall;
+						} else {
+							$all_paywalls['category'][] = $paywall;
+						}
+					} elseif ( ! empty( $paywall['access_to'] ) && 'exclude_category' === $paywall['access_to'] && ! empty( $paywall['access_entity'] ) ) {
+						$access_entity = maybe_unserialize( $paywall['access_entity'] );
+						if ( count( $access_entity ) > 1 ) {
+							$all_paywalls['exclude_categories'][] = $paywall;
+						} else {
+							$all_paywalls['exclude_category'][] = $paywall;
+						}
+					} else {
+						$all_paywalls[ $paywall['access_to'] ][] = $paywall;
+					}
 				}
 			}
 
