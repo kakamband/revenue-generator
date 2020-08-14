@@ -405,37 +405,46 @@ class Paywall extends Base {
 	 * @return string|\WP_Post
 	 */
 	public function get_connected_paywall_in_excluded_categories( $categories ) {
-		$query_args = [
-			'post_type'      => static::SLUG,
-			'post_status'    => [ 'publish' ],
-			'posts_per_page' => 1,
-		];
 
-		$meta_query = [
-			'relation' => 'AND',
-			[
-				'key'     => '_rg_access_entity',
-				'compare' => 'NOT IN',
-				'value'   => $categories,
-			],
-			[
-				'key'     => '_rg_access_to',
-				'value'   => 'exclude_category',
-				'compare' => '=',
-			],
-			[
-				'key'     => '_rg_is_active',
-				'value'   => '1',
-				'compare' => '=',
-			],
-		];
+		$current_post = array();
 
-		$query_args['meta_query'] = $meta_query;
+		if ( ! empty( $categories ) && is_array( $categories ) ) {
 
-		$query = new \WP_Query( $query_args );
+			foreach ( $categories as $category ) {
+				$query_args = [
+					'post_type'      => static::SLUG,
+					'post_status'    => [ 'publish' ],
+					'posts_per_page' => 1,
+				];
 
-		$current_post = $query->posts;
+				$meta_query = [
+					'relation' => 'AND',
+					[
+						'key'     => '_rg_access_entity',
+						'compare' => 'NOT LIKE',
+						'value'   => '"' . $category . '"',
+					],
+					[
+						'key'     => '_rg_access_to',
+						'value'   => 'exclude_category',
+						'compare' => '=',
+					],
+					[
+						'key'     => '_rg_is_active',
+						'value'   => '1',
+						'compare' => '=',
+					],
+				];
 
+				$query_args['meta_query'] = $meta_query;
+
+				$paywall_posts = new \WP_Query( $query_args );
+
+				$current_post = $paywall_posts->posts;
+			}
+		}
+
+		// if paywall exists return it.
 		if ( ! empty( $current_post[0] ) ) {
 			return $current_post[0]->ID;
 		}
@@ -536,7 +545,7 @@ class Paywall extends Base {
 		$query_args = [
 			'post_type'      => static::SLUG,
 			'post_status'    => [ 'publish' ],
-			'posts_per_page' => 1,
+			'posts_per_page' => -1,
 		];
 
 		$meta_query = [
@@ -562,10 +571,23 @@ class Paywall extends Base {
 
 		$query = new \WP_Query( $query_args );
 
-		$current_post = $query->posts;
+		$paywall_posts = $query->posts;
 
-		if ( ! empty( $current_post[0] ) ) {
-			return $current_post[0]->ID;
+		$new_paywall_order = array();
+		foreach ( $paywall_posts as $paywall_post ) {
+			$paywall_categories                             = get_post_meta( $paywall_post->ID, '_rg_access_entity', true );
+			$paywall_categories_count                       = count( $paywall_categories );
+			$new_paywall_order[ $paywall_categories_count ] = $paywall_post;
+		}
+
+		// Sort them by keys ( number of categories ).
+		ksort( $new_paywall_order );
+
+		// reset keys.
+		array_multisort( $new_paywall_order, SORT_ASC );
+
+		if ( ! empty( $new_paywall_order[0] ) ) {
+			return $new_paywall_order[0]->ID;
 		}
 
 		return '';
