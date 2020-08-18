@@ -38,7 +38,7 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 
 <div class="rev-gen-layout-wrapper">
 	<div class="laterpay-loader-wrapper">
-		<img alt="<?php esc_attr_e( 'LaterPay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
+		<img alt="<?php esc_attr_e( 'Laterpay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
 	</div>
 	<div class="rev-gen-preview-main">
 		<div class="rev-gen-preview-main--search" data-tippy-content="<?php esc_attr_e( 'Search for the page or post you\'d like to preview with Revenue Generator here.', 'revenue-generator' ); ?>">
@@ -315,7 +315,7 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 			<?php
 			echo wp_kses(
 				__(
-					'By selecting an option above, I am confirming that I have read and agree to LaterPay\'s <a href="#">privacy policy</a> and <a href="#">terms of service</a>.',
+					'By selecting an option above, I am confirming that I have read and agree to Laterpay\'s <a href="#">privacy policy</a> and <a href="#">terms of service</a>.',
 					'revenue-generator'
 				),
 				[
@@ -471,7 +471,7 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 			printf(
 				wp_kses(
 					__(
-						'If you select <b>Dynamic Pricing</b>, LaterPay’s AI will “dynamically” adjust the price based on our own data, analytics and algorithms based on the length of each article.',
+						'If you select <b>Dynamic Pricing</b>, Laterpay’s AI will “dynamically” adjust the price based on our own data, analytics and algorithms based on the length of each article.',
 						'revenue-generator'
 					),
 					[
@@ -526,7 +526,7 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 		<?php if ( false === $is_merchant_verified ) : ?>
 			<div class="rev-gen-preview-main-account-modal-action">
 				<h4 class="rev-gen-preview-main-account-modal-action-title"><?php esc_html_e( 'You’re almost done!', 'revenue-generator' ); ?></h4>
-				<span class="rev-gen-preview-main-account-modal-action-info"><?php esc_html_e( 'To make sure you get your revenues, we need you to connect your LaterPay account.', 'revenue-generator' ); ?></span>
+				<span class="rev-gen-preview-main-account-modal-action-info"><?php esc_html_e( 'To make sure you get your revenues, we need you to connect your Laterpay account.', 'revenue-generator' ); ?></span>
 				<div class="rev-gen-preview-main-account-modal-actions">
 					<button id="rg_js_connectAccount" class="rev-gen-preview-main-account-modal-actions-dark">
 						<?php esc_html_e( 'Connect Account', 'revenue-generator' ); ?>
@@ -567,7 +567,7 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 						sprintf(
 							/* translators: %1$s static anchor id to handle signup link %2$s statuc anchor id to handle re verification. */
 							__(
-								'It looks like you need to create a LaterPay account. Please <a id="%1$s" href="#">sign up here</a>, <a id="%2$s" href="#">try again</a>, or contact <a href="mailto:integration@laterpay.net">integration@laterpay.net</a> if you’re still experiencing difficulties.',
+								'It looks like you need to create a Laterpay account. Please <a id="%1$s" href="#">sign up here</a>, <a id="%2$s" href="#">try again</a>, or contact <a href="mailto:integration@laterpay.net">integration@laterpay.net</a> if you’re still experiencing difficulties.',
 								'revenue-generator'
 							),
 							'rg_js_warningSignup',

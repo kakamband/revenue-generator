@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div class="rev-gen-layout-wrapper">
 	<div class="laterpay-loader-wrapper">
-		<img alt="<?php esc_attr_e( 'LaterPay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
+		<img alt="<?php esc_attr_e( 'Laterpay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
 	</div>
 	<div class="rev-gen-dashboard-main" data-current="Contribution">
 		<div class="rev-gen-dashboard-bar">
@@ -111,8 +111,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<div class="rev-gen-dashboard-content-nopaywall--create-paywall">
 					<a href="<?php echo esc_url( $new_contribution_url ); ?>" class="rev-gen-dashboard-content-nopaywall--create-paywall--button"><?php echo esc_html( $empty_contribution_button_text ); ?></a>
 				</div>
-			</div>	
-			<?php endif; ?>	
+			</div>
+			<?php endif; ?>
 		</div>
 		<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
 	</div>
