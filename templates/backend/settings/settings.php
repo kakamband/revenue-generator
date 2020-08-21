@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="wrap">
 	<div class="rev-gen-layout-wrapper">
 		<div class="laterpay-loader-wrapper">
-			<img alt="<?php esc_attr_e( 'LaterPay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
+			<img alt="<?php esc_attr_e( 'Laterpay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
 		</div>
 		<div class="rev-gen-settings-main">
 			<h3 class="rev-gen-settings-main--header"><?php esc_html_e( 'Settings', 'revenue-generator' ); ?></h3>
@@ -85,7 +85,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					</tr>
 					<tr class="rg-laterpay-row">
 						<th>
-							<?php esc_html_e( 'LaterPay Google Analytics', 'revenue-generator' ); ?>
+							<?php esc_html_e( 'Laterpay Google Analytics', 'revenue-generator' ); ?>
 						</th>
 						<td>
 							<label for="rgGALaterPayStatus">
@@ -128,7 +128,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php
 				printf(
 					wp_kses(
-						__( 'Provide us with your <a href="https://support.google.com/analytics/answer/7372977?hl=en" target="_blank">Google Analytics UA-ID</a> and check to enable this feature if you would like to receive LaterPay events in your own Google Analytics instance.', 'revenue-generator' ),
+						__( 'Provide us with your <a href="https://support.google.com/analytics/answer/7372977?hl=en" target="_blank">Google Analytics UA-ID</a> and check to enable this feature if you would like to receive Laterpay events in your own Google Analytics instance.', 'revenue-generator' ),
 						[
 							'a' => [
 								'href'   => [],
@@ -147,7 +147,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			printf(
 				wp_kses(
 					__(
-						'For more analytics, log in to your <a href="https://www.laterpay.net/" target="_blank">LaterPay Merchant Portal</a> and check out your Analytics Dashboard.',
+						'For more analytics, log in to your <a href="https://www.laterpay.net/" target="_blank">Laterpay Merchant Portal</a> and check out your Analytics Dashboard.',
 						'revenue-generator'
 					),
 					[
@@ -165,10 +165,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 <script type="text/template" id="tmpl-revgen-info-laterpay">
 	<div class="rev-gen-settings-main-info-modal rev-gen-preview-main-info-modal laterpay-info-modal">
 	<span class="rev-gen-settings-main-info-modal-cross">X</span>
-		<h4 class="rev-gen-preview-main-info-modal-title rev-gen-settings-main-info-modal-title"><?php esc_html_e( 'LaterPay Google Analytics', 'revenue-generator' ); ?></h4>
+		<h4 class="rev-gen-preview-main-info-modal-title rev-gen-settings-main-info-modal-title"><?php esc_html_e( 'Laterpay Google Analytics', 'revenue-generator' ); ?></h4>
 		<p class="rev-gen-preview-main-info-modal-message">
 			<?php
-			esc_html_e( 'LaterPay collects information on how you are using our plugin in order to improve our products and services. We are not in the business of selling data but use this data only to benefit you, our customer.', 'revenue-generator' );
+			esc_html_e( 'Laterpay collects information on how you are using our plugin in order to improve our products and services. We are not in the business of selling data but use this data only to benefit you, our customer.', 'revenue-generator' );
 			?>
 		</p>
 		<p class="rev-gen-preview-main-info-modal-message">

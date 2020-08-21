@@ -448,10 +448,16 @@
 		color: #2e2e2e;
 		opacity: 0.4;
 		font-size: 13px;
-		line-height: 26px;
+		line-height: 1;
 		margin: 0;
 		position: relative;
 		bottom: 0;
+		img {
+			position: relative;
+			top: -2px;
+			max-width: 90px;
+			vertical-align: middle;
+		}
 	}
 
 	&-remove {

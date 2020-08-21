@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="wrap">
 	<div class="rev-gen-layout-wrapper">
 		<div class="laterpay-loader-wrapper">
-			<img alt="<?php esc_attr_e( 'LaterPay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
+			<img alt="<?php esc_attr_e( 'Laterpay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
 		</div>
 		<div class="rev-gen-contribution-main">
 			<h2 class="rev-gen-contribution-main--header"><?php esc_html_e( 'Create your Contribution box', 'revenue-generator' ); ?></h2>
@@ -69,14 +69,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<button data-info-for="shortcode" id="rev-gen-contribution-help-shortcode" class="rev-gen-settings-main-option-info rev-gen-contribution-main--help rev-gen-contribution-main--shortcode">
 					<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
 				</button>
-			</label>	
+			</label>
 			<p class="rev-gen-contribution-main-copy-message"><?php esc_html_e( 'To include the Contribution Box on your site, paste the code where you would like it to appear.', 'revenue-generator' ); ?></p>
 		</div>
 		</div>
 		<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
 		<a href="https://wordpress.org/support/plugin/revenue-generator" target="_blank" class="rev-gen-email-support"><?php esc_html_e( 'Email Support', 'revenue-generator' ); ?></a>
 		<div class="rev-gen-exit-tour"><?php esc_html_e( 'Exit Tour', 'revenue-generator' ); ?></div>
-	</div>	
+	</div>
 </div>
 <?php View::render_footer_backend(); ?>
 <!-- Template for ShortCode modal -->
@@ -129,7 +129,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php if ( false === $is_merchant_verified ) : ?>
 			<div class="rev-gen-preview-main-account-modal-action">
 				<h4 class="rev-gen-preview-main-account-modal-action-title"><?php esc_html_e( 'You’re almost done!', 'revenue-generator' ); ?></h4>
-				<span class="rev-gen-preview-main-account-modal-action-info"><?php esc_html_e( 'To make sure you get your revenues, we need you to connect your LaterPay account.', 'revenue-generator' ); ?></span>
+				<span class="rev-gen-preview-main-account-modal-action-info"><?php esc_html_e( 'To make sure you get your revenues, we need you to connect your Laterpay account.', 'revenue-generator' ); ?></span>
 				<div class="rev-gen-preview-main-account-modal-actions">
 					<button id="rg_js_connectAccount" class="rev-gen-preview-main-account-modal-actions-dark">
 						<?php esc_html_e( 'Connect Account', 'revenue-generator' ); ?>
@@ -170,7 +170,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						sprintf(
 							/* translators: %1$s static anchor id to handle signup link %2$s statuc anchor id to handle re verification. */
 							__(
-								'It looks like you need to create a LaterPay account. Please <a id="%1$s" href="#">sign up here</a>, <a id="%2$s" href="#">try again</a>, or contact <a href="mailto:integration@laterpay.net">integration@laterpay.net</a> if you’re still experiencing difficulties.',
+								'It looks like you need to create a Laterpay account. Please <a id="%1$s" href="#">sign up here</a>, <a id="%2$s" href="#">try again</a>, or contact <a href="mailto:integration@laterpay.net">integration@laterpay.net</a> if you’re still experiencing difficulties.',
 								'revenue-generator'
 							),
 							'rg_js_warningSignup',
