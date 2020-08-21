@@ -155,4 +155,4 @@ The Revenue Generator plugin uses [Semantic Versioning 2.0.0](http://semver.org)
 
 ## Copyright
 
-Copyright 2020 LaterPay GmbH – Released under MIT [LICENSE](LICENSE).
+Copyright 2020 Laterpay GmbH – Released under MIT [LICENSE](LICENSE).
