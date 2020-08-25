@@ -120,7 +120,7 @@ class Contribution extends Base {
 			$meta = array();
 
 			foreach ( $contribution_meta as $meta_key => $meta_value ) {
-				$unprefixed = str_replace( '_rg_', '', $meta_key );
+				$unprefixed        = str_replace( '_rg_', '', $meta_key );
 				$meta[$unprefixed] = maybe_unserialize( $meta_value[0] );
 			}
 
