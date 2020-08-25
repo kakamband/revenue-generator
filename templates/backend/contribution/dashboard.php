@@ -88,7 +88,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<div class="rev-gen-dashboard-content-contribution--info-updated">
 								<?php echo esc_html( $contribution_updated ); ?>
 							</div>
-							<input type="hidden" value="<?php echo esc_attr( $contribution['code'] ); ?>" class="rev-gen-dashboard-content-contribution-code" />
+							<?php
+							$contribution_code = sprintf(
+								'[laterpay_contribution id="%d"]',
+								$contribution_id
+							);
+
+							if ( ! empty( $contribution['code'] ) ) {
+								$contribution_code = $contribution['code'];
+							}
+							?>
+							<input type="hidden" value="<?php echo esc_attr( $contribution_code ); ?>" class="rev-gen-dashboard-content-contribution-code" />
 						</div>
 					</div>
 			<?php } else : ?>

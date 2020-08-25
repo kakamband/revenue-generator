@@ -80,7 +80,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</label>
 				<label id="rg_contribution_generate" class=" rev-gen-contribution-main-input-label rev-gen-contribution-main-button">
 					<button class="rev-gen-contribution-main-generate-button">
-						<?php esc_html_e( 'Generate and copy code', 'revenue-generator' ); ?>
+						<?php esc_html_e( 'Save and copy code', 'revenue-generator' ); ?>
 					</button>
 					<button data-info-for="shortcode" id="rev-gen-contribution-help-shortcode" class="rev-gen-settings-main-option-info rev-gen-contribution-main--help rev-gen-contribution-main--shortcode">
 						<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
