@@ -40,15 +40,17 @@ class Contribution extends Base {
 	}
 
 	/**
-	 * Create / Update Contribution.
+	 * Save contribution.
 	 *
 	 * @param array $contribution_data Contribution Information.
 	 *
 	 * @return int|\WP_Error
 	 */
-	public function update_contribution( $contribution_data ) {
+	public function save( $contribution_data ) {
+		$default_meta      = $this->get_default_meta();
+		$contribution_data = wp_parse_args( $contribution_data, $default_meta );
 
-		if ( empty( $contribution_data['id'] ) ) {
+		if ( empty( $contribution_data['ID'] ) ) {
 			$contribution_id = wp_insert_post(
 				[
 					'post_content' => $contribution_data['dialog_description'],
@@ -68,7 +70,13 @@ class Contribution extends Base {
 				]
 			);
 		} else {
-			$contribution_id = $contribution_data['id'];
+			$contribution_id   = $contribution_data['ID'];
+			$contribution_post = $this->get( $contribution_id );
+
+			if ( is_wp_error( $contribution_post ) ) {
+				return new WP_Error( 'invalid_contribution', __( 'Contribution with this ID does not exist.', 'revenue-generator' ) );
+			}
+
 			wp_update_post(
 				[
 					'ID'           => $contribution_id,
@@ -77,19 +85,70 @@ class Contribution extends Base {
 				]
 			);
 
-			update_post_meta( $contribution_id, '_rg_thank_you', $contribution_data['thank_you'] );
-			update_post_meta( $contribution_id, '_rg_type', $contribution_data['type'] );
-			update_post_meta( $contribution_id, '_rg_custom_amount', $contribution_data['custom_amount'] );
-			update_post_meta( $contribution_id, '_rg_all_amounts', $contribution_data['all_amounts'] );
-			update_post_meta( $contribution_id, '_rg_dialog_header', $contribution_data['dialog_header'] );
-			update_post_meta( $contribution_id, '_rg_all_revenues', $contribution_data['all_revenues'] );
-			update_post_meta( $contribution_id, '_rg_selected_amount', $contribution_data['selected_amount'] );
-			update_post_meta( $contribution_id, '_rg_code', $contribution_data['code'] );
+			foreach ( $default_meta as $meta_key => $meta_value ) {
+				update_post_meta( $contribution_id, "_rg_{$meta_key}", $contribution_data[$meta_key] );
+			}
 		}
 
 		return $contribution_id;
 	}
 
+	public function get_default_post() {
+		$post = [
+			'ID' => 0,
+			'post_title' => '',
+		];
+
+		$meta = $this->get_default_meta();
+
+		return array_merge( $post, $meta );
+	}
+
+	public function get( $id = 0 ) {
+		$contribution_default_meta = $this->get_default_meta();
+
+		if ( ! empty( $id ) ) {
+			$contribution_post = get_post( $id );
+
+			if ( ! $contribution_post || static::SLUG !== $contribution_post->post_type ) {
+				return new WP_Error( 'rg_contribution_not_found', __( 'No contribution found.', 'revenue-generator' ) );
+			}
+
+			$contribution_post = $contribution_post->to_array();
+			$contribution_meta = get_post_meta( $id, '', true );
+
+			$meta = array();
+
+			foreach ( $contribution_meta as $meta_key => $meta_value ) {
+				$unprefixed = str_replace( '_rg_', '', $meta_key );
+				$meta[$unprefixed] = maybe_unserialize( $meta_value[0] );
+			}
+
+			$meta = wp_parse_args( $meta, $contribution_default_meta );
+		} else {
+			$contribution_post = $this->get_default_post();
+			$meta              = $contribution_default_meta;
+		}
+
+		$contribution = array_merge( $contribution_post, $meta );
+
+		return $contribution;
+	}
+
+	public function get_default_meta() {
+		return [
+			'type' => 'multiple',
+			'name' => '',
+			'thank_you' => '',
+			'dialog_header' => '',
+			'dialog_description' => '',
+			'custom_amount' => '',
+			'all_amounts' => '',
+			'all_revenues' => '',
+			'selected_amount' => '',
+			'code' => '',
+		];
+	}
 
 	/**
 	 * Get all Contributions.
@@ -239,7 +298,7 @@ class Contribution extends Base {
 					unset( $config_array['custom_amount'] );
 				}
 				// Create the shortcode string.
-				$built_shortcode = sprintf( '[laterpay_contribution %s]', self::get_shortcode_string( $config_array ) );
+				$built_shortcode = sprintf( '[laterpay_contribution id="%s"]', 2 );
 				return [
 					'success' => true,
 					'code'    => $built_shortcode,
@@ -282,27 +341,6 @@ class Contribution extends Base {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Generate the shortcode string based on provide attributes and their values.
-	 *
-	 * @param array $config_array Shortcode attribute and value data.
-	 *
-	 * @return mixed
-	 */
-	private static function get_shortcode_string( $config_array ) {
-		return array_reduce(
-			array_keys( $config_array ),
-			function ( $carry, $key ) use ( $config_array ) {
-				$value = $config_array[ $key ];
-				if ( in_array( $key, [ 'all_amounts', 'all_revenues' ], true ) ) {
-					$value = implode( ',', $config_array[ $key ] );
-				}
-				return $carry . ' ' . $key . '="' . $value . '"';
-			},
-			''
-		);
 	}
 
 	/**

@@ -62,7 +62,7 @@ class Admin {
 		add_action( 'wp_ajax_rg_set_paywall_order', [ $this, 'set_paywall_sort_order' ] );
 		add_action( 'wp_ajax_rg_search_paywall', [ $this, 'search_paywall' ] );
 		add_action( 'wp_ajax_rg_set_paywall_name', [ $this, 'rg_set_paywall_name' ] );
-		add_action( 'wp_ajax_rg_contribution_shortcode_generator', [ $this, 'rg_contribution_shortcode_generator' ] );
+		add_action( 'wp_ajax_rg_contribution_save', [ $this, 'rg_contribution_save' ] );
 	}
 
 	/**
@@ -282,6 +282,77 @@ class Admin {
 		}
 	}
 
+	public function rg_contribution_save() {
+		check_ajax_referer( 'rg_contribution_nonce', 'security' );
+
+		$contribution_instance = Contribution::get_instance();
+
+		$contribution_data = [
+			'ID'                 => ( isset( $_REQUEST['ID'] ) ) ? intval( $_REQUEST['ID'] ) : 0,
+			'name'               => ( isset( $_REQUEST['title'] ) ) ? sanitize_text_field( $_REQUEST['title'] ) : '',
+			'thank_you'          => ( isset( $_REQUEST['thank_you'] ) ) ? sanitize_url( $_REQUEST['thank_you'] ) : '',
+			'dialog_header'      => ( isset( $_REQUEST['heading'] ) ) ? sanitize_text_field( $_REQUEST['heading'] ) : '',
+			'dialog_description' => ( isset( $_REQUEST['description'] ) ) ? sanitize_text_field( $_REQUEST['description'] ) : '',
+			'custom_amount'      => ( isset( $_REQUEST['custom-amount'] ) ) ? floatval( $_REQUEST['custom-amount'] ) : '',
+			'code'               => ( isset( $_REQUEST['code'] ) ) ? sanitize_text_field( $_REQUEST['code'] ) : '',
+		];
+
+		$amounts = isset( $_REQUEST['amounts'] ) ? $_REQUEST['amounts'] : [];
+
+		$all_amounts     = ( ! empty( $amounts ) ) ? json_decode( wp_unslash( $amounts ), true ) : array();
+		$filtered_prices = [];
+
+		// Sanitize the all amounts input.
+		$filters = [
+			'price'       => FILTER_SANITIZE_STRING,
+			'revenue'     => FILTER_SANITIZE_STRING,
+			'is_selected' => FILTER_VALIDATE_BOOLEAN,
+		];
+
+		$options = [
+			'price'       => [
+				'flags' => FILTER_NULL_ON_FAILURE,
+			],
+			'revenue'     => [
+				'flags' => FILTER_NULL_ON_FAILURE,
+			],
+			'is_selected' => [
+				'flags' => FILTER_NULL_ON_FAILURE,
+			],
+		];
+
+		$selected_amount = 1;
+		// Loop through the user input an build an array to be processed by shortcode generator.
+		foreach ( $all_amounts as $id => $amount_array ) {
+			foreach ( $amount_array as $key => $value ) {
+				$filtered_prices[$id][$key] = filter_var( $value, $filters[$key], $options[$key] );
+				if ( true === $amount_array['is_selected'] ) {
+					$selected_amount = $id + 1;
+				}
+			}
+		}
+
+		$contribution_data['all_amounts']  = array_column( $filtered_prices, 'price' );
+		$contribution_data['all_revenues'] = array_column( $filtered_prices, 'revenue' );
+
+		$contribution_id = $contribution_instance->save( $contribution_data );
+
+		$message = __( 'Oops! Something went wrong. Please try again.', 'revenue-generator' );
+
+		if ( ! empty( $contribution_id ) && ! is_wp_error( $contribution_id ) ) {
+			$message              = esc_html__( 'Successfully generated code, please paste at desired location.', 'revenue-generator' );
+			$generate_button_text = esc_html__( 'Code copied in your clipboard!', 'revenue-generator' );
+		}
+
+		wp_send_json(
+			[
+				'success'     => true,
+				'msg'         => $message,
+				'button_text' => $generate_button_text,
+			]
+		);
+	}
+
 	/**
 	 * Generates Contribution short code.
 	 */
@@ -359,9 +430,6 @@ class Admin {
 		$generated_shortcode    = isset( $result['code'] ) ? $result['code'] : '';
 		$shortcode_data['code'] = $generated_shortcode;
 
-		// Insert contribution to post type.
-		$contribution_id = $contribution_instace->update_contribution( $shortcode_data );
-
 		$message              = esc_html__( 'Something went wrong!', 'revenue-generator' );
 		$generate_button_text = esc_html__( 'Generate and copy code', 'revenue-generator' );
 
@@ -390,7 +458,7 @@ class Admin {
 		$admin_menus           = self::get_admin_menus();
 		$contribution_instance = Contribution::get_instance();
 		$config_data           = Config::get_global_options();
-		
+
 		// Ge Currencey Symbol.
 		$symbol = '';
 		if ( ! empty( $config_data['merchant_currency'] ) ) {
@@ -468,9 +536,30 @@ class Admin {
 			$is_merchant_verified = true;
 		}
 
+		$contributions_dashboard_url = add_query_arg(
+			[
+				'page' => $admin_menus['contributions']['url']
+			],
+			admin_url( 'admin.php' )
+		);
+
+		$contribution_instance = Contribution::get_instance();
+		$id                    = ( isset( $_GET['id'] ) ) ? intval( $_GET['id'] ) : 0;
+		$contribution_data     = $contribution_instance->get( $id );
+
+		if ( is_wp_error( $contribution_data ) ) {
+			printf(
+				__( 'Contribution does not exist. <a href="%s">Go back to dashboard</a>' ),
+				$contributions_dashboard_url
+			);
+
+			return;
+		}
+
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
 		$dashboard_page_data = [
-			'contributions_dashboard_url' => add_query_arg( [ 'page' => $admin_menus['contributions']['url'] ], admin_url( 'admin.php' ) ),
+			'contribution_data'           => $contribution_data,
+			'contributions_dashboard_url' => $contributions_dashboard_url,
 			'is_merchant_verified'        => $is_merchant_verified,
 			'currency_symbol'             => $symbol,
 			'action_icons'                => [
