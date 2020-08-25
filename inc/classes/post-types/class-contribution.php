@@ -26,6 +26,20 @@ class Contribution extends Base {
 	const SLUG = 'rg_contribution';
 
 	/**
+	 * Slug of admin screen for Contributions dashboard.
+	 *
+	 * @var string
+	 */
+	const ADMIN_DASHBOARD_SLUG = 'revenue-generator-contributions';
+
+	/**
+	 * Slug of admin screen for single Contributions edit.
+	 *
+	 * @var string
+	 */
+	const ADMIN_EDIT_SLUG = 'revenue-generator-contribution';
+
+	/**
 	 * To get list of labels for paywall post type.
 	 *
 	 * @return array

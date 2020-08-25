@@ -987,14 +987,14 @@ class Admin {
 			];
 
 			$menus['contributions'] = [
-				'url'    => 'revenue-generator-contributions',
+				'url'    => Contribution::ADMIN_DASHBOARD_SLUG,
 				'title'  => __( 'Contributions', 'revenue-generator' ),
 				'cap'    => 'manage_options',
 				'method' => 'contributions',
 			];
 
 			$menus['contribution'] = [
-				'url'    => 'revenue-generator-contribution',
+				'url'    => Contribution::ADMIN_EDIT_SLUG,
 				'title'  => __( 'Contribution', 'revenue-generator' ),
 				'cap'    => 'manage_options',
 				'method' => 'contribution',
