@@ -165,7 +165,7 @@ class Shortcodes {
 			'selected_amount'    => null,
 		);
 
-		if ( ! is_null( $atts['id'] ) ) {
+		if ( isset( $atts['id'] ) && ! empty( $atts['id'] ) ) {
 			$contribution_instance = Post_Types\Contribution::get_instance();
 			$contribution_atts     = $contribution_instance->get( (int) $atts['id'] );
 			$default_atts          = $contribution_atts;
