@@ -38,10 +38,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php
 			if ( ! empty( $contributions ) ) :
 				foreach ( $contributions as $contribution ) {
-					$contribution_id      = $contribution['id'];
-					$contribution_title   = $contribution['name'];
-					$contribution_updated = $contribution['updated'];
-
+					$contribution_id       = $contribution['id'];
+					$contribution_title    = $contribution['name'];
+					$contribution_updated  = $contribution['updated'];
+					$contribution_edit_url = admin_url(
+						sprintf(
+							'admin.php?page=%s&id=%d',
+							\LaterPay\Revenue_Generator\Inc\Post_Types\Contribution::ADMIN_EDIT_SLUG,
+							$contribution_id
+						)
+					);
 					?>
 					<div class="rev-gen-dashboard-content-contribution" data-contribution-id="<?php echo esc_attr( $contribution_id ); ?>">
 						<div class="rev-gen-dashboard-content-contribution--box">
@@ -80,7 +86,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						</div>
 						<div class="rev-gen-dashboard-content-contribution--info">
 							<h3 class="rev-gen-dashboard-content-contribution--info-title">
-								<?php echo esc_html( $contribution_title ); ?>
+								<a href="<?php echo $contribution_edit_url; ?>"><?php echo esc_html( $contribution_title ); ?></a>
 							</h3>
 							<div class="rev-gen-dashboard-content-contribution--info-url">
 								<?php echo esc_html( $contribution['thank_you'] ); ?>
