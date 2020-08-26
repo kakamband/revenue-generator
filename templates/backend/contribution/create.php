@@ -27,22 +27,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</h2>
 			<div class="rev-gen-contribution-main--box">
 				<div id="rev-gen-contribution-main-header-section">
-					<h3 class="rev-gen-contribution-main--box-header" contenteditable="true"><?php esc_html_e( 'Support the Author', 'revenue-generator' ); ?></h3>
-					<p class="rev-gen-contribution-main--box-description" contenteditable="true"><?php esc_html_e( 'Pick your contribution below:' ); ?></p>
+					<h3 class="rev-gen-contribution-main--box-header" contenteditable="true"><?php echo esc_html( $contribution_data['dialog_header'] ); ?></h3>
+					<p class="rev-gen-contribution-main--box-description" contenteditable="true"><?php echo esc_html( $contribution_data['dialog_description'] ); ?></p>
 				</div>
 				<div class="rev-gen-contribution-main--box-donation-wrapper">
-					<div class="rev-gen-contribution-main--box-donation">
-						<span class="rev-gen-contribution-main--box-donation-currency"><?php echo esc_html( $currency_symbol ); ?></span>
-						<span class="rev-gen-contribution-main--box-donation-amount" contenteditable="true"><?php esc_html_e( '0.50', 'revenue-generator' ); ?></span>
-					</div>
-					<div class="rev-gen-contribution-main--box-donation">
-						<span class="rev-gen-contribution-main--box-donation-currency"><?php echo esc_html( $currency_symbol ); ?></span>
-						<span class="rev-gen-contribution-main--box-donation-amount" contenteditable="true"><?php esc_html_e( '1.00', 'revenue-generator' ); ?></span>
-					</div>
-					<div class="rev-gen-contribution-main--box-donation">
-						<span class="rev-gen-contribution-main--box-donation-currency"><?php echo esc_html( $currency_symbol ); ?></span>
-						<span class="rev-gen-contribution-main--box-donation-amount" contenteditable="true"><?php esc_html_e( '5.00', 'revenue-generator' ); ?></span>
-					</div>
+					<?php foreach ( $contribution_data['all_amounts'] as $amount ) : ?>
+						<div class="rev-gen-contribution-main--box-donation">
+							<span class="rev-gen-contribution-main--box-donation-currency"><?php echo esc_html( $currency_symbol ); ?></span>
+							<span class="rev-gen-contribution-main--box-donation-amount" contenteditable="true"><?php echo View::format_number( floatval( (int) $amount / 100 ), 2 ); ?></span>
+						</div>
+					<?php endforeach; ?>
 					<div class="rev-gen-contribution-main--box-donation">
 						<span class="rev-gen-contribution-main--box-donation-currency"><?php echo esc_html( $currency_symbol ); ?></span>
 						<span class="rev-gen-contribution-main--box-donation-amount"><?php esc_html_e( 'custom', 'revenue-generator' ); ?></span>
@@ -58,6 +52,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<input type="hidden" name="ID" value="<?php echo $contribution_data['ID']; ?>">
 			<input type="hidden" name="action" value="rg_contribution_save">
 			<input type="hidden" name="amounts" value="">
+			<input type="hidden" name="dialog_header" value="<?php echo $contribution_data['dialog_header']; ?>">
+			<input type="hidden" name="dialog_description" value="<?php echo $contribution_data['dialog_description']; ?>">
 
 			<div class="rev-gen-contribution-main-inputs-wrapper">
 				<label id="rg_contribution_campaign_name"  class="rev-gen-contribution-main-input-label">
@@ -73,10 +69,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<button data-info-for="thankYouPage" id="rev-gen-contribution-help-thank-you" class="rev-gen-settings-main-option-info rev-gen-contribution-main--help">
 						<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
 					</button>
-				</label>
-				<label id="rg_contribution_shortcode_label" class="rev-gen-contribution-main-input-label">
-					<?php esc_html_e( 'Shortcode', 'revenue-generator' ); ?>
-					<textarea class="rev-gen-contribution-main-input" name="code" id="rg_contribution_shortcode" readonly><?php echo $contribution_data['code']; ?></textarea>
 				</label>
 				<label id="rg_contribution_generate" class=" rev-gen-contribution-main-input-label rev-gen-contribution-main-button">
 					<button class="rev-gen-contribution-main-generate-button">
