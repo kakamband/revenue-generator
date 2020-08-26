@@ -215,6 +215,12 @@ import { __, sprintf } from '@wordpress/i18n';
 										0,
 										true
 									);
+
+									if ( window.location.href !== r.edit_link ) {
+										setTimeout( function() {
+											window.location.href = r.edit_link;
+										}, 1500 );
+									}
 								}
 								// Release request lock.
 								$o.requestSent = false;
