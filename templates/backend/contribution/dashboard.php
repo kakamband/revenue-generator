@@ -6,6 +6,7 @@
  */
 
 use LaterPay\Revenue_Generator\Inc\View;
+use LaterPay\Revenue_Generator\Inc\Post_Types\Contribution as Contribution;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	// prevent direct access to this file.
@@ -36,18 +37,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 		<div class="rev-gen-dashboard-content rev-gen-dashboard-content-contribution-wrapper">
 			<?php
+			$contribution_instance = Contribution::get_instance();
+
 			if ( ! empty( $contributions ) ) :
 				foreach ( $contributions as $contribution ) {
-					$contribution_id       = $contribution['id'];
-					$contribution_title    = $contribution['name'];
-					$contribution_updated  = $contribution['updated'];
-					$contribution_edit_url = admin_url(
-						sprintf(
-							'admin.php?page=%s&id=%d',
-							\LaterPay\Revenue_Generator\Inc\Post_Types\Contribution::ADMIN_EDIT_SLUG,
-							$contribution_id
-						)
-					);
+					$contribution_id             = $contribution['ID'];
+					$contribution_title          = $contribution['name'];
+					$contribution_shortcode      = $contribution_instance->get_shortcode( $contribution );
+					$contribution_updated_string = $contribution_instance->get_date_time_string( $contribution );
+					$contribution_edit_link      = $contribution_instance->get_edit_link( $contribution );
 					?>
 					<div class="rev-gen-dashboard-content-contribution" data-contribution-id="<?php echo esc_attr( $contribution_id ); ?>">
 						<div class="rev-gen-dashboard-content-contribution--box">
@@ -55,7 +53,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 								<?php echo esc_html( $contribution['dialog_header'] ); ?>
 							</h4>
 							<p class="rev-gen-dashboard-content-contribution--box-description">
-								<?php echo esc_html( $contribution['description'] ); ?>
+								<?php echo esc_html( $contribution['dialog_description'] ); ?>
 							</p>
 							<div class="rev-gen-dashboard-content-contribution--box-donation-wrapper">
 								<?php
@@ -67,7 +65,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 											<?php echo esc_html( $currency_symbol ); ?>
 										</span>
 										<span class="rev-gen-dashboard-content-contribution--box-donation-amount">
-											<?php echo esc_html( View::format_number( $amount, 2 ) ); ?>
+											<?php echo esc_html( View::format_number( floatval( $amount / 100 ), 2 ) ); ?>
 										</span>
 									</div>
 										<?php
@@ -92,11 +90,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 								<?php echo esc_html( $contribution['thank_you'] ); ?>
 							</div>
 							<div class="rev-gen-dashboard-content-contribution--links">
-								<a href="#" class="rev-gen-dashboard__link--copy-shortcode" data-shortcode="<?php echo esc_attr( $contribution['code'] ); ?>"><?php _e( 'Copy shortcode', 'revenue-generator' ); ?></a> |
-								<a href="<?php echo $contribution_edit_url; ?>"><?php _e( 'Edit', 'revenue-generator' ); ?></a>
+								<a href="#" class="rev-gen-dashboard__link--copy-shortcode" data-shortcode="<?php echo esc_attr( $contribution_shortcode ); ?>"><?php _e( 'Copy shortcode', 'revenue-generator' ); ?></a> |
+								<a href="<?php echo esc_attr( $contribution_edit_link ); ?>"><?php _e( 'Edit', 'revenue-generator' ); ?></a>
 							</div>
 							<div class="rev-gen-dashboard-content-contribution--info-updated">
-								<?php echo esc_html( $contribution_updated ); ?>
+								<?php echo esc_html( $contribution_updated_string ); ?>
 							</div>
 						</div>
 					</div>
