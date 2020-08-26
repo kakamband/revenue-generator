@@ -11,6 +11,7 @@
 import '../utils';
 import { debounce } from '../helpers';
 import { __, sprintf } from '@wordpress/i18n';
+import { NodePath } from '@babel/core';
 
 ( function( $ ) {
 	$( function() {
@@ -59,19 +60,31 @@ import { __, sprintf } from '@wordpress/i18n';
 				rgContributionWrapper: $( '.rev-gen-contribution-main' ),
 
 				// Contribution Action Elements
+				form: $(
+					'.rev-gen-contribution-form'
+				),
 				contributionTitle: $(
 					'.rev-gen-contribution-main--box-header'
+				),
+				contributionTitleInput: $(
+					'[name="dialog_header"]'
 				),
 				contributionDescription: $(
 					'.rev-gen-contribution-main--box-description'
 				),
+				contributionDescriptionInput: $(
+					'[name="dialog_description"]'
+				),
 				contributionAmounts: $(
 					'.rev-gen-contribution-main--box-donation-amount'
+				),
+				allAmountsInput: $(
+					'[name="amounts"]'
 				),
 
 				contributionCampaignName: $( '#rg_contribution_title' ),
 				contributionThankYouPage: $( '#rg_contribution_thankyou' ),
-				contributionGnerateCode: $(
+				saveButton: $(
 					'.rev-gen-contribution-main-generate-button'
 				),
 
@@ -112,10 +125,24 @@ import { __, sprintf } from '@wordpress/i18n';
 					}
 				} );
 
+				$o.contributionTitle.on( 'keyup', function() {
+					$o.contributionTitleInput.val( $o.contributionTitle.text() );
+					$o.form.trigger( 'change' );
+				} );
+
+				$o.contributionDescription.on( 'keyup', function() {
+					$o.contributionDescriptionInput.val( $o.contributionDescription.text() );
+					$o.form.trigger( 'change' );
+				} );
+
+				$( 'input', $o.form ).on( 'keyup', function() {
+					$o.form.trigger( 'change' );
+				} );
+
 				// Generate Contribution Code.
-				$o.contributionGnerateCode.on(
-					'click',
-					debounce( function( e ) {
+				$o.form.on( 'submit', function( e ) {
+						e.preventDefault();
+
 						// validate fields.
 						const isValid = validateAllfields();
 
@@ -146,19 +173,9 @@ import { __, sprintf } from '@wordpress/i18n';
 							showLoader();
 
 							const allAmountJson = getContributionAmounts();
+							$o.allAmountsInput.val( allAmountJson );
 
-							const formData = {
-								action: 'rg_contribution_shortcode_generator',
-								heading: $o.contributionTitle.text().trim(),
-								description: $o.contributionDescription
-									.text()
-									.trim(),
-								amounts: allAmountJson,
-								title: $o.contributionCampaignName.val(),
-								thank_you: $o.contributionThankYouPage.val(),
-								security:
-									revenueGeneratorGlobalOptions.rg_contribution_nonce,
-							};
+							const formData = $o.form.serialize();
 
 							// Update the title.
 							$.ajax( {
@@ -171,14 +188,14 @@ import { __, sprintf } from '@wordpress/i18n';
 
 								if ( r.success ) {
 									copyToClipboard( r.code );
-									$o.contributionGnerateCode.text(
+									$o.saveButton.text(
 										r.button_text
 									);
 									$o.contributionCopyMessage.show();
-									$o.contributionGnerateCode.removeAttr(
+									$o.saveButton.removeAttr(
 										'style'
 									);
-									$o.contributionGnerateCode.prop(
+									$o.saveButton.prop(
 										'disabled',
 										true
 									);
@@ -227,9 +244,10 @@ import { __, sprintf } from '@wordpress/i18n';
 								// Hide Loader.
 								hideLoader();
 							} );
+
+							return false;
 						}
-					}, 500 )
-				);
+					} );
 
 				// Validate URL.
 				$o.contributionThankYouPage.on( 'focusout', function() {
@@ -249,6 +267,8 @@ import { __, sprintf } from '@wordpress/i18n';
 						.trim();
 					const validAmount = validatePrice( amount );
 					$( this ).text( validAmount );
+
+					$o.form.trigger( 'change' );
 				} );
 
 				// Validated Heading and Description.
@@ -264,16 +284,16 @@ import { __, sprintf } from '@wordpress/i18n';
 				} );
 
 				// Copy Contribution code on Dashboard.
-				$( $o.contributionDashboardList ).on( 'click', function() {
-					const contributionCode = $( this )
-						.find( $o.contributionDashboardCode )
-						.val();
-					copyToClipboard( contributionCode );
-					$o.snackBar.showSnackbar(
-						revenueGeneratorGlobalOptions.rg_code_copy_msg,
-						1500
-					);
-				} );
+				//$( $o.contributionDashboardList ).on( 'click', function() {
+				//	const contributionCode = $( this )
+				//		.find( $o.contributionDashboardCode )
+				//		.val();
+				//	copyToClipboard( contributionCode );
+				//	$o.snackBar.showSnackbar(
+				//		revenueGeneratorGlobalOptions.rg_code_copy_msg,
+				//		1500
+				//	);
+				//} );
 
 				/**
 				 * Handle tooltip button events for info modals.
@@ -325,12 +345,12 @@ import { __, sprintf } from '@wordpress/i18n';
 							$( $o.contributionGenerateButtonLabel )
 								.find( 'input' )
 								.removeClass( 'input-blur' );
-							$o.contributionGnerateCode.removeAttr( 'style' );
+							$o.saveButton.removeAttr( 'style' );
 							$( $o.contributionGenerateButtonLabel ).css(
 								'background-color',
 								'#fff'
 							);
-							$o.contributionGnerateCode.css( 'color', '#fff' );
+							$o.saveButton.css( 'color', '#fff' );
 						} else {
 							$( $o.contributionThankYouPageLabel )
 								.find( 'input' )
@@ -427,20 +447,20 @@ import { __, sprintf } from '@wordpress/i18n';
 					$o.body.find( 'input' ).removeClass( 'input-blur' );
 				} );
 
-				$o.contributionCampaignName.on( 'focusout', function() {
+				$o.form.on( 'change', function() {
 					// validate fields.
 					const isValid = validateAllfields();
 
 					if ( 'valid' === isValid ) {
-						$o.contributionGnerateCode.css(
+						$o.saveButton.css(
 							'background-color',
 							'#1d1d1d'
 						);
-						$o.contributionGnerateCode.css( 'color', '#ffffff' );
-						$o.contributionGnerateCode.text(
+						$o.saveButton.css( 'color', '#ffffff' );
+						$o.saveButton.text(
 							__( 'Generate and copy code', 'revenue-generator' )
 						);
-						$o.contributionGnerateCode.prop( 'disabled', false );
+						$o.saveButton.prop( 'disabled', false );
 					}
 				} );
 
