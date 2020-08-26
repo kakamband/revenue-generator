@@ -34,10 +34,8 @@ import { __, sprintf } from '@wordpress/i18n';
 				contributionHelpGenerate: $( '#rev-gen-contribution-help-generate' ),
 
 				// Dashboard elements.
-				contributionDashboardList:
-					'.rev-gen-dashboard-content-contribution',
-				contributionDashboardCode:
-					'.rev-gen-dashboard-content-contribution-code',
+				contributionDashboardShortcodeLink: $( '.rev-gen-dashboard__link--copy-shortcode' ),
+				contributionDashboardCode: '.rev-gen-dashboard-content-contribution-code',
 
 				helpGAModal: '.rev-gen-settings-main-info-modal',
 
@@ -264,16 +262,16 @@ import { __, sprintf } from '@wordpress/i18n';
 				} );
 
 				// Copy Contribution code on Dashboard.
-				//$( $o.contributionDashboardList ).on( 'click', function() {
-				//	const contributionCode = $( this )
-				//		.find( $o.contributionDashboardCode )
-				//		.val();
-				//	copyToClipboard( contributionCode );
-				//	$o.snackBar.showSnackbar(
-				//		revenueGeneratorGlobalOptions.rg_code_copy_msg,
-				//		1500
-				//	);
-				//} );
+				$o.contributionDashboardShortcodeLink.on( 'click', function( e ) {
+					e.preventDefault();
+
+					const contributionCode = $( this ).attr( 'data-shortcode' );
+					copyToClipboard( contributionCode );
+					$o.snackBar.showSnackbar(
+						revenueGeneratorGlobalOptions.rg_code_copy_msg,
+						1500
+					);
+				} );
 
 				/**
 				 * Handle tooltip button events for info modals.

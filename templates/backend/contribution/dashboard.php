@@ -48,6 +48,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 							$contribution_id
 						)
 					);
+
+					$contribution_shortcode = sprintf(
+						'[laterpay_contribution id="%d"]',
+						$contribution_id
+					);
+
+					if ( ! empty( $contribution['code'] ) ) {
+						$contribution_shortcode = $contribution['code'];
+					}
 					?>
 					<div class="rev-gen-dashboard-content-contribution" data-contribution-id="<?php echo esc_attr( $contribution_id ); ?>">
 						<div class="rev-gen-dashboard-content-contribution--box">
@@ -86,25 +95,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 						</div>
 						<div class="rev-gen-dashboard-content-contribution--info">
 							<h3 class="rev-gen-dashboard-content-contribution--info-title">
-								<a href="<?php echo $contribution_edit_url; ?>"><?php echo esc_html( $contribution_title ); ?></a>
+								<?php echo esc_html( $contribution_title ); ?>
 							</h3>
 							<div class="rev-gen-dashboard-content-contribution--info-url">
 								<?php echo esc_html( $contribution['thank_you'] ); ?>
 							</div>
+							<div class="rev-gen-dashboard-content-contribution--links">
+								<a href="#" class="rev-gen-dashboard__link--copy-shortcode" data-shortcode="<?php echo esc_attr( $contribution_shortcode ); ?>"><?php _e( 'Copy shortcode', 'revenue-generator' ); ?></a> |
+								<a href="<?php echo $contribution_edit_url; ?>"><?php _e( 'Edit', 'revenue-generator' ); ?></a>
+							</div>
 							<div class="rev-gen-dashboard-content-contribution--info-updated">
 								<?php echo esc_html( $contribution_updated ); ?>
 							</div>
-							<?php
-							$contribution_code = sprintf(
-								'[laterpay_contribution id="%d"]',
-								$contribution_id
-							);
-
-							if ( ! empty( $contribution['code'] ) ) {
-								$contribution_code = $contribution['code'];
-							}
-							?>
-							<input type="hidden" value="<?php echo esc_attr( $contribution_code ); ?>" class="rev-gen-dashboard-content-contribution-code" />
 						</div>
 					</div>
 			<?php } else : ?>

@@ -181,8 +181,9 @@ body.revenue-generator_page_revenue-generator-contribution {
 
 	&--help {
 		position: absolute;
-		top: 37px;
+		top: 39px;
 		right: 0;
+		cursor: pointer;
 
 		&-button {
 			position: absolute;
@@ -199,7 +200,7 @@ body.revenue-generator_page_revenue-generator-contribution {
 
 	&--shortcode {
 		position: absolute;
-		top: 16px;
+		top: 19px;
 		right: 0;
 	}
 
@@ -250,7 +251,6 @@ body.revenue-generator_page_revenue-generator-contribution {
 /* Dashboard Styling */
 .rev-gen-dashboard-content-contribution {
 	margin-bottom: 20px;
-	cursor: pointer;
 
 	&-wrapper {
 		margin: 40px 20px;
