@@ -149,19 +149,56 @@ class Contribution extends Base {
 		return $contribution;
 	}
 
+	/**
+	 * Get default meta data for contribution.
+	 *
+	 * @return array
+	 */
 	public function get_default_meta() {
 		return [
 			'type' => 'multiple',
 			'name' => '',
 			'thank_you' => '',
-			'dialog_header' => '',
-			'dialog_description' => '',
+			'dialog_header' => __( 'Support the Author', 'revenue-generator' ),
+			'dialog_description' => __( 'Pick your contribution below:', 'revenue-generator' ),
 			'custom_amount' => '',
-			'all_amounts' => '',
+			'all_amounts' => array( 50, 100, 150 ),
 			'all_revenues' => '',
 			'selected_amount' => '',
 			'code' => '',
 		];
+	}
+
+	/**
+	 * Get shortcode for the contribution.
+	 *
+	 * This supports previous versions of the plugin where shortcode was stored in the contribution's meta
+	 * and also a new version where shortcode is ID based.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int $contribution_id
+	 *
+	 * @return string Shortcode.
+	 */
+	public function get_shortcode( $contribution_id ) {
+		$contribution = $this->get( $contribution_id );
+		$shortcode    = '';
+
+		if ( is_wp_error( $contribution ) ) {
+			return $shortcode;
+		}
+
+		$shortcode = sprintf(
+			'[laterpay_contribution id="%d"]',
+			$contribution_id
+		);
+
+		if ( ! empty( $contribution['code'] ) ) {
+			$shortcode = $contribution['code'];
+		}
+
+		return $shortcode;
 	}
 
 	/**
