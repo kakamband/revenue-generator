@@ -241,8 +241,7 @@ class Contribution extends Base {
 	 * @return array Time Pass instance as array
 	 */
 	private function formatted_contribution( $post ) {
-		$post_meta               = get_post_meta( $post->ID );
-		$post_meta               = $this->formatted_post_meta( $post_meta );
+		$contribution_data       = $this->get( $post->ID );
 		$last_modified_user      = $this->get_last_modified_author_id( $post->ID );
 		$post_author             = empty( $last_modified_user ) ? $post->post_author : $last_modified_user;
 		$post_published_date     = get_the_date( '', $post->ID );
@@ -264,62 +263,38 @@ class Contribution extends Base {
 			get_the_author_meta( 'display_name', $post_author )
 		);
 
-		$all_amounts          = maybe_unserialize( $post_meta['all_amounts'] );
-		$all_formated_amounts = array();
+		$all_amounts          = maybe_unserialize( $contribution_data['all_amounts'] );
+		$all_formatted_amounts = array();
 		if ( ! empty( $all_amounts ) ) {
 			foreach ( $all_amounts as $amount ) {
-				$all_formated_amounts[] = floatval( $amount / 100 );
+				$all_formatted_amounts[] = floatval( $amount / 100 );
 			}
+		}
+
+		$contribution_shortcode = sprintf(
+			'[laterpay_contribution id="%d"]',
+			$post->ID
+		);
+
+		if ( ! empty( $contribution_data['code'] ) ) {
+			$contribution_shortcode = $contribution_data['code'];
 		}
 
 		$contribution                      = [];
 		$contribution['id']                = $post->ID;
 		$contribution['name']              = $post->post_title;
 		$contribution['description']       = $post->post_content;
-		$contribution['dialog_header']     = $post_meta['dialog_header'];
-		$contribution['thank_you']         = $post_meta['thank_you'];
-		$contribution['type']              = $post_meta['type'];
-		$contribution['all_amounts']       = $all_formated_amounts;
-		$contribution['all_revenues']      = maybe_unserialize( $post_meta['all_revenues'] );
-		$contribution['selected_amount']   = $post_meta['selected_amount'];
-		$contribution['code']              = $post_meta['code'];
+		$contribution['dialog_header']     = $contribution_data['dialog_header'];
+		$contribution['thank_you']         = $contribution_data['thank_you'];
+		$contribution['type']              = $contribution_data['type'];
+		$contribution['all_amounts']       = $all_formatted_amounts;
+		$contribution['all_revenues']      = maybe_unserialize( $contribution_data['all_revenues'] );
+		$contribution['selected_amount']   = $contribution_data['selected_amount'];
+		$contribution['code']              = $contribution_shortcode;
 		$contribution['updated_timestamp'] = strtotime( "{$post_modified_date} $post_modified_time" );
 		$contribution['updated']           = $post_updated_info;
 
 		return $contribution;
-	}
-
-	/**
-	 * Check if post meta has values.
-	 *
-	 * @param array $post_meta Post meta values fetched form database.
-	 *
-	 * @return array
-	 */
-	private function formatted_post_meta( $post_meta ) {
-
-		$post_meta_data = [];
-
-		/**
-		 * _rg_thank_you - Thank you page
-		 * _rg_type - Type of contribution single/ multiple future proof
-		 * _rg_custom_amount - Custom amount if any future proof.
-		 * _rg_all_amounts - All Amounts.
-		 * _rg_dialog_header - Dailogbox Header.
-		 * _rg_all_revenues  - All Revenues.
-		 * _rg_selected_amount - Selected amount.
-		 * _rg_code - generated code.
-		 */
-		$post_meta_data['thank_you']       = ( isset( $post_meta['_rg_thank_you'][0] ) ) ? $post_meta['_rg_thank_you'][0] : '';
-		$post_meta_data['type']            = ( isset( $post_meta['_rg_type'][0] ) ) ? $post_meta['_rg_type'][0] : '';
-		$post_meta_data['custom_amount']   = ( isset( $post_meta['_rg_custom_amount'][0] ) ) ? $post_meta['_rg_custom_amount'][0] : '0';
-		$post_meta_data['all_amounts']     = ( isset( $post_meta['_rg_all_amounts'][0] ) ) ? $post_meta['_rg_all_amounts'][0] : '';
-		$post_meta_data['dialog_header']   = ( isset( $post_meta['_rg_dialog_header'][0] ) ) ? $post_meta['_rg_dialog_header'][0] : '';
-		$post_meta_data['all_revenues']    = ( isset( $post_meta['_rg_all_revenues'][0] ) ) ? $post_meta['_rg_all_revenues'][0] : '';
-		$post_meta_data['selected_amount'] = ( isset( $post_meta['_rg_selected_amount'][0] ) ) ? $post_meta['_rg_selected_amount'][0] : '';
-		$post_meta_data['code']            = ( isset( $post_meta['_rg_code'][0] ) ) ? $post_meta['_rg_code'][0] : '';
-
-		return $post_meta_data;
 	}
 
 	/**
