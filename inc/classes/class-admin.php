@@ -291,8 +291,8 @@ class Admin {
 			'ID'                 => ( isset( $_REQUEST['ID'] ) ) ? intval( $_REQUEST['ID'] ) : 0,
 			'name'               => ( isset( $_REQUEST['title'] ) ) ? sanitize_text_field( $_REQUEST['title'] ) : '',
 			'thank_you'          => ( isset( $_REQUEST['thank_you'] ) ) ? sanitize_url( $_REQUEST['thank_you'] ) : '',
-			'dialog_header'      => ( isset( $_REQUEST['heading'] ) ) ? sanitize_text_field( $_REQUEST['heading'] ) : '',
-			'dialog_description' => ( isset( $_REQUEST['description'] ) ) ? sanitize_text_field( $_REQUEST['description'] ) : '',
+			'dialog_header'      => ( isset( $_REQUEST['dialog_header'] ) ) ? sanitize_text_field( $_REQUEST['dialog_header'] ) : '',
+			'dialog_description' => ( isset( $_REQUEST['dialog_description'] ) ) ? sanitize_text_field( $_REQUEST['dialog_description'] ) : '',
 			'custom_amount'      => ( isset( $_REQUEST['custom-amount'] ) ) ? floatval( $_REQUEST['custom-amount'] ) : '',
 			'code'               => ( isset( $_REQUEST['code'] ) ) ? sanitize_text_field( $_REQUEST['code'] ) : '',
 		];
@@ -335,19 +335,21 @@ class Admin {
 		$contribution_data['all_amounts']  = array_column( $filtered_prices, 'price' );
 		$contribution_data['all_revenues'] = array_column( $filtered_prices, 'revenue' );
 
-		$contribution_id = $contribution_instance->save( $contribution_data );
-
-		$message = __( 'Oops! Something went wrong. Please try again.', 'revenue-generator' );
+		$contribution_id   = $contribution_instance->save( $contribution_data );
+		$message           = __( 'Oops! Something went wrong. Please try again.', 'revenue-generator' );
+		$contribution_code = '';
 
 		if ( ! empty( $contribution_id ) && ! is_wp_error( $contribution_id ) ) {
 			$message              = esc_html__( 'Successfully generated code, please paste at desired location.', 'revenue-generator' );
 			$generate_button_text = esc_html__( 'Code copied in your clipboard!', 'revenue-generator' );
+			$contribution_code    = $contribution_instance->get_shortcode( $contribution_id );
 		}
 
 		wp_send_json(
 			[
 				'success'     => true,
 				'msg'         => $message,
+				'code'        => $contribution_code,
 				'button_text' => $generate_button_text,
 			]
 		);
