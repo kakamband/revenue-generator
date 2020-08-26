@@ -56,25 +56,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<input type="hidden" name="dialog_description" value="<?php echo $contribution_data['dialog_description']; ?>">
 
 			<div class="rev-gen-contribution-main-inputs-wrapper">
-				<label id="rg_contribution_campaign_name"  class="rev-gen-contribution-main-input-label">
+				<label id="rg_contribution_campaign_name" class="rev-gen-contribution-main-input-label" data-has-help>
 					<?php esc_html_e( 'Campaign name', 'revenue-generator' ); ?>
 					<input type="text" class="rev-gen-contribution-main-input" id="rg_contribution_title" name="title" value="<?php echo $contribution_data['post_title']; ?>" />
-					<button data-info-for="campaignName" id="rev-gen-contribution-help-campaign-name" class="rev-gen-settings-main-option-info rev-gen-contribution-main--help">
+					<button data-info-for="campaignName" id="rev-gen-contribution-help-campaign-name" class="rev-gen-settings-main-option-info rev-gen-contribution-main--help" onclick="javascript: return false;">
 						<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
 					</button>
 				</label>
-				<label id="rg_contribution_thankyou_label" class="rev-gen-contribution-main-input-label">
+				<label id="rg_contribution_thankyou_label" class="rev-gen-contribution-main-input-label" data-has-help>
 					<?php esc_html_e( 'Thank you Page (optional)', 'revenue-generator' ); ?>
 					<input type="text" class="rev-gen-contribution-main-input" id="rg_contribution_thankyou" name="thank_you" value="<?php echo $contribution_data['thank_you']; ?>" />
-					<button data-info-for="thankYouPage" id="rev-gen-contribution-help-thank-you" class="rev-gen-settings-main-option-info rev-gen-contribution-main--help">
+					<button data-info-for="thankYouPage" id="rev-gen-contribution-help-thank-you" class="rev-gen-settings-main-option-info rev-gen-contribution-main--help" onclick="javascript: return false;">
 						<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
 					</button>
 				</label>
-				<label id="rg_contribution_generate" class=" rev-gen-contribution-main-input-label rev-gen-contribution-main-button">
-					<button class="rev-gen-contribution-main-generate-button" disabled>
+				<label id="rg_contribution_generate" class="rev-gen-contribution-main-input-label rev-gen-contribution-main-button" data-has-help>
+					<button class="rev-gen-contribution-main-generate-button" type="submit" disabled>
 						<?php esc_html_e( 'Save and copy code', 'revenue-generator' ); ?>
 					</button>
-					<button data-info-for="shortcode" id="rev-gen-contribution-help-shortcode" class="rev-gen-settings-main-option-info rev-gen-contribution-main--help rev-gen-contribution-main--shortcode">
+					<button data-info-for="shortcode" id="rev-gen-contribution-help-shortcode" class="rev-gen-settings-main-option-info rev-gen-contribution-main--help rev-gen-contribution-main--shortcode" onclick="javascript: return false;">
 						<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
 					</button>
 				</label>
