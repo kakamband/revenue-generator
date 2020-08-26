@@ -123,6 +123,7 @@ class Contribution extends Base {
 
 		if ( ! empty( $id ) ) {
 			$contribution_post = get_post( $id );
+			$meta              = [];
 
 			if ( ! $contribution_post || static::SLUG !== $contribution_post->post_type ) {
 				return new WP_Error( 'rg_contribution_not_found', __( 'No contribution found.', 'revenue-generator' ) );
@@ -131,14 +132,12 @@ class Contribution extends Base {
 			$contribution_post = $contribution_post->to_array();
 			$contribution_meta = get_post_meta( $id, '', true );
 
-			$meta = array();
-
-			foreach ( $contribution_meta as $meta_key => $meta_value ) {
-				$unprefixed        = str_replace( '_rg_', '', $meta_key );
-				$meta[$unprefixed] = maybe_unserialize( $meta_value[0] );
-			}
-
+			$meta = $this->unprefix_meta( $contribution_meta );
 			$meta = wp_parse_args( $meta, $contribution_default_meta );
+
+			$last_modified_author_id = $this->get_last_modified_author_id( $id );
+
+			$contribution_post['last_modified_author'] = ( ! empty( $last_modified_author_id ) ) ? $last_modified_author_id : $contribution_post['post_author'];
 		} else {
 			$contribution_post = $this->get_default_post();
 			$meta              = $contribution_default_meta;
@@ -147,6 +146,50 @@ class Contribution extends Base {
 		$contribution = array_merge( $contribution_post, $meta );
 
 		return $contribution;
+	}
+
+	public function unprefix_meta( $meta = [] ) {
+		$unprefixed_meta = [];
+
+		foreach ( $meta as $key => $value ) {
+			$unprefixed_key                   = str_replace( '_rg_', '', $key );
+			$unprefixed_meta[$unprefixed_key] = maybe_unserialize( $value[0] );
+		}
+
+		return $unprefixed_meta;
+	}
+
+	public function get_date_time_string( $contribution ) {
+		if ( is_int( $contribution ) ) {
+			$contribution = $this->get( $contribution );
+		}
+
+		$date_time_string = '';
+
+		if ( ! is_array( $contribution ) ) {
+			return $date_time_string;
+		}
+
+		$created_modified_string = __( 'Created', 'revenue-generator' );
+		$post_published_date     = get_the_date( '', $contribution['ID'] );
+		$post_published_time     = get_the_time( '', $contribution['ID'] );
+		$post_modified_date      = get_the_modified_date( '', $contribution['ID'] );
+		$post_modified_time      = get_the_modified_time( '', $contribution['ID'] );
+
+		if ( $post_published_date !== $post_modified_date || $post_published_time !== $post_modified_time ) {
+			$created_modified_string = __( 'Updated', 'revenue-generator' );
+		}
+
+		$date_time_string  = sprintf(
+			/* translators: %1$s modified date, %2$s modified time */
+			__( '%1$s on %2$s at %3$s by %4$s', 'revenue-generator' ),
+			$created_modified_string,
+			$post_modified_date,
+			$post_modified_time,
+			get_the_author_meta( 'display_name', $contribution['last_modified_author'] )
+		);
+
+		return $date_time_string;
 	}
 
 	/**
@@ -181,17 +224,20 @@ class Contribution extends Base {
 	 *
 	 * @return string Shortcode.
 	 */
-	public function get_shortcode( $contribution_id ) {
-		$contribution = $this->get( $contribution_id );
-		$shortcode    = '';
+	public function get_shortcode( $contribution = 0 ) {
+		if ( is_int( $contribution ) ) {
+			$contribution = $this->get( $contribution );
+		}
 
-		if ( is_wp_error( $contribution ) ) {
+		$shortcode = '';
+
+		if ( ! is_array( $contribution ) ) {
 			return $shortcode;
 		}
 
 		$shortcode = sprintf(
 			'[laterpay_contribution id="%d"]',
-			$contribution_id
+			$contribution['ID']
 		);
 
 		if ( ! empty( $contribution['code'] ) ) {
@@ -199,6 +245,28 @@ class Contribution extends Base {
 		}
 
 		return $shortcode;
+	}
+
+	public function get_edit_link( $contribution = 0 ) {
+		$contribution_id = (int) $contribution;
+
+		if ( is_array( $contribution ) && isset( $contribution['ID'] ) ) {
+			$contribution_id = $contribution['ID'];
+		}
+
+		if ( empty( $contribution_id ) ) {
+			return;
+		}
+
+		$edit_link = admin_url(
+			sprintf(
+				'admin.php?page=%s&id=%d',
+				Contribution::ADMIN_EDIT_SLUG,
+				$contribution_id
+			)
+		);
+
+		return $edit_link;
 	}
 
 	/**
@@ -227,74 +295,10 @@ class Contribution extends Base {
 		$contributions = [];
 
 		foreach ( $posts as $key => $post ) {
-			$contributions[ $key ] = $this->formatted_contribution( $post );
+			$contributions[ $key ] = $this->get( $post->ID );
 		}
 
 		return $contributions;
-	}
-
-	/**
-	 * Returns relevant fields for Contribution of given WP_Post
-	 *
-	 * @param \WP_Post $post Post to transform.
-	 *
-	 * @return array Time Pass instance as array
-	 */
-	private function formatted_contribution( $post ) {
-		$contribution_data       = $this->get( $post->ID );
-		$last_modified_user      = $this->get_last_modified_author_id( $post->ID );
-		$post_author             = empty( $last_modified_user ) ? $post->post_author : $last_modified_user;
-		$post_published_date     = get_the_date( '', $post->ID );
-		$post_published_time     = get_the_time( '', $post->ID );
-		$post_modified_date      = get_the_modified_date( '', $post->ID );
-		$post_modified_time      = get_the_modified_time( '', $post->ID );
-		$created_modified_string = __( 'Created', 'revenue-generator' );
-
-		if ( $post_published_date !== $post_modified_date || $post_published_time !== $post_modified_time ) {
-			$created_modified_string = __( 'Updated', 'revenue-generator' );
-		}
-
-		$post_updated_info  = sprintf(
-			/* translators: %1$s modified date, %2$s modified time */
-			__( '%1$s on %2$s at %3$s by %4$s', 'revenue-generator' ),
-			$created_modified_string,
-			$post_modified_date,
-			$post_modified_time,
-			get_the_author_meta( 'display_name', $post_author )
-		);
-
-		$all_amounts          = maybe_unserialize( $contribution_data['all_amounts'] );
-		$all_formatted_amounts = array();
-		if ( ! empty( $all_amounts ) ) {
-			foreach ( $all_amounts as $amount ) {
-				$all_formatted_amounts[] = floatval( $amount / 100 );
-			}
-		}
-
-		$contribution_shortcode = sprintf(
-			'[laterpay_contribution id="%d"]',
-			$post->ID
-		);
-
-		if ( ! empty( $contribution_data['code'] ) ) {
-			$contribution_shortcode = $contribution_data['code'];
-		}
-
-		$contribution                      = [];
-		$contribution['id']                = $post->ID;
-		$contribution['name']              = $post->post_title;
-		$contribution['description']       = $post->post_content;
-		$contribution['dialog_header']     = $contribution_data['dialog_header'];
-		$contribution['thank_you']         = $contribution_data['thank_you'];
-		$contribution['type']              = $contribution_data['type'];
-		$contribution['all_amounts']       = $all_formatted_amounts;
-		$contribution['all_revenues']      = maybe_unserialize( $contribution_data['all_revenues'] );
-		$contribution['selected_amount']   = $contribution_data['selected_amount'];
-		$contribution['code']              = $contribution_shortcode;
-		$contribution['updated_timestamp'] = strtotime( "{$post_modified_date} $post_modified_time" );
-		$contribution['updated']           = $post_updated_info;
-
-		return $contribution;
 	}
 
 	/**
