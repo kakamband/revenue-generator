@@ -241,15 +241,24 @@ class Contribution extends Base {
 	 * @return array Time Pass instance as array
 	 */
 	private function formatted_contribution( $post ) {
-		$post_meta          = get_post_meta( $post->ID );
-		$post_meta          = $this->formatted_post_meta( $post_meta );
-		$last_modified_user = $this->get_last_modified_author_id( $post->ID );
-		$post_author        = empty( $last_modified_user ) ? $post->post_author : $last_modified_user;
-		$post_modified_date = get_the_modified_date( '', $post->ID );
-		$post_modified_time = get_the_modified_time( '', $post->ID );
+		$post_meta               = get_post_meta( $post->ID );
+		$post_meta               = $this->formatted_post_meta( $post_meta );
+		$last_modified_user      = $this->get_last_modified_author_id( $post->ID );
+		$post_author             = empty( $last_modified_user ) ? $post->post_author : $last_modified_user;
+		$post_published_date     = get_the_date( '', $post->ID );
+		$post_published_time     = get_the_time( '', $post->ID );
+		$post_modified_date      = get_the_modified_date( '', $post->ID );
+		$post_modified_time      = get_the_modified_time( '', $post->ID );
+		$created_modified_string = __( 'Created', 'revenue-generator' );
+
+		if ( $post_published_date !== $post_modified_date || $post_published_time !== $post_modified_time ) {
+			$created_modified_string = __( 'Updated', 'revenue-generator' );
+		}
+
 		$post_updated_info  = sprintf(
 			/* translators: %1$s modified date, %2$s modified time */
-			__( 'Created on %1$s at %2$s by %3$s' ),
+			__( '%1$s on %2$s at %3$s by %4$s', 'revenue-generator' ),
+			$created_modified_string,
 			$post_modified_date,
 			$post_modified_time,
 			get_the_author_meta( 'display_name', $post_author )
