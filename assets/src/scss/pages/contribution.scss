@@ -125,6 +125,10 @@ body.revenue-generator_page_revenue-generator-contribution {
 				vertical-align: middle;
 			}
 		}
+
+		&.faded {
+			background-color: darkgray;
+		}
 	}
 
 	&-inputs-wrapper {
@@ -168,6 +172,10 @@ body.revenue-generator_page_revenue-generator-contribution {
 			background: transparent;
 			color: $box-text-color;
 			border: 2px solid $box-text-color;
+		}
+		&.enabled {
+			background-color: $box-text-color;
+			color: $box-white;
 		}
 	}
 
@@ -353,4 +361,8 @@ body.revenue-generator_page_revenue-generator-contribution {
 			margin: 10px 0;
 		}
 	}
+}
+
+[data-has-help].highlighted {
+	background-color: $box-white;
 }
