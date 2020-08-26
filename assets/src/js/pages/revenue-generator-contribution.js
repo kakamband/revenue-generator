@@ -9,9 +9,7 @@
  * Internal dependencies.
  */
 import '../utils';
-import { debounce } from '../helpers';
 import { __, sprintf } from '@wordpress/i18n';
-import { NodePath } from '@babel/core';
 
 ( function( $ ) {
 	$( function() {
@@ -22,20 +20,18 @@ import { NodePath } from '@babel/core';
 				requestSent: false,
 
 				// Contribution Elements.
-				contributionBox: '.rev-gen-contribution-main--box',
+				contributionBox: $( '.rev-gen-contribution-main--box' ),
 				contributionRequiredField:
 					'h3[contenteditable], p[contenteditable], #rg_contribution_title',
 
 				// Contribution Help.
 				contributionHelpButton: '.rev-gen-contribution-main--help',
 				contributionHelpModal: '.rev-gen-contribution-main-info-modal',
-				contributionModalClose:
-					'.rev-gen-contribution-main-info-modal-cross',
-				contributionCampaignNameLabel: '#rg_contribution_campaign_name',
-				contributionThankYouPageLabel:
-					'#rg_contribution_thankyou_label',
-				contributionGenerateButtonLabel: '#rg_contribution_generate',
-				contributionHelpGenerate: '#rev-gen-contribution-help-generate',
+				contributionModalClose: '.rev-gen-contribution-main-info-modal-cross',
+				contributionCampaignNameLabel: $( '#rg_contribution_campaign_name' ),
+				contributionThankYouPageLabel: $( '#rg_contribution_thankyou_label' ),
+				contributionGenerateButtonLabel: $( '#rg_contribution_generate' ),
+				contributionHelpGenerate: $( '#rev-gen-contribution-help-generate' ),
 
 				// Dashboard elements.
 				contributionDashboardList:
@@ -60,37 +56,18 @@ import { NodePath } from '@babel/core';
 				rgContributionWrapper: $( '.rev-gen-contribution-main' ),
 
 				// Contribution Action Elements
-				form: $(
-					'.rev-gen-contribution-form'
-				),
-				contributionTitle: $(
-					'.rev-gen-contribution-main--box-header'
-				),
-				contributionTitleInput: $(
-					'[name="dialog_header"]'
-				),
-				contributionDescription: $(
-					'.rev-gen-contribution-main--box-description'
-				),
-				contributionDescriptionInput: $(
-					'[name="dialog_description"]'
-				),
-				contributionAmounts: $(
-					'.rev-gen-contribution-main--box-donation-amount'
-				),
-				allAmountsInput: $(
-					'[name="amounts"]'
-				),
+				form: $( '.rev-gen-contribution-form' ),
+				contributionTitle: $( '.rev-gen-contribution-main--box-header' ),
+				contributionTitleInput: $( '[name="dialog_header"]' ),
+				contributionDescription: $( '.rev-gen-contribution-main--box-description' ),
+				contributionDescriptionInput: $( '[name="dialog_description"]' ),
+				contributionAmounts: $( '.rev-gen-contribution-main--box-donation-amount' ),
+				allAmountsInput: $( '[name="amounts"]' ),
+				saveButton: $( '.rev-gen-contribution-main-generate-button' ),
 
 				contributionCampaignName: $( '#rg_contribution_title' ),
 				contributionThankYouPage: $( '#rg_contribution_thankyou' ),
-				saveButton: $(
-					'.rev-gen-contribution-main-generate-button'
-				),
-
-				contributionCopyMessage: $(
-					'.rev-gen-contribution-main-copy-message'
-				),
+				contributionCopyMessage: $( '.rev-gen-contribution-main-copy-message' ),
 
 				// Popup.
 				snackBar: $( '#rg_js_SnackBar' ),
@@ -101,6 +78,14 @@ import { NodePath } from '@babel/core';
 			// Initialize all required events.
 			const initializePage = function() {
 				bindEvents();
+			};
+
+			const onModalClose = function() {
+				$( $o.contributionHelpModal ).remove();
+				$( '[data-has-help]' ).removeClass( 'highlighted' );
+				$o.contributionBox.removeClass( 'faded' );
+				$o.body.removeClass( 'modal-blur' );
+				$o.body.find( 'input' ).removeClass( 'input-blur' );
 			};
 
 			/**
@@ -191,14 +176,9 @@ import { NodePath } from '@babel/core';
 									$o.saveButton.text(
 										r.button_text
 									);
+									$o.saveButton.removeClass( 'enabled' );
+									$o.saveButton.prop( 'disabled', true );
 									$o.contributionCopyMessage.show();
-									$o.saveButton.removeAttr(
-										'style'
-									);
-									$o.saveButton.prop(
-										'disabled',
-										true
-									);
 									$o.body.removeClass( 'modal-blur' );
 									$o.body
 										.find( 'input' )
@@ -305,6 +285,8 @@ import { NodePath } from '@babel/core';
 						$o.contributionHelpModal
 					);
 
+					let eventLabel = '';
+
 					// Remove any existing modal.
 					if ( existingModal.length ) {
 						$o.body.removeClass( 'modal-blur' );
@@ -319,62 +301,37 @@ import { NodePath } from '@babel/core';
 						// Change background color and highlight the clicked parent.
 						$o.body.addClass( 'modal-blur' );
 						$o.body.find( 'input' ).addClass( 'input-blur' );
-						$( $o.contributionBox ).css(
-							'background-color',
-							'darkgray'
-						);
+						$o.contributionBox.addClass( 'faded' );
 
 						// Highlight selected info modal parent based on type.
-						if ( 'campaignName' === modalType ) {
-							$( $o.contributionCampaignNameLabel )
-								.find( 'input' )
-								.removeClass( 'input-blur' );
+						switch ( modalType ) {
+							case 'campaignName':
+								eventLabel = 'Campaign name';
 
-							$( $o.contributionGenerateButtonLabel ).removeAttr(
-								'style'
-							);
+								$( 'input', $o.contributionCampaignNameLabel ).removeClass( 'input-blur' );
+								$o.contributionGenerateButtonLabel.removeClass( 'highlighted' );
+								$o.contributionThankYouPageLabel.removeClass( 'highlighted' );
+								$o.contributionCampaignNameLabel.addClass( 'highlighted' );
 
-							$( $o.contributionThankYouPageLabel ).removeAttr(
-								'style'
-							);
-							$( $o.contributionCampaignNameLabel ).css(
-								'background-color',
-								'#fff'
-							);
-						} else if ( 'shortcode' === modalType ) {
-							$( $o.contributionGenerateButtonLabel )
-								.find( 'input' )
-								.removeClass( 'input-blur' );
-							$o.saveButton.removeAttr( 'style' );
-							$( $o.contributionGenerateButtonLabel ).css(
-								'background-color',
-								'#fff'
-							);
-							$o.saveButton.css( 'color', '#fff' );
-						} else {
-							$( $o.contributionThankYouPageLabel )
-								.find( 'input' )
-								.removeClass( 'input-blur' );
-							$( $o.contributionCampaignNameLabel ).removeAttr(
-								'style'
-							);
-							$( $o.contributionThankYouPageLabel ).css(
-								'background-color',
-								'#fff'
-							);
-							$( $o.contributionGenerateButtonLabel ).removeAttr(
-								'style'
-							);
-						}
+								break;
 
-						let eventLabel = '';
+							case 'shortcode':
+								eventLabel = 'Generate Shortcode';
 
-						if ( 'campaignName' === modalType ) {
-							eventLabel = 'Campaign name';
-						} else if ( 'thankYouPage' === modalType ) {
-							eventLabel = 'Thank you page';
-						} else if ( 'shortcode' === modalType ) {
-							eventLabel = 'Generate Shortcode';
+								$( 'input', $o.contributionGenerateButtonLabel ).removeClass( 'input-blur' );
+								$o.contributionGenerateButtonLabel.addClass( 'highlighted' );
+
+								break;
+
+							case 'thankYouPage':
+								eventLabel = 'Thank you page';
+
+								$( 'input', $o.contributionThankYouPageLabel ).removeClass( 'input-blur' );
+								$o.contributionCampaignNameLabel.removeClass( 'highlighted' );
+								$o.contributionGenerateButtonLabel.removeClass( 'highlighted' );
+								$o.contributionThankYouPageLabel.addClass( 'highlighted' );
+
+								break;
 						}
 
 						// Send GA Event.
@@ -398,27 +355,7 @@ import { NodePath } from '@babel/core';
 						$( $o.contributionHelpModal ) &&
 						$( $o.contributionHelpModal ).length > 0
 					) {
-						// This may seem duplicate but modal is inside wrapper and needed to avoid call stack.
-						$( $o.contributionHelpModal ).remove();
-						$o.body.removeClass( 'modal-blur' );
-						$( $o.contributionCampaignNameLabel ).css(
-							'background-color',
-							'inherit'
-						);
-						$( $o.contributionBox ).css(
-							'background-color',
-							'#fff'
-						);
-						$( $o.contributionThankYouPageLabel ).css(
-							'background-color',
-							'inherit'
-						);
-						$( $o.contributionGenerateButtonLabel ).css(
-							'background-color',
-							'inherit'
-						);
-
-						$o.body.find( 'input' ).removeClass( 'input-blur' );
+						onModalClose();
 					}
 				} );
 
@@ -426,25 +363,7 @@ import { NodePath } from '@babel/core';
 				 * Hide the existing help popup.
 				 */
 				$o.body.on( 'click', $o.contributionModalClose, function() {
-					$( $o.contributionHelpModal ).remove();
-					$o.body.removeClass( 'modal-blur' );
-					$( $o.contributionCampaignNameLabel ).css(
-						'background-color',
-						'inherit'
-					);
-					$( $o.contributionThankYouPageLabel ).css(
-						'background-color',
-						'inherit'
-					);
-					$( $o.contributionThankYouPageLabel ).css(
-						'background-color',
-						'inherit'
-					);
-					$( $o.contributionGenerateButtonLabel ).css(
-						'background-color',
-						'inherit'
-					);
-					$o.body.find( 'input' ).removeClass( 'input-blur' );
+					onModalClose();
 				} );
 
 				$o.form.on( 'change', function() {
@@ -452,15 +371,7 @@ import { NodePath } from '@babel/core';
 					const isValid = validateAllfields();
 
 					if ( 'valid' === isValid ) {
-						$o.saveButton.css(
-							'background-color',
-							'#1d1d1d'
-						);
-						$o.saveButton.css( 'color', '#ffffff' );
-						$o.saveButton.text(
-							__( 'Generate and copy code', 'revenue-generator' )
-						);
-						$o.saveButton.prop( 'disabled', false );
+						$o.saveButton.addClass( 'enabled' ).prop( 'disabled', false );
 					}
 				} );
 
@@ -696,7 +607,7 @@ import { NodePath } from '@babel/core';
 				$o.body
 					.find( '*[contenteditable="true"]' )
 					.removeAttr( 'contenteditable' );
-				$( $o.contributionBox ).css( 'background-color', 'darkgray' );
+				$o.contributionBox.addClass( 'faded' );
 				$o.rgContributionWrapper.css( {
 					'pointer-events': 'none',
 				} );
@@ -724,7 +635,7 @@ import { NodePath } from '@babel/core';
 					// Revert to original state.
 					$o.body.removeClass( 'modal-blur' );
 					$o.body.find( 'input' ).removeClass( 'input-blur' );
-					$( $o.contributionBox ).css( 'background-color', '#fff' );
+					$o.contributionBox.removeClass( 'faded' );
 
 					$o.rgContributionWrapper.css( {
 						'pointer-events': 'unset',
@@ -822,7 +733,7 @@ import { NodePath } from '@babel/core';
 
 				// Blur out the background.
 				$o.body.addClass( 'modal-blur' );
-				$( $o.contributionBox ).addClass( 'modal-blur' );
+				$o.contributionBox.addClass( 'modal-blur' );
 				$o.body
 					.find( 'input' )
 					.not( $o.accountActionId + ',' + $o.accountActionKey )
