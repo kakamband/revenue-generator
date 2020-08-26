@@ -351,6 +351,7 @@ class Admin {
 				'msg'         => $message,
 				'code'        => $contribution_code,
 				'button_text' => $generate_button_text,
+				'edit_link'   => $contribution_instance->get_edit_link( $contribution_id ),
 			]
 		);
 	}
