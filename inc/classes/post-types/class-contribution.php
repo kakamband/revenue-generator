@@ -87,7 +87,7 @@ class Contribution extends Base {
 			$contribution_post = $this->get( $contribution_id );
 
 			if ( is_wp_error( $contribution_post ) ) {
-				return new WP_Error( 'invalid_contribution', __( 'Contribution with this ID does not exist.', 'revenue-generator' ) );
+				return new \WP_Error( 'invalid_contribution', __( 'Contribution with this ID does not exist.', 'revenue-generator' ) );
 			}
 
 			wp_update_post(
@@ -105,7 +105,7 @@ class Contribution extends Base {
 				 * since the update.
 				 */
 				if ( 'code' === $meta_key ) {
-					$meta_value = '';
+					$contribution_data[$meta_key] = '';
 				}
 
 				update_post_meta( $contribution_id, "_rg_{$meta_key}", $contribution_data[$meta_key] );
@@ -150,7 +150,7 @@ class Contribution extends Base {
 			$meta              = [];
 
 			if ( ! $contribution_post || static::SLUG !== $contribution_post->post_type ) {
-				return new WP_Error( 'rg_contribution_not_found', __( 'No contribution found.', 'revenue-generator' ) );
+				return new \WP_Error( 'rg_contribution_not_found', __( 'No contribution found.', 'revenue-generator' ) );
 			}
 
 			$contribution_post = $contribution_post->to_array();
@@ -270,11 +270,15 @@ class Contribution extends Base {
 	 * @return string Shortcode.
 	 */
 	public function get_shortcode( $contribution = 0 ) {
+		$shortcode = '';
+
+		if ( empty( $contribution ) ) {
+			return $shortcode;
+		}
+
 		if ( is_int( $contribution ) ) {
 			$contribution = $this->get( $contribution );
 		}
-
-		$shortcode = '';
 
 		if ( ! is_array( $contribution ) ) {
 			return $shortcode;
@@ -285,7 +289,7 @@ class Contribution extends Base {
 			$contribution['ID']
 		);
 
-		if ( ! empty( $contribution['code'] ) ) {
+		if ( isset( $contribution['code'] ) && ! empty( $contribution['code'] ) ) {
 			$shortcode = $contribution['code'];
 		}
 
@@ -354,7 +358,7 @@ class Contribution extends Base {
 	 *
 	 * @return string|int
 	 */
-	private function get_last_modified_author_id( $post_id ) {
+	public function get_last_modified_author_id( $post_id ) {
 		$last_id = get_post_meta( $post_id, '_edit_last', true );
 		if ( $last_id ) {
 			return $last_id;
