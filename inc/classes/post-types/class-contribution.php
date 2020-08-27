@@ -99,6 +99,11 @@ class Contribution extends Base {
 			);
 
 			foreach ( $default_meta as $meta_key => $meta_value ) {
+				/**
+				 * If there's shortcode stored in the meta, reset it
+				 * to empty value so auto-generated shortcode is used
+				 * since the update.
+				 */
 				if ( 'code' === $meta_key ) {
 					$meta_value = '';
 				}
@@ -110,6 +115,11 @@ class Contribution extends Base {
 		return $contribution_id;
 	}
 
+	/**
+	 * Default post data.
+	 *
+	 * @return array Post array with meta.
+	 */
 	public function get_default_post() {
 		$post = [
 			'ID' => 0,
@@ -121,9 +131,20 @@ class Contribution extends Base {
 		return array_merge( $post, $meta );
 	}
 
+	/**
+	 * Get Contribution data by ID.
+	 *
+	 * @param int $id ID of the contribution.
+	 *
+	 * @return array
+	 */
 	public function get( $id = 0 ) {
 		$contribution_default_meta = $this->get_default_meta();
 
+		/**
+		 * In case of non-empty ID, get contribution from the database
+		 * and parse meta.
+		 */
 		if ( ! empty( $id ) ) {
 			$contribution_post = get_post( $id );
 			$meta              = [];
@@ -141,16 +162,28 @@ class Contribution extends Base {
 			$last_modified_author_id = $this->get_last_modified_author_id( $id );
 
 			$contribution_post['last_modified_author'] = ( ! empty( $last_modified_author_id ) ) ? $last_modified_author_id : $contribution_post['post_author'];
+		/**
+		 * Empty ID (0) means that this is a new contribution, so
+		 * return default contribution data in that case.
+		 */
 		} else {
 			$contribution_post = $this->get_default_post();
 			$meta              = $contribution_default_meta;
 		}
 
+		// Merge post data and parsed meta to a single array.
 		$contribution = array_merge( $contribution_post, $meta );
 
 		return $contribution;
 	}
 
+	/**
+	 * Unprefix meta passed in the method's parameters.
+	 *
+	 * @param array $meta Prefixed meta to unprefix.
+	 *
+	 * @return array Unprefixed meta.
+	 */
 	public function unprefix_meta( $meta = [] ) {
 		$unprefixed_meta = [];
 
@@ -162,7 +195,16 @@ class Contribution extends Base {
 		return $unprefixed_meta;
 	}
 
+	/**
+	 * Get 'Created on <date> by <author>' string or 'Updated on <date> by <author>'
+	 * by contribution.
+	 *
+	 * @param array|int $contribution Contribution data or ID.
+	 *
+	 * @return string
+	 */
 	public function get_date_time_string( $contribution ) {
+		// If `$contribution` param is integer, attempt to get contribution data.
 		if ( is_int( $contribution ) ) {
 			$contribution = $this->get( $contribution );
 		}
@@ -250,13 +292,14 @@ class Contribution extends Base {
 		return $shortcode;
 	}
 
-	public function get_edit_link( $contribution = 0 ) {
-		$contribution_id = (int) $contribution;
-
-		if ( is_array( $contribution ) && isset( $contribution['ID'] ) ) {
-			$contribution_id = $contribution['ID'];
-		}
-
+	/**
+	 * Get edit link for contribution based on its ID.
+	 *
+	 * @param int $contribution Contribution ID.
+	 *
+	 * @return string
+	 */
+	public function get_edit_link( $contribution_id = 0 ) {
 		if ( empty( $contribution_id ) ) {
 			return;
 		}

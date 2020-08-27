@@ -45,7 +45,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					$contribution_title          = $contribution['name'];
 					$contribution_shortcode      = $contribution_instance->get_shortcode( $contribution );
 					$contribution_updated_string = $contribution_instance->get_date_time_string( $contribution );
-					$contribution_edit_link      = $contribution_instance->get_edit_link( $contribution );
+					$contribution_edit_link      = $contribution_instance->get_edit_link( $contribution['ID'] );
 					?>
 					<div class="rev-gen-dashboard-content-contribution" data-contribution-id="<?php echo esc_attr( $contribution_id ); ?>">
 						<div class="rev-gen-dashboard-content-contribution--box">
