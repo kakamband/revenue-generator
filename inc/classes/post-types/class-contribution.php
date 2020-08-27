@@ -79,7 +79,6 @@ class Contribution extends Base {
 						'_rg_dialog_header'   => $contribution_data['dialog_header'],
 						'_rg_all_revenues'    => $contribution_data['all_revenues'],
 						'_rg_selected_amount' => $contribution_data['selected_amount'],
-						'_rg_code'            => $contribution_data['code'],
 					],
 				]
 			);
@@ -100,6 +99,10 @@ class Contribution extends Base {
 			);
 
 			foreach ( $default_meta as $meta_key => $meta_value ) {
+				if ( 'code' === $meta_key ) {
+					$meta_value = '';
+				}
+
 				update_post_meta( $contribution_id, "_rg_{$meta_key}", $contribution_data[$meta_key] );
 			}
 		}
