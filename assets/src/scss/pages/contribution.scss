@@ -233,7 +233,13 @@ body.revenue-generator_page_revenue-generator-contribution {
 	&-button {
 		padding: 16px 30px 16px 16px;
 		position: relative;
-		margin-top: 45px;
+		margin-top: 15px;
+	}
+
+	&__p {
+		padding: 0 18px;
+		font: 13px/17px $box-font-helvetica;
+		color: $box-text-color;
 	}
 
 }
