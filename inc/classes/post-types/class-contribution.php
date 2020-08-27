@@ -105,10 +105,10 @@ class Contribution extends Base {
 				 * since the update.
 				 */
 				if ( 'code' === $meta_key ) {
-					$contribution_data[$meta_key] = '';
+					$contribution_data[ $meta_key ] = '';
 				}
 
-				update_post_meta( $contribution_id, "_rg_{$meta_key}", $contribution_data[$meta_key] );
+				update_post_meta( $contribution_id, "_rg_{$meta_key}", $contribution_data[ $meta_key ] );
 			}
 		}
 
@@ -162,11 +162,11 @@ class Contribution extends Base {
 			$last_modified_author_id = $this->get_last_modified_author_id( $id );
 
 			$contribution_post['last_modified_author'] = ( ! empty( $last_modified_author_id ) ) ? $last_modified_author_id : $contribution_post['post_author'];
-		/**
-		 * Empty ID (0) means that this is a new contribution, so
-		 * return default contribution data in that case.
-		 */
 		} else {
+			/**
+			 * Empty ID (0) means that this is a new contribution, so
+			 * return default contribution data in that case.
+			 */
 			$contribution_post = $this->get_default_post();
 			$meta              = $contribution_default_meta;
 		}
@@ -188,8 +188,8 @@ class Contribution extends Base {
 		$unprefixed_meta = [];
 
 		foreach ( $meta as $key => $value ) {
-			$unprefixed_key                   = str_replace( '_rg_', '', $key );
-			$unprefixed_meta[$unprefixed_key] = maybe_unserialize( $value[0] );
+			$unprefixed_key                     = str_replace( '_rg_', '', $key );
+			$unprefixed_meta[ $unprefixed_key ] = maybe_unserialize( $value[0] );
 		}
 
 		return $unprefixed_meta;
@@ -265,9 +265,9 @@ class Contribution extends Base {
 	 *
 	 * @since 1.1.0
 	 *
-	 * @param int $contribution_id
+	 * @param int $contribution Contribution ID or Contribution data in array.
 	 *
-	 * @return string Shortcode.
+	 * @return string
 	 */
 	public function get_shortcode( $contribution = 0 ) {
 		$shortcode = '';
@@ -299,7 +299,7 @@ class Contribution extends Base {
 	/**
 	 * Get edit link for contribution based on its ID.
 	 *
-	 * @param int $contribution Contribution ID.
+	 * @param int $contribution_id Contribution ID.
 	 *
 	 * @return string
 	 */
@@ -311,7 +311,7 @@ class Contribution extends Base {
 		$edit_link = admin_url(
 			sprintf(
 				'admin.php?page=%s&id=%d',
-				Contribution::ADMIN_EDIT_SLUG,
+				static::ADMIN_EDIT_SLUG,
 				$contribution_id
 			)
 		);

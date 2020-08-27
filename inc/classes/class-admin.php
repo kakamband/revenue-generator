@@ -282,6 +282,14 @@ class Admin {
 		}
 	}
 
+	/**
+	 * Saves Contribution offer to the database and returns data like shortcode and edit link in JSON which are then
+	 * used in JS.
+	 *
+	 * @since 1.1.0.
+	 *
+	 * @return void
+	 */
 	public function rg_contribution_save() {
 		check_ajax_referer( 'rg_contribution_nonce', 'security' );
 
@@ -290,94 +298,18 @@ class Admin {
 		$contribution_data = [
 			'ID'                 => ( isset( $_REQUEST['ID'] ) ) ? intval( $_REQUEST['ID'] ) : 0,
 			'name'               => ( isset( $_REQUEST['title'] ) ) ? sanitize_text_field( $_REQUEST['title'] ) : '',
-			'thank_you'          => ( isset( $_REQUEST['thank_you'] ) ) ? sanitize_url( $_REQUEST['thank_you'] ) : '',
+			'thank_you'          => ( isset( $_REQUEST['thank_you'] ) ) ? esc_url_raw( $_REQUEST['thank_you'] ) : '',
 			'dialog_header'      => ( isset( $_REQUEST['dialog_header'] ) ) ? sanitize_text_field( $_REQUEST['dialog_header'] ) : '',
 			'dialog_description' => ( isset( $_REQUEST['dialog_description'] ) ) ? sanitize_text_field( $_REQUEST['dialog_description'] ) : '',
 			'custom_amount'      => ( isset( $_REQUEST['custom-amount'] ) ) ? floatval( $_REQUEST['custom-amount'] ) : '',
 			'code'               => ( isset( $_REQUEST['code'] ) ) ? sanitize_text_field( $_REQUEST['code'] ) : '',
 		];
 
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$amounts = isset( $_REQUEST['amounts'] ) ? $_REQUEST['amounts'] : [];
 
 		$all_amounts     = ( ! empty( $amounts ) ) ? json_decode( wp_unslash( $amounts ), true ) : array();
 		$filtered_prices = [];
-
-		// Sanitize the all amounts input.
-		$filters = [
-			'price'       => FILTER_SANITIZE_STRING,
-			'revenue'     => FILTER_SANITIZE_STRING,
-			'is_selected' => FILTER_VALIDATE_BOOLEAN,
-		];
-
-		$options = [
-			'price'       => [
-				'flags' => FILTER_NULL_ON_FAILURE,
-			],
-			'revenue'     => [
-				'flags' => FILTER_NULL_ON_FAILURE,
-			],
-			'is_selected' => [
-				'flags' => FILTER_NULL_ON_FAILURE,
-			],
-		];
-
-		$selected_amount = 1;
-		// Loop through the user input an build an array to be processed by shortcode generator.
-		foreach ( $all_amounts as $id => $amount_array ) {
-			foreach ( $amount_array as $key => $value ) {
-				$filtered_prices[$id][$key] = filter_var( $value, $filters[$key], $options[$key] );
-				if ( true === $amount_array['is_selected'] ) {
-					$selected_amount = $id + 1;
-				}
-			}
-		}
-
-		$contribution_data['all_amounts']  = array_column( $filtered_prices, 'price' );
-		$contribution_data['all_revenues'] = array_column( $filtered_prices, 'revenue' );
-
-		$contribution_id   = $contribution_instance->save( $contribution_data );
-		$message           = __( 'Oops! Something went wrong. Please try again.', 'revenue-generator' );
-		$contribution_code = '';
-
-		if ( ! empty( $contribution_id ) && ! is_wp_error( $contribution_id ) ) {
-			$message              = esc_html__( 'Successfully generated code, please paste at desired location.', 'revenue-generator' );
-			$generate_button_text = esc_html__( 'Code copied in your clipboard!', 'revenue-generator' );
-			$contribution_code    = $contribution_instance->get_shortcode( $contribution_id );
-		}
-
-		wp_send_json(
-			[
-				'success'     => true,
-				'msg'         => $message,
-				'code'        => $contribution_code,
-				'button_text' => $generate_button_text,
-				'edit_link'   => $contribution_instance->get_edit_link( $contribution_id ),
-			]
-		);
-	}
-
-	/**
-	 * Generates Contribution short code.
-	 */
-	public function rg_contribution_shortcode_generator() {
-
-		// Verify authenticity.
-		check_ajax_referer( 'rg_contribution_nonce', 'security' );
-
-		$contribution_instace = Contribution::get_instance();
-
-		$campaing_name      = filter_input( INPUT_POST, 'title', FILTER_SANITIZE_STRING );
-		$thank_you_page     = filter_input( INPUT_POST, 'thank_you', FILTER_SANITIZE_URL );
-		$dialog_header      = filter_input( INPUT_POST, 'heading', FILTER_SANITIZE_STRING );
-		$dialog_description = filter_input( INPUT_POST, 'description', FILTER_SANITIZE_STRING );
-		$custom_amount      = filter_input( INPUT_POST, 'custom_amount', FILTER_SANITIZE_NUMBER_FLOAT );
-
-		// Get all amounts.
-		$amounts = filter_input( INPUT_POST, 'amounts' );
-
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Each value is sanitized below.
-		$all_amounts     = ( ! empty( $amounts ) ) ? json_decode( wp_unslash( $amounts ), true ) : array();
-		$filtered_prices = array();
 
 		// Sanitize the all amounts input.
 		$filters = [
@@ -409,45 +341,26 @@ class Admin {
 			}
 		}
 
-		// Generate the shortcode.
-		$shortcode_data = [
-			'name'            => sanitize_text_field( $campaing_name ),
-			'thank_you'       => esc_url_raw( $thank_you_page ),
-			'type'            => 'multiple',
-			'custom_amount'   => isset( $custom_amount ) ? (float) $custom_amount * 100 : '0',
-			'all_amounts'     => array_column( $filtered_prices, 'price' ),
-			'all_revenues'    => array_column( $filtered_prices, 'revenue' ),
-			'selected_amount' => $selected_amount,
-		];
+		$contribution_data['all_amounts']  = array_column( $filtered_prices, 'price' );
+		$contribution_data['all_revenues'] = array_column( $filtered_prices, 'revenue' );
 
-		if ( ! empty( $dialog_header ) ) {
-			$shortcode_data['dialog_header'] = wp_strip_all_tags( $dialog_header );
-		}
+		$contribution_id   = $contribution_instance->save( $contribution_data );
+		$message           = __( 'Oops! Something went wrong. Please try again.', 'revenue-generator' );
+		$contribution_code = '';
 
-		if ( ! empty( $dialog_description ) ) {
-			$shortcode_data['dialog_description'] = wp_strip_all_tags( $dialog_description );
-		}
-
-		$result = Contribution::shortcode_generator( 'contribution', $shortcode_data );
-
-		$generated_shortcode    = isset( $result['code'] ) ? $result['code'] : '';
-		$shortcode_data['code'] = $generated_shortcode;
-
-		$message              = esc_html__( 'Something went wrong!', 'revenue-generator' );
-		$generate_button_text = esc_html__( 'Generate and copy code', 'revenue-generator' );
-
-		if ( ! empty( $contribution_id ) && ! is_wp_error( $contribution_id ) && $result['success'] ) {
-
+		if ( ! empty( $contribution_id ) && ! is_wp_error( $contribution_id ) ) {
 			$message              = esc_html__( 'Successfully generated code, please paste at desired location.', 'revenue-generator' );
 			$generate_button_text = esc_html__( 'Code copied in your clipboard!', 'revenue-generator' );
+			$contribution_code    = $contribution_instance->get_shortcode( $contribution_id );
 		}
 
 		wp_send_json(
 			[
-				'success'     => $result['success'],
-				'msg'         => ( true === $result['success'] ) ? $message : $result['message'],
-				'code'        => $generated_shortcode,
+				'success'     => true,
+				'msg'         => $message,
+				'code'        => $contribution_code,
 				'button_text' => $generate_button_text,
+				'edit_link'   => $contribution_instance->get_edit_link( $contribution_id ),
 			]
 		);
 	}
@@ -541,7 +454,7 @@ class Admin {
 
 		$contributions_dashboard_url = add_query_arg(
 			[
-				'page' => $admin_menus['contributions']['url']
+				'page' => $admin_menus['contributions']['url'],
 			],
 			admin_url( 'admin.php' )
 		);
@@ -551,11 +464,11 @@ class Admin {
 		$contribution_data     = $contribution_instance->get( $id );
 
 		if ( is_wp_error( $contribution_data ) ) {
-			printf(
-				__( 'Contribution does not exist. <a href="%s">Go back to dashboard</a>' ),
-				$contributions_dashboard_url
-			);
+			?>
 
+			<?php esc_html_e( 'Contribution does not exist.', 'revenue-generator' ); ?> <a href="<?php echo esc_url( $contributions_dashboard_url ); ?>"><?php esc_html_e( 'Go back to dashboard', 'revenue-generator' ); ?></a>
+
+			<?php
 			return;
 		}
 
