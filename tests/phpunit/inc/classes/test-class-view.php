@@ -42,7 +42,12 @@ class Test_View extends \WP_UnitTestCase {
 	 * @covers ::render_footer_backend
 	 */
 	public function test_render_footer_backend() {
-		$template_output = Utility::invoke_method( $this->_instance, 'render_footer_backend' );
-		$this->assertContains( '<div class="rev-gen-footer">', $template_output );
+		$template_output = '';
+
+		ob_start();
+			Utility::invoke_method( $this->_instance, 'render_footer_backend' );
+		$template_output = ob_get_clean();
+
+		$this->assertContains( '<div class="rev-gen-powered-by-footer">', (string) $template_output );
 	}
 }

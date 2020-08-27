@@ -96,7 +96,7 @@ class Test_Config extends \WP_UnitTestCase {
 		);
 
 		$subscription_pricing = $pricing_high_defaults['subscription'];
-		$this->assertEquals( $subscription_pricing['price']['amount'], 499 );
+		$this->assertEquals( 4.99, $subscription_pricing['price'] );
 
 		// Test without options.
 		$pricing_high_defaults = Utility::invoke_method( $this->_instance, 'get_price_defaults', [] );
