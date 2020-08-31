@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<h1 class="welcome-screen--heading"><?php esc_html_e( 'Welcome to Revenue Generator', 'revenue-generator' ); ?></h1>
 			</div>
 			<div class="welcome-screen-question welcome-screen-question-paywall">
-				<p class="welcome-screen-publish-questionnaire--heading welcome-screen-publish-questionnaire--description"><?php esc_html_e( 'Want to see how LaterPay would work on your own site?', 'revenue-generator' ); ?></p>
+				<p class="welcome-screen-publish-questionnaire--heading welcome-screen-publish-questionnaire--description"><?php esc_html_e( 'Want to see how Laterpay would work on your own site?', 'revenue-generator' ); ?></p>
 				<p class="welcome-screen-question--description"><?php esc_html_e( 'Below, you can take a tour of the features we offer and see a step-by-step demonstration of how to set up your own flexible paywall.', 'revenue-generator' ); ?></p>
 			</div>
 			<div class="welcome-screen-publish-questionnaire welcome-screen-publish-questionnaire-paywall">

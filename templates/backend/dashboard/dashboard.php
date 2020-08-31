@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div class="rev-gen-layout-wrapper">
 	<div class="laterpay-loader-wrapper">
-		<img alt="<?php esc_attr_e( 'LaterPay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
+		<img alt="<?php esc_attr_e( 'Laterpay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
 	</div>
 	<div class="rev-gen-dashboard-main" data-current="Paywall">
 		<div class="rev-gen-dashboard-bar">

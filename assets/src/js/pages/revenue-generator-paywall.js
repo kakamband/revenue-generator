@@ -3024,7 +3024,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				tour.addStep( {
 					id: 'rg-purchase-option-paywall-publish',
 					text: __(
-						'When you’re ready to activate your paywall, connect your LaterPay account.',
+						'When you’re ready to activate your paywall, connect your Laterpay account.',
 						'revenue-generator'
 					),
 					attachTo: {
