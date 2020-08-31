@@ -150,6 +150,12 @@ $box-white:#fff;
 			a {
 				display: inline-block;
 			}
+			img {
+				position: relative;
+				top: -2px;
+				max-width: 90px;
+				vertical-align: middle;
+			}
 		}
 	}
 }

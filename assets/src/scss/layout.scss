@@ -125,6 +125,16 @@ body {
 	position: fixed;
 	bottom: 20px;
 	z-index: -1;
+	min-width: 180px;
+	a {
+		display: inline;
+	}
+	img {
+		position: relative;
+		top: -2px;
+		max-width: 90px;
+		vertical-align: middle;
+	}
 }
 
 .shepherd-modal-overlay-container {
