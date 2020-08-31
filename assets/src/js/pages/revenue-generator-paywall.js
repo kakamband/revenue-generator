@@ -104,6 +104,9 @@ import { __, sprintf } from '@wordpress/i18n';
 				savePaywall: $( '#rg_js_savePaywall' ),
 				searchPaywallContent: $( '#rg_js_searchPaywallContent' ),
 				searchPost: $( '#rg_js_searchPost' ),
+				select2Multiple: $(
+					'#rg_js_searchPaywallContent, #rg_js_searchPost'
+				),
 				searchPaywallWrapper: $(
 					'.rev-gen-preview-main--paywall-actions-search'
 				),
@@ -265,7 +268,7 @@ import { __, sprintf } from '@wordpress/i18n';
 					}
 
 					// Check if there are already preselected option on mutltiselect and trigger click event twice to reset placeholder.
-					const preSelectedOptions = $o.searchPost.val();
+					const preSelectedOptions = $o.select2Multiple.val();
 					if ( preSelectedOptions && preSelectedOptions.length > 0 ) {
 						const mutipleSelect2 = $(
 							'.select2-selection--multiple .select2-search.select2-search--inline'
@@ -523,26 +526,25 @@ import { __, sprintf } from '@wordpress/i18n';
 						},
 					},
 					minimumInputLength: 1,
+					closeOnSelect: false,
 				} );
 
 				/**
 				 * Handle change of current category to clear our meta data.
 				 */
 				$o.searchPaywallContent.on( 'change', function() {
-					const categoryId = $( this ).val();
-					const currentCategoryId = $o.postPreviewWrapper.attr(
-						'data-access-id'
-					);
+					const categoryIds = $( this ).val();
+					const jsonCategoryIds = JSON.stringify( categoryIds );
 
 					// Remove current meta.
-					if ( currentCategoryId ) {
-						removeCurrentCategoryMeta( currentCategoryId );
+					if ( jsonCategoryIds ) {
+						removeCurrentCategoryMeta( jsonCategoryIds );
 					}
 
-					if ( categoryId ) {
+					if ( jsonCategoryIds ) {
 						$o.postPreviewWrapper.attr(
 							'data-access-id',
-							categoryId
+							jsonCategoryIds
 						);
 						$o.savePaywall.removeAttr( 'disabled' );
 						$o.activatePaywall.removeAttr( 'disabled' );
@@ -602,7 +604,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				/*
 				 * Adds Placeholder in select2 on close and hide options.
 				 */
-				$o.searchPost.on( 'select2:close', function() {
+				$o.select2Multiple.on( 'select2:close', function() {
 					const parentMutiplediv = $( this )
 						.siblings( 'span.select2' )
 						.find( '.select2-selection--multiple' );
@@ -1420,9 +1422,13 @@ import { __, sprintf } from '@wordpress/i18n';
 							$o.savePaywall.attr( 'disabled', true );
 							$o.activatePaywall.attr( 'disabled', true );
 						}
+						const jsonCategoriesID = JSON.stringify(
+							$o.searchPaywallContent.val()
+						);
+
 						$o.postPreviewWrapper.attr(
 							'data-access-id',
-							$o.searchPaywallContent.val()
+							jsonCategoriesID
 						);
 					} else if ( 'specific_post' === $( this ).val() ) {
 						$o.searchPaywallWrapper.hide();

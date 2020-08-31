@@ -629,9 +629,9 @@ class Admin {
 
 		$post_types = Post_Types::get_instance();
 
-		$current_paywall   = filter_input( INPUT_GET, 'current_paywall', FILTER_SANITIZE_NUMBER_INT );
-		$rg_category_data  = '';
-		$rg_specific_posts = array();
+		$current_paywall    = filter_input( INPUT_GET, 'current_paywall', FILTER_SANITIZE_NUMBER_INT );
+		$rg_categories_data = array();
+		$rg_specific_posts  = array();
 
 		// Load paywall related content if found else load requested content for new paywall.
 		if ( ! empty( $current_paywall ) ) {
@@ -646,9 +646,14 @@ class Admin {
 
 			if ( ! empty( $paywall_data ) ) {
 				if ( 'category' === $paywall_data['access_to'] || 'exclude_category' === $paywall_data['access_to'] ) {
-					$rg_category_id = $paywall_data['access_entity'];
-					if ( ! empty( $rg_category_id ) ) {
-						$rg_category_data = get_term( $rg_category_id, 'category' );
+
+					$rg_categories_id = $paywall_data['access_entity'];
+					if ( ! empty( $rg_categories_id ) && is_array( $rg_categories_id ) ) {
+						foreach ( $rg_categories_id as $rg_category_id ) {
+							$rg_categories_data[] = get_term( $rg_category_id, 'category' );
+						}
+					} else {
+						$rg_categories_data[] = get_term( $rg_categories_id, 'category' );
 					}
 				}
 
@@ -723,7 +728,7 @@ class Admin {
 			'default_option_data'   => $default_option_data,
 			'dynamic_pricing_data'  => $post_dynamic_pricing_data,
 			'merchant_symbol'       => $symbol,
-			'rg_category_data'      => $rg_category_data,
+			'rg_categories_data'    => $rg_categories_data,
 			'rg_specific_posts'     => $rg_specific_posts,
 			'is_merchant_verified'  => $is_merchant_verified,
 			'new_paywall_url'       => add_query_arg( [ 'page' => $admin_menus['paywall']['url'] ], admin_url( 'admin.php' ) ),
@@ -937,19 +942,24 @@ class Admin {
 		check_ajax_referer( 'rg_paywall_nonce', 'security' );
 
 		// Sanitize the data.
-		$rg_post_id      = sanitize_text_field( filter_input( INPUT_POST, 'post_id', FILTER_SANITIZE_NUMBER_INT ) );
+		$rg_post_id      = sanitize_text_field( filter_input( INPUT_POST, 'post_id', FILTER_DEFAULT ) );
 		$paywall_data    = filter_input( INPUT_POST, 'paywall', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 		$individual_data = filter_input( INPUT_POST, 'individual', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 		$time_passes     = filter_input( INPUT_POST, 'time_passes', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 		$subscriptions   = filter_input( INPUT_POST, 'subscriptions', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 
-		$paywall_instance          = Paywall::get_instance();
-		$paywall['name']           = sanitize_text_field( wp_unslash( $paywall_data['name'] ) );
-		$paywall['description']    = sanitize_text_field( wp_unslash( $paywall_data['desc'] ) );
-		$paywall['title']          = sanitize_text_field( wp_unslash( $paywall_data['title'] ) );
-		$paywall['id']             = sanitize_text_field( $paywall_data['id'] );
-		$paywall['access_to']      = sanitize_text_field( wp_unslash( $paywall_data['applies'] ) );
-		$paywall['preview_id']     = sanitize_text_field( wp_unslash( $paywall_data['preview_id'] ) );
+		$paywall_instance       = Paywall::get_instance();
+		$paywall['name']        = sanitize_text_field( wp_unslash( $paywall_data['name'] ) );
+		$paywall['description'] = sanitize_text_field( wp_unslash( $paywall_data['desc'] ) );
+		$paywall['title']       = sanitize_text_field( wp_unslash( $paywall_data['title'] ) );
+		$paywall['id']          = sanitize_text_field( $paywall_data['id'] );
+		$paywall['access_to']   = sanitize_text_field( wp_unslash( $paywall_data['applies'] ) );
+		$paywall['preview_id']  = sanitize_text_field( wp_unslash( $paywall_data['preview_id'] ) );
+
+		if ( ! empty( $paywall['access_to'] ) && ( 'category' === $paywall['access_to'] || 'exclude_category' === $paywall['access_to'] ) ) {
+			$rg_post_id = json_decode( $rg_post_id );
+		}
+
 		$paywall['access_entity']  = $rg_post_id;
 		$specific_posts            = sanitize_text_field( wp_unslash( $paywall_data['specific_posts'] ) );
 		$paywall['specific_posts'] = json_decode( $specific_posts );
@@ -1335,10 +1345,17 @@ class Admin {
 		check_ajax_referer( 'rg_paywall_nonce', 'security' );
 
 		// Get all data and sanitize it.
-		$rg_category_id    = sanitize_text_field( filter_input( INPUT_POST, 'rg_category_id', FILTER_SANITIZE_NUMBER_INT ) );
+		$rg_category_ids   = sanitize_text_field( filter_input( INPUT_POST, 'rg_category_id', FILTER_DEFAULT ) );
 		$category_instance = Categories::get_instance();
 
-		if ( $category_instance->clear_category_paywall_meta( $rg_category_id ) ) {
+		$rg_cat_ids = json_decode( $rg_category_ids );
+		$error      = array();
+
+		foreach ( $rg_cat_ids as $rg_cat_id ) {
+			$error[] = $category_instance->clear_category_paywall_meta( $rg_cat_id );
+		}
+
+		if ( ! empty( $error ) && ! in_array( false, $error, true ) ) {
 			wp_send_json_success();
 		} else {
 			wp_send_json_error();
@@ -1446,26 +1463,46 @@ class Admin {
 
 		// Get all data and sanitize it.
 		$preview_post_id    = sanitize_text_field( filter_input( INPUT_POST, 'preview_post_id', FILTER_SANITIZE_NUMBER_INT ) );
-		$category_id        = sanitize_text_field( filter_input( INPUT_POST, 'category_id', FILTER_SANITIZE_NUMBER_INT ) );
+		$categories_id      = filter_input( INPUT_POST, 'category_id', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 		$applies_to         = sanitize_text_field( filter_input( INPUT_POST, 'applies_to', FILTER_SANITIZE_STRING ) );
 		$specific_posts_ids = filter_input( INPUT_POST, 'specific_posts_ids', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 
 		// Check if there is category id and current post has that category.
-		if ( ! empty( $category_id ) && ! has_category( $category_id, $preview_post_id ) ) {
+		if ( ! empty( $categories_id ) && is_array( $categories_id ) ) {
 
-			// If Preview post is post assigned to category, fetch post that has category.
-			$category_post = get_posts(
-				array(
+			// flag to check if post has category.
+			$has_category = false;
+
+			foreach ( $categories_id as $category_id ) {
+				if ( has_category( $category_id, $preview_post_id ) ) {
+					$has_category = true;
+				}
+			}
+
+			// If Preview post has not category assigned.
+			if ( ! $has_category ) {
+
+				$category_post_args = array(
+					'post_type'        => 'post',
 					'numberposts'      => 1,
-					'category'         => $category_id,
 					'suppress_filters' => false,
-				)
-			);
+				);
 
-			// If category post exists assign for preview.
-			if ( ! empty( $category_post ) ) {
-				// Set preview post id.
-				$preview_post_id = $category_post[0]->ID;
+				// If it applies to category include them else exclude them.
+				if ( 'category' === $applies_to ) {
+					$category_post_args['category__in'] = $categories_id;
+				} elseif ( 'category_exclude' === $applies_to ) {
+					$category_post_args['category__not_in'] = $categories_id;
+				}
+
+				// If Preview post is post assigned to category, fetch post that has category.
+				$category_post = get_posts( $category_post_args );
+
+				// If category post exists assign for preview.
+				if ( ! empty( $category_post ) ) {
+					// Set preview post id.
+					$preview_post_id = $category_post[0]->ID;
+				}
 			}
 		}
 
