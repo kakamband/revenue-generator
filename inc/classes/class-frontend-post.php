@@ -645,7 +645,9 @@ class Frontend_Post {
 			if ( ! $this->is_paywall_active( $paywall_data ) ) {
 				// Check if paywall is found on post categories.
 				$post_terms = wp_get_post_categories( $post_id );
-				if ( ! empty( $post_terms ) ) {
+
+				// Check the post type and if post has categories.
+				if ( ! empty( $post_terms ) && 'post' === get_post_type( $post_id ) ) {
 					$paywall_id   = $paywall_instance->get_connected_paywall_by_categories( $post_terms );
 					$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
 
