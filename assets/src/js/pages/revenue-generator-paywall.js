@@ -1098,12 +1098,16 @@ import { __, sprintf } from '@wordpress/i18n';
 					);
 
 					let entityId;
-					if ( 'individual' === optionType ) {
-						entityId = optionItem.attr( 'data-paywall-id' );
-					} else if ( 'timepass' === optionType ) {
-						entityId = optionItem.attr( 'data-tlp-id' );
-					} else if ( 'subscription' === optionType ) {
-						entityId = optionItem.attr( 'data-sub-id' );
+					switch ( optionType ) {
+						case 'individual':
+							entityId = optionItem.attr( 'data-paywall-id' );
+							break;
+						case 'timepass':
+							entityId = optionItem.attr( 'data-tlp-id' );
+							break;
+						case 'subscription':
+							entityId = optionItem.attr( 'data-sub-id' );
+							break;
 					}
 
 					// If a saved option is being edited, get confirmation.
@@ -1310,12 +1314,18 @@ import { __, sprintf } from '@wordpress/i18n';
 							}
 
 							let entityId;
-							if ( 'individual' === optionType ) {
-								entityId = optionItem.attr( 'data-paywall-id' );
-							} else if ( 'timepass' === optionType ) {
-								entityId = optionItem.attr( 'data-tlp-id' );
-							} else if ( 'subscription' === optionType ) {
-								entityId = optionItem.attr( 'data-sub-id' );
+							switch ( optionType ) {
+								case 'individual':
+									entityId = optionItem.attr(
+										'data-paywall-id'
+									);
+									break;
+								case 'timepass':
+									entityId = optionItem.attr( 'data-tlp-id' );
+									break;
+								case 'subscription':
+									entityId = optionItem.attr( 'data-sub-id' );
+									break;
 							}
 
 							// If a saved item is being updated, display warning.
@@ -1803,7 +1813,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						} else if ( 'timepass' === currentType ) {
 							entityId = optionItem.attr( 'data-tlp-id' );
 						} else if ( 'individual' === currentType ) {
-							entityId = optionItem.attr( 'data-paywall-id-id' );
+							entityId = optionItem.attr( 'data-paywall-id' );
 						}
 
 						if ( 'individual' !== currentType && entityId ) {
@@ -2156,14 +2166,19 @@ import { __, sprintf } from '@wordpress/i18n';
 							const purchaseType = optionItem.attr(
 								'data-purchase-type'
 							);
-							if ( 'subscription' === purchaseType ) {
-								entityId = optionItem.attr( 'data-sub-id' );
-							} else if ( 'timepass' === purchaseType ) {
-								entityId = optionItem.attr( 'data-tlp-id' );
-							} else if ( 'individual' === purchaseType ) {
-								entityId = optionItem.attr(
-									'data-paywall-id-id'
-								);
+
+							switch ( purchaseType ) {
+								case 'individual':
+									entityId = optionItem.attr(
+										'data-paywall-id'
+									);
+									break;
+								case 'timepass':
+									entityId = optionItem.attr( 'data-tlp-id' );
+									break;
+								case 'subscription':
+									entityId = optionItem.attr( 'data-sub-id' );
+									break;
 							}
 
 							// If its new item set flag.
