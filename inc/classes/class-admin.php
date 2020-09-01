@@ -1491,7 +1491,7 @@ class Admin {
 				// If it applies to category include them else exclude them.
 				if ( 'category' === $applies_to ) {
 					$category_post_args['category__in'] = $categories_id;
-				} elseif ( 'category_exclude' === $applies_to ) {
+				} elseif ( 'exclude_category' === $applies_to ) {
 					$category_post_args['category__not_in'] = $categories_id;
 				}
 
