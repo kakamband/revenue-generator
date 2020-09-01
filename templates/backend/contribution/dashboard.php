@@ -65,7 +65,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 											<?php echo esc_html( $currency_symbol ); ?>
 										</span>
 										<span class="rev-gen-dashboard-content-contribution--box-donation-amount">
-											<?php echo esc_html( View::format_number( floatval( $amount / 100 ), 2 ) ); ?>
+											<?php echo esc_html( View::format_number( floatval( (int) $amount / 100 ), 2 ) ); ?>
 										</span>
 									</div>
 										<?php
