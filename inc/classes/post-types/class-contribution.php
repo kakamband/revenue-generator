@@ -26,6 +26,20 @@ class Contribution extends Base {
 	const SLUG = 'rg_contribution';
 
 	/**
+	 * Slug of admin screen for Contributions dashboard.
+	 *
+	 * @var string
+	 */
+	const ADMIN_DASHBOARD_SLUG = 'revenue-generator-contributions';
+
+	/**
+	 * Slug of admin screen for single Contributions edit.
+	 *
+	 * @var string
+	 */
+	const ADMIN_EDIT_SLUG = 'revenue-generator-contribution';
+
+	/**
 	 * To get list of labels for paywall post type.
 	 *
 	 * @return array
@@ -40,15 +54,17 @@ class Contribution extends Base {
 	}
 
 	/**
-	 * Create / Update Contribution.
+	 * Save contribution.
 	 *
 	 * @param array $contribution_data Contribution Information.
 	 *
 	 * @return int|\WP_Error
 	 */
-	public function update_contribution( $contribution_data ) {
+	public function save( $contribution_data ) {
+		$default_meta      = $this->get_default_meta();
+		$contribution_data = wp_parse_args( $contribution_data, $default_meta );
 
-		if ( empty( $contribution_data['id'] ) ) {
+		if ( empty( $contribution_data['ID'] ) ) {
 			$contribution_id = wp_insert_post(
 				[
 					'post_content' => $contribution_data['dialog_description'],
@@ -63,12 +79,17 @@ class Contribution extends Base {
 						'_rg_dialog_header'   => $contribution_data['dialog_header'],
 						'_rg_all_revenues'    => $contribution_data['all_revenues'],
 						'_rg_selected_amount' => $contribution_data['selected_amount'],
-						'_rg_code'            => $contribution_data['code'],
 					],
 				]
 			);
 		} else {
-			$contribution_id = $contribution_data['id'];
+			$contribution_id   = $contribution_data['ID'];
+			$contribution_post = $this->get( $contribution_id );
+
+			if ( is_wp_error( $contribution_post ) ) {
+				return new \WP_Error( 'invalid_contribution', __( 'Contribution with this ID does not exist.', 'revenue-generator' ) );
+			}
+
 			wp_update_post(
 				[
 					'ID'           => $contribution_id,
@@ -77,19 +98,226 @@ class Contribution extends Base {
 				]
 			);
 
-			update_post_meta( $contribution_id, '_rg_thank_you', $contribution_data['thank_you'] );
-			update_post_meta( $contribution_id, '_rg_type', $contribution_data['type'] );
-			update_post_meta( $contribution_id, '_rg_custom_amount', $contribution_data['custom_amount'] );
-			update_post_meta( $contribution_id, '_rg_all_amounts', $contribution_data['all_amounts'] );
-			update_post_meta( $contribution_id, '_rg_dialog_header', $contribution_data['dialog_header'] );
-			update_post_meta( $contribution_id, '_rg_all_revenues', $contribution_data['all_revenues'] );
-			update_post_meta( $contribution_id, '_rg_selected_amount', $contribution_data['selected_amount'] );
-			update_post_meta( $contribution_id, '_rg_code', $contribution_data['code'] );
+			foreach ( $default_meta as $meta_key => $meta_value ) {
+				/**
+				 * If there's shortcode stored in the meta, reset it
+				 * to empty value so auto-generated shortcode is used
+				 * since the update.
+				 */
+				if ( 'code' === $meta_key ) {
+					$contribution_data[ $meta_key ] = '';
+				}
+
+				update_post_meta( $contribution_id, "_rg_{$meta_key}", $contribution_data[ $meta_key ] );
+			}
 		}
 
 		return $contribution_id;
 	}
 
+	/**
+	 * Default post data.
+	 *
+	 * @return array Post array with meta.
+	 */
+	public function get_default_post() {
+		$post = [
+			'ID' => 0,
+			'post_title' => '',
+		];
+
+		$meta = $this->get_default_meta();
+
+		return array_merge( $post, $meta );
+	}
+
+	/**
+	 * Get Contribution data by ID.
+	 *
+	 * @param int $id ID of the contribution.
+	 *
+	 * @return array
+	 */
+	public function get( $id = 0 ) {
+		$contribution_default_meta = $this->get_default_meta();
+
+		/**
+		 * In case of non-empty ID, get contribution from the database
+		 * and parse meta.
+		 */
+		if ( ! empty( $id ) ) {
+			$contribution_post = get_post( $id );
+			$meta              = [];
+
+			if ( ! $contribution_post || static::SLUG !== $contribution_post->post_type ) {
+				return new \WP_Error( 'rg_contribution_not_found', __( 'No contribution found.', 'revenue-generator' ) );
+			}
+
+			$contribution_post = $contribution_post->to_array();
+			$contribution_meta = get_post_meta( $id, '', true );
+
+			$meta = $this->unprefix_meta( $contribution_meta );
+			$meta = wp_parse_args( $meta, $contribution_default_meta );
+
+			$last_modified_author_id = $this->get_last_modified_author_id( $id );
+
+			$contribution_post['last_modified_author'] = ( ! empty( $last_modified_author_id ) ) ? $last_modified_author_id : $contribution_post['post_author'];
+		} else {
+			/**
+			 * Empty ID (0) means that this is a new contribution, so
+			 * return default contribution data in that case.
+			 */
+			$contribution_post = $this->get_default_post();
+			$meta              = $contribution_default_meta;
+		}
+
+		// Merge post data and parsed meta to a single array.
+		$contribution = array_merge( $contribution_post, $meta );
+
+		return $contribution;
+	}
+
+	/**
+	 * Unprefix meta passed in the method's parameters.
+	 *
+	 * @param array $meta Prefixed meta to unprefix.
+	 *
+	 * @return array Unprefixed meta.
+	 */
+	public function unprefix_meta( $meta = [] ) {
+		$unprefixed_meta = [];
+
+		foreach ( $meta as $key => $value ) {
+			$unprefixed_key                     = str_replace( '_rg_', '', $key );
+			$unprefixed_meta[ $unprefixed_key ] = maybe_unserialize( $value[0] );
+		}
+
+		return $unprefixed_meta;
+	}
+
+	/**
+	 * Get 'Created on <date> by <author>' string or 'Updated on <date> by <author>'
+	 * by contribution.
+	 *
+	 * @param array|int $contribution Contribution data or ID.
+	 *
+	 * @return string
+	 */
+	public function get_date_time_string( $contribution ) {
+		// If `$contribution` param is integer, attempt to get contribution data.
+		if ( is_int( $contribution ) ) {
+			$contribution = $this->get( $contribution );
+		}
+
+		$date_time_string = '';
+
+		if ( ! is_array( $contribution ) ) {
+			return $date_time_string;
+		}
+
+		$created_modified_string = __( 'Created', 'revenue-generator' );
+		$post_published_date     = get_the_date( '', $contribution['ID'] );
+		$post_published_time     = get_the_time( '', $contribution['ID'] );
+		$post_modified_date      = get_the_modified_date( '', $contribution['ID'] );
+		$post_modified_time      = get_the_modified_time( '', $contribution['ID'] );
+
+		if ( $post_published_date !== $post_modified_date || $post_published_time !== $post_modified_time ) {
+			$created_modified_string = __( 'Updated', 'revenue-generator' );
+		}
+
+		$date_time_string  = sprintf(
+			/* translators: %1$s modified date, %2$s modified time */
+			__( '%1$s on %2$s at %3$s by %4$s', 'revenue-generator' ),
+			$created_modified_string,
+			$post_modified_date,
+			$post_modified_time,
+			get_the_author_meta( 'display_name', $contribution['last_modified_author'] )
+		);
+
+		return $date_time_string;
+	}
+
+	/**
+	 * Get default meta data for contribution.
+	 *
+	 * @return array
+	 */
+	public function get_default_meta() {
+		return [
+			'type' => 'multiple',
+			'name' => '',
+			'thank_you' => '',
+			'dialog_header' => __( 'Support the Author', 'revenue-generator' ),
+			'dialog_description' => __( 'Pick your contribution below:', 'revenue-generator' ),
+			'custom_amount' => '',
+			'all_amounts' => array( 50, 100, 150 ),
+			'all_revenues' => '',
+			'selected_amount' => '',
+			'code' => '',
+		];
+	}
+
+	/**
+	 * Get shortcode for the contribution.
+	 *
+	 * This supports previous versions of the plugin where shortcode was stored in the contribution's meta
+	 * and also a new version where shortcode is ID based.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int $contribution Contribution ID or Contribution data in array.
+	 *
+	 * @return string
+	 */
+	public function get_shortcode( $contribution = 0 ) {
+		$shortcode = '';
+
+		if ( empty( $contribution ) ) {
+			return $shortcode;
+		}
+
+		if ( is_int( $contribution ) ) {
+			$contribution = $this->get( $contribution );
+		}
+
+		if ( ! is_array( $contribution ) ) {
+			return $shortcode;
+		}
+
+		$shortcode = sprintf(
+			'[laterpay_contribution id="%d"]',
+			$contribution['ID']
+		);
+
+		if ( isset( $contribution['code'] ) && ! empty( $contribution['code'] ) ) {
+			$shortcode = $contribution['code'];
+		}
+
+		return $shortcode;
+	}
+
+	/**
+	 * Get edit link for contribution based on its ID.
+	 *
+	 * @param int $contribution_id Contribution ID.
+	 *
+	 * @return string
+	 */
+	public function get_edit_link( $contribution_id = 0 ) {
+		if ( empty( $contribution_id ) ) {
+			return;
+		}
+
+		$edit_link = admin_url(
+			sprintf(
+				'admin.php?page=%s&id=%d',
+				static::ADMIN_EDIT_SLUG,
+				$contribution_id
+			)
+		);
+
+		return $edit_link;
+	}
 
 	/**
 	 * Get all Contributions.
@@ -117,90 +345,10 @@ class Contribution extends Base {
 		$contributions = [];
 
 		foreach ( $posts as $key => $post ) {
-			$contributions[ $key ] = $this->formatted_contribution( $post );
+			$contributions[ $key ] = $this->get( $post->ID );
 		}
 
 		return $contributions;
-	}
-
-	/**
-	 * Returns relevant fields for Contribution of given WP_Post
-	 *
-	 * @param \WP_Post $post Post to transform.
-	 *
-	 * @return array Time Pass instance as array
-	 */
-	private function formatted_contribution( $post ) {
-		$post_meta          = get_post_meta( $post->ID );
-		$post_meta          = $this->formatted_post_meta( $post_meta );
-		$last_modified_user = $this->get_last_modified_author_id( $post->ID );
-		$post_author        = empty( $last_modified_user ) ? $post->post_author : $last_modified_user;
-		$post_modified_date = get_the_modified_date( '', $post->ID );
-		$post_modified_time = get_the_modified_time( '', $post->ID );
-		$post_updated_info  = sprintf(
-			/* translators: %1$s modified date, %2$s modified time */
-			__( 'Created on %1$s at %2$s by %3$s' ),
-			$post_modified_date,
-			$post_modified_time,
-			get_the_author_meta( 'display_name', $post_author )
-		);
-
-		$all_amounts          = maybe_unserialize( $post_meta['all_amounts'] );
-		$all_formated_amounts = array();
-		if ( ! empty( $all_amounts ) ) {
-			foreach ( $all_amounts as $amount ) {
-				$all_formated_amounts[] = floatval( $amount / 100 );
-			}
-		}
-
-		$contribution                      = [];
-		$contribution['id']                = $post->ID;
-		$contribution['name']              = $post->post_title;
-		$contribution['description']       = $post->post_content;
-		$contribution['dialog_header']     = $post_meta['dialog_header'];
-		$contribution['thank_you']         = $post_meta['thank_you'];
-		$contribution['type']              = $post_meta['type'];
-		$contribution['all_amounts']       = $all_formated_amounts;
-		$contribution['all_revenues']      = maybe_unserialize( $post_meta['all_revenues'] );
-		$contribution['selected_amount']   = $post_meta['selected_amount'];
-		$contribution['code']              = $post_meta['code'];
-		$contribution['updated_timestamp'] = strtotime( "{$post_modified_date} $post_modified_time" );
-		$contribution['updated']           = $post_updated_info;
-
-		return $contribution;
-	}
-
-	/**
-	 * Check if post meta has values.
-	 *
-	 * @param array $post_meta Post meta values fetched form database.
-	 *
-	 * @return array
-	 */
-	private function formatted_post_meta( $post_meta ) {
-
-		$post_meta_data = [];
-
-		/**
-		 * _rg_thank_you - Thank you page
-		 * _rg_type - Type of contribution single/ multiple future proof
-		 * _rg_custom_amount - Custom amount if any future proof.
-		 * _rg_all_amounts - All Amounts.
-		 * _rg_dialog_header - Dailogbox Header.
-		 * _rg_all_revenues  - All Revenues.
-		 * _rg_selected_amount - Selected amount.
-		 * _rg_code - generated code.
-		 */
-		$post_meta_data['thank_you']       = ( isset( $post_meta['_rg_thank_you'][0] ) ) ? $post_meta['_rg_thank_you'][0] : '';
-		$post_meta_data['type']            = ( isset( $post_meta['_rg_type'][0] ) ) ? $post_meta['_rg_type'][0] : '';
-		$post_meta_data['custom_amount']   = ( isset( $post_meta['_rg_custom_amount'][0] ) ) ? $post_meta['_rg_custom_amount'][0] : '0';
-		$post_meta_data['all_amounts']     = ( isset( $post_meta['_rg_all_amounts'][0] ) ) ? $post_meta['_rg_all_amounts'][0] : '';
-		$post_meta_data['dialog_header']   = ( isset( $post_meta['_rg_dialog_header'][0] ) ) ? $post_meta['_rg_dialog_header'][0] : '';
-		$post_meta_data['all_revenues']    = ( isset( $post_meta['_rg_all_revenues'][0] ) ) ? $post_meta['_rg_all_revenues'][0] : '';
-		$post_meta_data['selected_amount'] = ( isset( $post_meta['_rg_selected_amount'][0] ) ) ? $post_meta['_rg_selected_amount'][0] : '';
-		$post_meta_data['code']            = ( isset( $post_meta['_rg_code'][0] ) ) ? $post_meta['_rg_code'][0] : '';
-
-		return $post_meta_data;
 	}
 
 	/**
@@ -210,47 +358,13 @@ class Contribution extends Base {
 	 *
 	 * @return string|int
 	 */
-	private function get_last_modified_author_id( $post_id ) {
+	public function get_last_modified_author_id( $post_id ) {
 		$last_id = get_post_meta( $post_id, '_edit_last', true );
 		if ( $last_id ) {
 			return $last_id;
 		}
 
 		return '';
-	}
-
-	/**
-	 * Generate shortcode based on provided config.
-	 *
-	 * @param string $type Type of shortcode.
-	 * @param array  $config_array shortcode configuration data.
-	 *
-	 * @return array|bool Returns shortcode or false.
-	 */
-	public static function shortcode_generator( $type, $config_array ) {
-		// Handle contribution shortcode generation.
-		if ( 'contribution' === $type ) {
-			// Validate the configuration.
-			$result = self::is_contribution_config_valid( $config_array );
-			if ( false === $result['success'] ) {
-				return $result;
-			} else {
-				if ( 'multiple' === $config_array['type'] && 'none' === $config_array['custom_amount'] ) {
-					unset( $config_array['custom_amount'] );
-				}
-				// Create the shortcode string.
-				$built_shortcode = sprintf( '[laterpay_contribution %s]', self::get_shortcode_string( $config_array ) );
-				return [
-					'success' => true,
-					'code'    => $built_shortcode,
-				];
-			}
-		}
-
-		return [
-			'success' => false,
-			'message' => esc_html__( 'Something went wrong.', 'revenue-generator' ),
-		];
 	}
 
 	/**
@@ -282,27 +396,6 @@ class Contribution extends Base {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Generate the shortcode string based on provide attributes and their values.
-	 *
-	 * @param array $config_array Shortcode attribute and value data.
-	 *
-	 * @return mixed
-	 */
-	private static function get_shortcode_string( $config_array ) {
-		return array_reduce(
-			array_keys( $config_array ),
-			function ( $carry, $key ) use ( $config_array ) {
-				$value = $config_array[ $key ];
-				if ( in_array( $key, [ 'all_amounts', 'all_revenues' ], true ) ) {
-					$value = implode( ',', $config_array[ $key ] );
-				}
-				return $carry . ' ' . $key . '="' . $value . '"';
-			},
-			''
-		);
 	}
 
 	/**

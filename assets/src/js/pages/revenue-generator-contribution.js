@@ -9,7 +9,6 @@
  * Internal dependencies.
  */
 import '../utils';
-import { debounce } from '../helpers';
 import { __, sprintf } from '@wordpress/i18n';
 
 ( function( $ ) {
@@ -21,26 +20,22 @@ import { __, sprintf } from '@wordpress/i18n';
 				requestSent: false,
 
 				// Contribution Elements.
-				contributionBox: '.rev-gen-contribution-main--box',
+				contributionBox: $( '.rev-gen-contribution-main--box' ),
 				contributionRequiredField:
 					'h3[contenteditable], p[contenteditable], #rg_contribution_title',
 
 				// Contribution Help.
 				contributionHelpButton: '.rev-gen-contribution-main--help',
 				contributionHelpModal: '.rev-gen-contribution-main-info-modal',
-				contributionModalClose:
-					'.rev-gen-contribution-main-info-modal-cross',
-				contributionCampaignNameLabel: '#rg_contribution_campaign_name',
-				contributionThankYouPageLabel:
-					'#rg_contribution_thankyou_label',
-				contributionGenerateButtonLabel: '#rg_contribution_generate',
-				contributionHelpGenerate: '#rev-gen-contribution-help-generate',
+				contributionModalClose: '.rev-gen-contribution-main-info-modal-cross',
+				contributionCampaignNameLabel: $( '#rg_contribution_campaign_name' ),
+				contributionThankYouPageLabel: $( '#rg_contribution_thankyou_label' ),
+				contributionGenerateButtonLabel: $( '#rg_contribution_generate' ),
+				contributionHelpGenerate: $( '#rev-gen-contribution-help-generate' ),
 
 				// Dashboard elements.
-				contributionDashboardList:
-					'.rev-gen-dashboard-content-contribution',
-				contributionDashboardCode:
-					'.rev-gen-dashboard-content-contribution-code',
+				contributionDashboardShortcodeLink: $( '.rev-gen-dashboard__link--copy-shortcode' ),
+				contributionDashboardCode: '.rev-gen-dashboard-content-contribution-code',
 
 				helpGAModal: '.rev-gen-settings-main-info-modal',
 
@@ -59,25 +54,18 @@ import { __, sprintf } from '@wordpress/i18n';
 				rgContributionWrapper: $( '.rev-gen-contribution-main' ),
 
 				// Contribution Action Elements
-				contributionTitle: $(
-					'.rev-gen-contribution-main--box-header'
-				),
-				contributionDescription: $(
-					'.rev-gen-contribution-main--box-description'
-				),
-				contributionAmounts: $(
-					'.rev-gen-contribution-main--box-donation-amount'
-				),
+				form: $( '.rev-gen-contribution-form' ),
+				contributionTitle: $( '.rev-gen-contribution-main--box-header' ),
+				contributionTitleInput: $( '[name="dialog_header"]' ),
+				contributionDescription: $( '.rev-gen-contribution-main--box-description' ),
+				contributionDescriptionInput: $( '[name="dialog_description"]' ),
+				contributionAmounts: $( '.rev-gen-contribution-main--box-donation-amount' ),
+				allAmountsInput: $( '[name="amounts"]' ),
+				saveButton: $( '.rev-gen-contribution-main-generate-button' ),
 
 				contributionCampaignName: $( '#rg_contribution_title' ),
 				contributionThankYouPage: $( '#rg_contribution_thankyou' ),
-				contributionGnerateCode: $(
-					'.rev-gen-contribution-main-generate-button'
-				),
-
-				contributionCopyMessage: $(
-					'.rev-gen-contribution-main-copy-message'
-				),
+				contributionCopyMessage: $( '.rev-gen-contribution-main-copy-message' ),
 
 				// Popup.
 				snackBar: $( '#rg_js_SnackBar' ),
@@ -88,6 +76,14 @@ import { __, sprintf } from '@wordpress/i18n';
 			// Initialize all required events.
 			const initializePage = function() {
 				bindEvents();
+			};
+
+			const onModalClose = function() {
+				$( $o.contributionHelpModal ).remove();
+				$( '[data-has-help]' ).removeClass( 'highlighted' );
+				$o.contributionBox.removeClass( 'faded' );
+				$o.body.removeClass( 'modal-blur' );
+				$o.body.find( 'input' ).removeClass( 'input-blur' );
 			};
 
 			/**
@@ -112,10 +108,24 @@ import { __, sprintf } from '@wordpress/i18n';
 					}
 				} );
 
+				$o.contributionTitle.on( 'keyup', function() {
+					$o.contributionTitleInput.val( $o.contributionTitle.text() );
+					$o.form.trigger( 'change' );
+				} );
+
+				$o.contributionDescription.on( 'keyup', function() {
+					$o.contributionDescriptionInput.val( $o.contributionDescription.text() );
+					$o.form.trigger( 'change' );
+				} );
+
+				$( 'input', $o.form ).on( 'keyup', function() {
+					$o.form.trigger( 'change' );
+				} );
+
 				// Generate Contribution Code.
-				$o.contributionGnerateCode.on(
-					'click',
-					debounce( function( e ) {
+				$o.form.on( 'submit', function( e ) {
+						e.preventDefault();
+
 						// validate fields.
 						const isValid = validateAllfields();
 
@@ -146,19 +156,9 @@ import { __, sprintf } from '@wordpress/i18n';
 							showLoader();
 
 							const allAmountJson = getContributionAmounts();
+							$o.allAmountsInput.val( allAmountJson );
 
-							const formData = {
-								action: 'rg_contribution_shortcode_generator',
-								heading: $o.contributionTitle.text().trim(),
-								description: $o.contributionDescription
-									.text()
-									.trim(),
-								amounts: allAmountJson,
-								title: $o.contributionCampaignName.val(),
-								thank_you: $o.contributionThankYouPage.val(),
-								security:
-									revenueGeneratorGlobalOptions.rg_contribution_nonce,
-							};
+							const formData = $o.form.serialize();
 
 							// Update the title.
 							$.ajax( {
@@ -171,17 +171,12 @@ import { __, sprintf } from '@wordpress/i18n';
 
 								if ( r.success ) {
 									copyToClipboard( r.code );
-									$o.contributionGnerateCode.text(
+									$o.saveButton.text(
 										r.button_text
 									);
+									$o.saveButton.removeClass( 'enabled' );
+									$o.saveButton.prop( 'disabled', true );
 									$o.contributionCopyMessage.show();
-									$o.contributionGnerateCode.removeAttr(
-										'style'
-									);
-									$o.contributionGnerateCode.prop(
-										'disabled',
-										true
-									);
 									$o.body.removeClass( 'modal-blur' );
 									$o.body
 										.find( 'input' )
@@ -220,6 +215,12 @@ import { __, sprintf } from '@wordpress/i18n';
 										0,
 										true
 									);
+
+									if ( window.location.href !== r.edit_link ) {
+										setTimeout( function() {
+											window.location.href = r.edit_link;
+										}, 1500 );
+									}
 								}
 								// Release request lock.
 								$o.requestSent = false;
@@ -227,9 +228,10 @@ import { __, sprintf } from '@wordpress/i18n';
 								// Hide Loader.
 								hideLoader();
 							} );
+
+							return false;
 						}
-					}, 500 )
-				);
+					} );
 
 				// Validate URL.
 				$o.contributionThankYouPage.on( 'focusout', function() {
@@ -249,6 +251,8 @@ import { __, sprintf } from '@wordpress/i18n';
 						.trim();
 					const validAmount = validatePrice( amount );
 					$( this ).text( validAmount );
+
+					$o.form.trigger( 'change' );
 				} );
 
 				// Validated Heading and Description.
@@ -264,10 +268,10 @@ import { __, sprintf } from '@wordpress/i18n';
 				} );
 
 				// Copy Contribution code on Dashboard.
-				$( $o.contributionDashboardList ).on( 'click', function() {
-					const contributionCode = $( this )
-						.find( $o.contributionDashboardCode )
-						.val();
+				$o.contributionDashboardShortcodeLink.on( 'click', function( e ) {
+					e.preventDefault();
+
+					const contributionCode = $( this ).attr( 'data-shortcode' );
 					copyToClipboard( contributionCode );
 					$o.snackBar.showSnackbar(
 						revenueGeneratorGlobalOptions.rg_code_copy_msg,
@@ -285,6 +289,8 @@ import { __, sprintf } from '@wordpress/i18n';
 						$o.contributionHelpModal
 					);
 
+					let eventLabel = '';
+
 					// Remove any existing modal.
 					if ( existingModal.length ) {
 						$o.body.removeClass( 'modal-blur' );
@@ -299,62 +305,37 @@ import { __, sprintf } from '@wordpress/i18n';
 						// Change background color and highlight the clicked parent.
 						$o.body.addClass( 'modal-blur' );
 						$o.body.find( 'input' ).addClass( 'input-blur' );
-						$( $o.contributionBox ).css(
-							'background-color',
-							'darkgray'
-						);
+						$o.contributionBox.addClass( 'faded' );
 
 						// Highlight selected info modal parent based on type.
-						if ( 'campaignName' === modalType ) {
-							$( $o.contributionCampaignNameLabel )
-								.find( 'input' )
-								.removeClass( 'input-blur' );
+						switch ( modalType ) {
+							case 'campaignName':
+								eventLabel = 'Campaign name';
 
-							$( $o.contributionGenerateButtonLabel ).removeAttr(
-								'style'
-							);
+								$( 'input', $o.contributionCampaignNameLabel ).removeClass( 'input-blur' );
+								$o.contributionGenerateButtonLabel.removeClass( 'highlighted' );
+								$o.contributionThankYouPageLabel.removeClass( 'highlighted' );
+								$o.contributionCampaignNameLabel.addClass( 'highlighted' );
 
-							$( $o.contributionThankYouPageLabel ).removeAttr(
-								'style'
-							);
-							$( $o.contributionCampaignNameLabel ).css(
-								'background-color',
-								'#fff'
-							);
-						} else if ( 'shortcode' === modalType ) {
-							$( $o.contributionGenerateButtonLabel )
-								.find( 'input' )
-								.removeClass( 'input-blur' );
-							$o.contributionGnerateCode.removeAttr( 'style' );
-							$( $o.contributionGenerateButtonLabel ).css(
-								'background-color',
-								'#fff'
-							);
-							$o.contributionGnerateCode.css( 'color', '#fff' );
-						} else {
-							$( $o.contributionThankYouPageLabel )
-								.find( 'input' )
-								.removeClass( 'input-blur' );
-							$( $o.contributionCampaignNameLabel ).removeAttr(
-								'style'
-							);
-							$( $o.contributionThankYouPageLabel ).css(
-								'background-color',
-								'#fff'
-							);
-							$( $o.contributionGenerateButtonLabel ).removeAttr(
-								'style'
-							);
-						}
+								break;
 
-						let eventLabel = '';
+							case 'shortcode':
+								eventLabel = 'Generate Shortcode';
 
-						if ( 'campaignName' === modalType ) {
-							eventLabel = 'Campaign name';
-						} else if ( 'thankYouPage' === modalType ) {
-							eventLabel = 'Thank you page';
-						} else if ( 'shortcode' === modalType ) {
-							eventLabel = 'Generate Shortcode';
+								$( 'input', $o.contributionGenerateButtonLabel ).removeClass( 'input-blur' );
+								$o.contributionGenerateButtonLabel.addClass( 'highlighted' );
+
+								break;
+
+							case 'thankYouPage':
+								eventLabel = 'Thank you page';
+
+								$( 'input', $o.contributionThankYouPageLabel ).removeClass( 'input-blur' );
+								$o.contributionCampaignNameLabel.removeClass( 'highlighted' );
+								$o.contributionGenerateButtonLabel.removeClass( 'highlighted' );
+								$o.contributionThankYouPageLabel.addClass( 'highlighted' );
+
+								break;
 						}
 
 						// Send GA Event.
@@ -378,27 +359,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						$( $o.contributionHelpModal ) &&
 						$( $o.contributionHelpModal ).length > 0
 					) {
-						// This may seem duplicate but modal is inside wrapper and needed to avoid call stack.
-						$( $o.contributionHelpModal ).remove();
-						$o.body.removeClass( 'modal-blur' );
-						$( $o.contributionCampaignNameLabel ).css(
-							'background-color',
-							'inherit'
-						);
-						$( $o.contributionBox ).css(
-							'background-color',
-							'#fff'
-						);
-						$( $o.contributionThankYouPageLabel ).css(
-							'background-color',
-							'inherit'
-						);
-						$( $o.contributionGenerateButtonLabel ).css(
-							'background-color',
-							'inherit'
-						);
-
-						$o.body.find( 'input' ).removeClass( 'input-blur' );
+						onModalClose();
 					}
 				} );
 
@@ -406,41 +367,15 @@ import { __, sprintf } from '@wordpress/i18n';
 				 * Hide the existing help popup.
 				 */
 				$o.body.on( 'click', $o.contributionModalClose, function() {
-					$( $o.contributionHelpModal ).remove();
-					$o.body.removeClass( 'modal-blur' );
-					$( $o.contributionCampaignNameLabel ).css(
-						'background-color',
-						'inherit'
-					);
-					$( $o.contributionThankYouPageLabel ).css(
-						'background-color',
-						'inherit'
-					);
-					$( $o.contributionThankYouPageLabel ).css(
-						'background-color',
-						'inherit'
-					);
-					$( $o.contributionGenerateButtonLabel ).css(
-						'background-color',
-						'inherit'
-					);
-					$o.body.find( 'input' ).removeClass( 'input-blur' );
+					onModalClose();
 				} );
 
-				$o.contributionCampaignName.on( 'focusout', function() {
+				$o.form.on( 'change', function() {
 					// validate fields.
 					const isValid = validateAllfields();
 
 					if ( 'valid' === isValid ) {
-						$o.contributionGnerateCode.css(
-							'background-color',
-							'#1d1d1d'
-						);
-						$o.contributionGnerateCode.css( 'color', '#ffffff' );
-						$o.contributionGnerateCode.text(
-							__( 'Generate and copy code', 'revenue-generator' )
-						);
-						$o.contributionGnerateCode.prop( 'disabled', false );
+						$o.saveButton.addClass( 'enabled' ).prop( 'disabled', false );
 					}
 				} );
 
@@ -676,7 +611,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				$o.body
 					.find( '*[contenteditable="true"]' )
 					.removeAttr( 'contenteditable' );
-				$( $o.contributionBox ).css( 'background-color', 'darkgray' );
+				$o.contributionBox.addClass( 'faded' );
 				$o.rgContributionWrapper.css( {
 					'pointer-events': 'none',
 				} );
@@ -704,7 +639,7 @@ import { __, sprintf } from '@wordpress/i18n';
 					// Revert to original state.
 					$o.body.removeClass( 'modal-blur' );
 					$o.body.find( 'input' ).removeClass( 'input-blur' );
-					$( $o.contributionBox ).css( 'background-color', '#fff' );
+					$o.contributionBox.removeClass( 'faded' );
 
 					$o.rgContributionWrapper.css( {
 						'pointer-events': 'unset',
@@ -802,7 +737,7 @@ import { __, sprintf } from '@wordpress/i18n';
 
 				// Blur out the background.
 				$o.body.addClass( 'modal-blur' );
-				$( $o.contributionBox ).addClass( 'modal-blur' );
+				$o.contributionBox.addClass( 'modal-blur' );
 				$o.body
 					.find( 'input' )
 					.not( $o.accountActionId + ',' + $o.accountActionKey )
