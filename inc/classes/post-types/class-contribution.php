@@ -368,40 +368,6 @@ class Contribution extends Base {
 	}
 
 	/**
-	 * Generate shortcode based on provided config.
-	 *
-	 * @param string $type Type of shortcode.
-	 * @param array  $config_array shortcode configuration data.
-	 *
-	 * @return array|bool Returns shortcode or false.
-	 */
-	public static function shortcode_generator( $type, $config_array ) {
-		// Handle contribution shortcode generation.
-		if ( 'contribution' === $type ) {
-			// Validate the configuration.
-			$result = self::is_contribution_config_valid( $config_array );
-			if ( false === $result['success'] ) {
-				return $result;
-			} else {
-				if ( 'multiple' === $config_array['type'] && 'none' === $config_array['custom_amount'] ) {
-					unset( $config_array['custom_amount'] );
-				}
-				// Create the shortcode string.
-				$built_shortcode = sprintf( '[laterpay_contribution id="%s"]', 2 );
-				return [
-					'success' => true,
-					'code'    => $built_shortcode,
-				];
-			}
-		}
-
-		return [
-			'success' => false,
-			'message' => esc_html__( 'Something went wrong.', 'revenue-generator' ),
-		];
-	}
-
-	/**
 	 * Check if the provided shortcode configuration for Contribution is valid or now.
 	 *
 	 * @param array $config_array Contribution configuration data.
