@@ -86,11 +86,6 @@ class Test_Contribution extends \WP_UnitTestCase {
 	}
 
 	public function test_get_shortcode_will_return_shortcode_if_contribution_is_supplied() {
-		//$mock = $this->createMock( 'LaterPay\Revenue_Generator\Inc\Post_Types\Contribution' );
-		//$mock->method( 'get' )->willReturn( array(
-		//	'ID' => 42
-		//) );
-
 		$contribution = [
 			'ID' => 42,
 		];
