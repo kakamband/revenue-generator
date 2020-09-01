@@ -953,7 +953,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						entityId = purchaseItem.attr( 'data-sub-id' );
 					}
 
-					if ( 'individual' !== type ) {
+					if ( 'individual' !== type && entityId ) {
 						showPurchaseOptionUpdateWarning( type ).then(
 							( confirmation ) => {
 								if ( true === confirmation ) {
@@ -1097,8 +1097,21 @@ import { __, sprintf } from '@wordpress/i18n';
 						$o.purchaseRevenueWrapper
 					);
 
+					let entityId;
+					switch ( optionType ) {
+						case 'individual':
+							entityId = optionItem.attr( 'data-paywall-id' );
+							break;
+						case 'timepass':
+							entityId = optionItem.attr( 'data-tlp-id' );
+							break;
+						case 'subscription':
+							entityId = optionItem.attr( 'data-sub-id' );
+							break;
+					}
+
 					// If a saved option is being edited, get confirmation.
-					if ( 'individual' !== optionType ) {
+					if ( 'individual' !== optionType && entityId ) {
 						showPurchaseOptionUpdateWarning( optionType ).then(
 							( confirmation ) => {
 								if ( true === confirmation ) {
@@ -1300,8 +1313,23 @@ import { __, sprintf } from '@wordpress/i18n';
 								showCurrencySelectionModal();
 							}
 
+							let entityId;
+							switch ( optionType ) {
+								case 'individual':
+									entityId = optionItem.attr(
+										'data-paywall-id'
+									);
+									break;
+								case 'timepass':
+									entityId = optionItem.attr( 'data-tlp-id' );
+									break;
+								case 'subscription':
+									entityId = optionItem.attr( 'data-sub-id' );
+									break;
+							}
+
 							// If a saved item is being updated, display warning.
-							if ( 'individual' !== optionType ) {
+							if ( 'individual' !== optionType && entityId ) {
 								showPurchaseOptionUpdateWarning(
 									optionType
 								).then( ( confirmation ) => {
@@ -1785,10 +1813,10 @@ import { __, sprintf } from '@wordpress/i18n';
 						} else if ( 'timepass' === currentType ) {
 							entityId = optionItem.attr( 'data-tlp-id' );
 						} else if ( 'individual' === currentType ) {
-							entityId = optionItem.attr( 'data-paywall-id-id' );
+							entityId = optionItem.attr( 'data-paywall-id' );
 						}
 
-						if ( 'individual' !== currentType ) {
+						if ( 'individual' !== currentType && entityId ) {
 							showPurchaseOptionUpdateWarning( currentType ).then(
 								( confirmation ) => {
 									// If merchant selects to continue, remove current option from DB.
@@ -2126,18 +2154,79 @@ import { __, sprintf } from '@wordpress/i18n';
 					) {
 						showAccountActivationModal();
 					} else {
-						/**
-						 * Save paywall data to get new paywall id and wait for some time to publish the paywall.
-						 */
-						$o.isPublish = true;
-						$o.savePaywall.trigger( 'click' );
-						$o.savePaywall.addClass( 'hide' );
-						showLoader();
-						setTimeout( function() {
-							publishPaywall();
-							hideLoader();
-							$o.isPublish = false;
-						}, 1500 );
+						let entityId;
+						const purchaseOptionItems = $( $o.purchaseOptionItem );
+						let isNewItem = false;
+
+						$.each( purchaseOptionItems, function(
+							key,
+							purchaseOptionItem
+						) {
+							const optionItem = $( purchaseOptionItem );
+							const purchaseType = optionItem.attr(
+								'data-purchase-type'
+							);
+
+							switch ( purchaseType ) {
+								case 'individual':
+									entityId = optionItem.attr(
+										'data-paywall-id'
+									);
+									break;
+								case 'timepass':
+									entityId = optionItem.attr( 'data-tlp-id' );
+									break;
+								case 'subscription':
+									entityId = optionItem.attr( 'data-sub-id' );
+									break;
+							}
+
+							// If its new item set flag.
+							if (
+								! isNewItem &&
+								! entityId &&
+								'individual' !== purchaseType
+							) {
+								isNewItem = true;
+							}
+						} );
+
+						if ( isNewItem ) {
+							showPurchaseOptionUpdateWarning(
+								'newPurchaseOption'
+							).then( ( confirmation ) => {
+								// If merchant selects to continue, remove current option from DB.
+								if ( true === confirmation ) {
+									/**
+									 * Save paywall data to get new paywall id and wait for some time to publish the paywall.
+									 */
+									$o.isPublish = true;
+									$o.savePaywall.trigger( 'click' );
+									$o.savePaywall.addClass( 'hide' );
+									showLoader();
+									setTimeout( function() {
+										publishPaywall();
+										hideLoader();
+										$o.isPublish = false;
+									}, 1500 );
+								} else {
+									return false;
+								}
+							} );
+						} else {
+							/**
+							 * Save paywall data to get new paywall id and wait for some time to publish the paywall.
+							 */
+							$o.isPublish = true;
+							$o.savePaywall.trigger( 'click' );
+							$o.savePaywall.addClass( 'hide' );
+							showLoader();
+							setTimeout( function() {
+								publishPaywall();
+								hideLoader();
+								$o.isPublish = false;
+							}, 1500 );
+						}
 					}
 				} );
 
@@ -3528,6 +3617,15 @@ import { __, sprintf } from '@wordpress/i18n';
 								.text(
 									__(
 										'The changes you have made will impact this subscription offer on all paywalls across your entire site.',
+										'revenue-generator'
+									)
+								);
+						} else if ( 'newPurchaseOption' === optionType ) {
+							updateWarning
+								.empty()
+								.text(
+									__(
+										'It looks like you have added a new Global Time Pass or Subscription to this Paywall. Global Time Passes and Subscriptions will show up on all paywalls across your entire site.',
 										'revenue-generator'
 									)
 								);
