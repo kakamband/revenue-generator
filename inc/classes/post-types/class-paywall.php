@@ -406,7 +406,8 @@ class Paywall extends Base {
 	 */
 	public function get_connected_paywall_in_excluded_categories( $categories ) {
 
-		$current_post = array();
+		$paywalls         = array();
+		$is_post_excluded = false; // flag to check one of mutiple categories is excluded.
 
 		if ( ! empty( $categories ) && is_array( $categories ) ) {
 
@@ -440,13 +441,18 @@ class Paywall extends Base {
 
 				$paywall_posts = new \WP_Query( $query_args );
 
-				$current_post = $paywall_posts->posts;
+				$paywalls = $paywall_posts->posts;
+
+				// Set flag to true when any one of category returns with no paywall.
+				if ( empty( $paywalls ) ) {
+					$is_post_excluded = true;
+				}
 			}
 		}
 
-		// if paywall exists return it.
-		if ( ! empty( $current_post[0] ) ) {
-			return $current_post[0]->ID;
+		// if paywall exists and post is not in excluded category return it.
+		if ( ! empty( $paywalls[0] ) && ! $is_post_excluded ) {
+			return $paywalls[0]->ID;
 		}
 
 		return '';
