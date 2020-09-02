@@ -444,7 +444,7 @@ class Paywall extends Base {
 				$paywalls = $paywall_posts->posts;
 
 				// Set flag to true when any one of category returns with no paywall.
-				if ( empty( $paywalls ) ) {
+				if ( empty( $paywalls ) && ! $is_post_excluded ) {
 					$is_post_excluded = true;
 				}
 			}
