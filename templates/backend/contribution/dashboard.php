@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			if ( ! empty( $contributions ) ) :
 				foreach ( $contributions as $contribution ) {
 					$contribution_id             = $contribution['ID'];
-					$contribution_title          = $contribution['name'];
+					$contribution_title          = $contribution['post_title'];
 					$contribution_shortcode      = $contribution_instance->get_shortcode( $contribution );
 					$contribution_updated_string = $contribution_instance->get_date_time_string( $contribution );
 					$contribution_edit_link      = $contribution_instance->get_edit_link( $contribution['ID'] );
