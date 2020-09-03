@@ -75,7 +75,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<?php endif; ?>
 				<label id="rg_contribution_generate" class="rev-gen-contribution-main-input-label rev-gen-contribution-main-button" data-has-help>
 					<button class="rev-gen-contribution-main-generate-button" type="submit" disabled>
-						<?php esc_html_e( 'Save and copy code', 'revenue-generator' ); ?>
+						<?php if ( ! empty( $contribution_data['ID'] ) ) : ?>
+							<?php esc_html_e( 'Update and copy code', 'revenue-generator' ); ?>
+						<?php else : ?>
+							<?php esc_html_e( 'Save and copy code', 'revenue-generator' ); ?>
+						<?php endif; ?>
 					</button>
 					<button data-info-for="shortcode" id="rev-gen-contribution-help-shortcode" class="rev-gen-settings-main-option-info rev-gen-contribution-main--help rev-gen-contribution-main--shortcode" onclick="javascript: return false;">
 						<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">

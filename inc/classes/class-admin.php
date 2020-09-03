@@ -305,6 +305,12 @@ class Admin {
 			'code'               => ( isset( $_REQUEST['code'] ) ) ? sanitize_text_field( $_REQUEST['code'] ) : '',
 		];
 
+		$is_edit = false;
+
+		if ( ! empty( $contribution_data['ID'] ) ) {
+			$is_edit = true;
+		}
+
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$amounts = isset( $_REQUEST['amounts'] ) ? $_REQUEST['amounts'] : [];
 
@@ -349,7 +355,12 @@ class Admin {
 		$contribution_code = '';
 
 		if ( ! empty( $contribution_id ) && ! is_wp_error( $contribution_id ) ) {
-			$message              = esc_html__( 'Successfully generated code, please paste at desired location.', 'revenue-generator' );
+			$message = esc_html__( 'Successfully generated code, please paste at desired location.', 'revenue-generator' );
+
+			if ( $is_edit ) {
+				$message = esc_html__( 'Code successfully updated and copied to your clipboard.', 'revenue-generator' );
+			}
+
 			$generate_button_text = esc_html__( 'Code copied in your clipboard!', 'revenue-generator' );
 			$contribution_code    = $contribution_instance->get_shortcode( $contribution_id );
 		}
