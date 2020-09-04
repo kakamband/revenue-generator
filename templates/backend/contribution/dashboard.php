@@ -49,6 +49,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 					?>
 					<div class="rev-gen-dashboard-content-contribution" data-contribution-id="<?php echo esc_attr( $contribution_id ); ?>">
 						<div class="rev-gen-dashboard-content-contribution--box">
+							<a href="<?php echo esc_attr( $contribution_edit_link ); ?>" class="rev-gen-dashboard-content-contribution--box__link">
+								<span class="screen-reader-text"><?php _e( 'Edit Contribution offer', 'revenue-generator' ); ?>
+							</a>
 							<h4 class="rev-gen-dashboard-content-contribution--box-header">
 								<?php echo esc_html( $contribution['dialog_header'] ); ?>
 							</h4>
@@ -89,12 +92,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<div class="rev-gen-dashboard-content-contribution--info-url">
 								<?php echo esc_html( $contribution['thank_you'] ); ?>
 							</div>
+							<div class="rev-gen-dashboard-content-contribution--info-updated">
+								<?php echo esc_html( $contribution_updated_string ); ?>
+							</div>
 							<div class="rev-gen-dashboard-content-contribution--links">
 								<a href="#" class="rev-gen-dashboard__link--copy-shortcode" data-shortcode="<?php echo esc_attr( $contribution_shortcode ); ?>"><?php esc_html_e( 'Copy shortcode', 'revenue-generator' ); ?></a> |
 								<a href="<?php echo esc_url( $contribution_edit_link ); ?>"><?php esc_html_e( 'Edit', 'revenue-generator' ); ?></a>
-							</div>
-							<div class="rev-gen-dashboard-content-contribution--info-updated">
-								<?php echo esc_html( $contribution_updated_string ); ?>
 							</div>
 						</div>
 					</div>

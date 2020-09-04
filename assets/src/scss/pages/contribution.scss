@@ -256,25 +256,41 @@ body.revenue-generator_page_revenue-generator-contribution {
 
 /* Dashboard Styling */
 .rev-gen-dashboard-content-contribution {
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
 	margin-bottom: 20px;
 
 	&-wrapper {
 		margin: 40px 20px;
 	}
 	&--box {
+		position: relative;
 		width: 320px;
-		min-height: 158px;
 		border-radius: 5px;
 		border: solid 2px $box-text-color;
 		background-color: $box-white;
 		text-align: center;
 		float: left;
-		padding: 30px 25px;
-		pointer-events: none;
+		padding: 25px 25px 20px;
+
+		@media (max-width: 800px) {
+			display: none;
+		}
+
+		&__link {
+			position: absolute;
+			top: 0;
+			left: 0;
+			z-index: 5;
+			width: 100%;
+			height: 100%;
+			display: block;
+		}
 
 		&-header {
 			width: 100%;
-			min-height: 24px;
+			margin: 0;
 			font-family: $box-font-helvetica;
 			font-size: 16px;
 			font-weight: 500;
@@ -282,6 +298,7 @@ body.revenue-generator_page_revenue-generator-contribution {
 			letter-spacing: -0.08px;
 			text-align: center;
 			color: $box-text-color;
+			pointer-events: none;
 		}
 		&-description {
 			width: 100%;
@@ -294,12 +311,14 @@ body.revenue-generator_page_revenue-generator-contribution {
 			text-align: center;
 			color: $box-text-color;
 			margin-bottom: 20px;
+			pointer-events: none;
 		}
 
 		&-donation-wrapper {
 			text-align: center;
 			position: relative;
 			display: inline-block;
+			pointer-events: none;
 		}
 
 		&-donation {
@@ -315,6 +334,7 @@ body.revenue-generator_page_revenue-generator-contribution {
 			justify-content: center;
 			overflow: hidden;
 			word-break: normal;
+			pointer-events: none;
 
 			&-currency {
 				@extend .amount-text-dashborad;
@@ -328,14 +348,23 @@ body.revenue-generator_page_revenue-generator-contribution {
 
 	}
 
+	&--links {
+		a {
+			color: #000;
+			font-weight: bold;
+			text-decoration: underline;
+			text-transform: uppercase;
+		}
+	}
+
 	&--info {
 		position: relative;
 		display: block;
 		float: left;
 		padding: 25px 30px;
-		width: 325px;
+		min-width: 325px;
 		&-title {
-			min-height: 28px;
+			margin: 0 0 10px 0;
 			font-family: $box-font-helvetica;
 			font-size: 21px;
 			font-weight: 500;
@@ -345,7 +374,6 @@ body.revenue-generator_page_revenue-generator-contribution {
 			color: $box-text-color;
 		}
 		&-url {
-			min-height: 20px;
 			font-family: $box-font-helvetica;
 			font-size: 16px;
 			font-weight: normal;
