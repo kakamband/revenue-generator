@@ -4,9 +4,9 @@ Contributors: laterpay
 Donate link: https://laterpay.net
 Tags: contribution, micropayment, paywall, sell content, subscription, conversion, earn money, monetization, monetize content, paid content, payment, sell article
 Requires at least: 5.3
-Tested up to: 5.4.2
+Tested up to: 5.5
 Requires PHP: 5.6
-Stable tag: 1.0.1
+Stable tag: 1.1.0
 Author URI: https://laterpay.net
 Plugin URI: https://github.com/laterpay/revenue-generator/
 License: MIT
@@ -81,6 +81,11 @@ Laterpay’s fee amounts to 15% of the revenues that it collects for its Merchan
 
 == Changelog ==
 
+= 1.1.0 ( 4 September 2020 ) =
+* Updated Paywall functionality to allow for the selection of multiple individual posts or categories.
+* Updated Contributions shortcode so that a contribution offering can be updated without requiring changes to the shortcode.
+* Updated Laterpay logo.
+
 = 1.0.1 ( 20 July 2020 ) =
 * Added Settings menu option.
 * Minor styling Improvements.
@@ -91,6 +96,9 @@ Laterpay’s fee amounts to 15% of the revenues that it collects for its Merchan
 * Initial Release.
 
 == Upgrade notice ==
+
+= 1.1.0 =
+Editable Contributions offers, updated paywall functionality, updated logo.
 
 = 1.0.1 =
 Added Settings menu option.
