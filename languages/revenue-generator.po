@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-09-04T08:12:16+00:00\n"
+"POT-Creation-Date: 2020-09-07T12:52:44+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: revenue-generator\n"
@@ -269,45 +269,45 @@ msgstr ""
 msgid "Something went wrong, if you are a site admin please add merchant credentials in settings."
 msgstr ""
 
-#: inc/classes/class-shortcodes.php:351
+#: inc/classes/class-shortcodes.php:357
 msgid "Please enter a campaign name above."
 msgstr ""
 
-#: inc/classes/class-shortcodes.php:360
-#: inc/classes/post-types/class-contribution.php:392
+#: inc/classes/class-shortcodes.php:366
+#: inc/classes/post-types/class-contribution.php:393
 msgid "Please enter a valid contribution amount above."
 msgstr ""
 
-#: inc/classes/post-types/class-contribution.php:90
+#: inc/classes/post-types/class-contribution.php:91
 msgid "Contribution with this ID does not exist."
 msgstr ""
 
-#: inc/classes/post-types/class-contribution.php:153
+#: inc/classes/post-types/class-contribution.php:154
 msgid "No contribution found."
 msgstr ""
 
-#: inc/classes/post-types/class-contribution.php:218
+#: inc/classes/post-types/class-contribution.php:219
 msgid "Created"
 msgstr ""
 
-#: inc/classes/post-types/class-contribution.php:225
+#: inc/classes/post-types/class-contribution.php:226
 msgid "Updated"
 msgstr ""
 
 #. translators: %1$s modified date, %2$s modified time
-#: inc/classes/post-types/class-contribution.php:230
+#: inc/classes/post-types/class-contribution.php:231
 msgid "%1$s on %2$s at %3$s by %4$s"
 msgstr ""
 
-#: inc/classes/post-types/class-contribution.php:250
+#: inc/classes/post-types/class-contribution.php:251
 msgid "Support the Author"
 msgstr ""
 
-#: inc/classes/post-types/class-contribution.php:251
+#: inc/classes/post-types/class-contribution.php:252
 msgid "Pick your contribution below:"
 msgstr ""
 
-#: inc/classes/post-types/class-contribution.php:383
+#: inc/classes/post-types/class-contribution.php:384
 msgid "Please enter a Campaign Name above."
 msgstr ""
 
