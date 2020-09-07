@@ -72,13 +72,14 @@ class Contribution extends Base {
 					'post_status'  => 'publish',
 					'post_type'    => static::SLUG,
 					'meta_input'   => [
-						'_rg_thank_you'       => $contribution_data['thank_you'],
-						'_rg_type'            => $contribution_data['type'],
-						'_rg_custom_amount'   => $contribution_data['custom_amount'],
-						'_rg_all_amounts'     => $contribution_data['all_amounts'],
-						'_rg_dialog_header'   => $contribution_data['dialog_header'],
-						'_rg_all_revenues'    => $contribution_data['all_revenues'],
-						'_rg_selected_amount' => $contribution_data['selected_amount'],
+						'_rg_thank_you'            => $contribution_data['thank_you'],
+						'_rg_type'                 => $contribution_data['type'],
+						'_rg_custom_amount'        => $contribution_data['custom_amount'],
+						'_rg_all_amounts'          => $contribution_data['all_amounts'],
+						'_rg_dialog_header'        => $contribution_data['dialog_header'],
+						'_rg_dialog_description'   => $contribution_data['dialog_description'],
+						'_rg_all_revenues'         => $contribution_data['all_revenues'],
+						'_rg_selected_amount'      => $contribution_data['selected_amount'],
 					],
 				]
 			);
@@ -244,16 +245,16 @@ class Contribution extends Base {
 	 */
 	public function get_default_meta() {
 		return [
-			'type' => 'multiple',
-			'name' => '',
-			'thank_you' => '',
-			'dialog_header' => __( 'Support the Author', 'revenue-generator' ),
+			'type'               => 'multiple',
+			'name'               => '',
+			'thank_you'          => '',
+			'dialog_header'      => __( 'Support the Author', 'revenue-generator' ),
 			'dialog_description' => __( 'Pick your contribution below:', 'revenue-generator' ),
-			'custom_amount' => '',
-			'all_amounts' => array( 50, 100, 150 ),
-			'all_revenues' => '',
-			'selected_amount' => '',
-			'code' => '',
+			'custom_amount'      => '',
+			'all_amounts'        => array( 50, 100, 150 ),
+			'all_revenues'       => '',
+			'selected_amount'    => '',
+			'code'               => '',
 		];
 	}
 
