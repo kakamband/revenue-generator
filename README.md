@@ -1,21 +1,32 @@
 ![Banner](./wporgassets/banner-1544x500.png)
 
-<h1 align="center"> Revenue Generator by LaterPay </h1>
+<h1 align="center"> Revenue Generator by Laterpay </h1>
 
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 [![License](https://img.shields.io/github/license/laterpay/revenue-generator)](https://github.com/laterpay/revenue-generator/blob/master/LICENSE)
 
-##### Revenue Generator is the official WordPress plugin for selling digital content using LaterPay’s patented [Pay Later model](https://www.laterpay.net/blog/how-to-laterpay-dos-and-donts-from-8-years-expertise).
+##### Revenue Generator is the official WordPress plugin for selling digital content using Laterpay’s patented [Pay Later model](https://www.laterpay.net/blog/how-to-laterpay-dos-and-donts-from-8-years-expertise).
 <hr/>
 
 ### Table of Contents
 
-- [Installation and Getting Started](#installation)
+- [Installation](#installation)
 - [Contributing](#contributing)
 - [Development Notes](#development-notes)
-- [Project Structure](#project-folder--file-structure)
+			- [Please run the following commands from the root directory of this repository.](#please-run-the-following-commands-from-the-root-directory-of-this-repository)
+- [Project Folder / File Structure](#project-folder--file-structure)
 - [Terminology](#terminology)
+		- [Payment Options](#payment-options)
+		- [Payment Models](#payment-models)
 - [Screenshots](#screenshots)
+	- [Welcome screen](#welcome-screen)
+	- [Onboarding tutorial](#onboarding-tutorial)
+	- [Paywall preview](#paywall-preview)
+	- [Add purchase option](#add-purchase-option)
+	- [Paywall Dashboard](#paywall-dashboard)
+	- [Published paywall](#published-paywall)
+	- [Create Contribution](#create-contribution)
+	- [Published Contribution](#published-contribution)
 - [Versioning](#versioning)
 - [Copyright](#copyright)
 
@@ -26,7 +37,7 @@ The latest release of the plugin is available [here](https://github.com/laterpay
 - Install the latest zip or use the latest code from `master` branch in your test site.
 - Activate the plugin and select `Revenue Generator` in the menu.
 - Go through the on-boarding tutorial to get an overview of the available features.
-- Once you have your first paywall set up, click “Publish.” You will be asked to connect your [LaterPay account](http://laterpay.net/) (only asked once).
+- Once you have your first paywall set up, click “Publish.” You will be asked to connect your [Laterpay account](http://laterpay.net/) (only asked once).
 - You should now see the paywall has been created.
 
 ## Contributing
@@ -99,7 +110,7 @@ revenue-generator
 
 #### Payment Models
 
-- **Pay Later** - When a customer purchases “Pay Later” content, the item is added to their LaterPay Tab and they will be asked to pay once they hit the threshold of 5€ or $5. Pay Later items can be priced between 0.05€ and 5.00€ and between $0.05 and $5.00.
+- **Pay Later** - When a customer purchases “Pay Later” content, the item is added to their Laterpay Tab and they will be asked to pay once they hit the threshold of 5€ or $5. Pay Later items can be priced between 0.05€ and 5.00€ and between $0.05 and $5.00.
 <hr/>
 
 - **Pay Now** - The “Pay Now” model is a traditional payment model which requires a customer to pay immediately. Pay Now items can be priced between 1.00€ and 1,000.00€ and between $1.99 and $1,000.00.
@@ -144,4 +155,4 @@ The Revenue Generator plugin uses [Semantic Versioning 2.0.0](http://semver.org)
 
 ## Copyright
 
-Copyright 2020 LaterPay GmbH – Released under MIT [LICENSE](LICENSE).
+Copyright 2020 Laterpay GmbH – Released under MIT [LICENSE](LICENSE).

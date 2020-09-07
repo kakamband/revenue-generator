@@ -49,7 +49,7 @@ class Test_Assets extends \WP_UnitTestCase {
 				'type'     => 'action',
 				'name'     => 'admin_enqueue_scripts',
 				'priority' => 11,
-				'function' => 'load_scripts',
+				'function' => 'load_admin_assets',
 			],
 		];
 
@@ -96,10 +96,5 @@ class Test_Assets extends \WP_UnitTestCase {
 		Utility::invoke_method( $this->_instance, 'register_scripts' );
 		$this->assertTrue( wp_script_is( 'revenue-generator', 'registered' ) );
 		$this->assertTrue( wp_style_is( 'revenue-generator', 'registered' ) );
-
-		// Verify script and style enqueue.
-		Utility::invoke_method( $this->_instance, 'load_scripts' );
-		$this->assertTrue( wp_script_is( 'revenue-generator', 'enqueued' ) );
-		$this->assertTrue( wp_style_is( 'revenue-generator', 'enqueued' ) );
 	}
 }

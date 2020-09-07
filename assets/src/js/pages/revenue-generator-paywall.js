@@ -103,8 +103,15 @@ import { __, sprintf } from '@wordpress/i18n';
 				activatePaywall: $( '#rg_js_activatePaywall' ),
 				savePaywall: $( '#rg_js_savePaywall' ),
 				searchPaywallContent: $( '#rg_js_searchPaywallContent' ),
+				searchPost: $( '#rg_js_searchPost' ),
+				select2Multiple: $(
+					'#rg_js_searchPaywallContent, #rg_js_searchPost'
+				),
 				searchPaywallWrapper: $(
 					'.rev-gen-preview-main--paywall-actions-search'
+				),
+				searchPostWrapper: $(
+					'.rev-gen-preview-main--paywall-actions-search-post'
 				),
 				paywallName: $( '.rev-gen-preview-main-paywall-name' ),
 
@@ -258,6 +265,18 @@ import { __, sprintf } from '@wordpress/i18n';
 						const tour = initializeTour();
 						addTourSteps( tour );
 						startWelcomeTour( tour );
+					}
+
+					// Check if there are already preselected option on mutltiselect and trigger click event twice to reset placeholder.
+					const preSelectedOptions = $o.select2Multiple.val();
+					if ( preSelectedOptions && preSelectedOptions.length > 0 ) {
+						const mutipleSelect2 = $(
+							'.select2-selection--multiple .select2-search.select2-search--inline'
+						);
+						// Open up search.
+						mutipleSelect2.trigger( 'click' );
+						// Close Search.
+						mutipleSelect2.trigger( 'click' );
 					}
 				} );
 
@@ -507,26 +526,111 @@ import { __, sprintf } from '@wordpress/i18n';
 						},
 					},
 					minimumInputLength: 1,
+					closeOnSelect: false,
 				} );
 
 				/**
 				 * Handle change of current category to clear our meta data.
 				 */
 				$o.searchPaywallContent.on( 'change', function() {
-					const categoryId = $( this ).val();
-					const currentCategoryId = $o.postPreviewWrapper.attr(
-						'data-access-id'
-					);
+					const categoryIds = $( this ).val();
+					const jsonCategoryIds = JSON.stringify( categoryIds );
 
 					// Remove current meta.
-					if ( currentCategoryId ) {
-						removeCurrentCategoryMeta( currentCategoryId );
+					if ( jsonCategoryIds ) {
+						removeCurrentCategoryMeta( jsonCategoryIds );
 					}
 
-					if ( categoryId ) {
+					if ( jsonCategoryIds ) {
 						$o.postPreviewWrapper.attr(
 							'data-access-id',
-							categoryId
+							jsonCategoryIds
+						);
+						$o.savePaywall.removeAttr( 'disabled' );
+						$o.activatePaywall.removeAttr( 'disabled' );
+					}
+				} );
+
+				$o.searchPost.select2( {
+					ajax: {
+						url: revenueGeneratorGlobalOptions.ajaxUrl,
+						dataType: 'json',
+						delay: 500,
+						type: 'POST',
+						data( params ) {
+							return {
+								term: params.term,
+								action: 'rg_search_post',
+								security:
+									revenueGeneratorGlobalOptions.rg_paywall_nonce,
+							};
+						},
+						processResults( data ) {
+							const options = [];
+							if ( data ) {
+								$.each( data.posts, function( index ) {
+									const post = data.posts[ index ];
+									options.push( {
+										id: post.ID,
+										text: post.post_title,
+									} );
+								} );
+							}
+							return {
+								results: options,
+							};
+						},
+						cache: true,
+					},
+					placeholder: __( 'search', 'revenue-generator' ),
+					language: {
+						inputTooShort() {
+							return __(
+								'Please enter 1 or more characters.',
+								'revenue-generator'
+							);
+						},
+						noResults() {
+							return __(
+								'No results found.',
+								'revenue-generator'
+							);
+						},
+					},
+					minimumInputLength: 1,
+					closeOnSelect: false,
+				} );
+
+				/*
+				 * Adds Placeholder in select2 on close and hide options.
+				 */
+				$o.select2Multiple.on( 'select2:close', function() {
+					const parentMutiplediv = $( this )
+						.siblings( 'span.select2' )
+						.find( '.select2-selection--multiple' );
+					const count = $( this ).select2( 'data' ).length;
+					const select2Counter = parentMutiplediv.find(
+						'.select2-selection__rendered .select2-search--inline input'
+					);
+					select2Counter.attr(
+						'placeholder',
+						count + ' items selected'
+					);
+
+					// Setting width dynamically as it has to overwrite default dynamic width.
+					select2Counter.css( 'width', '100%' );
+				} );
+
+				/**
+				 * Handle change of current post.
+				 */
+				$o.searchPost.on( 'change', function() {
+					const specificPosts = $( this ).val();
+					const jsonSpecificPosts = JSON.stringify( specificPosts );
+					if ( specificPosts ) {
+						$o.searchPostWrapper.attr(
+							'data-access-id',
+							jsonSpecificPosts
 						);
 						$o.savePaywall.removeAttr( 'disabled' );
 						$o.activatePaywall.removeAttr( 'disabled' );
@@ -849,7 +953,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						entityId = purchaseItem.attr( 'data-sub-id' );
 					}
 
-					if ( 'individual' !== type ) {
+					if ( 'individual' !== type && entityId ) {
 						showPurchaseOptionUpdateWarning( type ).then(
 							( confirmation ) => {
 								if ( true === confirmation ) {
@@ -993,8 +1097,21 @@ import { __, sprintf } from '@wordpress/i18n';
 						$o.purchaseRevenueWrapper
 					);
 
+					let entityId;
+					switch ( optionType ) {
+						case 'individual':
+							entityId = optionItem.attr( 'data-paywall-id' );
+							break;
+						case 'timepass':
+							entityId = optionItem.attr( 'data-tlp-id' );
+							break;
+						case 'subscription':
+							entityId = optionItem.attr( 'data-sub-id' );
+							break;
+					}
+
 					// If a saved option is being edited, get confirmation.
-					if ( 'individual' !== optionType ) {
+					if ( 'individual' !== optionType && entityId ) {
 						showPurchaseOptionUpdateWarning( optionType ).then(
 							( confirmation ) => {
 								if ( true === confirmation ) {
@@ -1196,8 +1313,23 @@ import { __, sprintf } from '@wordpress/i18n';
 								showCurrencySelectionModal();
 							}
 
+							let entityId;
+							switch ( optionType ) {
+								case 'individual':
+									entityId = optionItem.attr(
+										'data-paywall-id'
+									);
+									break;
+								case 'timepass':
+									entityId = optionItem.attr( 'data-tlp-id' );
+									break;
+								case 'subscription':
+									entityId = optionItem.attr( 'data-sub-id' );
+									break;
+							}
+
 							// If a saved item is being updated, display warning.
-							if ( 'individual' !== optionType ) {
+							if ( 'individual' !== optionType && entityId ) {
 								showPurchaseOptionUpdateWarning(
 									optionType
 								).then( ( confirmation ) => {
@@ -1291,6 +1423,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						'exclude_category' === $( this ).val() ||
 						'category' === $( this ).val()
 					) {
+						$o.searchPostWrapper.hide();
 						$o.searchPaywallWrapper.show();
 						if (
 							$o.searchPaywallContent.length &&
@@ -1299,14 +1432,29 @@ import { __, sprintf } from '@wordpress/i18n';
 							$o.savePaywall.attr( 'disabled', true );
 							$o.activatePaywall.attr( 'disabled', true );
 						}
-						$o.postPreviewWrapper.attr(
-							'data-access-id',
+						const jsonCategoriesID = JSON.stringify(
 							$o.searchPaywallContent.val()
 						);
+
+						$o.postPreviewWrapper.attr(
+							'data-access-id',
+							jsonCategoriesID
+						);
+					} else if ( 'specific_post' === $( this ).val() ) {
+						$o.searchPaywallWrapper.hide();
+						$o.searchPostWrapper.show();
+						if (
+							$o.searchPost.length &&
+							null === $o.searchPost.val()
+						) {
+							$o.savePaywall.attr( 'disabled', true );
+							$o.activatePaywall.attr( 'disabled', true );
+						}
 					} else {
 						$o.savePaywall.removeAttr( 'disabled' );
 						$o.activatePaywall.removeAttr( 'disabled' );
 						$o.searchPaywallWrapper.hide();
+						$o.searchPostWrapper.hide();
 						$o.postPreviewWrapper.attr(
 							'data-access-id',
 							$o.postPreviewWrapper.attr( 'data-preview-id' )
@@ -1665,10 +1813,10 @@ import { __, sprintf } from '@wordpress/i18n';
 						} else if ( 'timepass' === currentType ) {
 							entityId = optionItem.attr( 'data-tlp-id' );
 						} else if ( 'individual' === currentType ) {
-							entityId = optionItem.attr( 'data-paywall-id-id' );
+							entityId = optionItem.attr( 'data-paywall-id' );
 						}
 
-						if ( 'individual' !== currentType ) {
+						if ( 'individual' !== currentType && entityId ) {
 							showPurchaseOptionUpdateWarning( currentType ).then(
 								( confirmation ) => {
 									// If merchant selects to continue, remove current option from DB.
@@ -1937,6 +2085,12 @@ import { __, sprintf } from '@wordpress/i18n';
 						subscriptions.push( subscriptionObj );
 					} );
 
+					const specificPosts = $o.searchPost.val();
+					let jsonSpecificPosts = '';
+					if ( specificPosts ) {
+						jsonSpecificPosts = JSON.stringify( specificPosts );
+					}
+
 					/**
 					 * Paywall data.
 					 */
@@ -1952,6 +2106,7 @@ import { __, sprintf } from '@wordpress/i18n';
 							.trim(),
 						name: $o.paywallName.text().trim(),
 						applies: $( $o.paywallAppliesTo ).val(),
+						specific_posts: jsonSpecificPosts,
 						preview_id: $o.postPreviewWrapper.attr(
 							'data-preview-id'
 						),
@@ -1999,18 +2154,79 @@ import { __, sprintf } from '@wordpress/i18n';
 					) {
 						showAccountActivationModal();
 					} else {
-						/**
-						 * Save paywall data to get new paywall id and wait for some time to publish the paywall.
-						 */
-						$o.isPublish = true;
-						$o.savePaywall.trigger( 'click' );
-						$o.savePaywall.addClass( 'hide' );
-						showLoader();
-						setTimeout( function() {
-							publishPaywall();
-							hideLoader();
-							$o.isPublish = false;
-						}, 1500 );
+						let entityId;
+						const purchaseOptionItems = $( $o.purchaseOptionItem );
+						let isNewItem = false;
+
+						$.each( purchaseOptionItems, function(
+							key,
+							purchaseOptionItem
+						) {
+							const optionItem = $( purchaseOptionItem );
+							const purchaseType = optionItem.attr(
+								'data-purchase-type'
+							);
+
+							switch ( purchaseType ) {
+								case 'individual':
+									entityId = optionItem.attr(
+										'data-paywall-id'
+									);
+									break;
+								case 'timepass':
+									entityId = optionItem.attr( 'data-tlp-id' );
+									break;
+								case 'subscription':
+									entityId = optionItem.attr( 'data-sub-id' );
+									break;
+							}
+
+							// If its new item set flag.
+							if (
+								! isNewItem &&
+								! entityId &&
+								'individual' !== purchaseType
+							) {
+								isNewItem = true;
+							}
+						} );
+
+						if ( isNewItem ) {
+							showPurchaseOptionUpdateWarning(
+								'newPurchaseOption'
+							).then( ( confirmation ) => {
+								// If merchant selects to continue, remove current option from DB.
+								if ( true === confirmation ) {
+									/**
+									 * Save paywall data to get new paywall id and wait for some time to publish the paywall.
+									 */
+									$o.isPublish = true;
+									$o.savePaywall.trigger( 'click' );
+									$o.savePaywall.addClass( 'hide' );
+									showLoader();
+									setTimeout( function() {
+										publishPaywall();
+										hideLoader();
+										$o.isPublish = false;
+									}, 1500 );
+								} else {
+									return false;
+								}
+							} );
+						} else {
+							/**
+							 * Save paywall data to get new paywall id and wait for some time to publish the paywall.
+							 */
+							$o.isPublish = true;
+							$o.savePaywall.trigger( 'click' );
+							$o.savePaywall.addClass( 'hide' );
+							showLoader();
+							setTimeout( function() {
+								publishPaywall();
+								hideLoader();
+								$o.isPublish = false;
+							}, 1500 );
+						}
 					}
 				} );
 
@@ -2193,8 +2409,16 @@ import { __, sprintf } from '@wordpress/i18n';
 				$o.body.on( 'click', $o.viewPost, function() {
 					const targetPostId = $( this ).attr( 'data-target-id' );
 					const selectedCategoryId = $o.searchPaywallContent.val();
+					const appliesTo = $( $o.paywallAppliesTo ).val();
+					const specificPostIDs = $o.searchPost.val();
+
 					if ( targetPostId ) {
-						viewPost( targetPostId, selectedCategoryId );
+						viewPost(
+							targetPostId,
+							selectedCategoryId,
+							appliesTo,
+							specificPostIDs
+						);
 					}
 				} );
 
@@ -2215,13 +2439,22 @@ import { __, sprintf } from '@wordpress/i18n';
 			 *
 			 * @param {number} previewPostId Post Preview ID.
 			 * @param {number} selectedCategoryId Selected Category ID.
+			 * @param {string} appliesTo Applies to Type.
+			 * @param {Array} specificPostIDs Array of Specific Post ID's.
 			 */
-			const viewPost = function( previewPostId, selectedCategoryId = 0 ) {
+			const viewPost = function(
+				previewPostId,
+				selectedCategoryId = 0,
+				appliesTo = '',
+				specificPostIDs = []
+			) {
 				// Create form data.
 				const formData = {
 					action: 'rg_post_permalink',
 					preview_post_id: previewPostId,
 					category_id: selectedCategoryId,
+					applies_to: appliesTo,
+					specific_posts_ids: specificPostIDs,
 					security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
 				};
 
@@ -2343,6 +2576,11 @@ import { __, sprintf } from '@wordpress/i18n';
 								$( $o.postTitle )
 									.text()
 									.trim()
+							);
+						} else if ( 'specific_post' === appliedTo ) {
+							publishMessage = __(
+								'Has been published on <b>Specific Posts & Pages</b>.',
+								'revenue-generator'
 							);
 						} else {
 							publishMessage = __(
@@ -2875,7 +3113,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				tour.addStep( {
 					id: 'rg-purchase-option-paywall-publish',
 					text: __(
-						'When you’re ready to activate your paywall, connect your LaterPay account.',
+						'When you’re ready to activate your paywall, connect your Laterpay account.',
 						'revenue-generator'
 					),
 					attachTo: {
@@ -3379,6 +3617,15 @@ import { __, sprintf } from '@wordpress/i18n';
 								.text(
 									__(
 										'The changes you have made will impact this subscription offer on all paywalls across your entire site.',
+										'revenue-generator'
+									)
+								);
+						} else if ( 'newPurchaseOption' === optionType ) {
+							updateWarning
+								.empty()
+								.text(
+									__(
+										'It looks like you have added a new Global Time Pass or Subscription to this Paywall. Global Time Passes and Subscriptions will show up on all paywalls across your entire site.',
 										'revenue-generator'
 									)
 								);

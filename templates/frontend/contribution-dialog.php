@@ -33,7 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	</div>
 <?php } else { ?>
-	<div class="rev-gen-contribution-main is-style-wide"">
+	<div class="rev-gen-contribution-main is-style-wide">
 			<div class="rev-gen-contribution-main--box">
 				<div class="rev-gen-contribution-main--box-header rev-gen-contribution-tooltip-right"><?php echo esc_html( $dialog_header ); ?></div>
 				<div class="rev-gen-contribution-main--box-description rev-gen-contribution-tooltip-right"><?php echo esc_html( $dialog_description ); ?></div>
@@ -86,6 +86,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php View::render_footer_backend(); ?>
 				</div>
 			</div>
-	</div>	
+	</div>
 	<?php
 }

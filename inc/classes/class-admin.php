@@ -51,6 +51,7 @@ class Admin {
 		add_action( 'wp_ajax_rg_search_preview_content', [ $this, 'search_preview_content' ] );
 		add_action( 'wp_ajax_rg_select_preview_content', [ $this, 'select_preview_content' ] );
 		add_action( 'wp_ajax_rg_search_term', [ $this, 'select_search_term' ] );
+		add_action( 'wp_ajax_rg_search_post', [ $this, 'select_search_post' ] );
 		add_action( 'wp_ajax_rg_clear_category_meta', [ $this, 'clear_category_meta' ] );
 		add_action( 'wp_ajax_rg_complete_tour', [ $this, 'complete_tour' ] );
 		add_action( 'wp_ajax_rg_verify_account_credentials', [ $this, 'verify_account_credentials' ] );
@@ -61,7 +62,7 @@ class Admin {
 		add_action( 'wp_ajax_rg_set_paywall_order', [ $this, 'set_paywall_sort_order' ] );
 		add_action( 'wp_ajax_rg_search_paywall', [ $this, 'search_paywall' ] );
 		add_action( 'wp_ajax_rg_set_paywall_name', [ $this, 'rg_set_paywall_name' ] );
-		add_action( 'wp_ajax_rg_contribution_shortcode_generator', [ $this, 'rg_contribution_shortcode_generator' ] );
+		add_action( 'wp_ajax_rg_contribution_save', [ $this, 'rg_contribution_save' ] );
 	}
 
 	/**
@@ -282,27 +283,39 @@ class Admin {
 	}
 
 	/**
-	 * Generates Contribution short code.
+	 * Saves Contribution offer to the database and returns data like shortcode and edit link in JSON which are then
+	 * used in JS.
+	 *
+	 * @since 1.1.0.
+	 *
+	 * @return void
 	 */
-	public function rg_contribution_shortcode_generator() {
-
-		// Verify authenticity.
+	public function rg_contribution_save() {
 		check_ajax_referer( 'rg_contribution_nonce', 'security' );
 
-		$contribution_instace = Contribution::get_instance();
+		$contribution_instance = Contribution::get_instance();
 
-		$campaing_name      = filter_input( INPUT_POST, 'title', FILTER_SANITIZE_STRING );
-		$thank_you_page     = filter_input( INPUT_POST, 'thank_you', FILTER_SANITIZE_URL );
-		$dialog_header      = filter_input( INPUT_POST, 'heading', FILTER_SANITIZE_STRING );
-		$dialog_description = filter_input( INPUT_POST, 'description', FILTER_SANITIZE_STRING );
-		$custom_amount      = filter_input( INPUT_POST, 'custom_amount', FILTER_SANITIZE_NUMBER_FLOAT );
+		$contribution_data = [
+			'ID'                 => ( isset( $_REQUEST['ID'] ) ) ? intval( $_REQUEST['ID'] ) : 0,
+			'name'               => ( isset( $_REQUEST['title'] ) ) ? sanitize_text_field( $_REQUEST['title'] ) : '',
+			'thank_you'          => ( isset( $_REQUEST['thank_you'] ) ) ? esc_url_raw( $_REQUEST['thank_you'] ) : '',
+			'dialog_header'      => ( isset( $_REQUEST['dialog_header'] ) ) ? sanitize_text_field( $_REQUEST['dialog_header'] ) : '',
+			'dialog_description' => ( isset( $_REQUEST['dialog_description'] ) ) ? sanitize_text_field( $_REQUEST['dialog_description'] ) : '',
+			'custom_amount'      => ( isset( $_REQUEST['custom-amount'] ) ) ? floatval( $_REQUEST['custom-amount'] ) : '',
+			'code'               => ( isset( $_REQUEST['code'] ) ) ? sanitize_text_field( $_REQUEST['code'] ) : '',
+		];
 
-		// Get all amounts.
-		$amounts = filter_input( INPUT_POST, 'amounts' );
+		$is_edit = false;
 
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Each value is sanitized below.
+		if ( ! empty( $contribution_data['ID'] ) ) {
+			$is_edit = true;
+		}
+
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$amounts = isset( $_REQUEST['amounts'] ) ? $_REQUEST['amounts'] : [];
+
 		$all_amounts     = ( ! empty( $amounts ) ) ? json_decode( wp_unslash( $amounts ), true ) : array();
-		$filtered_prices = array();
+		$filtered_prices = [];
 
 		// Sanitize the all amounts input.
 		$filters = [
@@ -334,48 +347,31 @@ class Admin {
 			}
 		}
 
-		// Generate the shortcode.
-		$shortcode_data = [
-			'name'            => sanitize_text_field( $campaing_name ),
-			'thank_you'       => esc_url_raw( $thank_you_page ),
-			'type'            => 'multiple',
-			'custom_amount'   => isset( $custom_amount ) ? (float) $custom_amount * 100 : '0',
-			'all_amounts'     => array_column( $filtered_prices, 'price' ),
-			'all_revenues'    => array_column( $filtered_prices, 'revenue' ),
-			'selected_amount' => $selected_amount,
-		];
+		$contribution_data['all_amounts']  = array_column( $filtered_prices, 'price' );
+		$contribution_data['all_revenues'] = array_column( $filtered_prices, 'revenue' );
 
-		if ( ! empty( $dialog_header ) ) {
-			$shortcode_data['dialog_header'] = wp_strip_all_tags( $dialog_header );
-		}
+		$contribution_id   = $contribution_instance->save( $contribution_data );
+		$message           = __( 'Oops! Something went wrong. Please try again.', 'revenue-generator' );
+		$contribution_code = '';
 
-		if ( ! empty( $dialog_description ) ) {
-			$shortcode_data['dialog_description'] = wp_strip_all_tags( $dialog_description );
-		}
+		if ( ! empty( $contribution_id ) && ! is_wp_error( $contribution_id ) ) {
+			$message = esc_html__( 'Successfully generated code, please paste at desired location.', 'revenue-generator' );
 
-		$result = Contribution::shortcode_generator( 'contribution', $shortcode_data );
+			if ( $is_edit ) {
+				$message = esc_html__( 'Code successfully updated and copied to your clipboard.', 'revenue-generator' );
+			}
 
-		$generated_shortcode    = isset( $result['code'] ) ? $result['code'] : '';
-		$shortcode_data['code'] = $generated_shortcode;
-
-		// Insert contribution to post type.
-		$contribution_id = $contribution_instace->update_contribution( $shortcode_data );
-
-		$message              = esc_html__( 'Something went wrong!', 'revenue-generator' );
-		$generate_button_text = esc_html__( 'Generate and copy code', 'revenue-generator' );
-
-		if ( ! empty( $contribution_id ) && ! is_wp_error( $contribution_id ) && $result['success'] ) {
-
-			$message              = esc_html__( 'Successfully generated code, please paste at desired location.', 'revenue-generator' );
 			$generate_button_text = esc_html__( 'Code copied in your clipboard!', 'revenue-generator' );
+			$contribution_code    = $contribution_instance->get_shortcode( $contribution_id );
 		}
 
 		wp_send_json(
 			[
-				'success'     => $result['success'],
-				'msg'         => ( true === $result['success'] ) ? $message : $result['message'],
-				'code'        => $generated_shortcode,
+				'success'     => true,
+				'msg'         => $message,
+				'code'        => $contribution_code,
 				'button_text' => $generate_button_text,
+				'edit_link'   => $contribution_instance->get_edit_link( $contribution_id ),
 			]
 		);
 	}
@@ -389,7 +385,7 @@ class Admin {
 		$admin_menus           = self::get_admin_menus();
 		$contribution_instance = Contribution::get_instance();
 		$config_data           = Config::get_global_options();
-		
+
 		// Ge Currencey Symbol.
 		$symbol = '';
 		if ( ! empty( $config_data['merchant_currency'] ) ) {
@@ -467,9 +463,30 @@ class Admin {
 			$is_merchant_verified = true;
 		}
 
+		$contributions_dashboard_url = add_query_arg(
+			[
+				'page' => $admin_menus['contributions']['url'],
+			],
+			admin_url( 'admin.php' )
+		);
+
+		$contribution_instance = Contribution::get_instance();
+		$id                    = ( isset( $_GET['id'] ) ) ? intval( $_GET['id'] ) : 0;
+		$contribution_data     = $contribution_instance->get( $id );
+
+		if ( is_wp_error( $contribution_data ) ) {
+			?>
+
+			<?php esc_html_e( 'Contribution does not exist.', 'revenue-generator' ); ?> <a href="<?php echo esc_url( $contributions_dashboard_url ); ?>"><?php esc_html_e( 'Go back to dashboard', 'revenue-generator' ); ?></a>
+
+			<?php
+			return;
+		}
+
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
 		$dashboard_page_data = [
-			'contributions_dashboard_url' => add_query_arg( [ 'page' => $admin_menus['contributions']['url'] ], admin_url( 'admin.php' ) ),
+			'contribution_data'           => $contribution_data,
+			'contributions_dashboard_url' => $contributions_dashboard_url,
 			'is_merchant_verified'        => $is_merchant_verified,
 			'currency_symbol'             => $symbol,
 			'action_icons'                => [
@@ -628,8 +645,9 @@ class Admin {
 
 		$post_types = Post_Types::get_instance();
 
-		$current_paywall  = filter_input( INPUT_GET, 'current_paywall', FILTER_SANITIZE_NUMBER_INT );
-		$rg_category_data = '';
+		$current_paywall    = filter_input( INPUT_GET, 'current_paywall', FILTER_SANITIZE_NUMBER_INT );
+		$rg_categories_data = array();
+		$rg_specific_posts  = array();
 
 		// Load paywall related content if found else load requested content for new paywall.
 		if ( ! empty( $current_paywall ) ) {
@@ -644,9 +662,24 @@ class Admin {
 
 			if ( ! empty( $paywall_data ) ) {
 				if ( 'category' === $paywall_data['access_to'] || 'exclude_category' === $paywall_data['access_to'] ) {
-					$rg_category_id = $paywall_data['access_entity'];
-					if ( ! empty( $rg_category_id ) ) {
-						$rg_category_data = get_term( $rg_category_id, 'category' );
+
+					$rg_categories_id = $paywall_data['access_entity'];
+					if ( ! empty( $rg_categories_id ) && is_array( $rg_categories_id ) ) {
+						foreach ( $rg_categories_id as $rg_category_id ) {
+							$rg_categories_data[] = get_term( $rg_category_id, 'category' );
+						}
+					} else {
+						$rg_categories_data[] = get_term( $rg_categories_id, 'category' );
+					}
+				}
+
+				// Get Specific posts if user has selected type specific posts.
+				if ( 'specific_post' === $paywall_data['access_to'] ) {
+					$rg_specific_posts_ids = $paywall_data['specific_posts'];
+					if ( ! empty( $rg_specific_posts_ids ) ) {
+						foreach ( $rg_specific_posts_ids as $rg_specific_post_id ) {
+							$rg_specific_posts[ $rg_specific_post_id ] = get_the_title( $rg_specific_post_id );
+						}
 					}
 				}
 			}
@@ -711,7 +744,8 @@ class Admin {
 			'default_option_data'   => $default_option_data,
 			'dynamic_pricing_data'  => $post_dynamic_pricing_data,
 			'merchant_symbol'       => $symbol,
-			'rg_category_data'      => $rg_category_data,
+			'rg_categories_data'    => $rg_categories_data,
+			'rg_specific_posts'     => $rg_specific_posts,
 			'is_merchant_verified'  => $is_merchant_verified,
 			'new_paywall_url'       => add_query_arg( [ 'page' => $admin_menus['paywall']['url'] ], admin_url( 'admin.php' ) ),
 			'dashboard_url'         => add_query_arg( [ 'page' => $admin_menus['dashboard']['url'] ], admin_url( 'admin.php' ) ),
@@ -885,14 +919,14 @@ class Admin {
 			];
 
 			$menus['contributions'] = [
-				'url'    => 'revenue-generator-contributions',
+				'url'    => Contribution::ADMIN_DASHBOARD_SLUG,
 				'title'  => __( 'Contributions', 'revenue-generator' ),
 				'cap'    => 'manage_options',
 				'method' => 'contributions',
 			];
 
 			$menus['contribution'] = [
-				'url'    => 'revenue-generator-contribution',
+				'url'    => Contribution::ADMIN_EDIT_SLUG,
 				'title'  => __( 'Contribution', 'revenue-generator' ),
 				'cap'    => 'manage_options',
 				'method' => 'contribution',
@@ -924,20 +958,27 @@ class Admin {
 		check_ajax_referer( 'rg_paywall_nonce', 'security' );
 
 		// Sanitize the data.
-		$rg_post_id      = sanitize_text_field( filter_input( INPUT_POST, 'post_id', FILTER_SANITIZE_NUMBER_INT ) );
+		$rg_post_id      = sanitize_text_field( filter_input( INPUT_POST, 'post_id', FILTER_DEFAULT ) );
 		$paywall_data    = filter_input( INPUT_POST, 'paywall', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 		$individual_data = filter_input( INPUT_POST, 'individual', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 		$time_passes     = filter_input( INPUT_POST, 'time_passes', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 		$subscriptions   = filter_input( INPUT_POST, 'subscriptions', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 
-		$paywall_instance         = Paywall::get_instance();
-		$paywall['name']          = sanitize_text_field( wp_unslash( $paywall_data['name'] ) );
-		$paywall['description']   = sanitize_text_field( wp_unslash( $paywall_data['desc'] ) );
-		$paywall['title']         = sanitize_text_field( wp_unslash( $paywall_data['title'] ) );
-		$paywall['id']            = sanitize_text_field( $paywall_data['id'] );
-		$paywall['access_to']     = sanitize_text_field( wp_unslash( $paywall_data['applies'] ) );
-		$paywall['preview_id']    = sanitize_text_field( wp_unslash( $paywall_data['preview_id'] ) );
-		$paywall['access_entity'] = $rg_post_id;
+		$paywall_instance       = Paywall::get_instance();
+		$paywall['name']        = sanitize_text_field( wp_unslash( $paywall_data['name'] ) );
+		$paywall['description'] = sanitize_text_field( wp_unslash( $paywall_data['desc'] ) );
+		$paywall['title']       = sanitize_text_field( wp_unslash( $paywall_data['title'] ) );
+		$paywall['id']          = sanitize_text_field( $paywall_data['id'] );
+		$paywall['access_to']   = sanitize_text_field( wp_unslash( $paywall_data['applies'] ) );
+		$paywall['preview_id']  = sanitize_text_field( wp_unslash( $paywall_data['preview_id'] ) );
+
+		if ( ! empty( $paywall['access_to'] ) && ( 'category' === $paywall['access_to'] || 'exclude_category' === $paywall['access_to'] ) ) {
+			$rg_post_id = json_decode( $rg_post_id );
+		}
+
+		$paywall['access_entity']  = $rg_post_id;
+		$specific_posts            = sanitize_text_field( wp_unslash( $paywall_data['specific_posts'] ) );
+		$paywall['specific_posts'] = json_decode( $specific_posts );
 
 		$order_items = [];
 
@@ -954,6 +995,13 @@ class Admin {
 
 			// Add Individual option to paywall.
 			$paywall_instance->update_paywall_individual_option( $paywall_id, $individual );
+		}
+
+		// Save Paywall ID in selected specific posts meta.
+		if ( ! empty( $paywall['specific_posts'] ) ) {
+			foreach ( $paywall['specific_posts'] as $post_id ) {
+				update_post_meta( $post_id, '_rg_specific_paywall', $paywall_id );
+			}
 		}
 
 		$time_pass_instance = Time_Pass::get_instance();
@@ -1251,6 +1299,61 @@ class Admin {
 	}
 
 	/**
+	 * Search Post/page to be added in paywall
+	 */
+	public function select_search_post() {
+		// Verify authenticity.
+		check_ajax_referer( 'rg_paywall_nonce', 'security' );
+
+		// Get all data and sanitize it.
+		$post_term = sanitize_text_field( filter_input( INPUT_POST, 'term', FILTER_SANITIZE_STRING ) );
+
+		$args = [
+			'post_type'      => [
+				'post',
+				'page',
+			],
+			'posts_per_page' => 5,
+			'orderby'        => 'relevance',
+		];
+
+		if ( ! empty( $post_term ) ) {
+			$args['s'] = $post_term;
+		}
+
+		add_filter( 'posts_where', [ $this, 'rg_post_title_filter' ], 10, 2 );
+		$posts = new \WP_Query( $args );
+		remove_filter( 'posts_where', [ $this, 'rg_post_title_filter' ], 10, 2 );
+
+		wp_send_json(
+			[
+				'success' => true,
+				'posts'   => $posts->posts,
+			]
+		);
+	}
+
+	/**
+	 * Filter to modify the search of post and search by title.
+	 *
+	 * @param string    $sql   SQL string.
+	 * @param \WP_Query $query Query object.
+	 *
+	 * @return string
+	 */
+	public function rg_post_title_filter( $sql, $query ) {
+		global $wpdb;
+
+		// If our custom query var is set modify the query.
+		if ( ! empty( $query->query['s'] ) ) {
+			$term = $wpdb->esc_like( $query->query['s'] );
+			$sql .= ' AND ' . $wpdb->posts . '.post_title LIKE \'%' . $term . '%\'';
+		}
+
+		return $sql;
+	}
+
+	/**
 	 * Clear category meta data on new selection.
 	 */
 	public function clear_category_meta() {
@@ -1258,10 +1361,17 @@ class Admin {
 		check_ajax_referer( 'rg_paywall_nonce', 'security' );
 
 		// Get all data and sanitize it.
-		$rg_category_id    = sanitize_text_field( filter_input( INPUT_POST, 'rg_category_id', FILTER_SANITIZE_NUMBER_INT ) );
+		$rg_category_ids   = sanitize_text_field( filter_input( INPUT_POST, 'rg_category_id', FILTER_DEFAULT ) );
 		$category_instance = Categories::get_instance();
 
-		if ( $category_instance->clear_category_paywall_meta( $rg_category_id ) ) {
+		$rg_cat_ids = json_decode( $rg_category_ids );
+		$error      = array();
+
+		foreach ( $rg_cat_ids as $rg_cat_id ) {
+			$error[] = $category_instance->clear_category_paywall_meta( $rg_cat_id );
+		}
+
+		if ( ! empty( $error ) && ! in_array( false, $error, true ) ) {
 			wp_send_json_success();
 		} else {
 			wp_send_json_error();
@@ -1368,25 +1478,76 @@ class Admin {
 		check_ajax_referer( 'rg_paywall_nonce', 'security' );
 
 		// Get all data and sanitize it.
-		$preview_post_id = sanitize_text_field( filter_input( INPUT_POST, 'preview_post_id', FILTER_SANITIZE_NUMBER_INT ) );
-		$category_id     = sanitize_text_field( filter_input( INPUT_POST, 'category_id', FILTER_SANITIZE_NUMBER_INT ) );
+		$preview_post_id    = sanitize_text_field( filter_input( INPUT_POST, 'preview_post_id', FILTER_SANITIZE_NUMBER_INT ) );
+		$categories_id      = filter_input( INPUT_POST, 'category_id', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+		$applies_to         = sanitize_text_field( filter_input( INPUT_POST, 'applies_to', FILTER_SANITIZE_STRING ) );
+		$specific_posts_ids = filter_input( INPUT_POST, 'specific_posts_ids', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 
 		// Check if there is category id and current post has that category.
-		if ( ! empty( $category_id ) && ! has_category( $category_id, $preview_post_id ) ) {
+		if ( ! empty( $categories_id ) && is_array( $categories_id ) ) {
 
-			// If Preview post is post assigned to category, fetch post that has category.
-			$category_post = get_posts(
+			// flag to check if post has category.
+			$has_category = false;
+
+			foreach ( $categories_id as $category_id ) {
+				if ( has_category( $category_id, $preview_post_id ) ) {
+					$has_category = true;
+				}
+			}
+
+			// If Preview post has not category assigned.
+			if ( ! $has_category ) {
+
+				$category_post_args = array(
+					'post_type'        => 'post',
+					'numberposts'      => 1,
+					'suppress_filters' => false,
+				);
+
+				// If it applies to category include them else exclude them.
+				if ( 'category' === $applies_to ) {
+					$category_post_args['category__in'] = $categories_id;
+				} elseif ( 'exclude_category' === $applies_to ) {
+					$category_post_args['category__not_in'] = $categories_id;
+				}
+
+				// If Preview post is post assigned to category, fetch post that has category.
+				$category_post = get_posts( $category_post_args );
+
+				// If category post exists assign for preview.
+				if ( ! empty( $category_post ) ) {
+					// Set preview post id.
+					$preview_post_id = $category_post[0]->ID;
+				}
+			}
+		}
+
+		// Check if preview id exists in selected specific posts id.
+		if ( ! empty( $specific_posts_ids ) && ! in_array( $preview_post_id, $specific_posts_ids, true ) ) {
+			// If not in list use first post id from list for preview post.
+			$preview_post_id = $specific_posts_ids[0];
+		}
+
+		// Check Preview post has post type post and it applies to only posts.
+		if (
+			! empty( $applies_to )
+			&& 'posts' === $applies_to
+			&& 'post' !== get_post_type( $preview_post_id )
+		) {
+			// if preview post is not post type "post" then get latest post.
+			$latest_post = get_posts(
 				array(
 					'numberposts'      => 1,
-					'category'         => $category_id,
 					'suppress_filters' => false,
+					'post_type'        => 'post',
+					'orderby'          => 'ID',
+					'order'            => 'DESC',
 				)
 			);
 
-			// If category post exists assign for preview.
-			if ( ! empty( $category_post ) ) {
-				// Set preview post id.
-				$preview_post_id = $category_post[0]->ID;
+			// If we found a post then assing it to preview.
+			if ( ! empty( $latest_post ) ) {
+				$preview_post_id = $latest_post[0]->ID;
 			}
 		}
 

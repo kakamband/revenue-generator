@@ -1,6 +1,6 @@
 <p align="center"><img src="../wporgassets/banner-772x250.png" /></p>
 
-<h1 align="center"> Revenue Generator by LaterPay </h1>
+<h1 align="center"> Revenue Generator by Laterpay </h1>
 
 ### Table of Contents
 - [Development Notes](#development-notes)

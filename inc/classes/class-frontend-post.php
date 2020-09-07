@@ -635,11 +635,19 @@ class Frontend_Post {
 			$paywall_id   = $paywall_instance->get_connected_paywall_by_post( $post_id );
 			$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
 
+			// Check for Specific Post Paywall.
+			if ( ! $this->is_paywall_active( $paywall_data ) ) {
+				$paywall_id   = $paywall_instance->get_paywall_for_specific_post( $post_id );
+				$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
+			}
+
 			// If post doesn't have an individual paywall, check for paywall on categories.
 			if ( ! $this->is_paywall_active( $paywall_data ) ) {
 				// Check if paywall is found on post categories.
 				$post_terms = wp_get_post_categories( $post_id );
-				if ( ! empty( $post_terms ) ) {
+
+				// Check the post type and if post has categories.
+				if ( ! empty( $post_terms ) && 'post' === get_post_type( $post_id ) ) {
 					$paywall_id   = $paywall_instance->get_connected_paywall_by_categories( $post_terms );
 					$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
 
@@ -649,6 +657,12 @@ class Frontend_Post {
 						$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
 					}
 				}
+			}
+
+			// Get paywall applied for only post_type == post.
+			if ( ! $this->is_paywall_active( $paywall_data ) && 'post' === get_post_type( $post_id ) ) {
+				$paywall_id   = $paywall_instance->get_paywall_for_only_posts();
+				$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
 			}
 
 			// If no paywall found in categories and individual post, check for paywall applied on all posts as last resort.

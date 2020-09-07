@@ -150,20 +150,29 @@ class Shortcodes {
 	 */
 	public function render_contribution_dialog( $atts ) {
 
+		$default_atts = array(
+			'id'                 => null,
+			'type'               => 'multiple',
+			'name'               => null,
+			'dialog_header'      => __( 'Support the author', 'revenue-generator' ),
+			'dialog_description' => __( 'How much would you like to contribute?', 'revenue-generator' ),
+			'thank_you'          => null,
+			'single_amount'      => null,
+			'single_revenue'     => null,
+			'custom_amount'      => null,
+			'all_amounts'        => null,
+			'all_revenues'       => null,
+			'selected_amount'    => null,
+		);
+
+		if ( isset( $atts['id'] ) && ! empty( $atts['id'] ) ) {
+			$contribution_instance = Post_Types\Contribution::get_instance();
+			$contribution_atts     = $contribution_instance->get( (int) $atts['id'] );
+			$default_atts          = $contribution_atts;
+		}
+
 		$config_data = shortcode_atts(
-			array(
-				'type'               => 'multiple',
-				'name'               => null,
-				'dialog_header'      => __( 'Support the author', 'revenue-generator' ),
-				'dialog_description' => __( 'How much would you like to contribute?', 'revenue-generator' ),
-				'thank_you'          => null,
-				'single_amount'      => null,
-				'single_revenue'     => null,
-				'custom_amount'      => null,
-				'all_amounts'        => null,
-				'all_revenues'       => null,
-				'selected_amount'    => null,
-			),
+			$default_atts,
 			$atts
 		);
 
@@ -174,7 +183,7 @@ class Shortcodes {
 		$validation_result = self::is_contribution_config_valid( $config_data );
 
 		// Display error if something went wrong.
-		if ( $show_error && false === $validation_result['success'] ) {
+		if ( $show_error && ! $validation_result ) {
 			// Display Shortcode error.
 			return sprintf( '<div class="rg-shortcode-error">%s</div>', $validation_result['message'] );
 		}
@@ -232,8 +241,14 @@ class Shortcodes {
 		$payment_config    = [];
 		$contribution_urls = '';
 		$currency_config   = $this->merchant_region;
-		$campaign_name     = $config_data['name'];
-		$campaign_id       = str_replace( ' ', '-', strtolower( $campaign_name ) ) . '-' . (string) time();
+
+		// backward compatibility.
+		$campaign_name = $config_data['name'];
+		if ( empty( $campaign_name ) ) {
+			$campaign_name = $config_data['post_title'];
+		}
+
+		$campaign_id = str_replace( ' ', '-', strtolower( $campaign_name ) ) . '-' . (string) time();
 
 		$client = new Revenue_Generator_Client(
 			$this->merchant_id,
@@ -259,8 +274,19 @@ class Shortcodes {
 			);
 		} else {
 			// Get all amounts and revenues from shortcode.
-			$multiple_amounts  = explode( ',', $config_data['all_amounts'] );
-			$multiple_revenues = explode( ',', $config_data['all_revenues'] );
+			$multiple_amounts = array();
+
+			if ( is_array( $config_data['all_amounts'] ) ) {
+				$multiple_amounts = $config_data['all_amounts'];
+			} else {
+				$multiple_amounts  = explode( ',', $config_data['all_amounts'] );
+			}
+
+			if ( is_array( $config_data['all_revenues'] ) ) {
+				$multiple_revenues = $config_data['all_revenues'];
+			} else {
+				$multiple_revenues = explode( ',', $config_data['all_revenues'] );
+			}
 
 			// Loop through each amount  and configure amount attributes.
 			foreach ( $multiple_amounts as $key => $value ) {

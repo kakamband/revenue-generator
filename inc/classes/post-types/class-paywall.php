@@ -56,10 +56,11 @@ class Paywall extends Base {
 					'post_status'  => 'publish',
 					'post_type'    => static::SLUG,
 					'meta_input'   => [
-						'_rg_title'         => $paywall_data['title'],
-						'_rg_access_to'     => $paywall_data['access_to'],
-						'_rg_access_entity' => $paywall_data['access_entity'],
-						'_rg_preview_id'    => $paywall_data['preview_id'],
+						'_rg_title'          => $paywall_data['title'],
+						'_rg_access_to'      => $paywall_data['access_to'],
+						'_rg_access_entity'  => $paywall_data['access_entity'],
+						'_rg_preview_id'     => $paywall_data['preview_id'],
+						'_rg_specific_posts' => $paywall_data['specific_posts'],
 					],
 				]
 			);
@@ -77,6 +78,7 @@ class Paywall extends Base {
 			update_post_meta( $paywall_id, '_rg_access_to', $paywall_data['access_to'] );
 			update_post_meta( $paywall_id, '_rg_access_entity', $paywall_data['access_entity'] );
 			update_post_meta( $paywall_id, '_rg_preview_id', $paywall_data['preview_id'] );
+			update_post_meta( $paywall_id, '_rg_specific_posts', $paywall_data['specific_posts'] );
 		}
 
 		// If paywall is being added based on categories make sure to create meta to identify it.
@@ -162,6 +164,50 @@ class Paywall extends Base {
 	}
 
 	/**
+	 * Get paywall based on specific post it has been applied.
+	 *
+	 * @param int $post_id Post ID.
+	 *
+	 * @return int | false if no paywall found.
+	 */
+	public function get_paywall_for_specific_post( $post_id ) {
+
+		$query_args = [
+			'post_type'      => static::SLUG,
+			'post_status'    => [ 'publish' ],
+			'posts_per_page' => 1,
+			'fields'         => 'ids',
+			'orderby'        => 'modified',
+			'order'          => 'DESC',
+		];
+
+		$meta_query = [
+			'relation' => 'AND',
+			[
+				'key'     => '_rg_specific_posts',
+				'compare' => 'LIKE',
+				'value'   => '"' . $post_id . '"',
+			],
+			[
+				'key'     => '_rg_access_to',
+				'value'   => 'specific_post',
+				'compare' => '=',
+			],
+		];
+
+		$query_args['meta_query'] = $meta_query;
+
+		$query = new \WP_Query( $query_args );
+
+		if ( ! empty( $query->posts ) ) {
+			$paywall_id = $query->posts;
+			return $paywall_id[0];
+		}
+
+		return false;
+	}
+
+	/**
 	 * Get individual pricing information.
 	 *
 	 * @param int $paywall_id Paywall ID.
@@ -202,15 +248,16 @@ class Paywall extends Base {
 		$paywall      = get_post( $paywall_id );
 		if ( ! empty( $paywall ) ) {
 			if ( static::SLUG === $paywall->post_type ) {
-				$paywall_info['id']            = $paywall->ID;
-				$paywall_info['name']          = $paywall->post_title;
-				$paywall_info['description']   = $paywall->post_content;
-				$paywall_info['title']         = get_post_meta( $paywall->ID, '_rg_title', true );
-				$paywall_info['access_to']     = get_post_meta( $paywall->ID, '_rg_access_to', true );
-				$paywall_info['access_entity'] = get_post_meta( $paywall->ID, '_rg_access_entity', true );
-				$paywall_info['preview_id']    = get_post_meta( $paywall->ID, '_rg_preview_id', true );
-				$paywall_info['order']         = get_post_meta( $paywall->ID, '_rg_options_order', true );
-				$paywall_info['is_active']     = get_post_meta( $paywall->ID, '_rg_is_active', true );
+				$paywall_info['id']             = $paywall->ID;
+				$paywall_info['name']           = $paywall->post_title;
+				$paywall_info['description']    = $paywall->post_content;
+				$paywall_info['title']          = get_post_meta( $paywall->ID, '_rg_title', true );
+				$paywall_info['access_to']      = get_post_meta( $paywall->ID, '_rg_access_to', true );
+				$paywall_info['access_entity']  = get_post_meta( $paywall->ID, '_rg_access_entity', true );
+				$paywall_info['preview_id']     = get_post_meta( $paywall->ID, '_rg_preview_id', true );
+				$paywall_info['order']          = get_post_meta( $paywall->ID, '_rg_options_order', true );
+				$paywall_info['is_active']      = get_post_meta( $paywall->ID, '_rg_is_active', true );
+				$paywall_info['specific_posts'] = get_post_meta( $paywall->ID, '_rg_specific_posts', true );
 			}
 		}
 
@@ -358,22 +405,78 @@ class Paywall extends Base {
 	 * @return string|\WP_Post
 	 */
 	public function get_connected_paywall_in_excluded_categories( $categories ) {
+
+		$paywalls         = array();
+		$is_post_excluded = false; // flag to check one of mutiple categories is excluded.
+
+		if ( ! empty( $categories ) && is_array( $categories ) ) {
+
+			foreach ( $categories as $category ) {
+				$query_args = [
+					'post_type'      => static::SLUG,
+					'post_status'    => [ 'publish' ],
+					'posts_per_page' => 1,
+				];
+
+				$meta_query = [
+					'relation' => 'AND',
+					[
+						'key'     => '_rg_access_entity',
+						'compare' => 'NOT LIKE',
+						'value'   => '"' . $category . '"',
+					],
+					[
+						'key'     => '_rg_access_to',
+						'value'   => 'exclude_category',
+						'compare' => '=',
+					],
+					[
+						'key'     => '_rg_is_active',
+						'value'   => '1',
+						'compare' => '=',
+					],
+				];
+
+				$query_args['meta_query'] = $meta_query;
+
+				$paywall_posts = new \WP_Query( $query_args );
+
+				$paywalls = $paywall_posts->posts;
+
+				// Set flag to true when any one of category returns with no paywall.
+				if ( empty( $paywalls ) && ! $is_post_excluded ) {
+					$is_post_excluded = true;
+				}
+			}
+		}
+
+		// if paywall exists and post is not in excluded category return it.
+		if ( ! empty( $paywalls[0] ) && ! $is_post_excluded ) {
+			return $paywalls[0]->ID;
+		}
+
+		return '';
+	}
+
+	/**
+	 * Get related Paywall ID for only posts.
+	 *
+	 * @return string|\WP_Post
+	 */
+	public function get_paywall_for_only_posts() {
 		$query_args = [
 			'post_type'      => static::SLUG,
 			'post_status'    => [ 'publish' ],
 			'posts_per_page' => 1,
+			'orderby'        => 'modified',
+			'order'          => 'DESC',
 		];
 
 		$meta_query = [
 			'relation' => 'AND',
 			[
-				'key'     => '_rg_access_entity',
-				'compare' => 'NOT IN',
-				'value'   => $categories,
-			],
-			[
 				'key'     => '_rg_access_to',
-				'value'   => 'exclude_category',
+				'value'   => 'posts',
 				'compare' => '=',
 			],
 			[
@@ -448,15 +551,15 @@ class Paywall extends Base {
 		$query_args = [
 			'post_type'      => static::SLUG,
 			'post_status'    => [ 'publish' ],
-			'posts_per_page' => 1,
+			'posts_per_page' => -1,
 		];
 
 		$meta_query = [
 			'relation' => 'AND',
 			[
 				'key'     => '_rg_access_entity',
-				'compare' => '=',
-				'value'   => $category_id,
+				'compare' => 'LIKE',
+				'value'   => '"' . $category_id . '"',
 			],
 			[
 				'key'     => '_rg_access_to',
@@ -474,10 +577,23 @@ class Paywall extends Base {
 
 		$query = new \WP_Query( $query_args );
 
-		$current_post = $query->posts;
+		$paywall_posts = $query->posts;
 
-		if ( ! empty( $current_post[0] ) ) {
-			return $current_post[0]->ID;
+		$new_paywall_order = array();
+		foreach ( $paywall_posts as $paywall_post ) {
+			$paywall_categories                             = get_post_meta( $paywall_post->ID, '_rg_access_entity', true );
+			$paywall_categories_count                       = count( $paywall_categories );
+			$new_paywall_order[ $paywall_categories_count ] = $paywall_post;
+		}
+
+		// Sort them by keys ( number of categories ).
+		ksort( $new_paywall_order );
+
+		// reset keys.
+		array_multisort( $new_paywall_order, SORT_ASC );
+
+		if ( ! empty( $new_paywall_order[0] ) ) {
+			return $new_paywall_order[0]->ID;
 		}
 
 		return '';
@@ -568,21 +684,40 @@ class Paywall extends Base {
 
 		// Compose message based on paywall attributes.
 		if ( 'category' === $pay_wall['access_to'] || 'exclude_category' === $pay_wall['access_to'] ) {
-			$category_id     = $pay_wall['access_entity'];
-			$category_object = get_category( $category_id );
+
+			$categories_id = '';
+
+			// backward compatibility.
+			if ( isset( $pay_wall['access_entity'] ) && is_serialized( $pay_wall['access_entity'] ) ) {
+				$categories_id = maybe_unserialize( $pay_wall['access_entity'] );
+			} else {
+				$categories_id = array( $pay_wall['access_entity'] );
+			}
+
+			$categories_message = '';
+
+			if ( ! empty( $categories_id ) && is_array( $categories_id ) ) {
+				$categories_in_message = array();
+				foreach ( $categories_id as $category_id ) {
+					$category_object         = get_category( $category_id );
+					$categories_in_message[] = $category_object->name;
+				}
+				$categories_message = implode( ', ', $categories_in_message );
+			}
+
 			if ( 'category' === $pay_wall['access_to'] ) {
 				$published_on = sprintf(
 					/* translators: %1$s static string PUBLISHED/SAVED, %2$s category name */
 					__( '<b>%1$s</b> on <b>all posts</b> in the category <b>%2$s</b>', 'revenue-generator' ),
 					$saved_message,
-					$category_object->name
+					$categories_message
 				);
 			} else {
 				$published_on = sprintf(
 					/* translators: %1$s static string PUBLISHED/SAVED, %2$s category name */
 					__( '<b>%1$s</b> on <b>all posts</b> except the category <b>%2$s</b>', 'revenue-generator' ),
 					$saved_message,
-					$category_object->name
+					$categories_message
 				);
 			}
 		} elseif ( 'supported' === $pay_wall['access_to'] ) {
@@ -592,6 +727,12 @@ class Paywall extends Base {
 				__( '<b>%1$s</b> on <b>post</b> <b>%2$s</b>', 'revenue-generator' ),
 				$saved_message,
 				$rg_post_object->post_title
+			);
+		} elseif ( 'specific_post' === $pay_wall['access_to'] ) {
+			$published_on = sprintf(
+				/* translators: %s static string PUBLISHED/SAVED */
+				__( '<b>%s</b> on <b>specific posts & pages</b>', 'revenue-generator' ),
+				$saved_message
 			);
 		} else {
 			$published_on = sprintf(
@@ -871,10 +1012,14 @@ class Paywall extends Base {
 	public function sort_paywall_by_priority( $dashboard_paywalls ) {
 		if ( ! empty( $dashboard_paywalls ) ) {
 			$all_paywalls       = [
-				'supported'        => [],
-				'category'         => [],
-				'exclude_category' => [],
-				'all'              => [],
+				'supported'          => [],
+				'specific_post'      => [],
+				'category'           => [],
+				'categories'         => [],
+				'exclude_category'   => [],
+				'exclude_categories' => [],
+				'posts'              => [],
+				'all'                => [],
 			];
 			$published_paywalls = [];
 			$saved_paywalls     = [];
@@ -882,7 +1027,25 @@ class Paywall extends Base {
 			// Store all paywall data in one place for easier udpates.
 			foreach ( $dashboard_paywalls as $paywall ) {
 				if ( ! empty( $paywall ) ) {
-					$all_paywalls[ $paywall['access_to'] ][] = $paywall;
+
+					// Sort by Number of categories and execept categories.
+					if ( ! empty( $paywall['access_to'] ) && 'category' === $paywall['access_to'] && ! empty( $paywall['access_entity'] ) ) {
+						$access_entity = maybe_unserialize( $paywall['access_entity'] );
+						if ( count( $access_entity ) > 1 ) {
+							$all_paywalls['categories'][] = $paywall;
+						} else {
+							$all_paywalls['category'][] = $paywall;
+						}
+					} elseif ( ! empty( $paywall['access_to'] ) && 'exclude_category' === $paywall['access_to'] && ! empty( $paywall['access_entity'] ) ) {
+						$access_entity = maybe_unserialize( $paywall['access_entity'] );
+						if ( count( $access_entity ) > 1 ) {
+							$all_paywalls['exclude_categories'][] = $paywall;
+						} else {
+							$all_paywalls['exclude_category'][] = $paywall;
+						}
+					} else {
+						$all_paywalls[ $paywall['access_to'] ][] = $paywall;
+					}
 				}
 			}
 
