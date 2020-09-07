@@ -81,7 +81,7 @@ Laterpay’s fee amounts to 15% of the revenues that it collects for its Merchan
 
 == Changelog ==
 
-= 1.1.0 ( 4 September 2020 ) =
+= 1.1.0 ( 7 September 2020 ) =
 * Updated Paywall functionality to allow for the selection of multiple individual posts or categories.
 * Updated Contributions shortcode so that a contribution offering can be updated without requiring changes to the shortcode.
 * Updated Laterpay logo.
