@@ -49,8 +49,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 					?>
 					<div class="rev-gen-dashboard-content-contribution" data-contribution-id="<?php echo esc_attr( $contribution_id ); ?>">
 						<div class="rev-gen-dashboard-content-contribution--box">
-							<a href="<?php echo esc_url( $contribution_edit_link ); ?>" class="rev-gen-dashboard-content-contribution--box__link">
-								<span class="screen-reader-text"><?php esc_html_e( 'Edit Contribution offer', 'revenue-generator' ); ?>
+							<a href="<?php echo esc_attr( $contribution_edit_link ); ?>" class="rev-gen-dashboard-content-contribution--box__link">
+								<span class="screen-reader-text"><?php _e( 'Edit Contribution offer', 'revenue-generator' ); ?>
 							</a>
 							<h4 class="rev-gen-dashboard-content-contribution--box-header">
 								<?php echo esc_html( $contribution['dialog_header'] ); ?>

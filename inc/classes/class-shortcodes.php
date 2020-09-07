@@ -241,14 +241,8 @@ class Shortcodes {
 		$payment_config    = [];
 		$contribution_urls = '';
 		$currency_config   = $this->merchant_region;
-
-		// backward compatibility.
-		$campaign_name = $config_data['name'];
-		if ( empty( $campaign_name ) ) {
-			$campaign_name = $config_data['post_title'];
-		}
-
-		$campaign_id = str_replace( ' ', '-', strtolower( $campaign_name ) ) . '-' . (string) time();
+		$campaign_name     = $config_data['name'];
+		$campaign_id       = str_replace( ' ', '-', strtolower( $campaign_name ) ) . '-' . (string) time();
 
 		$client = new Revenue_Generator_Client(
 			$this->merchant_id,
