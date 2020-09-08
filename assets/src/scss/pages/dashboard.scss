@@ -30,29 +30,6 @@
 			letter-spacing: normal;
 			color: #333;
 		}
-
-		select {
-			border-top: 0;
-			border-left: 0;
-			border-right: 0;
-			border-radius: 0;
-			border-bottom: 2px solid #1e1e1e;
-			font-size: 16px;
-			font-weight: 400;
-			font-stretch: normal;
-			font-style: normal;
-			line-height: normal;
-			letter-spacing: normal;
-			color: #1e1e1e;
-			background: #fff url(../img/select-down.svg) no-repeat right 5px top 55%;
-			background-size: 13px 8px;
-			padding: 0 24px 0 0;
-			&:focus {
-				border-color: #1e1e1e;
-				color: #1e1e1e;
-				box-shadow: 0 0 0 1px #1e1e1e;
-			}
-		}
 	}
 
 	&--search {

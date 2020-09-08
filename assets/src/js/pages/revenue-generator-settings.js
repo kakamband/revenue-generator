@@ -216,6 +216,11 @@ import { debounce } from '../helpers';
 					);
 					$o.body.find( 'input' ).removeClass( 'input-blur' );
 				} );
+
+				$( 'select', $o.rgDashboard ).select2( {
+					width: 'auto',
+					minimumResultsForSearch: -1
+				} );
 			};
 
 			/**
