@@ -190,6 +190,17 @@ body {
 			outline: 0;
 		}
 	}
+
+	input.select2-search__field {
+		line-height: 24px;
+		height: auto;
+		min-height: auto;
+		margin-top: 0;
+		color: #1d1d1d;
+		&::placeholder {
+			color: #1d1d1d;
+		}
+	}
 }
 
 .rev-gen__select2--arrow-up + .select2-container {
@@ -206,6 +217,10 @@ body {
 		border: 0;
 		border-radius: 0;
 		background-color: #2e2e2e;
+	}
+
+	&--searchable.select2-dropdown {
+		width: 180px !important;
 	}
 
 	.select2-results__option[aria-selected],

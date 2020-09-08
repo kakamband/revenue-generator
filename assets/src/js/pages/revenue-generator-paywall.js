@@ -104,6 +104,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				savePaywall: $( '#rg_js_savePaywall' ),
 				searchPaywallContent: $( '#rg_js_searchPaywallContent' ),
 				searchPost: $( '#rg_js_searchPost' ),
+				applyToSelect: $( '.rev-gen-preview-main--paywall-actions-apply select' ),
 				select2Multiple: $(
 					'#rg_js_searchPaywallContent, #rg_js_searchPost'
 				),
@@ -206,6 +207,12 @@ import { __, sprintf } from '@wordpress/i18n';
 				 */
 				$( document ).ready( function() {
 					$o.postPreviewWrapper.fadeIn( 'slow' );
+
+					$o.applyToSelect.select2( {
+						width: 'auto',
+						dropdownAutoWidth: true,
+						dropdownCssClass: ':all:'
+					} );
 
 					// Highlight search bar and add tooltip, change background-color for wrapper.
 					if ( $( $o.noResultsWrapper ).length ) {
@@ -368,12 +375,6 @@ import { __, sprintf } from '@wordpress/i18n';
 					} );
 				} );
 
-				$( '.rev-gen__select2', $o.previewWrapper ).select2( {
-					width: 'auto',
-					dropdownAutoWidth: true,
-					dropdownCssClass: ':all:',
-				} );
-
 				/**
 				 * When merchant click in the search box blur out the rest of the area and prompt if existing.
 				 */
@@ -519,7 +520,7 @@ import { __, sprintf } from '@wordpress/i18n';
 					width: 'auto',
 					dropdownAutoWidth: true,
 					dropdownCssClass: ':all:',
-					placeholder: __( 'search', 'revenue-generator' ),
+					placeholder: __( 'Search', 'revenue-generator' ),
 					language: {
 						inputTooShort() {
 							return __(
