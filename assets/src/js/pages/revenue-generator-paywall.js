@@ -368,6 +368,12 @@ import { __, sprintf } from '@wordpress/i18n';
 					} );
 				} );
 
+				$( '.rev-gen__select2', $o.previewWrapper ).select2( {
+					width: 'auto',
+					dropdownAutoWidth: true,
+					dropdownCssClass: ':all:',
+				} );
+
 				/**
 				 * When merchant click in the search box blur out the rest of the area and prompt if existing.
 				 */
@@ -510,6 +516,9 @@ import { __, sprintf } from '@wordpress/i18n';
 						},
 						cache: true,
 					},
+					width: 'auto',
+					dropdownAutoWidth: true,
+					dropdownCssClass: ':all:',
 					placeholder: __( 'search', 'revenue-generator' ),
 					language: {
 						inputTooShort() {

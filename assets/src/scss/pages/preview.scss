@@ -117,6 +117,8 @@
 	&--paywall-actions {
 		align-self: center;
 		display: flex;
+		align-items: center;
+		justify-content: center;
 		flex-direction: row;
 		position: fixed;
 		bottom: 0;
@@ -126,33 +128,32 @@
 		border-radius: 4px;
 		height: 50px;
 		background: #fff;
-		justify-content: space-around;
 		padding: 0 15px;
 
 		&-apply {
 			display: flex;
 			align-items: center;
+			height: 15px;
+			font-size: 16px;
+			line-height: normal;
+			margin: 10px 10px 10px;
 
-			p {
-				height: 15px;
-				font-size: 14px;
-				line-height: normal;
-				margin: 10px 10px 10px;
-
-				span.rev-gen-preview-main-paywall-name {
-					font-weight: 500;
-					padding-bottom: 5px;
-					border-bottom: 2px solid #000;
-					min-width: 82px;
-					display: inline-block;
-					white-space: nowrap;
-					overflow: hidden;
-				}
+			span.rev-gen-preview-main-paywall-name {
+				position: relative;
+				top: 1px;
+				font-weight: 500;
+				padding-bottom: 2px;
+				border-bottom: 2px solid #000;
+				min-width: 50px;
+				margin: 0 5px;
+				display: inline-block;
+				white-space: nowrap;
+				overflow: hidden;
+				text-align: center;
 			}
 
 			.rev-gen-preview-main-paywall-applies-to {
 				border: 0;
-				height: 33px;
 				align-self: center;
 				border-bottom: 2px solid;
 				border-radius: 0;
@@ -162,6 +163,12 @@
 				font-weight: 500;
 				background: #fff url(../img/select-down.svg) no-repeat right 5px top 55%;
 				background-size: 13px 8px;
+				+ .select2-container {
+					margin-left: 5px;
+					.select2-selection__rendered {
+						padding-left: 0;
+					}
+				}
 			}
 
 			select {
@@ -174,72 +181,21 @@
 		}
 
 		&-search {
-			display: flex;
-
 			.select2-container {
-				background-color: inherit;
-				width: 150px !important; /* stylelint-disable-line declaration-no-important */
-				color: #1e1e1e;
-				height: 23px;
-				align-self: center;
-
-				&--open {
-					height: auto;
-					bottom: 40px;
-					span.selection {
-						span.select2-selection--multiple.select2-selection--multiple.select2-selection--multiple {
-							height: 109px;
-							position: relative;
-							overflow-y: scroll;
-							bottom: 0;
-							border-left: 1px solid #aaa;
-							border-right: 1px solid #aaa;
-							ul.select2-selection__rendered {
-								li.select2-selection__choice.select2-selection__choice {
-									display: block;
-								}
-							}
-						}
-					}
+				min-width: 160px !important;
+				.select2-search {
+					margin-bottom: 0;
 				}
-				span.selection {
-					span.select2-selection--multiple.select2-selection--multiple {
-						position: relative;
-						bottom: 6px;
-						ul.select2-selection__rendered {
-							li.select2-selection__choice {
-								display: none;
-							}
-							li.select2-search.select2-search--inline {
-								margin-bottom: 0;
-							}
-						}
-					}
-				}
-
-				.select2-selection__arrow {
-					display: none;
-				}
-
-				span.selection {
-					color: #333;
-					font-weight: 500;
-
-					span.select2-selection {
-						border: 0;
-						border-bottom: 2px solid #000;
-						border-radius: 0;
-						height: 23px;
-						overflow: hidden;
-					}
+				.select2-selection.select2-selection--multiple {
+					border: 0;
 				}
 			}
-
 			&-icon {
 				position: relative;
 				align-self: center;
 				left: -20px;
 				top: 5px;
+				display: inline-block;
 				background: url(../img/icon-search.svg) no-repeat right 0 bottom;
 				background-size: 16px 16px;
 				width: 16px;
@@ -260,10 +216,8 @@
 
 				&--open {
 					height: auto;
-					bottom: 40px;
 					span.selection {
 						span.select2-selection--multiple.select2-selection--multiple.select2-selection--multiple {
-							height: 109px;
 							position: relative;
 							overflow-y: scroll;
 							bottom: 0;
@@ -324,8 +278,6 @@
 		}
 
 		&-update {
-			align-self: center;
-
 			button {
 				cursor: pointer;
 				width: 90px;
@@ -1106,3 +1058,20 @@
 		color: #1d1d1d;
 	}
 }
+
+//select.rev-gen__select2 {
+//	+ .select2-container {
+//		.select2-selection {
+//			min-height: auto;
+//			height: auto;
+//			font-weight: 500;
+//			span.select2-selection__rendered {
+//				line-height: 24px;
+//				color: #1d1d1d;
+//			}
+//			&__arrow {
+//				height: 23px;
+//			}
+//		}
+//	}
+//}

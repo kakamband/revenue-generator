@@ -217,8 +217,10 @@ import { debounce } from '../helpers';
 					$o.body.find( 'input' ).removeClass( 'input-blur' );
 				} );
 
-				$( 'select', $o.rgDashboard ).select2( {
+				$( '.rev-gen__select2', $o.rgDashboard ).select2( {
 					width: 'auto',
+					dropdownAutoWidth: true,
+					dropdownCssClass: ':all:',
 					minimumResultsForSearch: -1
 				} );
 			};

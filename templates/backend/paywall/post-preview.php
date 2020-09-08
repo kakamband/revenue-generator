@@ -68,7 +68,6 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 			</div>
 			<div class="rev-gen-preview-main--paywall-actions">
 				<div class="rev-gen-preview-main--paywall-actions-apply">
-					<p>
 						<?php
 						$paywall_name = ! empty( $paywall_data['name'] ) ? $paywall_data['name'] : $default_paywall_title;
 						echo wp_kses(
@@ -85,12 +84,11 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 							]
 						);
 						?>
-					</p>
 					<?php
 						/* translators: %1s post type. */
 						$supported_label = ( ! empty( $rg_preview_post['type'] ) ) ? sprintf( __( 'this %1s only', 'revenue-generator' ), esc_html( $rg_preview_post['type'] ) ) : __( 'selected post or page', 'revenue-generator' );
 					?>
-					<select class="rev-gen-preview-main-paywall-applies-to">
+					<select class="rev-gen-preview-main-paywall-applies-to rev-gen__select2 rev-gen__select2--arrow-up rev-gen__select2--no-search">
 						<option <?php selected( $paywall_access_to, 'all', true ); ?> value="all"><?php esc_html_e( 'all posts and pages', 'revenue-generator' ); ?></option>
 						<option <?php selected( $paywall_access_to, 'posts', true ); ?> value="posts"><?php esc_html_e( 'all posts', 'revenue-generator' ); ?></option>
 						<option <?php selected( $paywall_access_to, 'category', true ); ?> value="category"><?php esc_html_e( 'category', 'revenue-generator' ); ?></option>
@@ -100,7 +98,7 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 					</select>
 				</div>
 				<div class="rev-gen-preview-main--paywall-actions-search">
-					<select id="rg_js_searchPaywallContent" multiple="multiple">
+					<select id="rg_js_searchPaywallContent" class="rev-gen__select2" multiple="multiple">
 						<?php if ( ! empty( $rg_categories_data ) && is_array( $rg_categories_data ) ) : ?>
 							<?php foreach ( $rg_categories_data as $rg_category_data ) : ?>
 								<option selected="selected" value="<?php echo esc_attr( $rg_category_data->term_id ); ?>">
@@ -112,7 +110,7 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 					<i class="rev-gen-preview-main--paywall-actions-search-icon"></i>
 				</div>
 				<div class="rev-gen-preview-main--paywall-actions-search-post">
-					<select id="rg_js_searchPost" name="posts[]" multiple="multiple">
+					<select id="rg_js_searchPost" class="rev-gen__select2" name="posts[]" multiple="multiple">
 						<?php if ( ! empty( $rg_specific_posts ) ) : ?>
 							<?php foreach ( $rg_specific_posts as $rg_specific_post_id => $rg_specific_post_title ) : ?>
 								<option selected="selected" value="<?php echo esc_attr( $rg_specific_post_id ); ?>">
