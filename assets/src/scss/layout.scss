@@ -201,6 +201,23 @@ body {
 			color: #1d1d1d;
 		}
 	}
+
+	.select2-selection--multiple {
+		.select2-selection {
+			&__choice {
+				font-size: 13px;
+				color: #fff;
+				border: 1px solid #2e2e2e;
+				background-color: #2e2e2e;
+				&__remove {
+					color: #fff;
+					&:hover {
+						color: #fff;
+					}
+				}
+			}
+		}
+	}
 }
 
 .rev-gen__select2--arrow-up + .select2-container {
@@ -250,7 +267,7 @@ body {
 		height: 12px;
 		background: url(../img/icon-check.svg) no-repeat;
 		background-size: 100%;
-		transform: translateY(-15px);
+		transform: translateY(-13px);
 	}
 
 	&--no-search {
