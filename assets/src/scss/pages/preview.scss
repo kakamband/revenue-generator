@@ -136,22 +136,34 @@
 		justify-content: center;
 		flex-direction: row;
 		position: fixed;
-		bottom: 0;
-		width: 732px;
-		box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.55);
+		bottom: 3px;
 		z-index: 5;
+		width: 732px;
+		height: 60px;
+		padding: 0 8px;
 		border-radius: 4px;
-		height: 50px;
-		background: #fff;
-		padding: 0 15px;
+		box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.4);
+		font-size: 18px;
+		-webkit-backdrop-filter: blur(10px);
+		backdrop-filter: blur(10px);
+		background-color: rgba(255, 255, 255, 0.9);
+
+		&-wrap {
+			flex: 1;
+			display: flex;
+			align-items: center;
+		}
 
 		&-apply {
 			display: flex;
 			align-items: center;
 			height: 15px;
-			font-size: 16px;
 			line-height: normal;
 			margin: 10px 10px 10px;
+
+			.select2 {
+				font-size: 18px;
+			}
 
 			span.rev-gen-preview-main-paywall-name {
 				position: relative;
@@ -196,6 +208,9 @@
 		}
 
 		&-search {
+			.select2 {
+				font-size: 18px;
+			}
 			.select2-container {
 				width: 180px !important;
 				padding: 0;
@@ -251,8 +266,8 @@
 			&-icon {
 				position: relative;
 				align-self: center;
-				left: -20px;
-				top: 5px;
+				left: -23px;
+				top: 3px;
 				display: inline-block;
 				background: url(../img/icon-search.svg) no-repeat right 0 bottom;
 				background-size: 16px 16px;
@@ -336,14 +351,13 @@
 		}
 
 		&-update {
+			margin-left: auto;
 			button {
 				cursor: pointer;
-				width: 90px;
-				height: 35px;
 				border: 2px solid #1d1d1d;
-				padding: 5px;
-				font-weight: 600;
-				font-size: 14px;
+				padding: 9px 13px;
+				font-weight: bold;
+				font-size: 18px;
 				border-radius: 3px;
 
 				&:disabled {
@@ -1103,14 +1117,15 @@
 
 .rev-gen-email-support {
 	position: fixed;
-	bottom: 20px;
-	right: 20px;
-	padding: 8px 10px;
+	bottom: 10px;
+	right: 10px;
+	padding: 10px 40px;
 	border: 2px solid #1d1d1d;
 	background-color: #fff;
 	color: #1d1d1d;
 	border-radius: 3px;
-	font-weight: 600;
+	font-weight: 500;
+	font-size: 17px;
 	text-decoration: none;
 	&:hover {
 		color: #1d1d1d;
