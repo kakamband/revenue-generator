@@ -28,11 +28,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</select>
 			</div>
 			<div class="rev-gen-dashboard-bar--item rev-gen-dashboard-bar--search">
-				<input placeholder="<?php esc_attr_e( 'Search Contribution', 'revenue-generator' ); ?>" type="text" id="rg_js_searchPaywall" value="<?php echo esc_attr( $search_term ); ?>">
+				<input placeholder="<?php esc_attr_e( 'Search Contributions', 'revenue-generator' ); ?>" type="text" id="rg_js_searchPaywall" value="<?php echo esc_attr( $search_term ); ?>">
 				<i class="rev-gen-dashboard-bar--search-icon"></i>
 			</div>
 			<div class="rev-gen-dashboard-bar--item rev-gen-dashboard-bar--actions">
-				<a href="<?php echo esc_url( $new_contribution_url ); ?>" id="rg_js_newContribution" class="rg-button"><?php esc_html_e( 'New Contribution', 'revenue-generator' ); ?></a>
+				<a href="<?php echo esc_url( $new_contribution_url ); ?>" id="rg_js_newContribution" class="rev-gen__button"><?php esc_html_e( 'New Contribution', 'revenue-generator' ); ?></a>
 			</div>
 		</div>
 		<div class="rev-gen-dashboard-content rev-gen-dashboard-content-contribution-wrapper">
@@ -126,6 +126,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 		<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
 	</div>
-	<div class="rev-gen-start-tutorial" id="rg_js_RestartTutorial_Contribution"><?php esc_html_e( 'Tutorial', 'revenue-generator' ); ?></div>
+	<div class="rev-gen__button rev-gen__button--secondary rev-gen-start-tutorial" id="rg_js_RestartTutorial_Contribution"><?php esc_html_e( 'Tutorial', 'revenue-generator' ); ?></div>
 </div>
 <?php View::render_footer_backend(); ?>

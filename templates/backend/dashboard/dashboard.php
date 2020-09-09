@@ -33,7 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<i class="rev-gen-dashboard-bar--search-icon"></i>
 			</div>
 			<div class="rev-gen-dashboard-bar--item rev-gen-dashboard-bar--actions">
-				<a href="<?php echo esc_url( $new_paywall_url ); ?>" id="rg_js_newPaywall" class="rg-button"><?php esc_html_e( 'New Paywall', 'revenue-generator' ); ?></a>
+				<a href="<?php echo esc_url( $new_paywall_url ); ?>" id="rg_js_newPaywall" class="rev-gen__button"><?php esc_html_e( 'New Paywall', 'revenue-generator' ); ?></a>
 			</div>
 		</div>
 		<div class="rev-gen-dashboard-content">
@@ -79,6 +79,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	</div>
 	<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
-	<div class="rev-gen-start-tutorial" id="rg_js_RestartTutorial"><?php esc_html_e( 'Tutorial', 'revenue-generator' ); ?></div>
+	<div class="rev-gen__button rev-gen__button--secondary rev-gen-start-tutorial" id="rg_js_RestartTutorial"><?php esc_html_e( 'Tutorial', 'revenue-generator' ); ?></div>
 </div>
 <?php View::render_footer_backend(); ?>
