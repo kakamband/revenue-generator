@@ -27,15 +27,27 @@ import { __, sprintf } from '@wordpress/i18n';
 				// Contribution Help.
 				contributionHelpButton: '.rev-gen-contribution-main--help',
 				contributionHelpModal: '.rev-gen-contribution-main-info-modal',
-				contributionModalClose: '.rev-gen-contribution-main-info-modal-cross',
-				contributionCampaignNameLabel: $( '#rg_contribution_campaign_name' ),
-				contributionThankYouPageLabel: $( '#rg_contribution_thankyou_label' ),
-				contributionGenerateButtonLabel: $( '#rg_contribution_generate' ),
-				contributionHelpGenerate: $( '#rev-gen-contribution-help-generate' ),
+				contributionModalClose:
+					'.rev-gen-contribution-main-info-modal-cross',
+				contributionCampaignNameLabel: $(
+					'#rg_contribution_campaign_name'
+				),
+				contributionThankYouPageLabel: $(
+					'#rg_contribution_thankyou_label'
+				),
+				contributionGenerateButtonLabel: $(
+					'#rg_contribution_generate'
+				),
+				contributionHelpGenerate: $(
+					'#rev-gen-contribution-help-generate'
+				),
 
 				// Dashboard elements.
-				contributionDashboardShortcodeLink: $( '.rev-gen-dashboard__link--copy-shortcode' ),
-				contributionDashboardCode: '.rev-gen-dashboard-content-contribution-code',
+				contributionDashboardShortcodeLink: $(
+					'.rev-gen-dashboard__link--copy-shortcode'
+				),
+				contributionDashboardCode:
+					'.rev-gen-dashboard-content-contribution-code',
 
 				helpGAModal: '.rev-gen-settings-main-info-modal',
 
@@ -55,17 +67,27 @@ import { __, sprintf } from '@wordpress/i18n';
 
 				// Contribution Action Elements
 				form: $( '.rev-gen-contribution-form' ),
-				contributionTitle: $( '.rev-gen-contribution-main--box-header' ),
+				contributionTitle: $(
+					'.rev-gen-contribution-main--box-header'
+				),
 				contributionTitleInput: $( '[name="dialog_header"]' ),
-				contributionDescription: $( '.rev-gen-contribution-main--box-description' ),
-				contributionDescriptionInput: $( '[name="dialog_description"]' ),
-				contributionAmounts: $( '.rev-gen-contribution-main--box-donation-amount' ),
+				contributionDescription: $(
+					'.rev-gen-contribution-main--box-description'
+				),
+				contributionDescriptionInput: $(
+					'[name="dialog_description"]'
+				),
+				contributionAmounts: $(
+					'.rev-gen-contribution-main--box-donation-amount'
+				),
 				allAmountsInput: $( '[name="amounts"]' ),
 				saveButton: $( '.rev-gen-contribution-main-generate-button' ),
 
 				contributionCampaignName: $( '#rg_contribution_title' ),
 				contributionThankYouPage: $( '#rg_contribution_thankyou' ),
-				contributionCopyMessage: $( '.rev-gen-contribution-main-copy-message' ),
+				contributionCopyMessage: $(
+					'.rev-gen-contribution-main-copy-message'
+				),
 
 				// Popup.
 				snackBar: $( '#rg_js_SnackBar' ),
@@ -109,12 +131,16 @@ import { __, sprintf } from '@wordpress/i18n';
 				} );
 
 				$o.contributionTitle.on( 'keyup', function() {
-					$o.contributionTitleInput.val( $o.contributionTitle.text() );
+					$o.contributionTitleInput.val(
+						$o.contributionTitle.text()
+					);
 					$o.form.trigger( 'change' );
 				} );
 
 				$o.contributionDescription.on( 'keyup', function() {
-					$o.contributionDescriptionInput.val( $o.contributionDescription.text() );
+					$o.contributionDescriptionInput.val(
+						$o.contributionDescription.text()
+					);
 					$o.form.trigger( 'change' );
 				} );
 
@@ -124,114 +150,109 @@ import { __, sprintf } from '@wordpress/i18n';
 
 				// Generate Contribution Code.
 				$o.form.on( 'submit', function( e ) {
+					e.preventDefault();
+
+					// validate fields.
+					const isValid = validateAllfields();
+
+					if ( 'invalid' === isValid ) {
 						e.preventDefault();
+						return false;
+					}
 
-						// validate fields.
-						const isValid = validateAllfields();
+					// Check for non verfied merchant.
+					if (
+						0 ===
+						parseInt(
+							revenueGeneratorGlobalOptions.globalOptions
+								.is_merchant_verified
+						)
+					) {
+						showAccountActivationModal();
+						e.preventDefault();
+						return false;
+					}
 
-						if ( 'invalid' === isValid ) {
-							e.preventDefault();
-							return false;
-						}
+					// check Lock.
+					if ( ! $o.requestSent ) {
+						// Add lock.
+						$o.requestSent = true;
 
-						// Check for non verfied merchant.
-						if (
-							0 ===
-							parseInt(
-								revenueGeneratorGlobalOptions.globalOptions
-									.is_merchant_verified
-							)
-						) {
-							showAccountActivationModal();
-							e.preventDefault();
-							return false;
-						}
+						// show loader.
+						showLoader();
 
-						// check Lock.
-						if ( ! $o.requestSent ) {
-							// Add lock.
-							$o.requestSent = true;
+						const allAmountJson = getContributionAmounts();
+						$o.allAmountsInput.val( allAmountJson );
 
-							// show loader.
-							showLoader();
+						const formData = $o.form.serialize();
 
-							const allAmountJson = getContributionAmounts();
-							$o.allAmountsInput.val( allAmountJson );
+						// Update the title.
+						$.ajax( {
+							url: revenueGeneratorGlobalOptions.ajaxUrl,
+							method: 'POST',
+							data: formData,
+							dataType: 'json',
+						} ).done( function( r ) {
+							$o.snackBar.showSnackbar( r.msg, 1500 );
 
-							const formData = $o.form.serialize();
-
-							// Update the title.
-							$.ajax( {
-								url: revenueGeneratorGlobalOptions.ajaxUrl,
-								method: 'POST',
-								data: formData,
-								dataType: 'json',
-							} ).done( function( r ) {
-								$o.snackBar.showSnackbar( r.msg, 1500 );
-
-								if ( r.success ) {
-									copyToClipboard( r.code );
-									$o.saveButton.text(
-										r.button_text
-									);
-									$o.saveButton.removeClass( 'enabled' );
-									$o.saveButton.prop( 'disabled', true );
-									$o.contributionCopyMessage.show();
-									$o.body.removeClass( 'modal-blur' );
-									$o.body
-										.find( 'input' )
-										.removeClass( 'input-blur' );
-									let merchantId =
-										revenueGeneratorGlobalOptions.merchant_id;
-									if (
-										! merchantId &&
-										$( $o.accountActionId ).val()
-									) {
-										merchantId = $(
-											$o.accountActionId
-										).val();
-									}
-
-									const eventAction = 'New ShortCode	';
-									const eventCategory =
-										'LP RevGen Contributions';
-									let eventLabel =
-										merchantId + ' - ' + formData.heading;
-									const amounts = $o.contributionAmounts;
-									amounts.each( function() {
-										const price = $( this )
-											.text()
-											.trim();
-										if ( 'custom' === price ) {
-											return true;
-										}
-										eventLabel += ' - ' + price;
-									} );
-
-									rgGlobal.sendLPGAEvent(
-										eventAction,
-										eventCategory,
-										eventLabel,
-										0,
-										true
-									);
-
-									if ( window.location.href !== r.edit_link ) {
-										setTimeout( function() {
-											window.location.href = r.edit_link;
-										}, 1500 );
-									}
+							if ( r.success ) {
+								copyToClipboard( r.code );
+								$o.saveButton.text( r.button_text );
+								$o.saveButton.removeClass( 'enabled' );
+								$o.saveButton.prop( 'disabled', true );
+								$o.contributionCopyMessage.show();
+								$o.body.removeClass( 'modal-blur' );
+								$o.body
+									.find( 'input' )
+									.removeClass( 'input-blur' );
+								let merchantId =
+									revenueGeneratorGlobalOptions.merchant_id;
+								if (
+									! merchantId &&
+									$( $o.accountActionId ).val()
+								) {
+									merchantId = $( $o.accountActionId ).val();
 								}
-								// Release request lock.
-								$o.requestSent = false;
 
-								// Hide Loader.
-								hideLoader();
-							} );
+								const eventAction = 'New ShortCode	';
+								const eventCategory = 'LP RevGen Contributions';
+								let eventLabel =
+									merchantId + ' - ' + formData.heading;
+								const amounts = $o.contributionAmounts;
+								amounts.each( function() {
+									const price = $( this )
+										.text()
+										.trim();
+									if ( 'custom' === price ) {
+										return true;
+									}
+									eventLabel += ' - ' + price;
+								} );
 
-							return false;
-						}
-					} );
+								rgGlobal.sendLPGAEvent(
+									eventAction,
+									eventCategory,
+									eventLabel,
+									0,
+									true
+								);
+
+								if ( window.location.href !== r.edit_link ) {
+									setTimeout( function() {
+										window.location.href = r.edit_link;
+									}, 1500 );
+								}
+							}
+							// Release request lock.
+							$o.requestSent = false;
+
+							// Hide Loader.
+							hideLoader();
+						} );
+
+						return false;
+					}
+				} );
 
 				// Validate URL.
 				$o.contributionThankYouPage.on( 'focusout', function() {
@@ -268,7 +289,9 @@ import { __, sprintf } from '@wordpress/i18n';
 				} );
 
 				// Copy Contribution code on Dashboard.
-				$o.contributionDashboardShortcodeLink.on( 'click', function( e ) {
+				$o.contributionDashboardShortcodeLink.on( 'click', function(
+					e
+				) {
 					e.preventDefault();
 
 					const contributionCode = $( this ).attr( 'data-shortcode' );
@@ -312,28 +335,51 @@ import { __, sprintf } from '@wordpress/i18n';
 							case 'campaignName':
 								eventLabel = 'Campaign name';
 
-								$( 'input', $o.contributionCampaignNameLabel ).removeClass( 'input-blur' );
-								$o.contributionGenerateButtonLabel.removeClass( 'highlighted' );
-								$o.contributionThankYouPageLabel.removeClass( 'highlighted' );
-								$o.contributionCampaignNameLabel.addClass( 'highlighted' );
+								$(
+									'input',
+									$o.contributionCampaignNameLabel
+								).removeClass( 'input-blur' );
+								$o.contributionGenerateButtonLabel.removeClass(
+									'highlighted'
+								);
+								$o.contributionThankYouPageLabel.removeClass(
+									'highlighted'
+								);
+								$o.contributionCampaignNameLabel.addClass(
+									'highlighted'
+								);
 
 								break;
 
 							case 'shortcode':
 								eventLabel = 'Generate Shortcode';
 
-								$( 'input', $o.contributionGenerateButtonLabel ).removeClass( 'input-blur' );
-								$o.contributionGenerateButtonLabel.addClass( 'highlighted' );
+								$(
+									'input',
+									$o.contributionGenerateButtonLabel
+								).removeClass( 'input-blur' );
+								$o.contributionGenerateButtonLabel.addClass(
+									'highlighted'
+								);
 
 								break;
 
 							case 'thankYouPage':
 								eventLabel = 'Thank you page';
 
-								$( 'input', $o.contributionThankYouPageLabel ).removeClass( 'input-blur' );
-								$o.contributionCampaignNameLabel.removeClass( 'highlighted' );
-								$o.contributionGenerateButtonLabel.removeClass( 'highlighted' );
-								$o.contributionThankYouPageLabel.addClass( 'highlighted' );
+								$(
+									'input',
+									$o.contributionThankYouPageLabel
+								).removeClass( 'input-blur' );
+								$o.contributionCampaignNameLabel.removeClass(
+									'highlighted'
+								);
+								$o.contributionGenerateButtonLabel.removeClass(
+									'highlighted'
+								);
+								$o.contributionThankYouPageLabel.addClass(
+									'highlighted'
+								);
 
 								break;
 						}
@@ -375,7 +421,9 @@ import { __, sprintf } from '@wordpress/i18n';
 					const isValid = validateAllfields();
 
 					if ( 'valid' === isValid ) {
-						$o.saveButton.addClass( 'enabled' ).prop( 'disabled', false );
+						$o.saveButton
+							.addClass( 'enabled' )
+							.prop( 'disabled', false );
 					}
 				} );
 
