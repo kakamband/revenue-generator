@@ -221,7 +221,7 @@ import { debounce } from '../helpers';
 					width: 'auto',
 					dropdownAutoWidth: true,
 					dropdownCssClass: ':all:',
-					minimumResultsForSearch: -1
+					minimumResultsForSearch: -1,
 				} );
 			};
 

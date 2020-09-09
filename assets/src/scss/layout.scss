@@ -239,7 +239,7 @@ body {
 	}
 
 	&--searchable.select2-dropdown {
-		width: 180px !important;
+		width: 180px !important; /* stylelint-disable-line declaration-no-important */
 	}
 
 	.select2-results__option[aria-selected],
@@ -254,14 +254,14 @@ body {
 		}
 	}
 
-	.select2-results__option[aria-selected=true],
+	.select2-results__option[aria-selected="true"],
 	.select2-results__option--highlighted[aria-selected] {
 		color: #fff;
-		background-color: transparent !important;
+		background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
 	}
 
-	.select2-results__option[aria-selected=true]:after {
-		content: '';
+	.select2-results__option[aria-selected="true"]::after {
+		content: "";
 		position: absolute;
 		right: 15px;
 		display: block;

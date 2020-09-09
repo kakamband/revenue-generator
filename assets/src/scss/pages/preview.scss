@@ -45,7 +45,7 @@
 		padding: 0 15px;
 		border: 1px solid #fefefe;
 		border-radius: 4px;
-		box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.4);
+		box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
 		-webkit-backdrop-filter: blur(10px);
 		backdrop-filter: blur(10px);
 		background-color: rgba(255, 255, 255, 0.9);
@@ -61,7 +61,6 @@
 			font-weight: 500;
 			font-stretch: normal;
 			font-style: normal;
-			line-height: normal;
 			letter-spacing: normal;
 		}
 
@@ -112,7 +111,7 @@
 			border-top: 0;
 			border-bottom-left-radius: 4px;
 			border-bottom-right-radius: 4px;
-			box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.4);
+			box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
 			background-color: rgba(255, 255, 255, 0.9);
 
 			span {
@@ -142,7 +141,7 @@
 		height: 60px;
 		padding: 0 8px;
 		border-radius: 4px;
-		box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.4);
+		box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
 		font-size: 18px;
 		-webkit-backdrop-filter: blur(10px);
 		backdrop-filter: blur(10px);
@@ -212,7 +211,7 @@
 				font-size: 18px;
 			}
 			.select2-container {
-				width: 180px !important;
+				width: 180px !important; /* stylelint-disable-line declaration-no-important */
 				padding: 0;
 				.select2-search {
 					margin-bottom: 0;
@@ -426,16 +425,16 @@
 	.blur-content {
 		position: relative;
 		min-height: 900px;
-		&:before {
+		&::before {
 			pointer-events: none;
-			content: '';
+			content: "";
 			position: absolute;
 			left: 0;
 			bottom: 91%;
 			z-index: 1;
 			width: 100%;
 			height: 200px;
-			background: linear-gradient(to bottom,rgba(255,255,255,0),#fff);
+			background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff);
 		}
 	}
 

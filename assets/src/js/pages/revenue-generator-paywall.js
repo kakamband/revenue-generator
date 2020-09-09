@@ -104,7 +104,9 @@ import { __, sprintf } from '@wordpress/i18n';
 				savePaywall: $( '#rg_js_savePaywall' ),
 				searchPaywallContent: $( '#rg_js_searchPaywallContent' ),
 				searchPost: $( '#rg_js_searchPost' ),
-				applyToSelect: $( '.rev-gen-preview-main--paywall-actions-apply select' ),
+				applyToSelect: $(
+					'.rev-gen-preview-main--paywall-actions-apply select'
+				),
 				select2Multiple: $(
 					'#rg_js_searchPaywallContent, #rg_js_searchPost'
 				),
@@ -211,7 +213,7 @@ import { __, sprintf } from '@wordpress/i18n';
 					$o.applyToSelect.select2( {
 						width: 'auto',
 						dropdownAutoWidth: true,
-						dropdownCssClass: ':all:'
+						dropdownCssClass: ':all:',
 					} );
 
 					// Highlight search bar and add tooltip, change background-color for wrapper.
