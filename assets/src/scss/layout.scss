@@ -63,6 +63,10 @@ body {
 	.shepherd-text {
 		padding: 5px;
 		min-height: 35px;
+		font-style: normal;
+		font-weight: 500;
+		font-size: 15px;
+		line-height: 20px;
 		a {
 			color: #fff;
 		}
@@ -75,6 +79,10 @@ body {
 		border: 0;
 		cursor: pointer;
 		padding: 0;
+		font-style: normal;
+		font-weight: bold;
+		font-size: 14px;
+		line-height: 18px;
 	}
 
 	.shepherd-footer {
@@ -85,7 +93,8 @@ body {
 
 	.shepherd-content-skip-tour {
 		position: relative;
-		right: 100px;
+		right: 80px;
+		font-weight: 500;
 	}
 
 	.shepherd-content-complete-tour-element {
@@ -155,4 +164,111 @@ body {
 }
 .hide {
 	display: none;
+}
+
+// Fade In.
+.fade-in {
+	animation: fadeIn ease 0.8;
+	-webkit-animation: fadeIn ease 0.8s;
+	-moz-animation: fadeIn ease 0.8s;
+	-o-animation: fadeIn ease 0.8s;
+	-ms-animation: fadeIn ease 0.8s;
+}
+
+@keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+@-moz-keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+@-webkit-keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+@-o-keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+@-ms-keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+// Fade Out.
+.fade-out {
+	animation: fadeOut ease 0.8s;
+	-webkit-animation: fadeOut ease 0.8s;
+	-moz-animation: fadeOut ease 0.8s;
+	-o-animation: fadeOut ease 0.8s;
+	-ms-animation: fadeOut ease 0.8s;
+}
+@keyframes fadeOut {
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+@-moz-keyframes fadeOut {
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+@-webkit-keyframes fadeOut {
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+@-o-keyframes fadeOut {
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+@-ms-keyframes fadeOut {
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
 }

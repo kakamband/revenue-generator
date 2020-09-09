@@ -2832,7 +2832,18 @@ import { __, sprintf } from '@wordpress/i18n';
 				return new Shepherd.Tour( {
 					defaultStepOptions: {
 						classes: 'rev-gen-tutorial-card',
-						scrollTo: { behavior: 'smooth', block: 'center' },
+						scrollTo: true,
+						scrollToHandler: ( e ) => {
+							$( 'html, body' ).animate(
+								{
+									scrollTop:
+										$( e ).offset().top -
+										$( window ).height() / 2 -
+										$( e ).height(),
+								},
+								1000
+							);
+						},
 					},
 				} );
 			};
@@ -2860,287 +2871,440 @@ import { __, sprintf } from '@wordpress/i18n';
 				const tutorialEventLabelComplete = 'Complete';
 
 				// Add tutorial step for main search.
-				tour.addStep( {
-					id: 'rg-main-search-input',
-					text: __(
-						"Search for the page or post you'd like to preview with Revenue Generator here.",
-						'revenue-generator'
-					),
-					attachTo: {
-						element: '.rev-gen-preview-main--search',
-						on: 'bottom',
-					},
-					arrow: true,
-					classes: 'shepherd-content-add-space-top',
-					buttons: [ skipTourButton, nextButton ],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'1 - Article Search',
-								tutorialEventCategory,
-								tutorialEventLabelContinue,
-								0,
-								true
-							);
-						},
-					},
-				} );
-
-				// Add tutorial step for editing header title
-				tour.addStep( {
-					id: 'rg-purchase-overlay-header',
-					text: __( 'Click to Edit', 'revenue-generator' ),
-					attachTo: {
-						element: '.rg-purchase-overlay-title',
-						on: 'bottom',
-					},
-					arrow: true,
-					classes: 'rev-gen-tutorial-title',
-					buttons: [ nextButton ],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'2 - Name Paywall',
-								tutorialEventCategory,
-								tutorialEventLabelContinue,
-								0,
-								true
-							);
-						},
-					},
-				} );
-
-				// Add tutorial step for option item.
-				tour.addStep( {
-					id: 'rg-purchase-option-item',
-					text: __(
-						'Hover over each element to see the available options.',
-						'revenue-generator'
-					),
-					attachTo: {
-						element:
-							'.rg-purchase-overlay-purchase-options .option-item-second',
-						on: 'top',
-					},
-					arrow: true,
-					classes: 'shepherd-content-add-space-bottom',
-					buttons: [ nextButton ],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'3 - Element Hover',
-								tutorialEventCategory,
-								tutorialEventLabelContinue,
-								0,
-								true
-							);
-						},
-					},
-				} );
-
-				// Add tutorial step for option item edit button.
-				tour.addStep( {
-					id: 'rg-purchase-option-item-edit',
-					text: __(
-						'Click on the ‘more options’ icon to set the product type (single item purchase, time pass, or subscription).',
-						'revenue-generator'
-					),
-					attachTo: {
-						element:
-							'.rg-purchase-overlay-purchase-options .option-item-second .rg-purchase-overlay-option-edit',
-						on: 'left',
-					},
-					arrow: true,
-					buttons: [ nextButton ],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'4 - More Options',
-								tutorialEventCategory,
-								tutorialEventLabelContinue,
-								0,
-								true
-							);
-						},
-					},
-				} );
-
-				// Add tutorial step for option item title area.
-				tour.addStep( {
-					id: 'rg-purchase-option-item-title',
-					text: __(
-						'Click on any text element to edit it.',
-						'revenue-generator'
-					),
-					attachTo: {
-						element:
-							'.rg-purchase-overlay-purchase-options .option-item-second .rg-purchase-overlay-purchase-options-item-info .rg-purchase-overlay-purchase-options-item-info-title',
-						on: 'top',
-					},
-					arrow: true,
-					classes: 'shepherd-content-add-space-bottom',
-					buttons: [ nextButton ],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'5 - Text Edit',
-								tutorialEventCategory,
-								tutorialEventLabelContinue,
-								0,
-								true
-							);
-						},
-					},
-				} );
-
-				// Add tutorial step for option item price area.
-				tour.addStep( {
-					id: 'rg-purchase-option-item-price',
-					text: sprintf(
-						/* translators: %1$s line break tag, %2$s laterpay.net info link opening,  %3$s laterpay.net info link closing */
-						__(
-							'These are our recommended prices. %1$s%1$sClick to edit; prices lower than 5.00 will default to %2$spay later%3$s.',
+				const step1 = tour
+					.addStep( {
+						id: 'rg-main-search-input',
+						text: __(
+							"Search for the page or post you'd like to preview with Revenue Generator here.",
 							'revenue-generator'
 						),
-						'<br/>',
-						'<a class="info-link" href="https://www.laterpay.net/academy/getting-started-with-laterpay-the-difference-between-pay-now-pay-later" target="_blank" rel="noopener noreferrer">',
-						'</a>'
-					),
-					attachTo: {
-						element:
-							'.rg-purchase-overlay-purchase-options .option-item-second .rg-purchase-overlay-purchase-options-item-price',
-						on: 'top',
-					},
-					arrow: true,
-					classes: 'shepherd-content-add-space-bottom',
-					buttons: [ nextButton ],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'6 - Pricing',
-								tutorialEventCategory,
-								tutorialEventLabelContinue,
-								0,
-								true
-							);
+						attachTo: {
+							element: '.rev-gen-preview-main--search',
+							on: 'bottom',
 						},
-					},
-				} );
+						arrow: true,
+						classes: 'shepherd-content-add-space-top fade-in',
+						buttons: [ skipTourButton, nextButton ],
+						when: {
+							hide() {
+								rgGlobal.sendLPGAEvent(
+									'1 - Article Search',
+									tutorialEventCategory,
+									tutorialEventLabelContinue,
+									0,
+									true
+								);
+							},
+						},
+					} )
+					.on( 'before-hide', () => {
+						const optionClasses = step1.options.classes;
+						step1.options.classes = optionClasses.replace(
+							'fade-in',
+							'fade-out'
+						);
+						step1.updateStepOptions( step1.options );
+					} )
+					.on( 'hide', () => {
+						$( step1.el ).removeAttr( 'hidden' );
+						setTimeout( function() {
+							$( step1.el ).attr( 'hidden', '' );
+						}, 700 );
+					} );
+
+				// Add tutorial step for editing header title
+				const step2 = tour
+					.addStep( {
+						id: 'rg-purchase-overlay-header',
+						text: __( 'Click to Edit', 'revenue-generator' ),
+						attachTo: {
+							element: '.rg-purchase-overlay-title',
+							on: 'bottom',
+						},
+						arrow: true,
+						classes: 'rev-gen-tutorial-title fade-in',
+						buttons: [ nextButton ],
+						when: {
+							hide() {
+								rgGlobal.sendLPGAEvent(
+									'2 - Name Paywall',
+									tutorialEventCategory,
+									tutorialEventLabelContinue,
+									0,
+									true
+								);
+							},
+						},
+					} )
+					.on( 'before-hide', () => {
+						const optionClasses = step2.options.classes;
+						step2.options.classes = optionClasses.replace(
+							'fade-in',
+							'fade-out'
+						);
+						step2.updateStepOptions( step2.options );
+					} )
+					.on( 'hide', () => {
+						$( step2.el ).removeAttr( 'hidden' );
+						setTimeout( function() {
+							$( step2.el ).attr( 'hidden', '' );
+						}, 700 );
+					} );
+
+				// Add tutorial step for option item.
+				const step3 = tour
+					.addStep( {
+						id: 'rg-purchase-option-item',
+						text: __(
+							'Hover over each element to see the available options.',
+							'revenue-generator'
+						),
+						attachTo: {
+							element:
+								'.rg-purchase-overlay-purchase-options .option-item-second',
+							on: 'top',
+						},
+						arrow: true,
+						classes: 'shepherd-content-add-space-bottom fade-in',
+						buttons: [ nextButton ],
+						when: {
+							hide() {
+								rgGlobal.sendLPGAEvent(
+									'3 - Element Hover',
+									tutorialEventCategory,
+									tutorialEventLabelContinue,
+									0,
+									true
+								);
+							},
+						},
+					} )
+					.on( 'before-hide', () => {
+						const optionClasses = step3.options.classes;
+						step3.options.classes = optionClasses.replace(
+							'fade-in',
+							'fade-out'
+						);
+						step3.updateStepOptions( step3.options );
+					} )
+					.on( 'hide', () => {
+						$( step3.el ).removeAttr( 'hidden' );
+						setTimeout( function() {
+							$( step3.el ).attr( 'hidden', '' );
+						}, 700 );
+					} );
+
+				// Add tutorial step for option item edit button.
+				const step4 = tour
+					.addStep( {
+						id: 'rg-purchase-option-item-edit',
+						text: __(
+							'Click on the ‘more options’ icon to set the product type (single item purchase, time pass, or subscription).',
+							'revenue-generator'
+						),
+						attachTo: {
+							element:
+								'.rg-purchase-overlay-purchase-options .option-item-second .rg-purchase-overlay-option-edit',
+							on: 'left',
+						},
+						arrow: true,
+						buttons: [ nextButton ],
+						classes: 'fade-in',
+						when: {
+							hide() {
+								rgGlobal.sendLPGAEvent(
+									'4 - More Options',
+									tutorialEventCategory,
+									tutorialEventLabelContinue,
+									0,
+									true
+								);
+							},
+						},
+					} )
+					.on( 'before-hide', () => {
+						const optionClasses = step4.options.classes;
+						step4.options.classes = optionClasses.replace(
+							'fade-in',
+							'fade-out'
+						);
+						step4.updateStepOptions( step4.options );
+					} )
+					.on( 'hide', () => {
+						$( step4.el ).removeAttr( 'hidden' );
+						setTimeout( function() {
+							$( step4.el ).attr( 'hidden', '' );
+						}, 700 );
+					} );
+
+				// Add tutorial step for option item title area.
+				const step5 = tour
+					.addStep( {
+						id: 'rg-purchase-option-item-title',
+						text: __(
+							'Click on any text element to edit it.',
+							'revenue-generator'
+						),
+						attachTo: {
+							element:
+								'.rg-purchase-overlay-purchase-options .option-item-second .rg-purchase-overlay-purchase-options-item-info .rg-purchase-overlay-purchase-options-item-info-title',
+							on: 'top',
+						},
+						arrow: true,
+						classes: 'shepherd-content-add-space-bottom fade-in',
+						buttons: [ nextButton ],
+						when: {
+							hide() {
+								rgGlobal.sendLPGAEvent(
+									'5 - Text Edit',
+									tutorialEventCategory,
+									tutorialEventLabelContinue,
+									0,
+									true
+								);
+							},
+						},
+					} )
+					.on( 'before-hide', () => {
+						const optionClasses = step5.options.classes;
+						step5.options.classes = optionClasses.replace(
+							'fade-in',
+							'fade-out'
+						);
+						step5.updateStepOptions( step5.options );
+					} )
+					.on( 'hide', () => {
+						$( step5.el ).removeAttr( 'hidden' );
+						setTimeout( function() {
+							$( step5.el ).attr( 'hidden', '' );
+						}, 700 );
+					} );
+
+				// Add tutorial step for option item price area.
+				const step6 = tour
+					.addStep( {
+						id: 'rg-purchase-option-item-price',
+						text: sprintf(
+							/* translators: %1$s line break tag, %2$s laterpay.net info link opening,  %3$s laterpay.net info link closing */
+							__(
+								'These are our recommended prices. %1$s%1$sClick to edit; prices lower than 5.00 will default to %2$spay later%3$s.',
+								'revenue-generator'
+							),
+							'<br/>',
+							'<a class="info-link" href="https://www.laterpay.net/academy/getting-started-with-laterpay-the-difference-between-pay-now-pay-later" target="_blank" rel="noopener noreferrer">',
+							'</a>'
+						),
+						attachTo: {
+							element:
+								'.rg-purchase-overlay-purchase-options .option-item-second .rg-purchase-overlay-purchase-options-item-price',
+							on: 'top',
+						},
+						arrow: true,
+						classes: 'shepherd-content-add-space-bottom fade-in',
+						buttons: [ nextButton ],
+						when: {
+							hide() {
+								rgGlobal.sendLPGAEvent(
+									'6 - Pricing',
+									tutorialEventCategory,
+									tutorialEventLabelContinue,
+									0,
+									true
+								);
+							},
+						},
+					} )
+					.on( 'before-hide', () => {
+						const optionClasses = step6.options.classes;
+						step6.options.classes = optionClasses.replace(
+							'fade-in',
+							'fade-out'
+						);
+						step6.updateStepOptions( step6.options );
+					} )
+					.on( 'hide', () => {
+						$( step6.el ).removeAttr( 'hidden' );
+						setTimeout( function() {
+							$( step6.el ).attr( 'hidden', '' );
+						}, 700 );
+					} );
 
 				// Add tutorial step for option item add.
-				tour.addStep( {
-					id: 'rg-purchase-option-item-add',
-					text: __(
-						'Hover below the paywall to get the option to add another purchase button.',
-						'revenue-generator'
-					),
-					attachTo: {
-						element: '.rg-purchase-overlay-option-area-add-option',
-						on: 'top',
-					},
-					arrow: true,
-					classes: 'shepherd-content-add-space-bottom',
-					buttons: [ nextButton ],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'7 - Add Purchase Option',
-								tutorialEventCategory,
-								tutorialEventLabelContinue,
-								0,
-								true
-							);
+				const step7 = tour
+					.addStep( {
+						id: 'rg-purchase-option-item-add',
+						text: __(
+							'Hover below the paywall to get the option to add another purchase button.',
+							'revenue-generator'
+						),
+						attachTo: {
+							element:
+								'.rg-purchase-overlay-option-area-add-option',
+							on: 'top',
 						},
-					},
-				} );
+						arrow: true,
+						classes: 'shepherd-content-add-space-bottom fade-in',
+						buttons: [ nextButton ],
+						when: {
+							hide() {
+								rgGlobal.sendLPGAEvent(
+									'7 - Add Purchase Option',
+									tutorialEventCategory,
+									tutorialEventLabelContinue,
+									0,
+									true
+								);
+							},
+						},
+					} )
+					.on( 'before-hide', () => {
+						const optionClasses = step7.options.classes;
+						step7.options.classes = optionClasses.replace(
+							'fade-in',
+							'fade-out'
+						);
+						step7.updateStepOptions( step7.options );
+					} )
+					.on( 'hide', () => {
+						$( step7.el ).removeAttr( 'hidden' );
+						setTimeout( function() {
+							$( step7.el ).attr( 'hidden', '' );
+						}, 700 );
+					} );
 
 				// Add tutorial step for paywall name.
-				tour.addStep( {
-					id: 'rg-purchase-option-paywall-name',
-					text: __(
-						'Click here to change the name of your paywall.',
-						'revenue-generator'
-					),
-					attachTo: {
-						element: '.rev-gen-preview-main-paywall-name',
-						on: 'bottom',
-					},
-					arrow: true,
-					classes: 'shepherd-content-add-space-bottom',
-					buttons: [ nextButton ],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'8 - Name Paywall',
-								tutorialEventCategory,
-								tutorialEventLabelContinue,
-								0,
-								true
-							);
+				const step8 = tour
+					.addStep( {
+						id: 'rg-purchase-option-paywall-name',
+						text: __(
+							'Click here to change the name of your paywall.',
+							'revenue-generator'
+						),
+						attachTo: {
+							element: '.rev-gen-preview-main-paywall-name',
+							on: 'bottom',
 						},
-					},
-				} );
+						arrow: true,
+						classes: 'shepherd-content-add-space-bottom fade-in',
+						buttons: [ nextButton ],
+						when: {
+							hide() {
+								rgGlobal.sendLPGAEvent(
+									'8 - Name Paywall',
+									tutorialEventCategory,
+									tutorialEventLabelContinue,
+									0,
+									true
+								);
+							},
+						},
+					} )
+					.on( 'before-hide', () => {
+						const optionClasses = step8.options.classes;
+						step8.options.classes = optionClasses.replace(
+							'fade-in',
+							'fade-out'
+						);
+						step8.updateStepOptions( step8.options );
+					} )
+					.on( 'hide', () => {
+						$( step8.el ).removeAttr( 'hidden' );
+						setTimeout( function() {
+							$( step8.el ).attr( 'hidden', '' );
+						}, 700 );
+					} );
 
 				// Add tutorial step for paywall actions search.
-				tour.addStep( {
-					id: 'rg-purchase-option-paywall-actions-search',
-					text: __(
-						'Select the content that should display this paywall.',
-						'revenue-generator'
-					),
-					attachTo: {
-						element:
-							'.rev-gen-preview-main--paywall-actions-search',
-						on: 'bottom',
-					},
-					arrow: true,
-					classes: 'shepherd-content-add-space-bottom',
-					buttons: [ nextButton ],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'9 - Select Content',
-								tutorialEventCategory,
-								tutorialEventLabelContinue,
-								0,
-								true
-							);
+				const step9 = tour
+					.addStep( {
+						id: 'rg-purchase-option-paywall-actions-search',
+						text: __(
+							'Select the content that should display this paywall.',
+							'revenue-generator'
+						),
+						attachTo: {
+							element:
+								'.rev-gen-preview-main--paywall-actions-search',
+							on: 'bottom',
 						},
-					},
-				} );
+						arrow: true,
+						classes: 'shepherd-content-add-space-bottom fade-in',
+						buttons: [ nextButton ],
+						when: {
+							hide() {
+								rgGlobal.sendLPGAEvent(
+									'9 - Select Content',
+									tutorialEventCategory,
+									tutorialEventLabelContinue,
+									0,
+									true
+								);
+							},
+						},
+					} )
+					.on( 'before-hide', () => {
+						const optionClasses = step9.options.classes;
+						step9.options.classes = optionClasses.replace(
+							'fade-in',
+							'fade-out'
+						);
+						step9.updateStepOptions( step9.options );
+					} )
+					.on( 'hide', () => {
+						$( step9.el ).removeAttr( 'hidden' );
+						setTimeout( function() {
+							$( step9.el ).attr( 'hidden', '' );
+						}, 700 );
+					} );
 
 				// Add tutorial step for paywall actions publish.
-				tour.addStep( {
-					id: 'rg-purchase-option-paywall-publish',
-					text: __(
-						'When you’re ready to activate your paywall, connect your Laterpay account.',
-						'revenue-generator'
-					),
-					attachTo: {
-						element: '#rg_js_activatePaywall',
-						on: 'bottom',
-					},
-					arrow: true,
-					classes: 'shepherd-content-add-space-bottom',
-					buttons: [
-						{
-							text: __( 'Complete', 'revenue-generator' ),
-							action: tour.next,
-							classes: 'shepherd-content-complete-tour-element',
+				const step10 = tour
+					.addStep( {
+						id: 'rg-purchase-option-paywall-publish',
+						text: __(
+							'When you’re ready to activate your paywall, connect your Laterpay account.',
+							'revenue-generator'
+						),
+						attachTo: {
+							element: '#rg_js_activatePaywall',
+							on: 'bottom',
 						},
-					],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'10 - Publish',
-								tutorialEventCategory,
-								tutorialEventLabelComplete,
-								0,
-								true
-							);
+						arrow: true,
+						classes: 'shepherd-content-add-space-bottom fade-in',
+						buttons: [
+							{
+								text: __( 'Complete', 'revenue-generator' ),
+								action: tour.next,
+								classes:
+									'shepherd-content-complete-tour-element',
+							},
+						],
+						when: {
+							hide() {
+								rgGlobal.sendLPGAEvent(
+									'10 - Publish',
+									tutorialEventCategory,
+									tutorialEventLabelComplete,
+									0,
+									true
+								);
+							},
 						},
-					},
-				} );
+					} )
+					.on( 'before-hide', () => {
+						const optionClasses = step10.options.classes;
+						step10.options.classes = optionClasses.replace(
+							'fade-in',
+							'fade-out'
+						);
+						step10.updateStepOptions( step10.options );
+					} )
+					.on( 'hide', () => {
+						$( step10.el ).removeAttr( 'hidden' );
+						setTimeout( function() {
+							$( step10.el ).attr( 'hidden', '' );
+						}, 700 );
+					} );
 			};
 
 			/**
