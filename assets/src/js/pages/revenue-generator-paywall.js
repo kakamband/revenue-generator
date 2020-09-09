@@ -343,6 +343,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				 */
 				$o.postPreviewWrapper.on( 'click', function() {
 					// Hide result wrapper and revert search box text if no action was taken.
+					$o.searchContentWrapper.removeClass( 'searching' );
 					$o.searchResultWrapper.hide();
 					$o.searchContentWrapper.find( 'label' ).show();
 					const searchText = $o.searchContent.val().trim();
@@ -3398,6 +3399,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						} ).done( function( r ) {
 							$o.requestSent = false;
 							if ( true === r.success ) {
+								$o.searchContentWrapper.addClass( 'searching' );
 								$o.searchResultWrapper.empty();
 								const postPreviews = r.preview_posts;
 								postPreviews.forEach( function( item ) {
