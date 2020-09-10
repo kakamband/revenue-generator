@@ -104,6 +104,9 @@ import { __, sprintf } from '@wordpress/i18n';
 				savePaywall: $( '#rg_js_savePaywall' ),
 				searchPaywallContent: $( '#rg_js_searchPaywallContent' ),
 				searchPost: $( '#rg_js_searchPost' ),
+				applyToSelect: $(
+					'.rev-gen-preview-main--paywall-actions-apply select'
+				),
 				select2Multiple: $(
 					'#rg_js_searchPaywallContent, #rg_js_searchPost'
 				),
@@ -206,6 +209,12 @@ import { __, sprintf } from '@wordpress/i18n';
 				 */
 				$( document ).ready( function() {
 					$o.postPreviewWrapper.fadeIn( 'slow' );
+
+					$o.applyToSelect.select2( {
+						width: 'auto',
+						dropdownAutoWidth: true,
+						dropdownCssClass: ':all:',
+					} );
 
 					// Highlight search bar and add tooltip, change background-color for wrapper.
 					if ( $( $o.noResultsWrapper ).length ) {
@@ -336,6 +345,7 @@ import { __, sprintf } from '@wordpress/i18n';
 				 */
 				$o.postPreviewWrapper.on( 'click', function() {
 					// Hide result wrapper and revert search box text if no action was taken.
+					$o.searchContentWrapper.removeClass( 'searching' );
 					$o.searchResultWrapper.hide();
 					$o.searchContentWrapper.find( 'label' ).show();
 					const searchText = $o.searchContent.val().trim();
@@ -510,7 +520,10 @@ import { __, sprintf } from '@wordpress/i18n';
 						},
 						cache: true,
 					},
-					placeholder: __( 'search', 'revenue-generator' ),
+					width: 'auto',
+					dropdownAutoWidth: true,
+					dropdownCssClass: ':all:',
+					placeholder: __( 'Search', 'revenue-generator' ),
 					language: {
 						inputTooShort() {
 							return __(
@@ -3388,6 +3401,7 @@ import { __, sprintf } from '@wordpress/i18n';
 						} ).done( function( r ) {
 							$o.requestSent = false;
 							if ( true === r.success ) {
+								$o.searchContentWrapper.addClass( 'searching' );
 								$o.searchResultWrapper.empty();
 								const postPreviews = r.preview_posts;
 								postPreviews.forEach( function( item ) {
