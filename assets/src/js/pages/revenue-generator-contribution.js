@@ -450,7 +450,18 @@ import { __, sprintf } from '@wordpress/i18n';
 				return new Shepherd.Tour( {
 					defaultStepOptions: {
 						classes: 'rev-gen-tutorial-card',
-						scrollTo: { behavior: 'smooth', block: 'center' },
+						scrollTo: true,
+						scrollToHandler: ( e ) => {
+							$( 'html, body' ).animate(
+								{
+									scrollTop:
+										$( e ).offset().top -
+										$( window ).height() / 2 -
+										$( e ).height(),
+								},
+								1000
+							);
+						},
 					},
 				} );
 			};
@@ -493,151 +504,230 @@ import { __, sprintf } from '@wordpress/i18n';
 				const tutorialEventLabelComplete = 'Complete';
 
 				// Add tutorial step for main search.
-				tour.addStep( {
-					id: 'rg-contribution-header-description',
-					text: __( 'Click to edit', 'revenue-generator' ),
-					attachTo: {
-						element: '#rev-gen-contribution-main-header-section',
-						on: 'top',
-					},
-					arrow: true,
-					classes: 'rev-gen-tutorial-contribution-title',
-					buttons: [ skipTourButton, nextButton ],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'1 - Text Edit',
-								tutorialEventCategory,
-								tutorialEventLabelContinue,
-								0,
-								true
-							);
+				const step1 = tour
+					.addStep( {
+						id: 'rg-contribution-header-description',
+						text: __( 'Click to edit', 'revenue-generator' ),
+						attachTo: {
+							element:
+								'#rev-gen-contribution-main-header-section',
+							on: 'top',
 						},
-					},
-				} );
+						arrow: true,
+						classes: 'rev-gen-tutorial-contribution-title fade-in',
+						buttons: [ skipTourButton, nextButton ],
+						when: {
+							hide() {
+								rgGlobal.sendLPGAEvent(
+									'1 - Text Edit',
+									tutorialEventCategory,
+									tutorialEventLabelContinue,
+									0,
+									true
+								);
+							},
+						},
+					} )
+					.on( 'before-hide', () => {
+						const optionClasses = step1.options.classes;
+						step1.options.classes = optionClasses.replace(
+							'fade-in',
+							'fade-out'
+						);
+						step1.updateStepOptions( step1.options );
+					} )
+					.on( 'hide', () => {
+						$( step1.el ).removeAttr( 'hidden' );
+						setTimeout( function() {
+							$( step1.el ).attr( 'hidden', '' );
+						}, 700 );
+					} );
 
 				// Add tutorial step for editing header title
-				tour.addStep( {
-					id: 'rg-contribution-amount-first',
-					text: __(
-						'Click to edit each amount',
-						'revenue-generator'
-					),
-					attachTo: {
-						element:
-							'.rev-gen-contribution-main--box-donation:first-child',
-						on: 'top',
-					},
-					arrow: true,
-					classes: 'rev-gen-tutorial-contribution-title',
-					buttons: [ nextButton ],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'2 - Amount Edit',
-								tutorialEventCategory,
-								tutorialEventLabelContinue,
-								0,
-								true
-							);
+				const step2 = tour
+					.addStep( {
+						id: 'rg-contribution-amount-first',
+						text: __(
+							'Click to edit each amount',
+							'revenue-generator'
+						),
+						attachTo: {
+							element:
+								'.rev-gen-contribution-main--box-donation:first-child',
+							on: 'top',
 						},
-					},
-				} );
+						arrow: true,
+						classes: 'rev-gen-tutorial-contribution-title fade-in',
+						buttons: [ nextButton ],
+						when: {
+							hide() {
+								rgGlobal.sendLPGAEvent(
+									'2 - Amount Edit',
+									tutorialEventCategory,
+									tutorialEventLabelContinue,
+									0,
+									true
+								);
+							},
+						},
+					} )
+					.on( 'before-hide', () => {
+						const optionClasses = step2.options.classes;
+						step2.options.classes = optionClasses.replace(
+							'fade-in',
+							'fade-out'
+						);
+						step2.updateStepOptions( step2.options );
+					} )
+					.on( 'hide', () => {
+						$( step2.el ).removeAttr( 'hidden' );
+						setTimeout( function() {
+							$( step2.el ).attr( 'hidden', '' );
+						}, 700 );
+					} );
 
 				// Add tutorial step for option item.
-				tour.addStep( {
-					id: 'rg-contribution-amount-second',
-					text: sprintf(
-						__(
-							'Amounts less than $5 will default to %1$s pay later %2$s',
-							'revenue-generator'
+				const step3 = tour
+					.addStep( {
+						id: 'rg-contribution-amount-second',
+						text: sprintf(
+							__(
+								'Amounts less than $5 will default to %1$s pay later %2$s',
+								'revenue-generator'
+							),
+							'<a target="_blank" href="https://www.laterpay.net/academy/getting-started-with-laterpay-the-difference-between-pay-now-pay-later">',
+							'</a>'
 						),
-						'<a target="_blank" href="https://www.laterpay.net/academy/getting-started-with-laterpay-the-difference-between-pay-now-pay-later">',
-						'</a>'
-					),
-					attachTo: {
-						element:
-							'.rev-gen-contribution-main--box-donation:nth-child(2)',
-						on: 'top',
-					},
-					arrow: true,
-					classes: 'rev-gen-tutorial-contribution-title',
-					buttons: [ nextButton ],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'3 - PN v PL',
-								tutorialEventCategory,
-								tutorialEventLabelContinue,
-								0,
-								true
-							);
+						attachTo: {
+							element:
+								'.rev-gen-contribution-main--box-donation:nth-child(2)',
+							on: 'top',
 						},
-					},
-				} );
+						arrow: true,
+						classes: 'rev-gen-tutorial-contribution-title fade-in',
+						buttons: [ nextButton ],
+						when: {
+							hide() {
+								rgGlobal.sendLPGAEvent(
+									'3 - PN v PL',
+									tutorialEventCategory,
+									tutorialEventLabelContinue,
+									0,
+									true
+								);
+							},
+						},
+					} )
+					.on( 'before-hide', () => {
+						const optionClasses = step3.options.classes;
+						step3.options.classes = optionClasses.replace(
+							'fade-in',
+							'fade-out'
+						);
+						step3.updateStepOptions( step3.options );
+					} )
+					.on( 'hide', () => {
+						$( step3.el ).removeAttr( 'hidden' );
+						setTimeout( function() {
+							$( step3.el ).attr( 'hidden', '' );
+						}, 700 );
+					} );
 
 				// Add tutorial step for option item edit button.
-				tour.addStep( {
-					id: 'rg-contribution-campaign-name',
-					text: __(
-						"Enter the description that you would like to appear on your customer's invoice",
-						'revenue-generator'
-					),
-					attachTo: {
-						element: '#rg_contribution_campaign_name',
-						on: 'top',
-					},
-					arrow: true,
-					classes: 'rev-gen-tutorial-contribution-title',
-					buttons: [ nextButton ],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'4 - Campaign Name',
-								tutorialEventCategory,
-								tutorialEventLabelContinue,
-								0,
-								true
-							);
-						},
-					},
-				} );
-
-				// Add tutorial step for paywall actions publish.
-				tour.addStep( {
-					id: 'rg-contribution-generate-button',
-					text: sprintf(
-						__(
-							'When you’re ready, click here to copy your customized %1$s shortcode %2$s',
+				const step4 = tour
+					.addStep( {
+						id: 'rg-contribution-campaign-name',
+						text: __(
+							"Enter the description that you would like to appear on your customer's invoice",
 							'revenue-generator'
 						),
-						'<a target="_blank" href="https://wordpress.com/support/shortcodes/">',
-						'</a>'
-					),
-					attachTo: {
-						element: '.rev-gen-contribution-main-generate-button',
-						on: 'right',
-					},
-					arrow: true,
-					buttons: [
-						{
-							text: __( 'Complete', 'revenue-generator' ),
-							action: tour.next,
-							classes: 'shepherd-content-complete-tour-element',
+						attachTo: {
+							element: '#rg_contribution_campaign_name',
+							on: 'top',
 						},
-					],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'5 - Generate Code',
-								tutorialEventCategory,
-								tutorialEventLabelComplete,
-								0,
-								true
-							);
+						arrow: true,
+						classes: 'rev-gen-tutorial-contribution-title fade-in',
+						buttons: [ nextButton ],
+						when: {
+							hide() {
+								rgGlobal.sendLPGAEvent(
+									'4 - Campaign Name',
+									tutorialEventCategory,
+									tutorialEventLabelContinue,
+									0,
+									true
+								);
+							},
 						},
-					},
-				} );
+					} )
+					.on( 'before-hide', () => {
+						const optionClasses = step4.options.classes;
+						step4.options.classes = optionClasses.replace(
+							'fade-in',
+							'fade-out'
+						);
+						step4.updateStepOptions( step4.options );
+					} )
+					.on( 'hide', () => {
+						$( step4.el ).removeAttr( 'hidden' );
+						setTimeout( function() {
+							$( step4.el ).attr( 'hidden', '' );
+						}, 700 );
+					} );
+
+				// Add tutorial step for paywall actions publish.
+				const step5 = tour
+					.addStep( {
+						id: 'rg-contribution-generate-button',
+						text: sprintf(
+							__(
+								'When you’re ready, click here to copy your customized %1$s shortcode %2$s',
+								'revenue-generator'
+							),
+							'<a target="_blank" href="https://wordpress.com/support/shortcodes/">',
+							'</a>'
+						),
+						attachTo: {
+							element:
+								'.rev-gen-contribution-main-generate-button',
+							on: 'right',
+						},
+						arrow: true,
+						classes: 'fade-in',
+						buttons: [
+							{
+								text: __( 'Complete', 'revenue-generator' ),
+								action: tour.next,
+								classes:
+									'shepherd-content-complete-tour-element',
+							},
+						],
+						when: {
+							hide() {
+								rgGlobal.sendLPGAEvent(
+									'5 - Generate Code',
+									tutorialEventCategory,
+									tutorialEventLabelComplete,
+									0,
+									true
+								);
+							},
+						},
+					} )
+					.on( 'before-hide', () => {
+						const optionClasses = step5.options.classes;
+						step5.options.classes = optionClasses.replace(
+							'fade-in',
+							'fade-out'
+						);
+						step5.updateStepOptions( step5.options );
+					} )
+					.on( 'hide', () => {
+						$( step5.el ).removeAttr( 'hidden' );
+						setTimeout( function() {
+							$( step5.el ).attr( 'hidden', '' );
+						}, 700 );
+					} );
 			};
 
 			/**
