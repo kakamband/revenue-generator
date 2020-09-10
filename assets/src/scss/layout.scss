@@ -63,10 +63,14 @@ body {
 	.shepherd-text {
 		padding: 5px;
 		min-height: 35px;
+		font-family: HelveticaNeue, serif;
+		font-size: 16px;
+		font-weight: normal;
+		font-stretch: normal;
 		font-style: normal;
-		font-weight: 500;
-		font-size: 15px;
-		line-height: 20px;
+		line-height: 1.25;
+		letter-spacing: normal;
+		color: #fff;
 		a {
 			color: #fff;
 		}
@@ -79,32 +83,42 @@ body {
 		border: 0;
 		cursor: pointer;
 		padding: 0;
-		font-style: normal;
-		font-weight: bold;
+		font-family: HelveticaNeue, serif;
 		font-size: 14px;
-		line-height: 18px;
+		font-weight: bold;
+		font-stretch: normal;
+		font-style: normal;
+		line-height: 1.29;
+		letter-spacing: normal;
 	}
 
 	.shepherd-footer {
 		position: absolute;
-		bottom: 10px;
+		bottom: 20px;
 		right: 0;
 	}
 
 	.shepherd-content-skip-tour {
 		position: relative;
 		right: 80px;
-		font-weight: 500;
+		font-family: HelveticaNeue, serif;
+		font-size: 14px;
+		font-weight: normal;
+		font-stretch: normal;
+		font-style: normal;
+		line-height: 1.29;
+		letter-spacing: normal;
+		color: #fff;
 	}
 
 	.shepherd-content-complete-tour-element {
 		position: relative;
-		left: -10px;
+		left: -15px;
 	}
 
 	.shepherd-content-next-tour-element {
 		position: relative;
-		left: -10px;
+		left: -15px;
 	}
 }
 
@@ -115,6 +129,12 @@ body {
 .rev-gen-tutorial-contribution-title {
 	height: auto;
 	padding: 20px;
+	.shepherd-footer {
+		bottom: 10px;
+		.shepherd-content-skip-tour {
+			right: 100px;
+		}
+	}
 }
 
 .shepherd-content-add-space {
