@@ -79,6 +79,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	</div>
 	<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
-	<div class="rev-gen__button rev-gen__button--secondary rev-gen-start-tutorial" id="rg_js_RestartTutorial"><?php esc_html_e( 'Tutorial', 'revenue-generator' ); ?></div>
+	<div class="rev-gen__button rev-gen__button--secondary rev-gen__button--help rev-gen-start-tutorial" id="rg_js_RestartTutorial"><?php esc_html_e( 'Tutorial', 'revenue-generator' ); ?></div>
 </div>
 <?php View::render_footer_backend(); ?>

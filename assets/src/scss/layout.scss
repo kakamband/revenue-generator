@@ -152,7 +152,7 @@ body {
 	color: #808080;
 	margin-left: 15px;
 	position: fixed;
-	bottom: 20px;
+	bottom: 10px;
 	z-index: -1;
 	min-width: 180px;
 	a {
@@ -314,7 +314,7 @@ body {
 }
 
 .rev-gen__button {
-	padding: 10px 40px;
+	padding: 7px 30px;
 	border: 2px solid #fff;
 	background-color: #1d1d1d;
 	color: #fff;
@@ -322,16 +322,23 @@ body {
 	font-weight: 500;
 	font-size: 17px;
 	text-decoration: none;
-	&:hover {
+	&:hover,
+	&:active,
+	&:focus {
 		color: #fff;
 	}
 	&--secondary {
 		border: 2px solid #1d1d1d;
 		background-color: #fff;
 		color: #1d1d1d;
-		&:hover {
+		&:hover,
+		&:active,
+		&:focus {
 			color: #1d1d1d;
 		}
+	}
+	&--help {
+		font-size: 14px;
 	}
 }
 

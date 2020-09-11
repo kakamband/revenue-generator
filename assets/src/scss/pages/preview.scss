@@ -40,7 +40,7 @@
 		flex-direction: row;
 		align-self: center;
 		align-items: center;
-		width: 590px;
+		width: 732px;
 		height: 50px;
 		padding: 0 15px;
 		border: 1px solid #fefefe;
@@ -57,7 +57,7 @@
 
 		label {
 			line-height: 1.7;
-			font-size: 18px;
+			font-size: 17px;
 			font-weight: 500;
 			font-stretch: normal;
 			font-style: normal;
@@ -74,7 +74,7 @@
 			border: 1px solid transparent;
 			border-radius: 0;
 			line-height: 1.5;
-			font-size: 18px;
+			font-size: 17px;
 			font-stretch: normal;
 			font-style: normal;
 			letter-spacing: normal;
@@ -138,14 +138,13 @@
 		bottom: 3px;
 		z-index: 5;
 		width: 732px;
-		height: 60px;
-		padding: 0 8px;
+		height: 52px;
+		padding: 0 15px;
 		border-radius: 4px;
 		box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
-		font-size: 18px;
+		font-size: 17px;
 		-webkit-backdrop-filter: blur(10px);
 		backdrop-filter: blur(10px);
-		background-color: rgba(255, 255, 255, 0.9);
 
 		&-wrap {
 			flex: 1;
@@ -161,7 +160,13 @@
 			margin: 10px 10px 10px;
 
 			.select2 {
-				font-size: 18px;
+				font-size: 17px;
+				.select2-selection--single {
+					background-color: transparent;
+				}
+				.select2-selection__arrow {
+					background-color: transparent;
+				}
 			}
 
 			span.rev-gen-preview-main-paywall-name {
@@ -208,7 +213,7 @@
 
 		&-search {
 			.select2 {
-				font-size: 18px;
+				font-size: 17px;
 			}
 			.select2-container {
 				width: 180px !important; /* stylelint-disable-line declaration-no-important */
@@ -354,9 +359,9 @@
 			button {
 				cursor: pointer;
 				border: 2px solid #1d1d1d;
-				padding: 9px 13px;
+				padding: 6px 13px;
 				font-weight: bold;
-				font-size: 18px;
+				font-size: 17px;
 				border-radius: 3px;
 
 				&:disabled {
@@ -365,7 +370,7 @@
 			}
 
 			&-save {
-				background-color: #fff;
+				background-color: transparent;
 				color: #1d1d1d;
 				&:disabled {
 					opacity: 0.2;
@@ -425,17 +430,8 @@
 	.blur-content {
 		position: relative;
 		min-height: 900px;
-		&::before {
-			pointer-events: none;
-			content: "";
-			position: absolute;
-			left: 0;
-			bottom: 91%;
-			z-index: 1;
-			width: 100%;
-			height: 200px;
-			background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff);
-		}
+		filter: blur(5px);
+		opacity: 0.5;
 	}
 
 	&-currency-modal {
@@ -1013,20 +1009,10 @@
 
 .rev-gen-exit-tour {
 	visibility: hidden;
-	width: 70px;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.15);
-	background-color: #fff;
-	text-align: center;
-	border-radius: 4px;
-	padding: 5px 10px;
 	position: fixed;
-	border: 2px solid #000;
-	font-size: 12px;
 	z-index: 15;
-	bottom: 20px;
-	right: 20px;
-	height: 20px;
-	font-weight: 500;
+	bottom: 10px;
+	right: 10px;
 	display: flex;
 	justify-content: center;
 	align-items: center;

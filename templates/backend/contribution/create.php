@@ -89,8 +89,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 			</div>
 			<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
-			<a href="https://wordpress.org/support/plugin/revenue-generator" target="_blank" class="rev-gen__button rev-gen__button--secondary rev-gen-email-support"><?php esc_html_e( 'Email Support', 'revenue-generator' ); ?></a>
-			<div class="rev-gen-exit-tour"><?php esc_html_e( 'Exit Tour', 'revenue-generator' ); ?></div>
+			<a href="https://wordpress.org/support/plugin/revenue-generator" target="_blank" class="rev-gen__button rev-gen__button--secondary rev-gen__button--help rev-gen-email-support"><?php esc_html_e( 'Email Support', 'revenue-generator' ); ?></a>
+			<div class="rev-gen-exit-tour rev-gen__button rev-gen__button--secondary rev-gen__button--help"><?php esc_html_e( 'Exit Tour', 'revenue-generator' ); ?></div>
 		</form>
 	</div>
 </div>
