@@ -455,3 +455,54 @@ body {
 		opacity: 0;
 	}
 }
+
+.rev-gen-modal-active {
+	overflow: hidden;
+}
+
+.rev-gen-modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 999999;
+	width: 100vw;
+	height: 100vh;
+	background: rgba(0, 0, 0, .65);
+}
+
+.rev-gen-modal {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	z-index: 9999999;
+	transform: translate(-50%, -50%);
+	border-radius: 4px;
+	background: #fff;
+	max-width: 390px;
+	&__inner {
+		padding: 40px 20px;
+		text-align: center;
+	}
+	&__title {
+		margin: 0 0 30px;
+		line-height: 1.25;
+		font-size: 26px;
+		color: #1d1d1d;
+	}
+	&__message {
+		font-weight: 500;
+		font-size: 16px;
+	}
+	&__buttons {
+		max-width: 230px;
+		margin: 40px auto 0;
+		button {
+			cursor: pointer;
+			margin-bottom: 10px;
+			outline: 0;
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+}

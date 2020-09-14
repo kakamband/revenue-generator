@@ -97,7 +97,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 							</div>
 							<div class="rev-gen-dashboard-content-contribution--links">
 								<a href="#" class="rev-gen-dashboard__link--copy-shortcode" data-shortcode="<?php echo esc_attr( $contribution_shortcode ); ?>"><?php esc_html_e( 'Copy shortcode', 'revenue-generator' ); ?></a> |
-								<a href="<?php echo esc_url( $contribution_edit_link ); ?>"><?php esc_html_e( 'Edit', 'revenue-generator' ); ?></a>
+								<a href="<?php echo esc_url( $contribution_edit_link ); ?>"><?php esc_html_e( 'Edit', 'revenue-generator' ); ?></a> |
+								<a href="#" data-id="<?php echo esc_attr( $contribution['ID'] ); ?>" class="rev-gen-dashboard__contribution-delete"><?php esc_html_e( 'Delete', 'revenue-generator' ); ?></a>
 							</div>
 						</div>
 					</div>
@@ -129,3 +130,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="rev-gen__button rev-gen__button--secondary rev-gen__button--help rev-gen-start-tutorial" id="rg_js_RestartTutorial_Contribution"><?php esc_html_e( 'Tutorial', 'revenue-generator' ); ?></div>
 </div>
 <?php View::render_footer_backend(); ?>
+
+<script type="text/template" id="tmpl-revgen-remove-contribution">
+	<div class="rev-gen-modal" id="rev-gen-remove-contribution">
+		<div class="rev-gen-modal__inner">
+			<h4 class="rev-gen-modal__title">
+				<?php esc_html_e( 'Are you sure you want to remove the contribution request?', 'revenue-generator' ); ?>
+			</h4>
+			<p class="rev-gen-modal__message">
+				<?php
+				esc_html_e( 'This will hide the contribution from your published site but the shortcode will need to be manually removed from the editor.', 'revenue-generator' );
+				?>
+			</p>
+			<div class="rev-gen-modal__buttons">
+				<button id="rg_js_removeContribution" class="rev-gen__button">
+					<?php esc_html_e( 'Yes, remove Contribution request', 'revenue-generator' ); ?>
+				</button>
+				<button id="rg_js_cancelContributionRemoval" class="rev-gen__button rev-gen__button--secondary">
+					<?php esc_html_e( 'No, keep Contribution request', 'revenue-generator' ); ?>
+				</button>
+			</div>
+		</div>
+	</div>
+	<div class="rev-gen-modal-overlay"></div>
+</script>

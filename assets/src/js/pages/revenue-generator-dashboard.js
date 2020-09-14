@@ -31,6 +31,7 @@ import '../utils';
 				editPayWallName: $( '.rev-gen-dashboard-paywall-name' ),
 				paywallSearchIcon: $( '.rev-gen-dashboard-bar--search-icon' ),
 				laterpayLoader: $( '.laterpay-loader-wrapper' ),
+				contributionDelete: $( '.rev-gen-dashboard__contribution-delete' ),
 
 				// Dashboard footer area.
 				restartTour: $( '#rg_js_RestartTutorial' ),
@@ -275,6 +276,42 @@ import '../utils';
 						}
 					}
 				} );
+
+				$o.contributionDelete.on( 'click', function( e ) {
+					e.preventDefault();
+
+					showContributionRemovalConfirmation().then( ( confirmation ) => {
+						if ( true === confirmation ) {
+							console.log( 'remove this' );
+						}
+					} );
+				} );
+
+				const showContributionRemovalConfirmation = async function() {
+					const confirm = await createContributionRemovalConfirmation();
+
+					$o.body.removeClass( 'rev-gen-modal-active' );
+
+					console.log( confirm );
+
+					return confirm;
+				};
+
+				const createContributionRemovalConfirmation = function() {
+					return new Promise( ( complete ) => {
+						const template = wp.template( 'revgen-remove-contribution' );
+						$o.body.append( template );
+						$o.body.addClass( 'rev-gen-modal-active' );
+
+						$( '#rg_js_removeContribution' ).on( 'click', () => {
+							complete( true );
+						} );
+
+						$( '#rg_js_cancelContributionRemoval' ).on( 'click', () => {
+							complete( false );
+						} );
+					} );
+				};
 			};
 
 			/**
