@@ -156,7 +156,7 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 <script type="text/template" id="tmpl-revgen-purchase-overlay-item-manager">
 	<div class="rg-purchase-overlay-option-manager">
 		<div class="rg-purchase-overlay-option-manager-entity-selection">
-			<select id="rg_js_purchaseOptionType" class="rg-purchase-overlay-option-manager-entity">
+			<select id="rg_js_purchaseOptionType" class="rg-purchase-overlay-option-manager-entity rev-gen__select2">
 				<option
 				<# data.entityType === 'individual' ? print("selected") : print('') #> value="individual"><?php esc_html_e( 'Individual Article', 'revenue-generator' ); ?></option>
 				<option
@@ -187,7 +187,7 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 				<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>"></button>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-duration">
-			<select class="rg-purchase-overlay-option-manager-duration-count">
+			<select class="rg-purchase-overlay-option-manager-duration-count rev-gen__select2">
 				<?php
 				echo wp_kses(
 					Post_Types::get_select_options( 'duration' ),
@@ -200,7 +200,7 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 				);
 				?>
 			</select>
-			<select class="rg-purchase-overlay-option-manager-duration-period">
+			<select class="rg-purchase-overlay-option-manager-duration-period rev-gen__select2">
 				<?php
 				echo wp_kses(
 					Post_Types::get_select_options( 'period' ),

@@ -923,6 +923,13 @@ import { __, sprintf } from '@wordpress/i18n';
 						optionHighlight.show();
 					}
 
+					$( '.rev-gen__select2', actionManager ).select2( {
+						width: 'auto',
+						dropdownAutoWidth: true,
+						dropdownCssClass: ':all:',
+						minimumResultsForSearch: -1,
+					} );
+
 					/**
 					 * This is done to keep current state of triggered action manger
 					 * not be changed by the hiding of all others.
