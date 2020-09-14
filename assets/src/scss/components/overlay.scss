@@ -217,8 +217,11 @@
 			border-bottom: 1px solid;
 			height: 45px;
 			text-align: left;
-			display: table;
+			display: flex;
+			flex-flow: row nowrap;
+			align-items: center;
 			width: 95%;
+			overflow: hidden;
 			padding-left: 5%;
 			font-family: HelveticaNeue, serif;
 			font-size: 14px;
@@ -237,12 +240,22 @@
 				vertical-align: middle;
 			}
 
+			span.select2,
+			span.select2 span {
+				display: inline-block;
+				vertical-align: auto;
+			}
+
 			button {
 				cursor: pointer;
 			}
 		}
 
 		div.rg-purchase-overlay-option-manager-entity-selection {
+			width: 320px;
+			.select2 {
+				min-width: 290px;
+			}
 			select {
 				border: 0;
 				width: 100%;
@@ -269,6 +282,7 @@
 			}
 
 			input[type="checkbox"] {
+				position: absolute;
 				opacity: 0;
 				width: 0;
 				height: 0;
@@ -280,18 +294,14 @@
 			}
 
 			.switch {
+				display: flex;
+				align-items: center;
 				position: relative;
-				display: inline-block;
 				margin: 0 15px 0 10px;
 				height: 20px;
 
 				.slider {
-					position: absolute;
 					cursor: pointer;
-					top: 0;
-					left: -5px;
-					right: 0;
-					bottom: 0;
 					background-color: #ccc;
 					transition: 0.4s;
 					width: 29px;
@@ -302,7 +312,7 @@
 						position: absolute;
 						content: "";
 						left: 1px;
-						top: 2px;
+						top: 4px;
 						background-color: #fff;
 						transition: 0.4s;
 						width: 12px;
@@ -354,6 +364,9 @@
 		}
 
 		&-duration {
+			.select2 {
+				margin-right: 10px;
+			}
 			select {
 				border-radius: 0;
 				border-color: #e3e4e6;
@@ -487,12 +500,17 @@
 			width: 210px;
 
 			div.rg-purchase-overlay-option-manager-entity-selection {
-				select {
-					font-size: 11px;
+				width: 210px;
+				select,
+				.select2 {
+					min-width: 190px;
+					width: 210px;
+					font-size: 10px;
 				}
 			}
 
-			div {
+			div,
+			.select2 {
 				font-size: 10px;
 			}
 
