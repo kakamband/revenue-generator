@@ -179,6 +179,29 @@ class Contribution extends Base {
 	}
 
 	/**
+	 * Deletes Contribution offer from the database.
+	 *
+	 * @param int $contribution_id ID of the contribution.
+	 *
+	 * @return mixed Boolean on failure, contribution offer's ID on success.
+	 */
+	public function delete( $contribution_id = 0 ) {
+		if ( empty( $contribution_id ) ) {
+			return false;
+		}
+
+		$contribution = $this->get( $contribution_id );
+
+		if ( ! is_wp_error( $contribution ) ) {
+			wp_delete_post( $contribution_id );
+
+			return $contribution_id;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Unprefix meta passed in the method's parameters.
 	 *
 	 * @param array $meta Prefixed meta to unprefix.
