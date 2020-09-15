@@ -221,6 +221,12 @@ body {
 			}
 		}
 
+		&--open .select2-selection {
+			&__arrow {
+				transform: rotate(180deg);
+			}
+		}
+
 		input.select2-search__field {
 			line-height: 24px;
 			height: auto;

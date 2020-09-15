@@ -923,11 +923,14 @@ import { __, sprintf } from '@wordpress/i18n';
 						optionHighlight.show();
 					}
 
-					$( '.rev-gen__select2', actionManager ).select2( {
-						width: 'auto',
-						dropdownAutoWidth: true,
-						dropdownCssClass: ':all:',
-						minimumResultsForSearch: -1,
+					$( '.rev-gen__select2', actionManager ).each( function() {
+						$( this ).select2( {
+							width: 'auto',
+							dropdownAutoWidth: true,
+							dropdownParent: $( this ).parent(),
+							dropdownCssClass: ':all:',
+							minimumResultsForSearch: -1,
+						} );
 					} );
 
 					/**
