@@ -290,7 +290,10 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					new RevGenModal( {
 						id: 'rg-modal-remove-contribution',
 						templateData: {
-							isEditable: $this.data( 'editable' ),
+							isEditable: parseInt(
+								$this.data( 'editable' ),
+								10
+							),
 						},
 						onConfirm: async () => {
 							$.ajax( {

@@ -103,7 +103,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<div class="rev-gen-dashboard-content-contribution--links">
 								<a href="#" class="rev-gen-dashboard__link--copy-shortcode" data-shortcode="<?php echo esc_attr( $contribution_shortcode ); ?>"><?php esc_html_e( 'Copy shortcode', 'revenue-generator' ); ?></a> |
 								<a href="<?php echo esc_url( $contribution_edit_link ); ?>"><?php esc_html_e( 'Edit', 'revenue-generator' ); ?></a> |
-								<a href="#" data-id="<?php echo esc_attr( $contribution['ID'] ); ?>" data-nonce="<?php echo esc_attr( wp_create_nonce( 'rg_contribution_delete_nonce' ) ); ?>" data-editable="<?php echo ( empty( $contribution['code'] ) ); ?>" class="rev-gen-dashboard__contribution-delete"><?php echo esc_html( $delete_button_text ); ?></a>
+								<a href="#" data-id="<?php echo esc_attr( $contribution['ID'] ); ?>" data-nonce="<?php echo esc_attr( wp_create_nonce( 'rg_contribution_delete_nonce' ) ); ?>" data-editable="<?php echo esc_attr( empty( $contribution['code'] ) ? 1 : 0 ); ?>" class="rev-gen-dashboard__contribution-delete"><?php echo esc_html( $delete_button_text ); ?></a>
 							</div>
 						</div>
 					</div>
@@ -143,7 +143,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<?php esc_html_e( 'Are you sure you want to remove the contribution request?', 'revenue-generator' ); ?>
 			</h4>
 
-			<# if ( data.isEditable ) { #>
+			<# if ( 1 === data.isEditable ) { #>
 				<p class="rev-gen-modal__message">
 					<?php esc_html_e( 'This will hide the contribution from your published site but the shortcode will need to be manually removed from the editor.', 'revenue-generator' ); ?>
 				</p>
@@ -158,7 +158,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</p>
 			<div class="rev-gen-modal__buttons">
 				<button id="rg_js_modal_confirm" class="rev-gen__button">
-					<# if ( data.isEditable ) { #>
+					<# if ( 1 === data.isEditable ) { #>
 						<?php esc_html_e( 'Yes, remove Contribution request', 'revenue-generator' ); ?>
 					<# } else { #>
 						<?php esc_html_e( 'Yes, hide Contribution request', 'revenue-generator' ); ?>
