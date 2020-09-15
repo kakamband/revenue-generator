@@ -74,9 +74,11 @@ class RevGenModal {
 			return;
 		}
 
-		const body      = document.querySelector( 'body' );
-		const template  = wp.template( this.options.id );
-		const modalHTML = ( this.options.templateData ) ? template( this.options.templateData ) : template();
+		const body = document.querySelector( 'body' );
+		const template = wp.template( this.options.id );
+		const modalHTML = this.options.templateData
+			? template( this.options.templateData )
+			: template();
 
 		// Insert modal to the end of <body>.
 		body.insertAdjacentHTML( 'beforeend', modalHTML );
