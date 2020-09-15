@@ -392,8 +392,13 @@ class Admin {
 		check_ajax_referer( 'rg_contribution_delete_nonce', 'security' );
 
 		$contribution_instance = Contribution::get_instance();
-		$contribution_id       = (int) $_REQUEST['id'];
-		$delete                = $contribution_instance->delete( $contribution_id );
+		$contribution_id       = ( isset( $_REQUEST['id'] ) ) ? (int) $_REQUEST['id'] : null;
+
+		if ( is_null( $contribution_id ) ) {
+			wp_send_json_error();
+		}
+
+		$delete = $contribution_instance->delete( $contribution_id );
 
 		if ( is_wp_error( $delete ) ) {
 			wp_send_json_error(
