@@ -33,6 +33,7 @@ class RevGenModal {
 		/** @type {Object} */
 		const defaultOptions = {
 			id: '',
+			templateData: {},
 			onConfirm: () => {
 				// noop
 			},
@@ -73,11 +74,12 @@ class RevGenModal {
 			return;
 		}
 
-		const body = document.querySelector( 'body' );
-		const template = wp.template( this.options.id );
+		const body      = document.querySelector( 'body' );
+		const template  = wp.template( this.options.id );
+		const modalHTML = ( this.options.templateData ) ? template( this.options.templateData ) : template();
 
 		// Insert modal to the end of <body>.
-		body.insertAdjacentHTML( 'beforeend', template() );
+		body.insertAdjacentHTML( 'beforeend', modalHTML );
 
 		// Store reference to the modal.
 		this.el = document.getElementById( this.options.id );
