@@ -183,7 +183,7 @@ class Contribution extends Base {
 	 *
 	 * @param int $contribution_id ID of the contribution.
 	 *
-	 * @return mixed Boolean on failure, contribution offer's ID on success.
+	 * @return mixed WP_Error on failure, contribution offer's ID on success.
 	 */
 	public function delete( $contribution_id = 0 ) {
 		if ( empty( $contribution_id ) ) {
@@ -198,7 +198,7 @@ class Contribution extends Base {
 			return $contribution_id;
 		}
 
-		return false;
+		return $contribution;
 	}
 
 	/**
