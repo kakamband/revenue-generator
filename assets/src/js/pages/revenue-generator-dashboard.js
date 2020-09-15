@@ -9,6 +9,7 @@
  * Internal dependencies.
  */
 import '../utils';
+import { RevGenModal } from '../utils/rev-gen-modal';
 
 ( function( $ ) {
 	$( function() {
@@ -280,38 +281,30 @@ import '../utils';
 				$o.contributionDelete.on( 'click', function( e ) {
 					e.preventDefault();
 
-					showContributionRemovalConfirmation().then( ( confirmation ) => {
-						if ( true === confirmation ) {
-							console.log( 'remove this' );
+					const $this          = $( e.target );
+					const contributionID = $this.data( 'id' );
+					const nonce          = $this.data( 'nonce' );
+
+					new RevGenModal( {
+						id: 'rg-modal-remove-contribution',
+						onConfirm: async () => {
+							$.ajax( {
+								url: revenueGeneratorGlobalOptions.ajaxUrl,
+								data: {
+									action: 'rg_contribution_delete',
+									security: nonce,
+									id: contributionID
+								},
+								success: () => {
+									window.location.reload();
+								}
+							} );
+						},
+						onCancel: () => {
+							// noop
 						}
 					} );
 				} );
-
-				const showContributionRemovalConfirmation = async function() {
-					const confirm = await createContributionRemovalConfirmation();
-
-					$o.body.removeClass( 'rev-gen-modal-active' );
-
-					console.log( confirm );
-
-					return confirm;
-				};
-
-				const createContributionRemovalConfirmation = function() {
-					return new Promise( ( complete ) => {
-						const template = wp.template( 'revgen-remove-contribution' );
-						$o.body.append( template );
-						$o.body.addClass( 'rev-gen-modal-active' );
-
-						$( '#rg_js_removeContribution' ).on( 'click', () => {
-							complete( true );
-						} );
-
-						$( '#rg_js_cancelContributionRemoval' ).on( 'click', () => {
-							complete( false );
-						} );
-					} );
-				};
 			};
 
 			/**
