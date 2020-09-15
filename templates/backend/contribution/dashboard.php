@@ -98,7 +98,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<div class="rev-gen-dashboard-content-contribution--links">
 								<a href="#" class="rev-gen-dashboard__link--copy-shortcode" data-shortcode="<?php echo esc_attr( $contribution_shortcode ); ?>"><?php esc_html_e( 'Copy shortcode', 'revenue-generator' ); ?></a> |
 								<a href="<?php echo esc_url( $contribution_edit_link ); ?>"><?php esc_html_e( 'Edit', 'revenue-generator' ); ?></a> |
-								<a href="#" data-id="<?php echo esc_attr( $contribution['ID'] ); ?>" class="rev-gen-dashboard__contribution-delete"><?php esc_html_e( 'Delete', 'revenue-generator' ); ?></a>
+								<a href="#" data-id="<?php echo esc_attr( $contribution['ID'] ); ?>" data-nonce="<?php echo esc_attr( wp_create_nonce( 'rg_contribution_delete_nonce' ) ); ?>" class="rev-gen-dashboard__contribution-delete"><?php esc_html_e( 'Delete', 'revenue-generator' ); ?></a>
 							</div>
 						</div>
 					</div>
@@ -131,8 +131,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 </div>
 <?php View::render_footer_backend(); ?>
 
-<script type="text/template" id="tmpl-revgen-remove-contribution">
-	<div class="rev-gen-modal" id="rev-gen-remove-contribution">
+<script type="text/template" id="tmpl-rg-modal-remove-contribution">
+	<div class="rev-gen-modal" id="rg-modal-remove-contribution">
 		<div class="rev-gen-modal__inner">
 			<h4 class="rev-gen-modal__title">
 				<?php esc_html_e( 'Are you sure you want to remove the contribution request?', 'revenue-generator' ); ?>
@@ -143,10 +143,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 				?>
 			</p>
 			<div class="rev-gen-modal__buttons">
-				<button id="rg_js_removeContribution" class="rev-gen__button">
+				<button id="rg_js_modal_confirm" class="rev-gen__button">
 					<?php esc_html_e( 'Yes, remove Contribution request', 'revenue-generator' ); ?>
 				</button>
-				<button id="rg_js_cancelContributionRemoval" class="rev-gen__button rev-gen__button--secondary">
+				<button id="rg_js_modal_cancel" class="rev-gen__button rev-gen__button--secondary">
 					<?php esc_html_e( 'No, keep Contribution request', 'revenue-generator' ); ?>
 				</button>
 			</div>
