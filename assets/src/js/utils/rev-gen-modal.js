@@ -30,19 +30,19 @@ class RevGenModal {
 	 * @param {Object} options - Additional options.
 	 */
 	constructor( options ) {
-		/** @type {object} */
+		/** @type {Object} */
 		const defaultOptions = {
 			id: '',
-			onConfirm: function() {
-				console.log( 'modal is confirmed' );
+			onConfirm: () => {
+				// noop
 			},
-			onCancel: function() {
-				console.log( 'modal is cancelled' );
+			onCancel: () => {
+				// noop
 			},
 			autoShow: true,
 		};
 
-		/** @type {object} */
+		/** @type {Object} */
 		this.options = {
 			...defaultOptions,
 			...options
@@ -73,7 +73,7 @@ class RevGenModal {
 			return;
 		}
 
-		let body       = document.querySelector( 'body' );
+		const body     = document.querySelector( 'body' );
 		const template = wp.template( this.options.id );
 
 		// Insert modal to the end of <body>.
