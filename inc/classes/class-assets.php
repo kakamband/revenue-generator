@@ -126,7 +126,12 @@ class Assets {
 	 * Enqueue the registered scripts.
 	 */
 	public function load_admin_assets() {
-		wp_enqueue_style( 'revenue-generator' );
+		global $current_screen;
+
+		if ( $current_screen && strpos( $current_screen->base, 'revenue-generator' ) ) {
+			wp_enqueue_style( 'revenue-generator' );
+		}
+
 		wp_enqueue_style( 'revenue-generator-admin' );
 	}
 
