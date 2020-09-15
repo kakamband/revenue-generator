@@ -46,6 +46,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 					$contribution_shortcode      = $contribution_instance->get_shortcode( $contribution );
 					$contribution_updated_string = $contribution_instance->get_date_time_string( $contribution );
 					$contribution_edit_link      = $contribution_instance->get_edit_link( $contribution['ID'] );
+					$delete_button_text          = __( 'Delete', 'revenue-generator' );
+
+					if ( ! empty( $contribution['code'] ) ) {
+						$delete_button_text = __( 'Hide', 'revenue-generator' );
+					}
 					?>
 					<div class="rev-gen-dashboard-content-contribution" data-contribution-id="<?php echo esc_attr( $contribution_id ); ?>">
 						<div class="rev-gen-dashboard-content-contribution--box">
@@ -98,7 +103,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<div class="rev-gen-dashboard-content-contribution--links">
 								<a href="#" class="rev-gen-dashboard__link--copy-shortcode" data-shortcode="<?php echo esc_attr( $contribution_shortcode ); ?>"><?php esc_html_e( 'Copy shortcode', 'revenue-generator' ); ?></a> |
 								<a href="<?php echo esc_url( $contribution_edit_link ); ?>"><?php esc_html_e( 'Edit', 'revenue-generator' ); ?></a> |
-								<a href="#" data-id="<?php echo esc_attr( $contribution['ID'] ); ?>" data-nonce="<?php echo esc_attr( wp_create_nonce( 'rg_contribution_delete_nonce' ) ); ?>" class="rev-gen-dashboard__contribution-delete"><?php esc_html_e( 'Delete', 'revenue-generator' ); ?></a>
+								<a href="#" data-id="<?php echo esc_attr( $contribution['ID'] ); ?>" data-nonce="<?php echo esc_attr( wp_create_nonce( 'rg_contribution_delete_nonce' ) ); ?>" data-editable="<?php echo ( empty( $contribution['code'] ) ); ?>" class="rev-gen-dashboard__contribution-delete"><?php echo esc_html( $delete_button_text ); ?></a>
 							</div>
 						</div>
 					</div>
@@ -137,14 +142,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<h4 class="rev-gen-modal__title">
 				<?php esc_html_e( 'Are you sure you want to remove the contribution request?', 'revenue-generator' ); ?>
 			</h4>
-			<p class="rev-gen-modal__message">
-				<?php
-				esc_html_e( 'This will hide the contribution from your published site but the shortcode will need to be manually removed from the editor.', 'revenue-generator' );
-				?>
+
+			<# if ( data.isEditable ) { #>
+				<p class="rev-gen-modal__message">
+					<?php esc_html_e( 'This will hide the contribution from your published site but the shortcode will need to be manually removed from the editor.', 'revenue-generator' ); ?>
+				</p>
+			<# } else { #>
+				<p class="rev-gen-modal__message">
+					<?php esc_html_e( 'This will NOT remove the Contribution request from your site.', 'revenue-generator' ); ?>
+				</p>
+				<p class="rev-gen-modal__message">
+					<?php esc_html_e( 'The shortcode will need to be manually removed from the editor in order to remove it from your published site. Are you sure that you would like to hide this contribution offer from your dashboard?', 'revenue-generator' ); ?>
+				</p>
+			<# } #>
 			</p>
 			<div class="rev-gen-modal__buttons">
 				<button id="rg_js_modal_confirm" class="rev-gen__button">
-					<?php esc_html_e( 'Yes, remove Contribution request', 'revenue-generator' ); ?>
+					<# if ( data.isEditable ) { #>
+						<?php esc_html_e( 'Yes, remove Contribution request', 'revenue-generator' ); ?>
+					<# } else { #>
+						<?php esc_html_e( 'Yes, hide Contribution request', 'revenue-generator' ); ?>
+					<# } #>
 				</button>
 				<button id="rg_js_modal_cancel" class="rev-gen__button rev-gen__button--secondary">
 					<?php esc_html_e( 'No, keep Contribution request', 'revenue-generator' ); ?>
