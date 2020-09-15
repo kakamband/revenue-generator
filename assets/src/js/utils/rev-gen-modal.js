@@ -45,7 +45,7 @@ class RevGenModal {
 		/** @type {Object} */
 		this.options = {
 			...defaultOptions,
-			...options
+			...options,
 		};
 
 		// Call init method to set up modal.
@@ -73,7 +73,7 @@ class RevGenModal {
 			return;
 		}
 
-		const body     = document.querySelector( 'body' );
+		const body = document.querySelector( 'body' );
 		const template = wp.template( this.options.id );
 
 		// Insert modal to the end of <body>.
@@ -97,8 +97,12 @@ class RevGenModal {
 	 * Binds events on modal's action buttons.
 	 */
 	bindEvents() {
-		this.el.querySelector( '#rg_js_modal_confirm' ).addEventListener( 'click', this.onConfirm.bind( this ) );
-		this.el.querySelector( '#rg_js_modal_cancel' ).addEventListener( 'click', this.onCancel.bind( this ) );
+		this.el
+			.querySelector( '#rg_js_modal_confirm' )
+			.addEventListener( 'click', this.onConfirm.bind( this ) );
+		this.el
+			.querySelector( '#rg_js_modal_cancel' )
+			.addEventListener( 'click', this.onCancel.bind( this ) );
 	}
 
 	/**

@@ -32,7 +32,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				editPayWallName: $( '.rev-gen-dashboard-paywall-name' ),
 				paywallSearchIcon: $( '.rev-gen-dashboard-bar--search-icon' ),
 				laterpayLoader: $( '.laterpay-loader-wrapper' ),
-				contributionDelete: $( '.rev-gen-dashboard__contribution-delete' ),
+				contributionDelete: $(
+					'.rev-gen-dashboard__contribution-delete'
+				),
 
 				// Dashboard footer area.
 				restartTour: $( '#rg_js_RestartTutorial' ),
@@ -281,9 +283,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				$o.contributionDelete.on( 'click', function( e ) {
 					e.preventDefault();
 
-					const $this          = $( e.target );
+					const $this = $( e.target );
 					const contributionID = $this.data( 'id' );
-					const nonce          = $this.data( 'nonce' );
+					const nonce = $this.data( 'nonce' );
 
 					new RevGenModal( {
 						id: 'rg-modal-remove-contribution',
@@ -293,16 +295,16 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 								data: {
 									action: 'rg_contribution_delete',
 									security: nonce,
-									id: contributionID
+									id: contributionID,
 								},
 								success: () => {
 									window.location.reload();
-								}
+								},
 							} );
 						},
 						onCancel: () => {
 							// noop
-						}
+						},
 					} );
 				} );
 			};
