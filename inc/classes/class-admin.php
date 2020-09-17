@@ -63,6 +63,7 @@ class Admin {
 		add_action( 'wp_ajax_rg_search_paywall', [ $this, 'search_paywall' ] );
 		add_action( 'wp_ajax_rg_set_paywall_name', [ $this, 'rg_set_paywall_name' ] );
 		add_action( 'wp_ajax_rg_contribution_save', [ $this, 'rg_contribution_save' ] );
+		add_action( 'wp_ajax_rg_contribution_delete', [ $this, 'rg_contribution_delete' ] );
 	}
 
 	/**
@@ -288,6 +289,8 @@ class Admin {
 	 *
 	 * @since 1.1.0.
 	 *
+	 * @hooked action `wp_ajax_rg_contribution_save`
+	 *
 	 * @return void
 	 */
 	public function rg_contribution_save() {
@@ -372,6 +375,42 @@ class Admin {
 				'code'        => $contribution_code,
 				'button_text' => $generate_button_text,
 				'edit_link'   => $contribution_instance->get_edit_link( $contribution_id ),
+			]
+		);
+	}
+
+	/**
+	 * Handles AJAX request for deleting Contribution offer from the database.
+	 *
+	 * @since 1.2.0.
+	 *
+	 * @hooked action `wp_ajax_rg_contribution_delete`
+	 *
+	 * @return void
+	 */
+	public function rg_contribution_delete() {
+		check_ajax_referer( 'rg_contribution_delete_nonce', 'security' );
+
+		$contribution_instance = Contribution::get_instance();
+		$contribution_id       = ( isset( $_REQUEST['id'] ) ) ? (int) $_REQUEST['id'] : null;
+
+		if ( is_null( $contribution_id ) ) {
+			wp_send_json_error();
+		}
+
+		$delete = $contribution_instance->delete( $contribution_id );
+
+		if ( is_wp_error( $delete ) ) {
+			wp_send_json_error(
+				[
+					'msg' => $delete->get_error_message(),
+				]
+			);
+		}
+
+		wp_send_json_success(
+			[
+				'msg' => __( 'Contribution request deleted.', 'revenue-generator' ),
 			]
 		);
 	}
