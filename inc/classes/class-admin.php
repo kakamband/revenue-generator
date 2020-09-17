@@ -408,7 +408,11 @@ class Admin {
 			);
 		}
 
-		wp_send_json_success();
+		wp_send_json_success(
+			[
+				'msg' => __( 'Contribution request deleted.', 'revenue-generator' ),
+			]
+		);
 	}
 
 	/**

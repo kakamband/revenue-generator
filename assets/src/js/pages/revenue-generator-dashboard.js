@@ -303,8 +303,15 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 									security: nonce,
 									id: contributionID,
 								},
-								success: () => {
-									window.location.reload();
+								success: ( r ) => {
+									$o.snackBar.showSnackbar(
+										r.data.msg,
+										1500
+									);
+
+									setTimeout( () => {
+										window.location.reload();
+									}, 1500 );
 								},
 							} );
 						},
