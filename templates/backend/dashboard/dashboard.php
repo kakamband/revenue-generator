@@ -51,6 +51,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<span contenteditable="true" class="rev-gen-dashboard-paywall-name"><?php echo esc_html( $paywall_title ); ?></span>
 							<p><?php echo wp_kses_post( $paywall_published ); ?></p>
 							<p class="rev-gen-dashboard-content-paywall-info-updated"><?php echo esc_html( $paywall_updated ); ?></p>
+							<div class="rev-gen-dashboard-content-paywall-info-links">
+								<a href="#" class="rev-gen-dashboard-remove-paywall" data-paywall-id="<?php echo esc_attr( $paywall_id ); ?>"><?php esc_html_e( 'Delete Paywall', 'revenue-generator' ); ?></a>
+							</div>
 						</div>
 					</div>
 				<?php } else : ?>
@@ -82,3 +85,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="rev-gen__button rev-gen__button--secondary rev-gen__button--help rev-gen-start-tutorial" id="rg_js_RestartTutorial"><?php esc_html_e( 'Tutorial', 'revenue-generator' ); ?></div>
 </div>
 <?php View::render_footer_backend(); ?>
+<!-- Template for paywall removal confirmation. -->
+<script type="text/template" id="tmpl-revgen-remove-paywall">
+	<div class="rev-gen-preview-main-remove-paywall">
+		<h4 class="rev-gen-preview-main-remove-paywall-title"><?php esc_html_e( 'Are you sure you want to remove the paywall?', 'revenue-generator' ); ?></h4>
+		<p class="rev-gen-preview-main-remove-paywall-message">
+			<?php
+			esc_html_e( 'This content will be visible to all users.', 'revenue-generator' );
+			?>
+		</p>
+		<div class="rev-gen-preview-main-remove-paywall-buttons">
+			<button id="rg_js_removePaywall" class="rev-gen-preview-main-remove-paywall-buttons-dark">
+				<?php esc_html_e( 'Yes, remove Paywall', 'revenue-generator' ); ?>
+			</button>
+			<button id="rg_js_cancelPaywallRemoval" class="rev-gen-preview-main-remove-paywall-buttons-light">
+				<?php esc_html_e( 'No, keep Paywall', 'revenue-generator' ); ?>
+			</button>
+		</div>
+	</div>
+</script>

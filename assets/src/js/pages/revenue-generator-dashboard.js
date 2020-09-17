@@ -1,4 +1,4 @@
-/* global revenueGeneratorGlobalOptions */
+/* global revenueGeneratorGlobalOptions rgGlobal */
 /**
  * JS to handle plugin dashboard screen interactions.
  *
@@ -23,7 +23,16 @@ import '../utils';
 				paywallPreview: '.rev-gen-dashboard-content-paywall-preview',
 				paywallContentWrapper: '.rev-gen-dashboard-content-paywall',
 
+				// Delete Paywall link.
+				removePaywallDashboard: '.rev-gen-dashboard-remove-paywall',
+				// Paywall remove warning modal.
+				paywallRemovalModal: '.rev-gen-preview-main-remove-paywall',
+				paywallRemove: '#rg_js_removePaywall',
+				paywallCancelRemove: '#rg_js_cancelPaywallRemoval',
+
 				// Dashboard bar action items.
+				previewWrapper: $( '.rev-gen-layout-wrapper' ),
+				dashboardWrapper: $( '.rev-gen-dashboard-main' ),
 				newPaywall: $( '#rg_js_newPaywall' ),
 				newContribution: $( '#rg_js_newContribution' ),
 				sortPaywalls: $( '#rg_js_filterPaywalls' ),
@@ -274,6 +283,114 @@ import '../utils';
 								break;
 						}
 					}
+				} );
+
+				/**
+				 * Remove the paywall after merchant confirmation.
+				 */
+				$o.body.on( 'click', $o.removePaywallDashboard, function() {
+					showPaywallRemovalConfirmation().then( ( confirmation ) => {
+						if ( true === confirmation ) {
+							const paywallId = $( this ).attr(
+								'data-paywall-id'
+							);
+							const eventLabel = $( this )
+								.closest(
+									'.rev-gen-dashboard-content-paywall-info'
+								)
+								.find( '.rev-gen-dashboard-paywall-name' )
+								.text()
+								.trim();
+							removePaywall( paywallId, eventLabel );
+						}
+					} );
+				} );
+			};
+
+			/**
+			 * Remove Paywall
+			 *
+			 * @param {number} paywallId
+			 * @param {string} eventLabel
+			 * @return {void}
+			 */
+			const removePaywall = function( paywallId, eventLabel ) {
+				// Create form data.
+				const formData = {
+					action: 'rg_remove_paywall',
+					id: paywallId,
+					security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
+				};
+
+				// Delete the option.
+				$.ajax( {
+					url: revenueGeneratorGlobalOptions.ajaxUrl,
+					method: 'POST',
+					data: formData,
+					dataType: 'json',
+				} ).done( function( r ) {
+					// Show message and remove the overlay.
+					$o.snackBar.showSnackbar( r.msg, 1500 );
+					// Send GA Event.
+					const eventCategory = 'LP RevGen Configure Paywall';
+					const eventAction = 'Paywall Deleted';
+					rgGlobal.sendLPGAEvent(
+						eventAction,
+						eventCategory,
+						eventLabel,
+						0,
+						true
+					);
+
+					// waits until snackbar is shown and delete event is sent.
+					setTimeout( function() {
+						window.location.reload();
+					}, 1500 );
+				} );
+			};
+
+			/**
+			 * Show the confirmation box for removing paywall.
+			 */
+			const showPaywallRemovalConfirmation = async function() {
+				const confirm = await createPaywallRemovalConfirmation();
+				$o.previewWrapper.find( $o.paywallRemovalModal ).remove();
+				$o.body.removeClass( 'modal-blur' );
+				$o.dashboardWrapper.css( {
+					filter: 'unset',
+					'pointer-events': 'unset',
+				} );
+				return confirm;
+			};
+
+			/**
+			 * Create a confirmation modal with warning before removing paywall.
+			 */
+			const createPaywallRemovalConfirmation = function() {
+				return new Promise( ( complete ) => {
+					$o.previewWrapper.find( $o.paywallRemovalModal ).remove();
+
+					// Get the template for confirmation popup and add it.
+					const template = wp.template( 'revgen-remove-paywall' );
+					$o.previewWrapper.append( template );
+
+					$o.body.addClass( 'modal-blur' );
+					$o.dashboardWrapper.css( {
+						filter: 'blur(5px)',
+						'pointer-events': 'none',
+					} );
+
+					$( $o.paywallRemove ).off( 'click' );
+					$( $o.paywallCancelRemove ).off( 'click' );
+
+					$( $o.paywallRemove ).on( 'click', () => {
+						$( $o.paywallRemovalModal ).hide();
+						complete( true );
+					} );
+					$( $o.paywallCancelRemove ).on( 'click', () => {
+						$( $o.paywallRemovalModal ).hide();
+						complete( false );
+					} );
 				} );
 			};
 
