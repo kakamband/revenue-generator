@@ -187,7 +187,7 @@ class Contribution extends Base {
 	 */
 	public function delete( $contribution_id = 0 ) {
 		if ( empty( $contribution_id ) ) {
-			return false;
+			return new \WP_Error( 'empty_contribution_id', __( 'Provided empty contribution ID to delete method.', 'revenue-generator' ) );
 		}
 
 		$contribution = $this->get( $contribution_id );
