@@ -9,6 +9,7 @@
  * Internal dependencies.
  */
 import '../utils';
+import { RevGenModal } from '../utils/rev-gen-modal';
 
 ( function( $ ) {
 	$( function() {
@@ -31,6 +32,9 @@ import '../utils';
 				editPayWallName: $( '.rev-gen-dashboard-paywall-name' ),
 				paywallSearchIcon: $( '.rev-gen-dashboard-bar--search-icon' ),
 				laterpayLoader: $( '.laterpay-loader-wrapper' ),
+				contributionDelete: $(
+					'.rev-gen-dashboard__contribution-delete'
+				),
 
 				// Dashboard footer area.
 				restartTour: $( '#rg_js_RestartTutorial' ),
@@ -274,6 +278,47 @@ import '../utils';
 								break;
 						}
 					}
+				} );
+
+				$o.contributionDelete.on( 'click', function( e ) {
+					e.preventDefault();
+
+					const $this = $( e.target );
+					const contributionID = $this.data( 'id' );
+					const nonce = $this.data( 'nonce' );
+
+					new RevGenModal( {
+						id: 'rg-modal-remove-contribution',
+						templateData: {
+							isEditable: parseInt(
+								$this.data( 'editable' ),
+								10
+							),
+						},
+						onConfirm: async () => {
+							$.ajax( {
+								url: revenueGeneratorGlobalOptions.ajaxUrl,
+								data: {
+									action: 'rg_contribution_delete',
+									security: nonce,
+									id: contributionID,
+								},
+								success: ( r ) => {
+									$o.snackBar.showSnackbar(
+										r.data.msg,
+										1500
+									);
+
+									setTimeout( () => {
+										window.location.reload();
+									}, 1500 );
+								},
+							} );
+						},
+						onCancel: () => {
+							// noop
+						},
+					} );
 				} );
 			};
 

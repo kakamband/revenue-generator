@@ -149,7 +149,6 @@ class Shortcodes {
 	 * @param array $atts shortcode attributes.
 	 */
 	public function render_contribution_dialog( $atts ) {
-
 		$default_atts = array(
 			'id'                 => null,
 			'type'               => 'multiple',
@@ -169,6 +168,21 @@ class Shortcodes {
 			$contribution_instance = Post_Types\Contribution::get_instance();
 			$contribution_atts     = $contribution_instance->get( (int) $atts['id'] );
 			$default_atts          = $contribution_atts;
+
+			if ( is_wp_error( $contribution_atts ) ) {
+				if ( is_preview() ) {
+					$message = __( 'This Contribution request has been deleted. Please delete this shortcode.', 'revenue-generator' );
+
+					$html = sprintf(
+						'<p>%s</p>',
+						esc_html( $message )
+					);
+
+					return $html;
+				} else {
+					return;
+				}
+			}
 		}
 
 		$config_data = shortcode_atts(
