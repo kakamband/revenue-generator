@@ -35,7 +35,7 @@
 	&--search {
 		position: fixed;
 		top: 30px;
-		z-index: 5;
+		z-index: 9999;
 		display: flex;
 		flex-direction: row;
 		align-self: center;
@@ -136,7 +136,7 @@
 		flex-direction: row;
 		position: fixed;
 		bottom: 0;
-		z-index: 5;
+		z-index: 9999;
 		width: 732px;
 		height: 52px;
 		padding: 0 15px;
