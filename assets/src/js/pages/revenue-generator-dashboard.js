@@ -27,9 +27,6 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				// Delete Paywall link.
 				removePaywallDashboard: '.rev-gen-dashboard-remove-paywall',
 
-				// Dashboard bar action items.
-				previewWrapper: $( '.rev-gen-layout-wrapper' ),
-				dashboardWrapper: $( '.rev-gen-dashboard-main' ),
 				newPaywall: $( '#rg_js_newPaywall' ),
 				newContribution: $( '#rg_js_newContribution' ),
 				sortPaywalls: $( '#rg_js_filterPaywalls' ),
