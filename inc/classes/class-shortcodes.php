@@ -174,7 +174,8 @@ class Shortcodes {
 					$message = __( 'This Contribution request has been deleted. Please delete this shortcode.', 'revenue-generator' );
 
 					$html = sprintf(
-						'<p>%s</p>',
+						'<p class="%s">%s</p>',
+						'rev-gen-contribution-error',
 						esc_html( $message )
 					);
 
