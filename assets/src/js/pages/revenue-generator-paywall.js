@@ -11,6 +11,7 @@
 import '../utils';
 import { debounce } from '../helpers';
 import { __, sprintf } from '@wordpress/i18n';
+import { RevGenModal } from '../utils/rev-gen-modal';
 
 ( function( $ ) {
 	$( function() {
@@ -1719,9 +1720,62 @@ import { __, sprintf } from '@wordpress/i18n';
 				 * Remove the paywall after merchant confirmation.
 				 */
 				$o.body.on( 'click', $o.purchaseOverlayRemove, function() {
-					showPaywallRemovalConfirmation().then( ( confirmation ) => {
-						if ( true === confirmation ) {
-							removePaywall();
+					new RevGenModal( {
+						id: 'rg-modal-remove-paywall',
+						onConfirm: async() => {
+							const paywall = $( $o.purchaseOptionItems );
+							const paywallId = paywall.attr( 'data-paywall-id' );
+
+							// Create form data.
+							const formData = {
+								action: 'rg_remove_paywall',
+								id: paywallId,
+								security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
+							};
+
+							// Delete the option.
+							$.ajax( {
+								url: revenueGeneratorGlobalOptions.ajaxUrl,
+								method: 'POST',
+								data: formData,
+								dataType: 'json',
+							} ).done( function( r ) {
+								const eventLabel = $o.paywallName.text().trim();
+
+								// Show message and remove the overlay.
+								$o.snackBar.showSnackbar( r.msg, 1500 );
+								$o.purchaseOverlay.remove();
+
+								// Update paywall actions bar with new button.
+								$o.actionsWrapper.css( {
+									width: '75%',
+									'background-color': 'rgba(239, 239, 239, 0.3)',
+									'backdrop-filter': 'blur(10px)',
+								} );
+
+								// Get the template for confirmation popup and add it.
+								const template = wp.template( 'revgen-add-paywall' );
+								$o.actionsWrapper.empty().append( template );
+
+								// Add preview url for new paywall.
+								if ( r.preview_id ) {
+									$( $o.addPaywall ).attr(
+										'data-preview-id',
+										r.preview_id
+									);
+								}
+
+								// Send GA Event.
+								const eventCategory = 'LP RevGen Configure Paywall';
+								const eventAction = 'Paywall Deleted';
+								rgGlobal.sendLPGAEvent(
+									eventAction,
+									eventCategory,
+									eventLabel,
+									0,
+									true
+								);
+							} );
 						}
 					} );
 				} );
@@ -3637,110 +3691,6 @@ import { __, sprintf } from '@wordpress/i18n';
 			 */
 			const hideLoader = function() {
 				$o.laterpayLoader.hide();
-			};
-
-			/**
-			 * Remove paywall.
-			 */
-			const removePaywall = function() {
-				const paywall = $( $o.purchaseOptionItems );
-				const paywallId = paywall.attr( 'data-paywall-id' );
-
-				// Create form data.
-				const formData = {
-					action: 'rg_remove_paywall',
-					id: paywallId,
-					security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
-				};
-
-				// Delete the option.
-				$.ajax( {
-					url: revenueGeneratorGlobalOptions.ajaxUrl,
-					method: 'POST',
-					data: formData,
-					dataType: 'json',
-				} ).done( function( r ) {
-					const eventLabel = $o.paywallName.text().trim();
-
-					// Show message and remove the overlay.
-					$o.snackBar.showSnackbar( r.msg, 1500 );
-					$o.purchaseOverlay.remove();
-
-					// Update paywall actions bar with new button.
-					$o.actionsWrapper.css( {
-						width: '75%',
-						'background-color': 'rgba(239, 239, 239, 0.3)',
-						'backdrop-filter': 'blur(10px)',
-					} );
-
-					// Get the template for confirmation popup and add it.
-					const template = wp.template( 'revgen-add-paywall' );
-					$o.actionsWrapper.empty().append( template );
-
-					// Add preview url for new paywall.
-					if ( r.preview_id ) {
-						$( $o.addPaywall ).attr(
-							'data-preview-id',
-							r.preview_id
-						);
-					}
-
-					// Send GA Event.
-					const eventCategory = 'LP RevGen Configure Paywall';
-					const eventAction = 'Paywall Deleted';
-					rgGlobal.sendLPGAEvent(
-						eventAction,
-						eventCategory,
-						eventLabel,
-						0,
-						true
-					);
-				} );
-			};
-
-			/**
-			 * Show the confirmation box for removing paywall.
-			 */
-			const showPaywallRemovalConfirmation = async function() {
-				const confirm = await createPaywallRemovalConfirmation();
-				$o.previewWrapper.find( $o.paywallRemovalModal ).remove();
-				$o.body.removeClass( 'modal-blur' );
-				$o.purchaseOverlay.css( {
-					filter: 'unset',
-					'pointer-events': 'unset',
-				} );
-				return confirm;
-			};
-
-			/**
-			 * Create a confirmation modal with warning before removing paywall.
-			 */
-			const createPaywallRemovalConfirmation = function() {
-				return new Promise( ( complete ) => {
-					$o.previewWrapper.find( $o.paywallRemovalModal ).remove();
-
-					// Get the template for confirmation popup and add it.
-					const template = wp.template( 'revgen-remove-paywall' );
-					$o.previewWrapper.append( template );
-
-					$o.body.addClass( 'modal-blur' );
-					$o.purchaseOverlay.css( {
-						filter: 'blur(5px)',
-						'pointer-events': 'none',
-					} );
-
-					$( $o.paywallRemove ).off( 'click' );
-					$( $o.paywallCancelRemove ).off( 'click' );
-
-					$( $o.paywallRemove ).on( 'click', () => {
-						$( $o.paywallRemovalModal ).hide();
-						complete( true );
-					} );
-					$( $o.paywallCancelRemove ).on( 'click', () => {
-						$( $o.paywallRemovalModal ).hide();
-						complete( false );
-					} );
-				} );
 			};
 
 			/**
