@@ -1,3 +1,15 @@
+<?php
+/**
+ * Revenue Generator paywall removal modal template.
+ *
+ * @package revenue-generator
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	// prevent direct access to this file.
+	exit;
+}
+?>
 <!-- Template for paywall removal confirmation. -->
 <script type="text/template" id="tmpl-rg-modal-remove-paywall">
 	<div class="rev-gen-modal" id="rg-modal-remove-paywall">
