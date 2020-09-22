@@ -41,6 +41,7 @@ class RevGenModal {
 				// noop
 			},
 			autoShow: true,
+			keepOpen: false,
 		};
 
 		/** @type {Object} */
@@ -101,12 +102,23 @@ class RevGenModal {
 	 * Binds events on modal's action buttons.
 	 */
 	bindEvents() {
-		this.el
-			.querySelector( '#rg_js_modal_confirm' )
-			.addEventListener( 'click', this.onConfirm.bind( this ) );
-		this.el
-			.querySelector( '#rg_js_modal_cancel' )
-			.addEventListener( 'click', this.onCancel.bind( this ) );
+		if ( this.el.querySelector( '#rg_js_modal_confirm' ) ) {
+			this.el
+				.querySelector( '#rg_js_modal_confirm' )
+				.addEventListener( 'click', this.onConfirm.bind( this ) );
+		}
+
+		if ( this.el.querySelector( '#rg_js_modal_cancel' ) ) {
+			this.el
+				.querySelector( '#rg_js_modal_cancel' )
+				.addEventListener( 'click', this.onCancel.bind( this ) );
+		}
+
+		if ( this.el.querySelector( '#rg_js_modal_close' ) ) {
+			this.el
+				.querySelector( '#rg_js_modal_close' )
+				.addEventListener( 'click', this.hide.bind( this ) );
+		}
 	}
 
 	/**
@@ -115,10 +127,12 @@ class RevGenModal {
 	 * - Calls `onConfirm` callback function as defined in options passed to the instance.
 	 * - Closes modal.
 	 */
-	onConfirm() {
-		this.options.onConfirm();
+	onConfirm( e ) {
+		this.options.onConfirm( e, this.el );
 
-		this.hide();
+		if ( ! this.options.keepOpen ) {
+			this.hide();
+		}
 	}
 
 	/**
@@ -127,10 +141,12 @@ class RevGenModal {
 	 * - Calls `onCancel` callback function as defined in options passed to the instance.
 	 * - Closes modal.
 	 */
-	onCancel() {
-		this.options.onCancel();
+	onCancel( e ) {
+		this.options.onCancel( e, this.el );
 
-		this.hide();
+		if ( ! this.options.keepOpen ) {
+			this.hide();
+		}
 	}
 }
 
