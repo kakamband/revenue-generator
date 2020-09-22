@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<h4 class="rev-gen-modal__title">
 				<?php esc_html_e( 'Are you sure you want to remove the paywall?', 'revenue-generator' ); ?>
 			</h4>
-			<p class="rev-gen-preview-main-remove-paywall-message">
+			<p class="rev-gen-modal__message">
 				<?php esc_html_e( 'This content will be visible to all users.', 'revenue-generator' ); ?>
 			</p>
 			<div class="rev-gen-modal__buttons">
