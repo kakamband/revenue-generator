@@ -971,26 +971,35 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					);
 					const type = purchaseItem.attr( 'data-purchase-type' );
 					let entityId;
-					if ( 'individual' === type ) {
-						entityId = purchaseItem.attr( 'data-paywall-id' );
-					} else if ( 'timepass' === type ) {
-						entityId = purchaseItem.attr( 'data-tlp-id' );
-					} else if ( 'subscription' === type ) {
-						entityId = purchaseItem.attr( 'data-sub-id' );
+
+					switch ( type ) {
+						case 'individual':
+							entityId = purchaseItem.attr( 'data-paywall-id' );
+							break;
+
+						case 'timepass':
+							entityId = purchaseItem.attr( 'data-tlp-id' );
+							break;
+
+						case 'subscription':
+							entityId = purchaseItem.attr( 'data-sub-id' );
+							break;
 					}
 
 					if ( 'individual' !== type && entityId ) {
-						showPurchaseOptionUpdateWarning( type ).then(
-							( confirmation ) => {
-								if ( true === confirmation ) {
-									purchaseItem.remove();
-									reorderPurchaseItems();
-									removePurchaseOption( type, entityId );
-									$o.isPublish = true;
-									$o.savePaywall.trigger( 'click' );
-								}
-							}
-						);
+						new RevGenModal( {
+							id: 'rg-modal-purchase-option-update',
+							templateData: {
+								optionType: type
+							},
+							onConfirm: async () => {
+								purchaseItem.remove();
+								reorderPurchaseItems();
+								removePurchaseOption( type, entityId );
+								$o.isPublish = true;
+								$o.savePaywall.trigger( 'click' );
+							},
+						} );
 					} else {
 						purchaseItem.remove();
 						reorderPurchaseItems();
@@ -1138,75 +1147,77 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 
 					// If a saved option is being edited, get confirmation.
 					if ( 'individual' !== optionType && entityId ) {
-						showPurchaseOptionUpdateWarning( optionType ).then(
-							( confirmation ) => {
-								if ( true === confirmation ) {
-									if ( revenueSelection.prop( 'checked' ) ) {
-										priceItem.attr(
-											'data-pay-model',
-											'ppu'
-										);
-										revenueSelection.val( 1 );
-										validatePricingRevenue(
-											optionItem,
-											true
-										);
-										revenueWrapper
-											.find( '.pay-later' )
-											.removeClass( 'unchecked' );
-										revenueWrapper
-											.find( '.pay-now' )
-											.addClass( 'unchecked' );
-									} else {
-										priceItem.attr(
-											'data-pay-model',
-											'sis'
-										);
-										revenueSelection.val( 0 );
-										validatePricingRevenue(
-											optionItem,
-											false
-										);
-										revenueWrapper
-											.find( '.pay-later' )
-											.addClass( 'unchecked' );
-										revenueWrapper
-											.find( '.pay-now' )
-											.removeClass( 'unchecked' );
-									}
+						new RevGenModal( {
+							id: 'rg-modal-purchase-option-update',
+							templateData: {
+								optionType: optionType
+							},
+							onConfirm: async () => {
+								if ( revenueSelection.prop( 'checked' ) ) {
+									priceItem.attr(
+										'data-pay-model',
+										'ppu'
+									);
+									revenueSelection.val( 1 );
+									validatePricingRevenue(
+										optionItem,
+										true
+									);
+									revenueWrapper
+										.find( '.pay-later' )
+										.removeClass( 'unchecked' );
+									revenueWrapper
+										.find( '.pay-now' )
+										.addClass( 'unchecked' );
 								} else {
 									priceItem.attr(
 										'data-pay-model',
-										currentRevenue
+										'sis'
 									);
-									revenueSelection.val( currentValue );
-									revenueSelection.attr(
-										'checked',
-										1 === parseInt( currentValue )
-									);
+									revenueSelection.val( 0 );
 									validatePricingRevenue(
 										optionItem,
-										1 === parseInt( currentValue )
+										false
 									);
-									if ( 1 === parseInt( currentValue ) ) {
-										revenueWrapper
-											.find( '.pay-later' )
-											.removeClass( 'unchecked' );
-										revenueWrapper
-											.find( '.pay-now' )
-											.addClass( 'unchecked' );
-									} else {
-										revenueWrapper
-											.find( '.pay-later' )
-											.addClass( 'unchecked' );
-										revenueWrapper
-											.find( '.pay-now' )
-											.removeClass( 'unchecked' );
-									}
+									revenueWrapper
+										.find( '.pay-later' )
+										.addClass( 'unchecked' );
+									revenueWrapper
+										.find( '.pay-now' )
+										.removeClass( 'unchecked' );
+								}
+							},
+							onCancel: async () => {
+								priceItem.attr(
+									'data-pay-model',
+									currentRevenue
+								);
+								revenueSelection.val( currentValue );
+								revenueSelection.attr(
+									'checked',
+									1 === parseInt( currentValue )
+								);
+								validatePricingRevenue(
+									optionItem,
+									1 === parseInt( currentValue )
+								);
+								if ( 1 === parseInt( currentValue ) ) {
+									revenueWrapper
+										.find( '.pay-later' )
+										.removeClass( 'unchecked' );
+									revenueWrapper
+										.find( '.pay-now' )
+										.addClass( 'unchecked' );
+								} else {
+									revenueWrapper
+										.find( '.pay-later' )
+										.addClass( 'unchecked' );
+									revenueWrapper
+										.find( '.pay-now' )
+										.removeClass( 'unchecked' );
 								}
 							}
-						);
-						return;
+						} );
 					}
 
 					if ( revenueSelection.prop( 'checked' ) ) {
@@ -1356,11 +1367,12 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 
 							// If a saved item is being updated, display warning.
 							if ( 'individual' !== optionType && entityId ) {
-								showPurchaseOptionUpdateWarning(
-									optionType
-								).then( ( confirmation ) => {
-									// If merchant selects to continue, remove current option from DB.
-									if ( true === confirmation ) {
+								new RevGenModal( {
+									id: 'rg-modal-purchase-option-update',
+									templateData: {
+										optionType: optionType,
+									},
+									onConfirm: async () => {
 										const validatedPrice = validatePrice(
 											newPrice,
 											'subscription' === optionType
@@ -1372,7 +1384,8 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 											validatedPrice,
 											optionItem
 										);
-									} else {
+									},
+									onCancel: async() => {
 										const validatedPrice = validatePrice(
 											currentPrice,
 											'subscription' === optionType
@@ -1896,28 +1909,29 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						}
 
 						if ( 'individual' !== currentType && entityId ) {
-							showPurchaseOptionUpdateWarning( currentType ).then(
-								( confirmation ) => {
-									// If merchant selects to continue, remove current option from DB.
-									if ( true === confirmation ) {
-										// Remove the data from DB.
-										removePurchaseOption(
-											currentType,
-											entityId,
-											false
-										);
-										$o.isPublish = true;
-										$o.savePaywall.trigger( 'click' );
-									} else {
-										optionItem.attr(
-											'data-purchase-type',
-											currentType
-										);
-										$( this ).val( currentType );
-										return false;
-									}
+							new RevGenModal( {
+								id: 'rg-modal-purchase-option-update',
+								templateData: {
+									optionType: currentType,
+								},
+								onConfirm: async () => {
+									removePurchaseOption(
+										currentType,
+										entityId,
+										false
+									);
+									$o.isPublish = true;
+									$o.savePaywall.trigger( 'click' );
+								},
+								onCancel: async() => {
+									optionItem.attr(
+										'data-purchase-type',
+										currentType
+									);
+									$( this ).val( currentType );
+									return false;
 								}
-							);
+							} );
 						}
 
 						// Remove all current attributes.
@@ -2271,11 +2285,12 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						} );
 
 						if ( isNewItem ) {
-							showPurchaseOptionUpdateWarning(
-								'newPurchaseOption'
-							).then( ( confirmation ) => {
-								// If merchant selects to continue, remove current option from DB.
-								if ( true === confirmation ) {
+							new RevGenModal( {
+								id: 'rg-modal-purchase-option-update',
+								templateData: {
+									optionType: 'newPurchaseOption'
+								},
+								onConfirm: async () => {
 									/**
 									 * Save paywall data to get new paywall id and wait for some time to publish the paywall.
 									 */
@@ -2288,9 +2303,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 										hideLoader();
 										$o.isPublish = false;
 									}, 1500 );
-								} else {
-									return false;
-								}
+								},
 							} );
 						} else {
 							/**
@@ -2553,37 +2566,164 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 			/**
 			 * Publish the paywall.
 			 */
+			//const publishPaywall = function() {
+			//	if (
+			//		1 ===
+			//		parseInt(
+			//			revenueGeneratorGlobalOptions.globalOptions
+			//				.is_merchant_verified
+			//		)
+			//	) {
+			//		$o.previewWrapper.find( $o.activationModal ).remove();
+
+			//		// Get the template for account verification.
+			//		const template = wp.template(
+			//			'revgen-account-activation-modal'
+			//		);
+			//		$o.previewWrapper.append( template );
+
+			//		// Blur out the background.
+			//		$o.body.addClass( 'modal-blur' );
+			//		$o.purchaseOverlay.css( {
+			//			filter: 'blur(5px)',
+			//			'pointer-events': 'none',
+			//		} );
+			//		$o.actionsWrapper.css( {
+			//			'background-color': '#a9a9a9',
+			//		} );
+			//		$o.actionButtons.css( { opacity: '0.5' } );
+			//		$o.searchContentWrapper.css( {
+			//			'background-color': '#a9a9a9',
+			//		} );
+			//	}
+
+			//	if ( ! $o.requestSent ) {
+			//		$o.requestSent = true;
+			//		showLoader();
+
+			//		// Get paywall id.
+			//		const paywall = $( $o.purchaseOptionItems );
+			//		const paywallId = paywall.attr( 'data-paywall-id' );
+
+			//		// Create form data for activating paywall.
+			//		const formData = {
+			//			action: 'rg_activate_paywall',
+			//			paywall_id: paywallId,
+			//			security:
+			//				revenueGeneratorGlobalOptions.rg_paywall_nonce,
+			//		};
+
+			//		// Delete the option.
+			//		$.ajax( {
+			//			url: revenueGeneratorGlobalOptions.ajaxUrl,
+			//			method: 'POST',
+			//			data: formData,
+			//			dataType: 'json',
+			//		} ).done( function( r ) {
+			//			$o.requestSent = false;
+			//			hideLoader();
+
+			//			// Get required info for success message.
+			//			const postPreviewId = $o.postPreviewWrapper.attr(
+			//				'data-preview-id'
+			//			);
+			//			const paywallName = $o.paywallName.text().trim();
+			//			const appliedTo = $( $o.paywallAppliesTo ).val();
+			//			let publishMessage = '';
+
+			//			// Compose message based on paywall attributes.
+			//			if (
+			//				'category' === appliedTo ||
+			//				'exclude_category' === appliedTo
+			//			) {
+			//				const categoryName = $o.searchPaywallContent
+			//					.text()
+			//					.trim();
+			//				if ( 'category' === appliedTo ) {
+			//					publishMessage = sprintf(
+			//						/* translators: %s category name */
+			//						__(
+			//							'Has been published to <b>all posts</b> in category <b>%s</b>.',
+			//							'revenue-generator'
+			//						),
+			//						categoryName
+			//					);
+			//				} else {
+			//					publishMessage = sprintf(
+			//						/* translators: %s category name */
+			//						__(
+			//							'Has been published to <b>all posts, except posts under</b> in category <b>%s</b>.',
+			//							'revenue-generator'
+			//						),
+			//						categoryName
+			//					);
+			//				}
+			//			} else if ( 'supported' === appliedTo ) {
+			//				publishMessage = sprintf(
+			//					/* translators: %s post name */
+			//					__(
+			//						'Has been published on <b>%s</b>.',
+			//						'revenue-generator'
+			//					),
+			//					$( $o.postTitle )
+			//						.text()
+			//						.trim()
+			//				);
+			//			} else if ( 'specific_post' === appliedTo ) {
+			//				publishMessage = __(
+			//					'Has been published on <b>Specific Posts & Pages</b>.',
+			//					'revenue-generator'
+			//				);
+			//			} else {
+			//				publishMessage = __(
+			//					'Has been published on <b>all posts</b>.',
+			//					'revenue-generator'
+			//				);
+			//			}
+
+			//			// Remove unnecessary markup form modal and show success message.
+			//			const activationModal = $o.previewWrapper.find(
+			//				$o.activationModal
+			//			);
+			//			const activationSuccess = activationModal.find(
+			//				$o.activationModalSuccess
+			//			);
+			//			activationSuccess
+			//				.find( $o.activationModalSuccessTitle )
+			//				.text( paywallName );
+			//			activationSuccess
+			//				.find( $o.activationModalSuccessMessage )
+			//				.append( $( '<p/>' ).html( publishMessage ) );
+			//			activationSuccess
+			//				.find( $o.viewPost )
+			//				.attr( 'data-target-id', postPreviewId );
+			//			activationModal
+			//				.find( $o.activationModalError )
+			//				.remove();
+			//			activationModal
+			//				.find( $o.accountActionsWrapper )
+			//				.remove();
+			//			activationModal
+			//				.find( $o.accountActionsFields )
+			//				.remove();
+
+			//			// If merchant has more than one paywalls, add a warning.
+			//			if ( true === r.has_paywalls ) {
+			//				activationSuccess
+			//					.find( $o.activationModalWarningMessage )
+			//					.show();
+			//			} else {
+			//				activationSuccess
+			//					.find( $o.activationModalWarningMessage )
+			//					.hide();
+			//			}
+
+			//			activationSuccess.css( { display: 'flex' } );
+			//		} );
+			//	}
+			//};
+
 			const publishPaywall = function() {
-				if (
-					1 ===
-					parseInt(
-						revenueGeneratorGlobalOptions.globalOptions
-							.is_merchant_verified
-					)
-				) {
-					$o.previewWrapper.find( $o.activationModal ).remove();
-
-					// Get the template for account verification.
-					const template = wp.template(
-						'revgen-account-activation-modal'
-					);
-					$o.previewWrapper.append( template );
-
-					// Blur out the background.
-					$o.body.addClass( 'modal-blur' );
-					$o.purchaseOverlay.css( {
-						filter: 'blur(5px)',
-						'pointer-events': 'none',
-					} );
-					$o.actionsWrapper.css( {
-						'background-color': '#a9a9a9',
-					} );
-					$o.actionButtons.css( { opacity: '0.5' } );
-					$o.searchContentWrapper.css( {
-						'background-color': '#a9a9a9',
-					} );
-				}
-
 				if ( ! $o.requestSent ) {
 					$o.requestSent = true;
 					showLoader();
@@ -2611,101 +2751,67 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						hideLoader();
 
 						// Get required info for success message.
-						const postPreviewId = $o.postPreviewWrapper.attr(
+						const postPreviewID = $o.postPreviewWrapper.attr(
 							'data-preview-id'
 						);
+						const categoryName = $o.searchPaywallContent.text().trim();
 						const paywallName = $o.paywallName.text().trim();
 						const appliedTo = $( $o.paywallAppliesTo ).val();
-						let publishMessage = '';
+						const selectedCategoryID = $o.searchPaywallContent.val();
+						const specificPostIDs = $o.searchPost.val();
 
-						// Compose message based on paywall attributes.
-						if (
-							'category' === appliedTo ||
-							'exclude_category' === appliedTo
-						) {
-							const categoryName = $o.searchPaywallContent
-								.text()
-								.trim();
-							if ( 'category' === appliedTo ) {
-								publishMessage = sprintf(
-									/* translators: %s category name */
-									__(
-										'Has been published to <b>all posts</b> in category <b>%s</b>.',
-										'revenue-generator'
-									),
-									categoryName
-								);
-							} else {
-								publishMessage = sprintf(
-									/* translators: %s category name */
-									__(
-										'Has been published to <b>all posts, except posts under</b> in category <b>%s</b>.',
-										'revenue-generator'
-									),
-									categoryName
-								);
-							}
-						} else if ( 'supported' === appliedTo ) {
-							publishMessage = sprintf(
-								/* translators: %s post name */
-								__(
-									'Has been published on <b>%s</b>.',
-									'revenue-generator'
-								),
-								$( $o.postTitle )
-									.text()
-									.trim()
-							);
-						} else if ( 'specific_post' === appliedTo ) {
-							publishMessage = __(
-								'Has been published on <b>Specific Posts & Pages</b>.',
-								'revenue-generator'
-							);
+						if ( 0 === parseInt(
+							revenueGeneratorGlobalOptions.globalOptions
+							.is_merchant_verified
+						) ) {
+							new RevGenModal( {
+								id: 'rg-modal-paywall-activation',
+								templateData: {
+									paywallID: paywallId,
+									paywallName: paywallName,
+									appliedTo: appliedTo,
+									categoryName: categoryName,
+									postTitle: $( $o.postTitle )
+											.text()
+											.trim()
+								},
+								onConfirm: async() => {
+									if ( postPreviewID ) {
+										viewPost(
+											postPreviewID,
+											selectedCategoryID,
+											appliedTo,
+											specificPostIDs
+										);
+									}
+								},
+								onCancel: async ( e ) => {
+									window.location.href = e.target.dataset.dashboard_url;
+								}
+							} );
 						} else {
-							publishMessage = __(
-								'Has been published on <b>all posts</b>.',
-								'revenue-generator'
-							);
+							new RevGenModal( {
+								id: 'rg-modal-account-activation',
+								templateData: {
+
+								},
+								onConfirm: async ( e, el ) => {
+									new RevGenModal( {
+										id: 'rg-modal-connect-account',
+										keepOpen: true,
+										templateData: {
+
+										},
+										onConfirm: async () => {
+											console.log( 'connected!' );
+										}
+									} );
+								},
+								onCancel: async () => {
+
+								}
+							} );
 						}
-
-						// Remove unnecessary markup form modal and show success message.
-						const activationModal = $o.previewWrapper.find(
-							$o.activationModal
-						);
-						const activationSuccess = activationModal.find(
-							$o.activationModalSuccess
-						);
-						activationSuccess
-							.find( $o.activationModalSuccessTitle )
-							.text( paywallName );
-						activationSuccess
-							.find( $o.activationModalSuccessMessage )
-							.append( $( '<p/>' ).html( publishMessage ) );
-						activationSuccess
-							.find( $o.viewPost )
-							.attr( 'data-target-id', postPreviewId );
-						activationModal
-							.find( $o.activationModalError )
-							.remove();
-						activationModal
-							.find( $o.accountActionsWrapper )
-							.remove();
-						activationModal
-							.find( $o.accountActionsFields )
-							.remove();
-
-						// If merchant has more than one paywalls, add a warning.
-						if ( true === r.has_paywalls ) {
-							activationSuccess
-								.find( $o.activationModalWarningMessage )
-								.show();
-						} else {
-							activationSuccess
-								.find( $o.activationModalWarningMessage )
-								.hide();
-						}
-
-						activationSuccess.css( { display: 'flex' } );
 					} );
 				}
 			};
@@ -3694,113 +3800,84 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 			};
 
 			/**
-			 * Show the confirmation box for saved entity update.
-			 *
-			 * @param {string} optionType Option type.
-			 */
-			const showPurchaseOptionUpdateWarning = async function(
-				optionType
-			) {
-				const confirm = await createEntityUpdateConfirmation(
-					optionType
-				);
-				$o.previewWrapper
-					.find( $o.purchaseOptionWarningWrapper )
-					.remove();
-				$o.body.removeClass( 'modal-blur' );
-				$o.purchaseOverlay.css( {
-					filter: 'unset',
-					'pointer-events': 'unset',
-				} );
-
-				// Grey out the paywall actions and change position.
-				$o.actionsWrapper.css( {
-					'background-color': '#fff',
-				} );
-				$o.actionButtons.css( { opacity: '1' } );
-				$o.searchContentWrapper.css( { 'background-color': '#fff' } );
-				return confirm;
-			};
-
-			/**
 			 * Create a confirmation modal with warning before saved entity is updated.
 			 *
 			 * @param {string} optionType Option type.
 			 */
-			const createEntityUpdateConfirmation = function( optionType ) {
-				return new Promise( ( complete ) => {
-					$o.previewWrapper
-						.find( $o.purchaseOptionWarningWrapper )
-						.remove();
+			//const createEntityUpdateConfirmation = function( optionType ) {
+			//	return new Promise( ( complete ) => {
+			//		$o.previewWrapper
+			//			.find( $o.purchaseOptionWarningWrapper )
+			//			.remove();
 
-					// Get the template for confirmation popup and add it.
-					const template = wp.template(
-						'revgen-purchase-option-update'
-					);
-					$o.previewWrapper.append( template );
-					const updateWarning = $(
-						$o.purchaseOptionWarningWrapper
-					).find( $o.purchaseOptionWarningMessage );
-					if ( updateWarning.length ) {
-						if ( 'timepass' === optionType ) {
-							updateWarning
-								.empty()
-								.text(
-									__(
-										'The changes you have made will impact this time pass offer on all paywalls across your entire site.',
-										'revenue-generator'
-									)
-								);
-						} else if ( 'subscription' === optionType ) {
-							updateWarning
-								.empty()
-								.text(
-									__(
-										'The changes you have made will impact this subscription offer on all paywalls across your entire site.',
-										'revenue-generator'
-									)
-								);
-						} else if ( 'newPurchaseOption' === optionType ) {
-							updateWarning
-								.empty()
-								.text(
-									__(
-										'It looks like you have added a new Global Time Pass or Subscription to this Paywall. Global Time Passes and Subscriptions will show up on all paywalls across your entire site.',
-										'revenue-generator'
-									)
-								);
-						}
-					}
+			//		// Get the template for confirmation popup and add it.
+			//		const template = wp.template(
+			//			'revgen-purchase-option-update'
+			//		);
+			//		$o.previewWrapper.append( template );
+			//		const updateWarning = $(
+			//			$o.purchaseOptionWarningWrapper
+			//		).find( $o.purchaseOptionWarningMessage );
+			//		if ( updateWarning.length ) {
+			//			if ( 'timepass' === optionType ) {
+			//				updateWarning
+			//					.empty()
+			//					.text(
+			//						__(
+			//							'The changes you have made will impact this time pass offer on all paywalls across your entire site.',
+			//							'revenue-generator'
+			//						)
+			//					);
+			//			} else if ( 'subscription' === optionType ) {
+			//				updateWarning
+			//					.empty()
+			//					.text(
+			//						__(
+			//							'The changes you have made will impact this subscription offer on all paywalls across your entire site.',
+			//							'revenue-generator'
+			//						)
+			//					);
+			//			} else if ( 'newPurchaseOption' === optionType ) {
+			//				updateWarning
+			//					.empty()
+			//					.text(
+			//						__(
+			//							'It looks like you have added a new Global Time Pass or Subscription to this Paywall. Global Time Passes and Subscriptions will show up on all paywalls across your entire site.',
+			//							'revenue-generator'
+			//						)
+			//					);
+			//			}
+			//		}
 
-					$o.body.addClass( 'modal-blur' );
-					$o.purchaseOverlay.css( {
-						filter: 'blur(5px)',
-						'pointer-events': 'none',
-					} );
+			//		$o.body.addClass( 'modal-blur' );
+			//		$o.purchaseOverlay.css( {
+			//			filter: 'blur(5px)',
+			//			'pointer-events': 'none',
+			//		} );
 
-					// Grey out the paywall actions and change position.
-					$o.actionsWrapper.css( {
-						'background-color': '#a9a9a9',
-					} );
-					$o.actionButtons.css( { opacity: '0.5' } );
+			//		// Grey out the paywall actions and change position.
+			//		$o.actionsWrapper.css( {
+			//			'background-color': '#a9a9a9',
+			//		} );
+			//		$o.actionButtons.css( { opacity: '0.5' } );
 
-					$o.searchContentWrapper.css( {
-						'background-color': '#a9a9a9',
-					} );
+			//		$o.searchContentWrapper.css( {
+			//			'background-color': '#a9a9a9',
+			//		} );
 
-					$( $o.purchaseOperationContinue ).off( 'click' );
-					$( $o.purchaseOperationCancel ).off( 'click' );
+			//		$( $o.purchaseOperationContinue ).off( 'click' );
+			//		$( $o.purchaseOperationCancel ).off( 'click' );
 
-					$( $o.purchaseOperationContinue ).on( 'click', () => {
-						$( $o.purchaseOptionWarningWrapper ).hide();
-						complete( true );
-					} );
-					$( $o.purchaseOperationCancel ).on( 'click', () => {
-						$( $o.purchaseOptionWarningWrapper ).hide();
-						complete( false );
-					} );
-				} );
-			};
+			//		$( $o.purchaseOperationContinue ).on( 'click', () => {
+			//			$( $o.purchaseOptionWarningWrapper ).hide();
+			//			complete( true );
+			//		} );
+			//		$( $o.purchaseOperationCancel ).on( 'click', () => {
+			//			$( $o.purchaseOptionWarningWrapper ).hide();
+			//			complete( false );
+			//		} );
+			//	} );
+			//};
 
 			/**
 			 * Remove purchase option from DB.
