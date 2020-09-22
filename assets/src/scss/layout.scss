@@ -477,6 +477,21 @@ body.modal-blur select.rev-gen__select2 + .select2-container .select2-selection-
 	&__inner {
 		padding: 60px 40px;
 		text-align: center;
+		a:not(.rev-gen-modal__close) {
+			color: #1d1d1d;
+			text-decoration: underline;
+		}
+	}
+	&__close {
+		position: absolute;
+		top: 15px;
+		right: 15px;
+		font-size: 18px;
+		color: rgba(0, 0, 0, 0.5);
+		text-decoration: none;
+		&:hover {
+			color: rgba(0, 0, 0, 0.5);
+		}
 	}
 	&__title {
 		margin: 0 0 30px;
@@ -484,17 +499,22 @@ body.modal-blur select.rev-gen__select2 + .select2-container .select2-selection-
 		font-size: 26px;
 		color: #1d1d1d;
 	}
+	p {
+		font-size: 16px;
+	}
 	&__message {
 		font-weight: 500;
-		font-size: 16px;
 		color: #333;
 	}
 	&__buttons {
-		max-width: 230px;
+		display: flex;
+		flex-flow: column;
+		max-width: 260px;
 		margin: 40px auto 0;
 		button {
 			cursor: pointer;
 			margin-bottom: 10px;
+			border: 2px solid #1d1d1d;
 			outline: 0;
 			line-height: 1.45;
 			font-size: 16px;
@@ -502,6 +522,18 @@ body.modal-blur select.rev-gen__select2 + .select2-container .select2-selection-
 				margin-bottom: 0;
 			}
 		}
+	}
+	&__icon {
+		width: 70px;
+		height: 70px;
+		margin: 15px auto;
+		border: 3px solid #1d1d1d;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 40px;
+		font-weight: 400;
 	}
 	&-overlay {
 		position: fixed;
@@ -512,5 +544,27 @@ body.modal-blur select.rev-gen__select2 + .select2-container .select2-selection-
 		height: 100vh;
 		background: rgba(0, 0, 0, 0.5);
 		box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+	}
+}
+
+.rev-gen-modal--connect {
+	.rev-gen-modal__fields {
+		max-width: 260px;
+		margin: 0 auto;
+		input {
+			border: 0;
+			border-bottom: 2px solid #333;
+			border-radius: 0;
+			margin-bottom: 30px;
+			text-align: left;
+			width: 100%;
+			padding: 0;
+			font-size: 16px;
+
+			&:focus {
+				box-shadow: none;
+				outline: unset;
+			}
+		}
 	}
 }
