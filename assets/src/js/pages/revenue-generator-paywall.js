@@ -2208,12 +2208,6 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							tlp_id: $( timePass ).attr( 'data-tlp-id' ),
 							uid: $( timePass ).attr( 'data-uid' ),
 							order: $( timePass ).attr( 'data-order' ),
-							custom_title: $( timePass ).attr(
-								'data-custom-title'
-							),
-							custom_desc: $( timePass ).attr(
-								'data-custom-desc'
-							),
 						};
 						timePasses.push( timePassObj );
 					} );
@@ -2254,12 +2248,6 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							sub_id: $( subscription ).attr( 'data-sub-id' ),
 							uid: $( subscription ).attr( 'data-uid' ),
 							order: $( subscription ).attr( 'data-order' ),
-							custom_title: $( subscription ).attr(
-								'data-custom-title'
-							),
-							custom_desc: $( subscription ).attr(
-								'data-custom-desc'
-							),
 						};
 						subscriptions.push( subscriptionObj );
 					} );
