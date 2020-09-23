@@ -595,6 +595,8 @@ import { __, sprintf } from '@wordpress/i18n';
 						},
 						cache: true,
 					},
+					dropdownAutoWidth: true,
+					dropdownCssClass: ':all:',
 					placeholder: __( 'search', 'revenue-generator' ),
 					language: {
 						inputTooShort() {
