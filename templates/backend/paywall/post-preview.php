@@ -98,7 +98,7 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 							<option <?php selected( $paywall_access_to, 'supported', true ); ?> value="supported"><?php echo esc_html( $supported_label ); ?></option>
 						</select>
 					</div>
-					<div class="rev-gen-preview-main--paywall-actions-search">
+					<div class="rev-gen-preview-main--paywall-actions__search rev-gen-preview-main--paywall-actions-search">
 						<select id="rg_js_searchPaywallContent" class="rev-gen__select2 rev-gen__select2--searchable" multiple="multiple">
 							<?php if ( ! empty( $rg_categories_data ) && is_array( $rg_categories_data ) ) : ?>
 								<?php foreach ( $rg_categories_data as $rg_category_data ) : ?>
@@ -108,10 +108,10 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 								<?php endforeach; ?>
 							<?php endif; ?>
 						</select>
-						<i class="rev-gen-preview-main--paywall-actions-search-icon"></i>
+						<i class="rev-gen-preview-main--paywall-actions__search-icon"></i>
 					</div>
-					<div class="rev-gen-preview-main--paywall-actions-search-post">
-						<select id="rg_js_searchPost" class="rev-gen__select2" name="posts[]" multiple="multiple">
+					<div class="rev-gen-preview-main--paywall-actions__search rev-gen-preview-main--paywall-actions-search-post">
+						<select id="rg_js_searchPost" class="rev-gen__select2 rev-gen__select2--searchable" name="posts[]" multiple="multiple">
 							<?php if ( ! empty( $rg_specific_posts ) ) : ?>
 								<?php foreach ( $rg_specific_posts as $rg_specific_post_id => $rg_specific_post_title ) : ?>
 									<option selected="selected" value="<?php echo esc_attr( $rg_specific_post_id ); ?>">
@@ -120,7 +120,7 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 								<?php endforeach; ?>
 							<?php endif; ?>
 						</select>
-						<i class="rev-gen-preview-main--paywall-actions-search-icon"></i>
+						<i class="rev-gen-preview-main--paywall-actions__search-icon"></i>
 					</div>
 				</div>
 				<div class="rev-gen-preview-main--paywall-actions-update">

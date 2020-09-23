@@ -3,7 +3,7 @@
  * Plugin Name: Revenue Generator
  * Description: Monetize your blog and content with Laterpay's Revenue Generator.
  * Plugin URI: https://github.com/laterpay/revenue-generator
- * Version: 1.1.0
+ * Version: 1.2.0
  * Author: Laterpay
  * Text Domain: revenue-generator
  * Author URI: https://laterpay.net/

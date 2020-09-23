@@ -737,6 +737,8 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						},
 						cache: true,
 					},
+					dropdownAutoWidth: true,
+					dropdownCssClass: ':all:',
 					placeholder: __( 'search', 'revenue-generator' ),
 					language: {
 						inputTooShort() {
