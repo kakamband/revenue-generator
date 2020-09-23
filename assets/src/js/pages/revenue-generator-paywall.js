@@ -10,7 +10,8 @@
  */
 import '../utils';
 import { debounce } from '../helpers';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
+import { RevGenModal } from '../utils/rev-gen-modal';
 
 ( function( $ ) {
 	$( function() {
@@ -292,64 +293,143 @@ import { __, sprintf } from '@wordpress/i18n';
 				/**
 				 * Adds data attribute if custom title or description is added to purchase option.
 				 */
-				$o.body.on('click', $o.purchaseOptionItemTitle, function() {
-					this.addEventListener('input', function() {
-						$(this).closest($o.purchaseOptionItem).attr('data-custom-title', '1' );
-					});
-					
+				$o.body.on( 'click', $o.purchaseOptionItemTitle, function() {
+					this.addEventListener( 'input', function() {
+						$( this )
+							.closest( $o.purchaseOptionItem )
+							.attr( 'data-custom-title', '1' );
+					} );
 				} );
 
-				$o.body.on('click', $o.purchaseOptionItemDesc, function() {
-					this.addEventListener('input', function() {
-						$(this).closest($o.purchaseOptionItem).attr('data-custom-desc', '1' );
-					});
-					
+				$o.body.on( 'click', $o.purchaseOptionItemDesc, function() {
+					this.addEventListener( 'input', function() {
+						$( this )
+							.closest( $o.purchaseOptionItem )
+							.attr( 'data-custom-desc', '1' );
+					} );
 				} );
 
 				/**
 				 * Handles Dynamic Title and Descirpitons.
 				 */
-				$o.body.on( 'change', $o.periodCountSelection + ', ' + $o.periodSelection, function(){
-				    
-				    // Get selection values.
-				    const periodCount = $($o.periodCountSelection).val();
-				    const periodSelection = $($o.periodSelection).val();
-				    
-				    // Get current title and descriptions
-				    const currentTitle        = $(this).closest($o.purchaseOptionItem).find($o.purchaseOptionItemTitle).text().trim();
-				    const currentDescription  = $(this).closest($o.purchaseOptionItem).find($o.purchaseOptionItemDesc ).text().trim();
-				    const currentPurchaseType = $(this).closest( $o.purchaseOptionItem ).data('purchase-type');
-				    
-				    const newTitle = '';
-				    /*
-				    if ( revenueGeneratorGlobalOptions !== null && 'object' === typeof revenueGeneratorGlobalOptions ) {
-					switch ( currentPurchaseType ) {
-					    case 'subscription':
-						// Compare with global default Descritpion.
-						if( currentDescription !== revenueGeneratorGlobalOptions.defaultConfig.subscription.description ) {
-							is_custom_description = true;
-						}
-						// Compare with global default Descritpion.
-						if( currentTitle !== revenueGeneratorGlobalOptions.defaultConfig.subscription.title ) {
-							is_custom_description = true;
-						}
-					    break;
-					   case 'timepass':
-						// Compare with global default Descritpion.
-						if( currentDescription !== revenueGeneratorGlobalOptions.defaultConfig.timepass.description ) {
-							is_custom_description = true;
-						}
-					    break;
+				$o.body.on(
+					'change',
+					$o.periodCountSelection + ', ' + $o.periodSelection,
+					function() {
+						const $this = $( this );
 
+						//Prevent user actions after dropdown change.
+						showLoader();
+
+						// Timeout is added to wait for changeDurationOptions to perform operations on change first.
+						setTimeout( function() {
+							// Get selection values.
+							const periodCount = parseInt(
+								$this
+									.closest( $o.purchaseOptionItem )
+									.find( $o.periodCountSelection )
+									.val()
+							);
+							const periodSelection = $this
+								.closest( $o.purchaseOptionItem )
+								.find( $o.periodSelection )
+								.val();
+							const currentPurchaseType = $this
+								.closest( $o.purchaseOptionItem )
+								.data( 'purchase-type' );
+
+							new RevGenModal( {
+								id: 'rg-modal-dynamic-title-desc',
+								onConfirm: async () => {
+									let newTitle;
+									newTitle = periodCount;
+									switch ( periodSelection ) {
+										case 'h':
+											newTitle += _n(
+												' Hour',
+												' Hours',
+												periodCount,
+												'revenue-generator'
+											);
+											break;
+										case 'd':
+											newTitle += _n(
+												' Day',
+												' Days',
+												periodCount,
+												'revenue-generator'
+											);
+											break;
+										case 'w':
+											newTitle += _n(
+												' Week',
+												' Weeks',
+												periodCount,
+												'revenue-generator'
+											);
+											break;
+										case 'm':
+											newTitle += _n(
+												' Month',
+												' Months',
+												periodCount,
+												'revenue-generator'
+											);
+											break;
+										case 'Y':
+											newTitle += _n(
+												' Year',
+												' Years',
+												periodCount,
+												'revenue-generator'
+											);
+											break;
+									}
+
+									const newDescription = sprintf(
+										__(
+											'Enjoy unlimited access to all our content for %1$s'
+										),
+										newTitle
+									);
+
+									switch ( currentPurchaseType ) {
+										case 'subscription':
+											newTitle += __(
+												' Subscription',
+												'revenue-generator'
+											);
+											break;
+										case 'timepass':
+											newTitle += __(
+												' Pass',
+												'revenue-generator'
+											);
+											break;
+									}
+
+									newTitle += __(
+										' Pass',
+										'revenue-generator'
+									);
+
+									$this
+										.closest( $o.purchaseOptionItem )
+										.find( $o.purchaseOptionItemTitle )
+										.text( newTitle );
+									$this
+										.closest( $o.purchaseOptionItem )
+										.find( $o.purchaseOptionItemDesc )
+										.text( newDescription );
+								},
+								onCancel: () => {
+									// do nothing.
+								},
+							} );
+							hideLoader();
+						}, 500 );
 					}
-					
-					// Compare with global default Descritpion.
-					if( currentDescription !== revenueGeneratorGlobalOptions.defaultConfig.currentPurchaseType.Description ) {
-					    is_custom_description = true;
-					}
-				    }*/
-				    
-				});
+				);
 
 				/**
 				 * Handle the next button events of the tour and update preview accordingly.
@@ -2126,8 +2206,12 @@ import { __, sprintf } from '@wordpress/i18n';
 							tlp_id: $( timePass ).attr( 'data-tlp-id' ),
 							uid: $( timePass ).attr( 'data-uid' ),
 							order: $( timePass ).attr( 'data-order' ),
-							custom_title : $(timePass).attr('data-custom-title'),
-							custom_desc : $(timePass).attr('data-custom-desc'),
+							custom_title: $( timePass ).attr(
+								'data-custom-title'
+							),
+							custom_desc: $( timePass ).attr(
+								'data-custom-desc'
+							),
 						};
 						timePasses.push( timePassObj );
 					} );
@@ -2168,8 +2252,12 @@ import { __, sprintf } from '@wordpress/i18n';
 							sub_id: $( subscription ).attr( 'data-sub-id' ),
 							uid: $( subscription ).attr( 'data-uid' ),
 							order: $( subscription ).attr( 'data-order' ),
-							custom_title : $(subscription).attr('data-custom-title'),
-							custom_desc : $(subscription).attr('data-custom-desc'),
+							custom_title: $( subscription ).attr(
+								'data-custom-title'
+							),
+							custom_desc: $( subscription ).attr(
+								'data-custom-desc'
+							),
 						};
 						subscriptions.push( subscriptionObj );
 					} );
