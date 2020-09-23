@@ -290,6 +290,68 @@ import { __, sprintf } from '@wordpress/i18n';
 				} );
 
 				/**
+				 * Adds data attribute if custom title or description is added to purchase option.
+				 */
+				$o.body.on('click', $o.purchaseOptionItemTitle, function() {
+					this.addEventListener('input', function() {
+						$(this).closest($o.purchaseOptionItem).attr('data-custom-title', '1' );
+					});
+					
+				} );
+
+				$o.body.on('click', $o.purchaseOptionItemDesc, function() {
+					this.addEventListener('input', function() {
+						$(this).closest($o.purchaseOptionItem).attr('data-custom-desc', '1' );
+					});
+					
+				} );
+
+				/**
+				 * Handles Dynamic Title and Descirpitons.
+				 */
+				$o.body.on( 'change', $o.periodCountSelection + ', ' + $o.periodSelection, function(){
+				    
+				    // Get selection values.
+				    const periodCount = $($o.periodCountSelection).val();
+				    const periodSelection = $($o.periodSelection).val();
+				    
+				    // Get current title and descriptions
+				    const currentTitle        = $(this).closest($o.purchaseOptionItem).find($o.purchaseOptionItemTitle).text().trim();
+				    const currentDescription  = $(this).closest($o.purchaseOptionItem).find($o.purchaseOptionItemDesc ).text().trim();
+				    const currentPurchaseType = $(this).closest( $o.purchaseOptionItem ).data('purchase-type');
+				    
+				    const newTitle = '';
+				    /*
+				    if ( revenueGeneratorGlobalOptions !== null && 'object' === typeof revenueGeneratorGlobalOptions ) {
+					switch ( currentPurchaseType ) {
+					    case 'subscription':
+						// Compare with global default Descritpion.
+						if( currentDescription !== revenueGeneratorGlobalOptions.defaultConfig.subscription.description ) {
+							is_custom_description = true;
+						}
+						// Compare with global default Descritpion.
+						if( currentTitle !== revenueGeneratorGlobalOptions.defaultConfig.subscription.title ) {
+							is_custom_description = true;
+						}
+					    break;
+					   case 'timepass':
+						// Compare with global default Descritpion.
+						if( currentDescription !== revenueGeneratorGlobalOptions.defaultConfig.timepass.description ) {
+							is_custom_description = true;
+						}
+					    break;
+
+					}
+					
+					// Compare with global default Descritpion.
+					if( currentDescription !== revenueGeneratorGlobalOptions.defaultConfig.currentPurchaseType.Description ) {
+					    is_custom_description = true;
+					}
+				    }*/
+				    
+				});
+
+				/**
 				 * Handle the next button events of the tour and update preview accordingly.
 				 */
 				$o.body.on( 'click', '.shepherd-button', function() {
@@ -2064,6 +2126,8 @@ import { __, sprintf } from '@wordpress/i18n';
 							tlp_id: $( timePass ).attr( 'data-tlp-id' ),
 							uid: $( timePass ).attr( 'data-uid' ),
 							order: $( timePass ).attr( 'data-order' ),
+							custom_title : $(timePass).attr('data-custom-title'),
+							custom_desc : $(timePass).attr('data-custom-desc'),
 						};
 						timePasses.push( timePassObj );
 					} );
@@ -2104,6 +2168,8 @@ import { __, sprintf } from '@wordpress/i18n';
 							sub_id: $( subscription ).attr( 'data-sub-id' ),
 							uid: $( subscription ).attr( 'data-uid' ),
 							order: $( subscription ).attr( 'data-order' ),
+							custom_title : $(subscription).attr('data-custom-title'),
+							custom_desc : $(subscription).attr('data-custom-desc'),
 						};
 						subscriptions.push( subscriptionObj );
 					} );
