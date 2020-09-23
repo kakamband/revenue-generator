@@ -6,7 +6,7 @@ Tags: contribution, micropayment, paywall, sell content, subscription, conversio
 Requires at least: 5.3
 Tested up to: 5.5
 Requires PHP: 5.6
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 Author URI: https://laterpay.net
 Plugin URI: https://github.com/laterpay/revenue-generator/
 License: MIT
