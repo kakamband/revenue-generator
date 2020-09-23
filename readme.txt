@@ -81,6 +81,12 @@ Laterpay’s fee amounts to 15% of the revenues that it collects for its Merchan
 
 == Changelog ==
 
+= 1.2.0 ( 23 September 2020 ) =
+* Added option to delete contribution requests.
+* Added option to delete paywalls.
+* Updated look and feel of dropdowns and autocomplete fields in admin UI.
+* Fixed animations in tutorials to smoothen navigation between steps.
+
 = 1.1.0 ( 7 September 2020 ) =
 * Updated Paywall functionality to allow for the selection of multiple individual posts or categories.
 * Updated Contributions shortcode so that a contribution offering can be updated without requiring changes to the shortcode.
@@ -96,6 +102,9 @@ Laterpay’s fee amounts to 15% of the revenues that it collects for its Merchan
 * Initial Release.
 
 == Upgrade notice ==
+
+= 1.2.0 =
+New feature enabling to delete paywalls and contribution requests. Style updates.
 
 = 1.1.0 =
 Editable Contributions offers, updated paywall functionality, updated logo.
