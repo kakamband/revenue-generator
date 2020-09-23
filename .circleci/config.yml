@@ -1,0 +1,90 @@
+# PHP CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-php/ for more details
+#
+version: 2
+jobs:
+  build:
+    branches:
+      only:
+        - develop
+    docker:
+      # Specify the version you desire here
+      - image: circleci/php:7.2-node-browsers
+    environment:
+      GIT_EMAIL: "$(git log HEAD^..HEAD --pretty='%aE' | sort -u)"
+      GIT_NAME: "$(git log HEAD^..HEAD --pretty='%aN' | sort -u)"
+    steps:
+      - checkout
+      - run: sudo apt update # PHP CircleCI 2.0 Configuration File# PHP CircleCI 2.0 Configuration File sudo apt install zlib1g-dev libsqlite3-dev
+      - run: sudo docker-php-ext-install zip
+      - run: sudo composer self-update
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            # "composer.lock" can be used if it is committed to the repo
+            - v1-dependencies-{{ checksum "composer.json" }}
+            - v1-dependencies-
+
+      - run: composer install -n --prefer-dist
+
+      # run phpcs
+      - run:
+          name: Check PHP coding standards
+          command: composer phpcs
+
+      # run phpcompat
+      - run:
+          name: Check compatibility with PHP 5.6
+          command: composer phpcompat
+
+      - save_cache:
+          key: v1-dependencies-{{ checksum "composer.json" }}
+          paths:
+            - ./vendor
+
+      - restore_cache:
+          keys:
+            - node-v1-{{ checksum "package.json" }}
+            - node-v1-
+
+      # run npm
+      - run: npm install
+      - save_cache:
+          key: node-v1-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+
+      - run:
+          name: Run JS code through linter
+          command: npm run lint:js
+
+      - run:
+          name: npm build
+          command: npm run build
+
+      # add ssh keys
+      - add_ssh_keys:
+          fingerprints:
+            - "$SSH_FINGERPRINT"
+
+      # deploy to WP Engine
+      - run: echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+      - run:
+          name: Push to WP Engine
+          command: |
+                  echo Cloning WP Engine repo
+                  git config --global user.email "$GIT_EMAIL"
+                  git config --global user.name "$GIT_NAME"
+                  mkdir ~/wpe && cd ~/wpe
+                  git clone "$WP_ENGINE_GIT_REMOTE" . -q
+                  echo Removing existing plugin files
+                  rm -rf "$WPE_PLUGIN_DIR"
+                  echo Copying new plugin files
+                  cp -r ~/project/ "$WPE_PLUGIN_DIR"/
+                  echo Removing files ignored from dist
+                  cat "$WPE_PLUGIN_DIR"/.distignore | while read line; do rm -rf "$WPE_PLUGIN_DIR"/"$line"; done
+                  echo Committing changes
+                  git add . && git commit --allow-empty -m "Develop build pushed on `date +'%Y-%m-%d %H:$M:%S'`" -q && git push origin -q
+                  echo Done

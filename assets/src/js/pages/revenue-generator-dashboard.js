@@ -1,4 +1,4 @@
-/* global revenueGeneratorGlobalOptions */
+/* global revenueGeneratorGlobalOptions rgGlobal */
 /**
  * JS to handle plugin dashboard screen interactions.
  *
@@ -9,6 +9,7 @@
  * Internal dependencies.
  */
 import '../utils';
+import { RevGenModal } from '../utils/rev-gen-modal';
 
 ( function( $ ) {
 	$( function() {
@@ -23,7 +24,9 @@ import '../utils';
 				paywallPreview: '.rev-gen-dashboard-content-paywall-preview',
 				paywallContentWrapper: '.rev-gen-dashboard-content-paywall',
 
-				// Dashboard bar action items.
+				// Delete Paywall link.
+				removePaywallDashboard: '.rev-gen-dashboard-remove-paywall',
+
 				newPaywall: $( '#rg_js_newPaywall' ),
 				newContribution: $( '#rg_js_newContribution' ),
 				sortPaywalls: $( '#rg_js_filterPaywalls' ),
@@ -31,6 +34,9 @@ import '../utils';
 				editPayWallName: $( '.rev-gen-dashboard-paywall-name' ),
 				paywallSearchIcon: $( '.rev-gen-dashboard-bar--search-icon' ),
 				laterpayLoader: $( '.laterpay-loader-wrapper' ),
+				contributionDelete: $(
+					'.rev-gen-dashboard__contribution-delete'
+				),
 
 				// Dashboard footer area.
 				restartTour: $( '#rg_js_RestartTutorial' ),
@@ -274,6 +280,101 @@ import '../utils';
 								break;
 						}
 					}
+				} );
+
+				/**
+				 * Handles Contribution deletion on confirmation.
+				 */
+				$o.contributionDelete.on( 'click', function( e ) {
+					e.preventDefault();
+
+					const $this = $( e.target );
+					const contributionID = $this.data( 'id' );
+					const nonce = $this.data( 'nonce' );
+
+					new RevGenModal( {
+						id: 'rg-modal-remove-contribution',
+						templateData: {
+							isEditable: parseInt(
+								$this.data( 'editable' ),
+								10
+							),
+						},
+						onConfirm: async () => {
+							$.ajax( {
+								url: revenueGeneratorGlobalOptions.ajaxUrl,
+								data: {
+									action: 'rg_contribution_delete',
+									security: nonce,
+									id: contributionID,
+								},
+								success: ( r ) => {
+									$o.snackBar.showSnackbar(
+										r.data.msg,
+										1500
+									);
+
+									setTimeout( () => {
+										window.location.reload();
+									}, 1500 );
+								},
+							} );
+						},
+						onCancel: () => {
+							// noop
+						},
+					} );
+				} );
+
+				/**
+				 * Remove the paywall after merchant confirmation.
+				 */
+				$o.body.on( 'click', $o.removePaywallDashboard, function() {
+					const paywallId = $( this ).attr( 'data-paywall-id' );
+					const eventLabel = $( this )
+						.closest( '.rev-gen-dashboard-content-paywall-info' )
+						.find( '.rev-gen-dashboard-paywall-name' )
+						.text()
+						.trim();
+
+					new RevGenModal( {
+						id: 'rg-modal-remove-paywall',
+						onConfirm: async () => {
+							$.ajax( {
+								url: revenueGeneratorGlobalOptions.ajaxUrl,
+								method: 'POST',
+								data: {
+									action: 'rg_remove_paywall',
+									id: paywallId,
+									security:
+										revenueGeneratorGlobalOptions.rg_paywall_nonce,
+								},
+								success: ( r ) => {
+									// Show message and remove the overlay.
+									$o.snackBar.showSnackbar( r.msg, 1500 );
+									// Send GA Event.
+									const eventCategory =
+										'LP RevGen Configure Paywall';
+									const eventAction = 'Paywall Deleted';
+									rgGlobal.sendLPGAEvent(
+										eventAction,
+										eventCategory,
+										eventLabel,
+										0,
+										true
+									);
+
+									// waits until snackbar is shown and delete event is sent.
+									setTimeout( function() {
+										window.location.reload();
+									}, 1500 );
+								},
+							} );
+						},
+						onCancel: () => {
+							// do nothing.
+						},
+					} );
 				} );
 			};
 

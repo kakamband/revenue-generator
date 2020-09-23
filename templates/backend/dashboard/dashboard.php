@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="rev-gen-dashboard-bar">
 			<div class="rev-gen-dashboard-bar--item rev-gen-dashboard-bar--filter">
 				<label for="rg_js_filterPaywalls"><?php esc_html_e( 'Sort By', 'revenue-generator' ); ?></label>
-				<select id="rg_js_filterPaywalls">
+				<select id="rg_js_filterPaywalls" class="rev-gen__select2">
 					<option <?php selected( strtolower( $current_sort_order ), 'desc', true ); ?> value="desc"><?php esc_attr_e( 'Newest First', 'revenue-generator' ); ?></option>
 					<option <?php selected( strtolower( $current_sort_order ), 'asc', true ); ?> value="asc"><?php esc_attr_e( 'Oldest First', 'revenue-generator' ); ?></option>
 					<option <?php selected( strtolower( $current_sort_order ), 'priority', true ); ?> value="priority"><?php esc_attr_e( 'Priority', 'revenue-generator' ); ?></option>
@@ -33,7 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<i class="rev-gen-dashboard-bar--search-icon"></i>
 			</div>
 			<div class="rev-gen-dashboard-bar--item rev-gen-dashboard-bar--actions">
-				<a href="<?php echo esc_url( $new_paywall_url ); ?>" id="rg_js_newPaywall" class="rg-button"><?php esc_html_e( 'New Paywall', 'revenue-generator' ); ?></a>
+				<a href="<?php echo esc_url( $new_paywall_url ); ?>" id="rg_js_newPaywall" class="rev-gen__button"><?php esc_html_e( 'New Paywall', 'revenue-generator' ); ?></a>
 			</div>
 		</div>
 		<div class="rev-gen-dashboard-content">
@@ -51,6 +51,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<span contenteditable="true" class="rev-gen-dashboard-paywall-name"><?php echo esc_html( $paywall_title ); ?></span>
 							<p><?php echo wp_kses_post( $paywall_published ); ?></p>
 							<p class="rev-gen-dashboard-content-paywall-info-updated"><?php echo esc_html( $paywall_updated ); ?></p>
+							<div class="rev-gen-dashboard-content-paywall-info-links">
+								<a href="#" class="rev-gen-dashboard-remove-paywall" data-paywall-id="<?php echo esc_attr( $paywall_id ); ?>"><?php esc_html_e( 'Delete Paywall', 'revenue-generator' ); ?></a>
+							</div>
 						</div>
 					</div>
 				<?php } else : ?>
@@ -79,6 +82,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	</div>
 	<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
-	<div class="rev-gen-start-tutorial" id="rg_js_RestartTutorial"><?php esc_html_e( 'Tutorial', 'revenue-generator' ); ?></div>
+	<div class="rev-gen__button rev-gen__button--secondary rev-gen__button--help rev-gen-start-tutorial" id="rg_js_RestartTutorial"><?php esc_html_e( 'Tutorial', 'revenue-generator' ); ?></div>
 </div>
 <?php View::render_footer_backend(); ?>
+<script type="text/template" id="tmpl-rg-modal-remove-paywall">
+	<div class="rev-gen-modal" id="rg-modal-remove-paywall">
+		<div class="rev-gen-modal__inner">
+			<h4 class="rev-gen-modal__title">
+				<?php esc_html_e( 'Are you sure you want to remove the paywall?', 'revenue-generator' ); ?>
+			</h4>
+			<p class="rev-gen-modal__message">
+				<?php esc_html_e( 'This content will be visible to all users.', 'revenue-generator' ); ?>
+			</p>
+			<div class="rev-gen-modal__buttons">
+				<button id="rg_js_modal_confirm" class="rev-gen__button">
+					<?php esc_html_e( 'Yes, remove Paywall', 'revenue-generator' ); ?>
+				</button>
+				<button id="rg_js_modal_cancel" class="rev-gen__button rev-gen__button--secondary">
+					<?php esc_html_e( 'No, keep Paywall', 'revenue-generator' ); ?>
+				</button>
+			</div>
+		</div>
+	</div>
+	<div class="rev-gen-modal-overlay"></div>
+</script>

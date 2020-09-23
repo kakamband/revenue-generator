@@ -171,4 +171,39 @@ class Test_Contribution extends \WP_UnitTestCase {
 
 		$this->assertEquals( $expected, $test );
 	}
+
+	public function test_delete_will_return_wp_error_on_empty_id() {
+		$test     = $this->_instance->delete( 0 );
+		$expected = is_wp_error( $test );
+
+		$this->assertTrue( $expected );
+	}
+
+	public function test_delete_will_return_wp_error_when_attempting_to_delete_different_post_type() {
+		$post_id = wp_insert_post(
+			[
+				'post_type' => 'post',
+			]
+		);
+
+		$test     = $this->_instance->delete( $post_id );
+		$expected = is_wp_error( $test );
+
+		$this->assertTrue( $expected );
+	}
+
+	public function test_delete_will_delete_contribution_if_valid_id_is_passed() {
+		$post_id = wp_insert_post(
+			[
+				'post_type' => Contribution::SLUG,
+			]
+		);
+
+		$test = $this->_instance->delete( $post_id );
+
+		$post     = get_post( $post_id );
+		$expected = is_null( $post );
+
+		$this->assertTrue( $expected );
+	}
 }

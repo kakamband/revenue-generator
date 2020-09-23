@@ -67,61 +67,61 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 				</div>
 			</div>
 			<div class="rev-gen-preview-main--paywall-actions">
-				<div class="rev-gen-preview-main--paywall-actions-apply">
-					<p>
+				<div class="rev-gen-preview-main--paywall-actions-wrap">
+					<div class="rev-gen-preview-main--paywall-actions-apply">
+							<?php
+							$paywall_name = ! empty( $paywall_data['name'] ) ? $paywall_data['name'] : $default_paywall_title;
+							echo wp_kses(
+								sprintf(
+									/* translators: %s Paywall name */
+									__( 'Apply <span contenteditable="true" class="rev-gen-preview-main-paywall-name">%s</span> to', 'revenue-generator' ),
+									$paywall_name
+								),
+								[
+									'span' => [
+										'class'           => [],
+										'contenteditable' => true,
+									],
+								]
+							);
+							?>
 						<?php
-						$paywall_name = ! empty( $paywall_data['name'] ) ? $paywall_data['name'] : $default_paywall_title;
-						echo wp_kses(
-							sprintf(
-								/* translators: %s Paywall name */
-								__( 'Apply <span contenteditable="true" class="rev-gen-preview-main-paywall-name">%s</span> to', 'revenue-generator' ),
-								$paywall_name
-							),
-							[
-								'span' => [
-									'class'           => [],
-									'contenteditable' => true,
-								],
-							]
-						);
+							/* translators: %1s post type. */
+							$supported_label = ( ! empty( $rg_preview_post['type'] ) ) ? sprintf( __( 'this %1s only', 'revenue-generator' ), esc_html( $rg_preview_post['type'] ) ) : __( 'selected post or page', 'revenue-generator' );
 						?>
-					</p>
-					<?php
-						/* translators: %1s post type. */
-						$supported_label = ( ! empty( $rg_preview_post['type'] ) ) ? sprintf( __( 'this %1s only', 'revenue-generator' ), esc_html( $rg_preview_post['type'] ) ) : __( 'selected post or page', 'revenue-generator' );
-					?>
-					<select class="rev-gen-preview-main-paywall-applies-to">
-						<option <?php selected( $paywall_access_to, 'all', true ); ?> value="all"><?php esc_html_e( 'all posts and pages', 'revenue-generator' ); ?></option>
-						<option <?php selected( $paywall_access_to, 'posts', true ); ?> value="posts"><?php esc_html_e( 'all posts', 'revenue-generator' ); ?></option>
-						<option <?php selected( $paywall_access_to, 'category', true ); ?> value="category"><?php esc_html_e( 'category', 'revenue-generator' ); ?></option>
-						<option <?php selected( $paywall_access_to, 'exclude_category', true ); ?> value="exclude_category"><?php esc_html_e( 'except for category', 'revenue-generator' ); ?></option>
-						<option <?php selected( $paywall_access_to, 'specific_post', true ); ?> value="specific_post"><?php esc_html_e( 'specific posts or pages', 'revenue-generator' ); ?></option>
-						<option <?php selected( $paywall_access_to, 'supported', true ); ?> value="supported"><?php echo esc_html( $supported_label ); ?></option>
-					</select>
-				</div>
-				<div class="rev-gen-preview-main--paywall-actions-search">
-					<select id="rg_js_searchPaywallContent" multiple="multiple">
-						<?php if ( ! empty( $rg_categories_data ) && is_array( $rg_categories_data ) ) : ?>
-							<?php foreach ( $rg_categories_data as $rg_category_data ) : ?>
-								<option selected="selected" value="<?php echo esc_attr( $rg_category_data->term_id ); ?>">
-									<?php echo esc_html( $rg_category_data->name ); ?>
-								</option>
-							<?php endforeach; ?>
-						<?php endif; ?>
-					</select>
-					<i class="rev-gen-preview-main--paywall-actions-search-icon"></i>
-				</div>
-				<div class="rev-gen-preview-main--paywall-actions-search-post">
-					<select id="rg_js_searchPost" name="posts[]" multiple="multiple">
-						<?php if ( ! empty( $rg_specific_posts ) ) : ?>
-							<?php foreach ( $rg_specific_posts as $rg_specific_post_id => $rg_specific_post_title ) : ?>
-								<option selected="selected" value="<?php echo esc_attr( $rg_specific_post_id ); ?>">
-									<?php echo esc_html( $rg_specific_post_title ); ?>
-								</option>
-							<?php endforeach; ?>
-						<?php endif; ?>
-					</select>
-					<i class="rev-gen-preview-main--paywall-actions-search-icon"></i>
+						<select class="rev-gen-preview-main-paywall-applies-to rev-gen__select2 rev-gen__select2--arrow-up rev-gen__select2--no-search">
+							<option <?php selected( $paywall_access_to, 'all', true ); ?> value="all"><?php esc_html_e( 'all posts and pages', 'revenue-generator' ); ?></option>
+							<option <?php selected( $paywall_access_to, 'posts', true ); ?> value="posts"><?php esc_html_e( 'all posts', 'revenue-generator' ); ?></option>
+							<option <?php selected( $paywall_access_to, 'category', true ); ?> value="category"><?php esc_html_e( 'category', 'revenue-generator' ); ?></option>
+							<option <?php selected( $paywall_access_to, 'exclude_category', true ); ?> value="exclude_category"><?php esc_html_e( 'except for category', 'revenue-generator' ); ?></option>
+							<option <?php selected( $paywall_access_to, 'specific_post', true ); ?> value="specific_post"><?php esc_html_e( 'specific posts or pages', 'revenue-generator' ); ?></option>
+							<option <?php selected( $paywall_access_to, 'supported', true ); ?> value="supported"><?php echo esc_html( $supported_label ); ?></option>
+						</select>
+					</div>
+					<div class="rev-gen-preview-main--paywall-actions__search rev-gen-preview-main--paywall-actions-search">
+						<select id="rg_js_searchPaywallContent" class="rev-gen__select2 rev-gen__select2--searchable" multiple="multiple">
+							<?php if ( ! empty( $rg_categories_data ) && is_array( $rg_categories_data ) ) : ?>
+								<?php foreach ( $rg_categories_data as $rg_category_data ) : ?>
+									<option selected="selected" value="<?php echo esc_attr( $rg_category_data->term_id ); ?>">
+										<?php echo esc_html( $rg_category_data->name ); ?>
+									</option>
+								<?php endforeach; ?>
+							<?php endif; ?>
+						</select>
+						<i class="rev-gen-preview-main--paywall-actions__search-icon"></i>
+					</div>
+					<div class="rev-gen-preview-main--paywall-actions__search rev-gen-preview-main--paywall-actions-search-post">
+						<select id="rg_js_searchPost" class="rev-gen__select2 rev-gen__select2--searchable" name="posts[]" multiple="multiple">
+							<?php if ( ! empty( $rg_specific_posts ) ) : ?>
+								<?php foreach ( $rg_specific_posts as $rg_specific_post_id => $rg_specific_post_title ) : ?>
+									<option selected="selected" value="<?php echo esc_attr( $rg_specific_post_id ); ?>">
+										<?php echo esc_html( $rg_specific_post_title ); ?>
+									</option>
+								<?php endforeach; ?>
+							<?php endif; ?>
+						</select>
+						<i class="rev-gen-preview-main--paywall-actions__search-icon"></i>
+					</div>
 				</div>
 				<div class="rev-gen-preview-main--paywall-actions-update">
 					<button id="rg_js_savePaywall" class="rev-gen-preview-main--paywall-actions-update-save <?php echo esc_attr( sanitize_html_class( $paywall_hide_class ) ); ?>">
@@ -139,8 +139,8 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 		<?php endif; ?>
 	</div>
 	<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
-	<a href="https://wordpress.org/support/plugin/revenue-generator" target="_blank" class="rev-gen-email-support"><?php esc_html_e( 'Email Support', 'revenue-generator' ); ?></a>
-	<div class="rev-gen-exit-tour"><?php esc_html_e( 'Exit Tour', 'revenue-generator' ); ?></div>
+	<a href="https://wordpress.org/support/plugin/revenue-generator" target="_blank" class="rev-gen__button rev-gen__button--secondary rev-gen-email-support rev-gen__button--help"><?php esc_html_e( 'Email Support', 'revenue-generator' ); ?></a>
+	<div class="rev-gen-exit-tour rev-gen__button rev-gen__button--secondary rev-gen__button--help"><?php esc_html_e( 'Exit Tour', 'revenue-generator' ); ?></div>
 </div>
 
 <!-- Template for purchase option manager actions -->
@@ -156,7 +156,7 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 <script type="text/template" id="tmpl-revgen-purchase-overlay-item-manager">
 	<div class="rg-purchase-overlay-option-manager">
 		<div class="rg-purchase-overlay-option-manager-entity-selection">
-			<select id="rg_js_purchaseOptionType" class="rg-purchase-overlay-option-manager-entity">
+			<select id="rg_js_purchaseOptionType" class="rg-purchase-overlay-option-manager-entity rev-gen__select2">
 				<option
 				<# data.entityType === 'individual' ? print("selected") : print('') #> value="individual"><?php esc_html_e( 'Individual Article', 'revenue-generator' ); ?></option>
 				<option
@@ -187,7 +187,7 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 				<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>"></button>
 		</div>
 		<div class="rg-purchase-overlay-option-manager-duration">
-			<select class="rg-purchase-overlay-option-manager-duration-count">
+			<select class="rg-purchase-overlay-option-manager-duration-count rev-gen__select2">
 				<?php
 				echo wp_kses(
 					Post_Types::get_select_options( 'duration' ),
@@ -200,7 +200,7 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 				);
 				?>
 			</select>
-			<select class="rg-purchase-overlay-option-manager-duration-period">
+			<select class="rg-purchase-overlay-option-manager-duration-period rev-gen__select2">
 				<?php
 				echo wp_kses(
 					Post_Types::get_select_options( 'period' ),
