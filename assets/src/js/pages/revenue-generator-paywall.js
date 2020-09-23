@@ -408,11 +408,6 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 											break;
 									}
 
-									newTitle += __(
-										' Pass',
-										'revenue-generator'
-									);
-
 									$this
 										.closest( $o.purchaseOptionItem )
 										.find( $o.purchaseOptionItemTitle )
