@@ -214,6 +214,7 @@
 		}
 
 		&-search {
+			position: relative;
 			.select2 {
 				font-size: 17px;
 			}
@@ -270,9 +271,9 @@
 				}
 			}
 			&-icon {
-				position: relative;
+				position: absolute;
 				align-self: center;
-				left: -23px;
+				right: 0;
 				top: 3px;
 				display: inline-block;
 				background: url(../img/icon-search.svg) no-repeat right 0 bottom;
@@ -1133,4 +1134,8 @@ select.rev-gen__select2 {
 			}
 		}
 	}
+}
+
+body.modal-blur .rev-gen-preview-main--search {
+	border-color: transparent;
 }
