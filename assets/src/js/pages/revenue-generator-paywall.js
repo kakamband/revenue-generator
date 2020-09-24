@@ -136,64 +136,20 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				currencyModalClose:
 					'.rev-gen-preview-main-currency-modal-cross',
 
-				// Purchase options warning modal.
-				purchaseOptionWarningWrapper:
-					'.rev-gen-preview-main-option-update',
-				purchaseOptionWarningMessage:
-					'.rev-gen-preview-main-option-update-message',
-				purchaseOperationContinue: '#rg_js_continueOperation',
-				purchaseOperationCancel: '#rg_js_cancelOperation',
-
-				// Paywall warnning modal.
-				newPaywallWarningContinue: '#rg_js_continueSearch',
-				newPaywallWarningCancel: '#rg_js_cancelSearch',
-
 				// Purchase options info modal.
 				purchaseOptionInfoButton: '.rg-purchase-overlay-option-info',
 				purchaseOptionInfoModal: '.rev-gen-preview-main-info-modal',
 
-				// Paywall remove warning modal.
-				paywallRemovalModal: '.rev-gen-preview-main-remove-paywall',
-				paywallRemove: '#rg_js_removePaywall',
-				paywallCancelRemove: '#rg_js_cancelPaywallRemoval',
-
 				// Account activation modal.
-				activationModal: '.rev-gen-preview-main-account-modal',
-				activationModalClose:
-					'.rev-gen-preview-main-account-modal-cross',
-				connectAccount: '#rg_js_connectAccount',
-				accountSignup: '#rg_js_signUp',
-				activateAccount: '#rg_js_verifyAccount',
-				reVerifyAccount: '#rg_js_restartVerification',
-				accountActionsWrapper:
-					'.rev-gen-preview-main-account-modal-action',
-				accountActionsFields:
-					'.rev-gen-preview-main-account-modal-fields',
-				accountCredentialsInfo:
-					'.rev-gen-preview-main-account-modal-credentials-info',
 				accountActionId:
 					'#rev-gen-merchant-id',
 				accountActionKey:
 					'#rev-gen-api-key',
-				accountActionTitle:
-					'.rev-gen-preview-main-account-modal-fields-title',
-				accountActions: '.rev-gen-preview-main-account-modal-actions',
-				accountVerificationLoader:
-					'.rev-gen-preview-main-account-modal-fields-loader',
-				activationModalError:
-					'.rev-gen-preview-main-account-modal-error',
-				activationModalSuccess:
-					'.rev-gen-preview-main-account-modal-success',
-				activationModalSuccessTitle:
-					'.rev-gen-preview-main-account-modal-success-title',
-				activationModalSuccessMessage:
-					'.rev-gen-preview-main-account-modal-success-message',
-				activationModalWarningMessage:
-					'.rev-gen-preview-main-account-modal-warning-message',
 				activateSignup: '#rg_js_activateSignup',
 				warningSignup: '#rg_js_warningSignup',
 				viewPost: '#rg_js_viewPost',
 				viewDashboard: '#rg_js_viewDashboard',
+
 				// Tour elements.
 				exitTour: '.rev-gen-exit-tour',
 
@@ -2170,14 +2126,6 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				} );
 
 				/**
-				 * Reload the Connect account page.
-				 */
-				$o.body.on( 'click', $o.reVerifyAccount, function( e ) {
-					e.preventDefault();
-					showAccountActivationModal();
-				} );
-
-				/**
 				 * Handle paywall activation.
 				 */
 				$o.activatePaywall.on( 'click', function() {
@@ -2359,28 +2307,6 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				} );
 
 				/**
-				 * Close account activation modal.
-				 */
-				$o.body.on( 'click', $o.activationModalClose, function() {
-					//Blur out the body and disable events.
-					$o.previewWrapper.find( $o.activationModal ).remove();
-					$o.body.removeClass( 'modal-blur' );
-					$o.contributionBox.removeClass( 'modal-blur' );
-					$o.body.find( 'input' ).removeClass( 'input-blur' );
-					$o.purchaseOverlay.css( {
-						filter: 'unset',
-						'pointer-events': 'unset',
-					} );
-					$o.actionsWrapper.css( {
-						'background-color': '#fff',
-					} );
-					$o.actionButtons.css( { opacity: '1' } );
-					$o.searchContentWrapper.css( {
-						'background-color': '#fff',
-					} );
-				} );
-
-				/**
 				 * Handle merchant id input.
 				 */
 				$o.body.on( 'input change', $o.accountActionId, function() {
@@ -2396,24 +2322,6 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					if ( areCredentialsFilled() ) {
 						$( '#rg_js_modal_confirm', $o.body ).removeAttr( 'disabled' );
 					}
-				} );
-
-				/**
-				 * Verify the account details.
-				 */
-				$o.body.on( 'click', $o.activateAccount, function() {
-					const activationModal = $o.previewWrapper.find(
-						$o.activationModal
-					);
-					const merchantId = activationModal
-						.find( $o.accountActionId )
-						.val()
-						.trim();
-					const merchantKey = activationModal
-						.find( $o.accountActionKey )
-						.val()
-						.trim();
-					verifyAccountCredentials( merchantId, merchantKey );
 				} );
 
 				/**
@@ -2649,7 +2557,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						dataType: 'json',
 					} ).done( function( r ) {
 						$o.requestSent = false;
-						//activationModal.find( $o.accountActionsFields ).hide();
+
 						// Get all purchase options and check paywall id.
 						const allPurchaseOptions = $( $o.purchaseOptionItems );
 
@@ -2756,46 +2664,6 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 			 */
 			const initializeTooltip = function( elementIdentifier ) {
 				tippy( elementIdentifier, { arrow: tippy.roundArrow } );
-			};
-
-			/**
-			 * Display account verification fields.
-			 */
-			const showAccountVerificationFields = function() {
-				const activationModal = $o.previewWrapper.find(
-					$o.activationModal
-				);
-				activationModal.find( $o.accountActionsWrapper ).hide();
-				activationModal
-					.find( $o.accountActionsFields )
-					.css( { display: 'flex' } );
-			};
-
-			/**
-			 * Display account activation modal for new merchant.
-			 */
-			const showAccountActivationModal = function() {
-				$o.previewWrapper.find( $o.activationModal ).remove();
-
-				// Get the template for account verification.
-				const template = wp.template(
-					'revgen-account-activation-modal'
-				);
-				$o.previewWrapper.append( template );
-
-				// Blur out the background.
-				$o.body.addClass( 'modal-blur' );
-				$o.purchaseOverlay.css( {
-					filter: 'blur(5px)',
-					'pointer-events': 'none',
-				} );
-				$o.actionsWrapper.css( {
-					'background-color': '#a9a9a9',
-				} );
-				$o.actionButtons.css( { opacity: '0.5' } );
-				$o.searchContentWrapper.css( {
-					'background-color': '#a9a9a9',
-				} );
 			};
 
 			/**
