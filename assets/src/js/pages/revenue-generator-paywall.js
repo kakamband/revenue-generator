@@ -172,9 +172,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				accountCredentialsInfo:
 					'.rev-gen-preview-main-account-modal-credentials-info',
 				accountActionId:
-					'.rev-gen-preview-main-account-modal-fields-merchant-id',
+					'#rev-gen-merchant-id',
 				accountActionKey:
-					'.rev-gen-preview-main-account-modal-fields-merchant-key',
+					'#rev-gen-api-key',
 				accountActionTitle:
 					'.rev-gen-preview-main-account-modal-fields-title',
 				accountActions: '.rev-gen-preview-main-account-modal-actions',
@@ -2441,19 +2441,8 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				 * Handle merchant id input.
 				 */
 				$o.body.on( 'input change', $o.accountActionId, function() {
-					const activationModal = $o.previewWrapper.find(
-						$o.activationModal
-					);
-					const merchantId = activationModal
-						.find( $o.accountActionId )
-						.val()
-						.trim();
-					const merchantKey = activationModal
-						.find( $o.accountActionKey )
-						.val()
-						.trim();
-					if ( merchantId.length && merchantKey.length ) {
-						$( $o.activateAccount ).removeAttr( 'disabled' );
+					if ( areCredentialsFilled() ) {
+						$( '#rg_js_modal_confirm', $o.body ).removeAttr( 'disabled' );
 					}
 				} );
 
@@ -2461,19 +2450,8 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				 * Handle merchant key input.
 				 */
 				$o.body.on( 'input change', $o.accountActionKey, function() {
-					const activationModal = $o.previewWrapper.find(
-						$o.activationModal
-					);
-					const merchantId = activationModal
-						.find( $o.accountActionId )
-						.val()
-						.trim();
-					const merchantKey = activationModal
-						.find( $o.accountActionKey )
-						.val()
-						.trim();
-					if ( merchantId.length && merchantKey.length ) {
-						$( $o.activateAccount ).removeAttr( 'disabled' );
+					if ( areCredentialsFilled() ) {
+						$( '#rg_js_modal_confirm', $o.body ).removeAttr( 'disabled' );
 					}
 				} );
 
@@ -2524,6 +2502,17 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						location.href = dashboardURL;
 					}
 				} );
+			};
+
+			const areCredentialsFilled = function() {
+				const merchantID = $o.body.find( $o.accountActionId ).val().trim();
+				const merchantKey = $o.body.find( $o.accountActionKey ).val().trim();
+
+				if ( merchantID && merchantKey ) {
+					return true;
+				}
+
+				return false;
 			};
 
 			/**
@@ -2795,17 +2784,8 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 								templateData: {
 
 								},
-								onConfirm: async ( e, el ) => {
-									new RevGenModal( {
-										id: 'rg-modal-connect-account',
-										keepOpen: true,
-										templateData: {
-
-										},
-										onConfirm: async () => {
-											console.log( 'connected!' );
-										}
-									} );
+								onConfirm: async () => {
+									showAccountModal();
 								},
 								onCancel: async () => {
 
@@ -2814,6 +2794,39 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						}
 					} );
 				}
+			};
+
+			const showAccountModal = function() {
+				new RevGenModal( {
+					id: 'rg-modal-connect-account',
+					keepOpen: true,
+					templateData: {
+
+					},
+					onConfirm: async ( e, el ) => {
+						const closeEvent = new Event( 'rev-gen-modal-close' );
+						const $el = $( el );
+						const merchantID = $( '#rev-gen-merchant-id', $el ).val();
+						const merchantKey = $( '#rev-gen-api-key', $el ).val();
+						const $tryAgain = $( '#rg_js_restartVerification', $el );
+
+						$el.addClass( 'loading' );
+
+						const verify = verifyAccountCredentials( merchantID, merchantKey );
+
+						$tryAgain.on( 'click', function() {
+							el.dispatchEvent( closeEvent );
+							showAccountModal();
+						} );
+
+						if ( verify ) {
+							$el.removeClass( 'loading' );
+							el.dispatchEvent( closeEvent );
+						} else {
+							$el.removeClass( 'loading' ).addClass( 'modal-error' );
+						}
+					}
+				} );
 			};
 
 			/**
@@ -2839,29 +2852,18 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					};
 
 					let eventLabel = '';
-
-					// Remove merchant credential fields and show the loader.
-					const activationModal = $o.previewWrapper.find(
-						$o.activationModal
-					);
-					activationModal
-						.find( $o.accountActionTitle )
-						.text( __( 'Just a second...', 'revenue-generator' ) );
-					activationModal.find( $o.accountActionId ).remove();
-					activationModal.find( $o.accountCredentialsInfo ).remove();
-					activationModal.find( $o.accountActionKey ).remove();
-					activationModal.find( $o.accountActions ).remove();
-					activationModal.find( $o.accountVerificationLoader ).show();
+					let success = false;
 
 					// Validate merchant details.
 					$.ajax( {
 						url: revenueGeneratorGlobalOptions.ajaxUrl,
 						method: 'POST',
+						async: false,
 						data: formData,
 						dataType: 'json',
 					} ).done( function( r ) {
 						$o.requestSent = false;
-						activationModal.find( $o.accountActionsFields ).hide();
+						//activationModal.find( $o.accountActionsFields ).hide();
 						// Get all purchase options and check paywall id.
 						const allPurchaseOptions = $( $o.purchaseOptionItems );
 
@@ -2899,14 +2901,15 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 									}, 2000 );
 								}
 								eventLabel = 'Success';
+
+								success = true;
 							} else {
 								// Save the paywall as well, so that we don't miss any new changes if merchant as done any.
 								$o.isPublish = true;
 								$o.savePaywall.trigger( 'click' );
-								activationModal
-									.find( $o.activationModalError )
-									.css( { display: 'flex' } );
 								eventLabel = 'Failure - ' + r.msg;
+
+								success = false;
 							}
 
 							// Check for Screen to perform actions Contribution.
@@ -2917,7 +2920,6 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							if ( true === r.success ) {
 								$o.isPublish = true;
 								showLoader();
-								$( $o.activationModalClose ).trigger( 'click' );
 
 								setTimeout( function() {
 									// Explicitly change loclized data.
@@ -2928,21 +2930,21 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 									$o.snackBar.showSnackbar( r.msg, 1500 );
 								}, 2000 );
 								eventLabel = 'Success';
+
+								success = true;
 							} else {
 								// If there is error show Modal Error.
 								$o.isPublish = true;
-								activationModal
-									.find( $o.activationModalError )
-									.css( { display: 'flex' } );
 								eventLabel = 'Failure - ' + r.msg;
+
+								success = false;
 							}
 						} else {
 							// If there is error show Modal Error.
 							$o.isPublish = true;
-							activationModal
-								.find( $o.activationModalError )
-								.css( { display: 'flex' } );
 							eventLabel = 'Failure - Unknow Error';
+
+							success = false;
 						}
 
 						// Send GA Event.
@@ -2956,6 +2958,8 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							true
 						);
 					} );
+
+					return success;
 				}
 			};
 
