@@ -535,6 +535,22 @@ body.modal-blur select.rev-gen__select2 + .select2-container .select2-selection-
 		font-size: 40px;
 		font-weight: 400;
 	}
+	&__loader {
+		display: none;
+		margin: 60px auto;
+		font-size: 5px;
+		position: relative;
+		border: 3px solid #000;
+		border-left: 3px solid #fff;
+		transform: translateZ(0);
+		animation: load8 1.1s infinite linear;
+		border-radius: 50%;
+		width: 10em;
+		height: 10em;
+	}
+	&__error {
+		display: none;
+	}
 	&-overlay {
 		position: fixed;
 		top: 0;
@@ -544,6 +560,31 @@ body.modal-blur select.rev-gen__select2 + .select2-container .select2-selection-
 		height: 100vh;
 		background: rgba(0, 0, 0, 0.5);
 		box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+	}
+	.show-on-loading {
+		display: none;
+	}
+	&.loading {
+		.rev-gen-modal__loader {
+			display: block;
+		}
+		.hide-on-loading {
+			display: none;
+		}
+		.show-on-loading {
+			display: block;
+		}
+	}
+	&.modal-error {
+		.rev-gen-modal__inner > * {
+			display: none;
+		}
+		.rev-gen-modal__error {
+			display: block;
+		}
+		.rev-gen-modal__close {
+			display: block;
+		}
 	}
 }
 
