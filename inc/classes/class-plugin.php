@@ -43,6 +43,12 @@ class Plugin {
 		// Initialize frontend post class.
 		Frontend_Post::get_instance();
 
+		// Initialize settigns class.
+		Settings::get_instance();
+
+		// Intialize Shortcode class.
+		Shortcodes::get_instance();
+
 		// Setup required hooks.
 		$this->setup_hooks();
 	}
@@ -69,7 +75,7 @@ class Plugin {
 	 * Define required plugin constants.
 	 */
 	protected function add_constants() {
-		define( 'REVENUE_GENERATOR_VERSION', '1.0.0-beta1' );
+		define( 'REVENUE_GENERATOR_VERSION', '1.1.0' );
 		define( 'REVENUE_GENERATOR_BUILD_DIR', REVENUE_GENERATOR_PLUGIN_DIR . '/assets/build/' );
 		define( 'REVENUE_GENERATOR_BUILD_URL', plugins_url( '/assets/build/', REVENUE_GENERATOR_PLUGIN_FILE ) );
 	}

@@ -6,16 +6,19 @@
 }
 
 .rev-gen-dashboard-bar {
-	box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.55);
+	box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.05);
 	width: 100%;
 	z-index: 2;
 	display: flex;
+	align-items: center;
 	justify-content: space-between;
 	height: 50px;
+	position: sticky;
+	top: 33px;
+	background: #fff;
 
 	&--filter {
-		align-self: flex-start;
-		margin: 10px;
+		margin-left: 10px;
 
 		label {
 			text-transform: uppercase;
@@ -25,26 +28,13 @@
 			font-style: normal;
 			line-height: normal;
 			letter-spacing: normal;
-			color: #333;
-		}
-
-		select {
-			border-top: 0;
-			border-left: 0;
-			border-right: 0;
-			border-radius: 0;
-			border-bottom: 3px solid #1e1e1e;
-			font-size: 16px;
-			font-weight: 500;
-			font-stretch: normal;
-			font-style: normal;
-			line-height: normal;
-			letter-spacing: normal;
-			color: #1e1e1e;
+			color: rgba(51, 51, 51, 0.6);
 		}
 	}
 
 	&--search {
+		position: relative;
+		top: -3px;
 		display: inline-flex;
 		align-self: center;
 		width: 30%;
@@ -60,50 +50,35 @@
 			letter-spacing: normal;
 			color: #1e1e1e;
 			border: 0;
+			padding: 0;
+
+			&::placeholder {
+				color: #1e1e1e;
+			}
 
 			&:focus {
 				box-shadow: none;
 			}
 		}
 
-		i {
-			padding: 5px;
+		&-icon {
+			padding: 7px 5px;
+			background: url(../img/icon-search.svg) no-repeat right 0 center;
+			cursor: pointer;
+			height: 16px;
+			width: 16px;
+			background-size: 16px 16px;
 		}
 
-		&-results {
-			display: none;
-			flex-direction: column;
-			background: #fff;
-			align-self: center;
-			width: inherit;
-			box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.55);
-			position: absolute;
-			top: 45px;
-			z-index: 5;
-			height: 100px;
-
-			span {
-				height: 20px;
-				cursor: pointer;
-				margin: 2px;
-			}
-		}
 	}
 
 	&--actions {
-		align-self: flex-end;
 		display: inline-flex;
-		width: 15%;
+		margin-right: 10px;
 
-		a {
-			border-radius: 4px;
-			background-color: #000;
-			color: #fff;
-			width: 120px;
-			margin: 10px;
-			text-align: center;
-			padding: 5px;
-			text-decoration: none;
+		.rev-gen__button {
+			padding: 7px 30px;
+			font-size: 14px;
 		}
 	}
 }
@@ -125,9 +100,9 @@
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
-			width: 30%;
+			width: 225px;
 			min-height: 300px;
-			border: 4px solid #000;
+			border: 2px solid #000;
 			border-radius: 5px;
 			margin-right: 30px;
 			cursor: pointer;
@@ -153,7 +128,6 @@
 				margin: 15px 0;
 
 				&-item {
-					background-color: #fff;
 					border: 2px solid #2e2e2e;
 					border-radius: 5px;
 					display: flex;
@@ -222,8 +196,15 @@
 			color: #000;
 
 			span {
-				font-size: 16px;
+				font-size: 21px;
 				font-weight: 500;
+				min-width: 165px;
+				display: inline-block;
+			}
+
+			p {
+				margin: 0.5em 0;
+				font-size: 16px;
 			}
 
 			b {
@@ -233,14 +214,69 @@
 			}
 
 			&-updated {
+				margin-top: 0;
+				font-size: 14px;
 				color: rgba(51, 51, 51, 0.6);
+			}
+
+			&-links {
+				a {
+					color: #000;
+					font-weight: bold;
+					text-decoration: underline;
+					text-transform: uppercase;
+				}
 			}
 		}
 	}
 
+	&-nopaywall {
+		left: 50%;
+		top: 33%;
+		position: absolute;
+		transform: translate(-50%, 0);
+
+		&--title {
+			font-family: HelveticaNeue, serif;
+			font-size: 21px;
+			font-weight: bold;
+			font-style: normal;
+			line-height: 1.52;
+			color: #000;
+			text-align: center;
+		}
+
+		&--create-paywall {
+
+			text-align: center;
+			margin-top: 23px;
+
+			&--button {
+
+				width: 222px;
+				height: 44px;
+				border-radius: 4px;
+				background-color: #000;
+				font-family: HelveticaNeue, serif;
+				font-size: 15px;
+				font-weight: bold;
+				line-height: 40px;
+				color: #fff;
+				text-decoration: none;
+				display: block;
+				margin: 0 auto;
+
+				&:hover {
+					color: #fff;
+				}
+			}
+		}
+
+	}
+
 	// Style for in active paywalls.
 	.is-disabled {
-		border: 4px solid #808080;
+		border: 2px solid #808080;
 
 		* {
 			color: #808080;
@@ -253,23 +289,9 @@
 }
 
 .rev-gen-start-tutorial {
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.15);
-	background-color: #fff;
-	text-align: center;
-	border-radius: 4px;
-	padding: 5px 10px;
 	position: fixed;
-	border: 2px solid #000;
-	font-size: 12px;
-	z-index: 15;
-	bottom: 25px;
-	right: 20px;
-	height: 25px;
-	width: 70px;
-	font-weight: 500;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+	bottom: 10px;
+	right: 10px;
 	cursor: pointer;
 }
 
@@ -279,7 +301,6 @@
 			width: 75%;
 
 			&-preview {
-				width: 50%;
 
 				&-purchase-options {
 
@@ -302,7 +323,6 @@
 			width: 70%;
 
 			&-preview {
-				width: 50%;
 
 				&-purchase-options {
 
@@ -324,10 +344,6 @@
 		&-paywall {
 			width: 75%;
 
-			&-preview {
-				width: 40%;
-			}
-
 			&-info {
 				width: 60%;
 			}
@@ -338,9 +354,6 @@
 @media only screen and (min-width: 1280px) and (max-width: 1300px) {
 	.rev-gen-dashboard-content {
 		&-paywall {
-			&-preview {
-				width: 35%;
-			}
 
 			&-info {
 				width: 65%;
@@ -352,9 +365,6 @@
 @media only screen and (min-width: 1600px) and (max-width: 2048px) {
 	.rev-gen-dashboard-content {
 		&-paywall {
-			&-preview {
-				width: 25%;
-			}
 
 			&-info {
 				width: 75%;

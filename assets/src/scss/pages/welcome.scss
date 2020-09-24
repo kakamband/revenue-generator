@@ -34,6 +34,26 @@
 			font-size: 15px;
 			color: #333;
 		}
+
+		&-tracking {
+			&-wrapper {
+				margin-top: 50px;
+			}
+
+			input[type="checkbox"] {
+				&:checked {
+					&::before {
+						content: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMi42NTIiIGhlaWdodD0iOC43NzgiIHZpZXdCb3g9IjAgMCAxMi42NTIgOC43NzgiPjxkZWZzPjxzdHlsZT4uYXtmaWxsOm5vbmU7c3Ryb2tlOiMzMzM7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS13aWR0aDoycHg7fTwvc3R5bGU+PC9kZWZzPjxwYXRoIGNsYXNzPSJhIiBkPSJNMSw3LjA3MWw0LjE2Nyw0LjE2Nyw3LjA3MS03LjA3MSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTAuMjkzIC0zLjQ2KSIvPjwvc3ZnPg==);
+						margin: -8px 0 0 -4px;
+					}
+				}
+			}
+
+			font-family: HelveticaNeue, serif;
+			font-size: 18px;
+			line-height: 28px;
+			color: #333;
+		}
 	}
 
 	.welcome-screen-question {
@@ -47,19 +67,31 @@
 			color: #333;
 			margin: 0;
 		}
+		&-paywall {
+			margin: 65px 0;
+		}
 	}
 
 	.welcome-screen-publish-questionnaire {
-		margin-top: 50px;
+		width: 50%;
+		text-align: center;
+		margin: 20px auto 40px;
+
 		&--heading {
 			font-size: 15px;
 			font-weight: 600;
+		}
+		&--description {
+			margin-bottom: 0;
+		}
+		&-paywall {
+			margin-bottom: 40px;
+			width: 100%;
 		}
 	}
 
 	&--card {
 		width: 100%;
-		height: 150px;
 		display: flex;
 		justify-content: center;
 	}

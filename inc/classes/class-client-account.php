@@ -93,6 +93,22 @@ class Client_Account {
 	];
 
 	/**
+	 * Web API endpoints.
+	 *
+	 * @var array Common values used for web related info throughout the plugin.
+	 */
+	public static $web_endpoints = [
+		'EU' => [
+			'sandbox' => 'https://web.sandbox.laterpaytest.net',
+			'live'    => 'https://web.laterpay.net',
+		],
+		'US' => [
+			'sandbox' => 'https://web.sandbox.uselaterpaytest.com',
+			'live'    => 'https://web.uselaterpay.com',
+		],
+	];
+
+	/**
 	 * Class Client_Account construct method.
 	 */
 	protected function __construct() {
@@ -121,7 +137,7 @@ class Client_Account {
 	 *
 	 * @return array
 	 */
-	public function get_merchant_credentials() {
+	public static function get_merchant_credentials() {
 		return get_option( 'lp_rg_merchant_credentials', [] );
 	}
 

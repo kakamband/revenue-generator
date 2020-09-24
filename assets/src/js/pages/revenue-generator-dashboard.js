@@ -1,4 +1,4 @@
-/* global revenueGeneratorGlobalOptions */
+/* global revenueGeneratorGlobalOptions rgGlobal */
 /**
  * JS to handle plugin dashboard screen interactions.
  *
@@ -9,7 +9,7 @@
  * Internal dependencies.
  */
 import '../utils';
-import { debounce } from '../helpers';
+import { RevGenModal } from '../utils/rev-gen-modal';
 
 ( function( $ ) {
 	$( function() {
@@ -23,19 +23,26 @@ import { debounce } from '../helpers';
 				paywallContent: '.rev-gen-dashboard-content',
 				paywallPreview: '.rev-gen-dashboard-content-paywall-preview',
 				paywallContentWrapper: '.rev-gen-dashboard-content-paywall',
-				// Dashboard bar action items.
+
+				// Delete Paywall link.
+				removePaywallDashboard: '.rev-gen-dashboard-remove-paywall',
+
 				newPaywall: $( '#rg_js_newPaywall' ),
+				newContribution: $( '#rg_js_newContribution' ),
 				sortPaywalls: $( '#rg_js_filterPaywalls' ),
 				searchPaywall: $( '#rg_js_searchPaywall' ),
-				searchResultWrapper: $(
-					'.rev-gen-dashboard-bar--search-results'
-				),
-				searchResultItem: '.rev-gen-dashboard-bar--search-results-item',
 				editPayWallName: $( '.rev-gen-dashboard-paywall-name' ),
+				paywallSearchIcon: $( '.rev-gen-dashboard-bar--search-icon' ),
+				laterpayLoader: $( '.laterpay-loader-wrapper' ),
+				contributionDelete: $(
+					'.rev-gen-dashboard__contribution-delete'
+				),
 
 				// Dashboard footer area.
 				restartTour: $( '#rg_js_RestartTutorial' ),
-
+				restartTourContribution: $(
+					'#rg_js_RestartTutorial_Contribution'
+				),
 				snackBar: $( '#rg_js_SnackBar' ),
 			};
 
@@ -59,12 +66,13 @@ import { debounce } from '../helpers';
 				} );
 
 				/**
-				 * Restart the tour from dashboard.
+				 * Restart the Payall tour from Payall dashboard.
 				 */
 				$o.restartTour.on( 'click', function() {
 					// Create form data.
 					const formData = {
 						action: 'rg_restart_tour',
+						tour_type: 'is_paywall_tutorial_completed',
 						restart_tour: '1',
 						security:
 							revenueGeneratorGlobalOptions.rg_paywall_nonce,
@@ -79,6 +87,32 @@ import { debounce } from '../helpers';
 					} ).done( function( r ) {
 						if ( true === r.success ) {
 							window.location = $o.newPaywall.attr( 'href' );
+						}
+					} );
+				} );
+
+				/**
+				 * Restart the contribution tour from Contribution Dashboard.
+				 */
+				$o.restartTourContribution.on( 'click', function() {
+					// Create form Data.
+					const formData = {
+						action: 'rg_restart_tour',
+						tour_type: 'is_contribution_tutorial_completed',
+						restart_tour: '1',
+						security:
+							revenueGeneratorGlobalOptions.rg_paywall_nonce,
+					};
+
+					// Delete the option.
+					$.ajax( {
+						url: revenueGeneratorGlobalOptions.ajaxUrl,
+						method: 'POST',
+						data: formData,
+						dataType: 'json',
+					} ).done( function( r ) {
+						if ( true === r.success ) {
+							window.location = $o.newContribution.attr( 'href' );
 						}
 					} );
 				} );
@@ -116,7 +150,6 @@ import { debounce } from '../helpers';
 				$o.searchPaywall.on( 'focus', function() {
 					$( $o.paywallContent ).addClass( 'blury' );
 					$o.body.css( {
-						overflow: 'hidden',
 						height: '100%',
 					} );
 					const searchPaywallTerm = $( this )
@@ -132,7 +165,6 @@ import { debounce } from '../helpers';
 				 */
 				$o.searchPaywall.on( 'focusout', function() {
 					$o.body.css( {
-						overflow: 'auto',
 						height: 'auto',
 					} );
 					$( $o.paywallContent ).removeClass( 'blury' );
@@ -147,35 +179,24 @@ import { debounce } from '../helpers';
 						height: 'auto',
 					} );
 					$( $o.paywallContent ).removeClass( 'blury' );
-					$( $o.searchResultWrapper ).css( { display: 'none' } );
 				} );
 
 				/**
-				 * Handle preview content search input.
+				 * Handle dashboard search icon click event.
 				 */
-				$o.searchPaywall.on(
-					'input change',
-					debounce( function() {
-						const searchPaywallTerm = $( this )
-							.val()
-							.trim();
-						if ( searchPaywallTerm.length ) {
-							searchPaywall( searchPaywallTerm );
-						}
-					}, 1500 )
-				);
+				$o.paywallSearchIcon.on( 'click', function() {
+					showLoader();
+					const searchPaywallTerm = $o.searchPaywall.val().trim();
+					searchPaywall( searchPaywallTerm );
+				} );
 
 				/**
-				 * Handle the event when merchant has clicked a paywall for preview.
+				 * Handle Search input on enter.
 				 */
-				$o.body.on( 'click', $o.searchResultItem, function() {
-					const searchItem = $( this );
-					const searchPostID = searchItem.attr( 'data-id' );
-					if ( searchPostID ) {
-						window.location.href =
-							revenueGeneratorGlobalOptions.paywallPageBase +
-							'&current_paywall=' +
-							searchPostID;
+				$o.searchPaywall.on( 'keyup', function( event ) {
+					// Check for enter key.
+					if ( event.keyCode === 13 ) {
+						$o.paywallSearchIcon.trigger( 'click' );
 					}
 				} );
 
@@ -227,6 +248,141 @@ import { debounce } from '../helpers';
 						} );
 					}
 				} );
+
+				/**
+				 * Limit paywall name to 20 characters.
+				 */
+				$o.editPayWallName.on( 'keydown', function( e ) {
+					const textlen = $( this )
+						.text()
+						.trim().length;
+					if ( 20 <= textlen ) {
+						// if more than 20 prevent allow following keys execept default case.
+						switch ( e.keyCode ) {
+							case 8: // Backspace
+							case 9: // Tab
+							case 13: // Enter
+							case 37: // Left
+							case 38: // Up
+							case 39: // Right
+							case 40: // Down
+								break;
+							default:
+								const regex = new RegExp(
+									'^[a-zA-Z0-9.,/ $@()]+$'
+								);
+								const key = e.key;
+								// Block All Characters, Numbers and Special Characters.
+								if ( regex.test( key ) ) {
+									e.preventDefault();
+									return false;
+								}
+								break;
+						}
+					}
+				} );
+
+				/**
+				 * Handles Contribution deletion on confirmation.
+				 */
+				$o.contributionDelete.on( 'click', function( e ) {
+					e.preventDefault();
+
+					const $this = $( e.target );
+					const contributionID = $this.data( 'id' );
+					const nonce = $this.data( 'nonce' );
+
+					new RevGenModal( {
+						id: 'rg-modal-remove-contribution',
+						templateData: {
+							isEditable: parseInt(
+								$this.data( 'editable' ),
+								10
+							),
+						},
+						onConfirm: async () => {
+							$.ajax( {
+								url: revenueGeneratorGlobalOptions.ajaxUrl,
+								data: {
+									action: 'rg_contribution_delete',
+									security: nonce,
+									id: contributionID,
+								},
+								success: ( r ) => {
+									$o.snackBar.showSnackbar(
+										r.data.msg,
+										1500
+									);
+
+									setTimeout( () => {
+										window.location.reload();
+									}, 1500 );
+								},
+							} );
+						},
+						onCancel: () => {
+							// noop
+						},
+					} );
+				} );
+
+				/**
+				 * Remove the paywall after merchant confirmation.
+				 */
+				$o.body.on( 'click', $o.removePaywallDashboard, function() {
+					const paywallId = $( this ).attr( 'data-paywall-id' );
+					const eventLabel = $( this )
+						.closest( '.rev-gen-dashboard-content-paywall-info' )
+						.find( '.rev-gen-dashboard-paywall-name' )
+						.text()
+						.trim();
+
+					new RevGenModal( {
+						id: 'rg-modal-remove-paywall',
+						onConfirm: async () => {
+							$.ajax( {
+								url: revenueGeneratorGlobalOptions.ajaxUrl,
+								method: 'POST',
+								data: {
+									action: 'rg_remove_paywall',
+									id: paywallId,
+									security:
+										revenueGeneratorGlobalOptions.rg_paywall_nonce,
+								},
+								success: ( r ) => {
+									// Show message and remove the overlay.
+									$o.snackBar.showSnackbar( r.msg, 1500 );
+									// Send GA Event.
+									const eventCategory =
+										'LP RevGen Configure Paywall';
+									const eventAction = 'Paywall Deleted';
+									rgGlobal.sendLPGAEvent(
+										eventAction,
+										eventCategory,
+										eventLabel,
+										0,
+										true
+									);
+
+									// waits until snackbar is shown and delete event is sent.
+									setTimeout( function() {
+										window.location.reload();
+									}, 1500 );
+								},
+							} );
+						},
+						onCancel: () => {
+							// do nothing.
+						},
+					} );
+				} );
+			};
+
+			/**
+			 * Show the loader.
+			 */
+			const showLoader = function() {
+				$o.laterpayLoader.css( { display: 'flex' } );
 			};
 
 			/**
@@ -235,19 +391,23 @@ import { debounce } from '../helpers';
 			 * @param {string} searchTerm The part of name being searched for.
 			 */
 			const searchPaywall = function( searchTerm ) {
-				if ( searchTerm.length ) {
-					// prevent duplicate requests.
-					if ( ! $o.requestSent ) {
-						$o.requestSent = true;
+				// prevent duplicate requests.
+				if ( ! $o.requestSent ) {
+					$o.requestSent = true;
 
+					// Has something input.
+					if ( searchTerm.length ) {
+						// Search and display resultset.
 						// Create form data.
 						const formData = {
 							action: 'rg_search_paywall',
+							rg_current_url: window.location.href,
 							search_term: searchTerm,
 							security:
 								revenueGeneratorGlobalOptions.rg_paywall_nonce,
 						};
 
+						// Delete the option.
 						$.ajax( {
 							url: revenueGeneratorGlobalOptions.ajaxUrl,
 							method: 'POST',
@@ -255,24 +415,21 @@ import { debounce } from '../helpers';
 							dataType: 'json',
 						} ).done( function( r ) {
 							$o.requestSent = false;
-							if ( true === r.success ) {
-								$o.searchResultWrapper.empty();
-								const resultPaywalls = r.paywalls;
-								resultPaywalls.forEach( function( item ) {
-									const searchItem = $( '<span/>', {
-										'data-id': item.id,
-										class:
-											'rev-gen-dashboard-bar--search-results-item',
-									} ).text( item.name );
-									$o.searchResultWrapper.append( searchItem );
-									$o.searchResultWrapper.css( {
-										display: 'inline-flex',
-									} );
-								} );
-							} else {
-								$o.snackBar.showSnackbar( r.msg, 1500 );
+							if ( true === r.success && r.redirect_to ) {
+								window.location.href = r.redirect_to;
 							}
 						} );
+					} else {
+						const url = new URL( window.location.href );
+						const params = url.searchParams;
+
+						// Delete the search_term parameter.
+						params.delete( 'search_term' );
+						url.search = params.toString();
+						const dashboardURL = url.toString();
+
+						// redirects to dashboard url.
+						window.location.href = dashboardURL;
 					}
 				}
 			};

@@ -1,9 +1,9 @@
 {
 	"name": "revenue-generator",
-	"version": "1.0.0-beta1",
+	"version": "1.2.0",
 	"homepage": "https://github.com/laterpay/revenue-generator/",
 	"title": "Revenue Generator",
-	"description": "Monetize your blog and content with LaterPay's Revenue Generator.",
+	"description": "Monetize your blog and content with Laterpay's Revenue Generator.",
 	"author": "laterpay",
 	"license": "MIT",
 	"repository": {

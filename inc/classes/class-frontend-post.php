@@ -145,6 +145,11 @@ class Frontend_Post {
 			$this->current_post_id = ( ! empty( $this->current_post_id ) ) ? $this->current_post_id : get_the_ID();
 			$paywall_data          = $this->get_connected_paywall_id( $this->current_post_id );
 
+			// Don't add connector to every page.
+			if ( empty( $paywall_data ) ) {
+				wp_dequeue_script( 'revenue-generator-classic-connector' );
+				return;
+			}
 			?>
 			<!-- LaterPay Connector In-Page Configuration for appearance layout and deleted purchase options. -->
 			<script type="application/json" id="laterpay-connector">
@@ -253,6 +258,13 @@ class Frontend_Post {
 	public function revenue_generator_post_content( $post_content ) {
 		// Bail early, if unsupported post type.
 		if ( ! is_singular( Post_Types::get_allowed_post_types() ) ) {
+			return $post_content;
+		}
+
+		$this->current_post_id = ( ! empty( $this->current_post_id ) ) ? $this->current_post_id : get_the_ID();
+		$paywall_data          = $this->get_connected_paywall_id( $this->current_post_id );
+
+		if ( empty( $paywall_data ) ) {
 			return $post_content;
 		}
 
@@ -383,33 +395,28 @@ class Frontend_Post {
 			return [];
 		}
 
-		$deleted_options           = [];
-		$individual_option_existed = false;
-		$paywall_instance          = Paywall::get_instance();
-		$time_pass_instance        = Time_Pass::get_instance();
-		$subscription_instance     = Subscription::get_instance();
-		$deleted_time_pass_ids     = $time_pass_instance->get_inactive_time_pass_tokenized_ids();
-		$deleted_subscription_ids  = $subscription_instance->get_inactive_subscription_tokenized_ids();
-		$deleted_options           = array_merge( $deleted_options, $deleted_time_pass_ids, $deleted_subscription_ids );
+		$deleted_options          = [];
+		$paywall_instance         = Paywall::get_instance();
+		$time_pass_instance       = Time_Pass::get_instance();
+		$subscription_instance    = Subscription::get_instance();
+		$deleted_time_pass_ids    = $time_pass_instance->get_inactive_time_pass_tokenized_ids();
+		$deleted_subscription_ids = $subscription_instance->get_inactive_subscription_tokenized_ids();
+		$deleted_options          = array_merge( $deleted_options, $deleted_time_pass_ids, $deleted_subscription_ids );
 
 		// Set correct paywall id for the post.
 		$this->get_connected_paywall_id( $this->current_post_id );
 
 		$individual_option_data = $paywall_instance->get_individual_purchase_option_data( $this->connected_paywall_id );
-		if ( isset( $individual_option_data['individual'] ) && 'option_did_exist' === $individual_option_data['individual'] ) {
-			$individual_option_existed = true;
-		} else {
-			$this->individual_article_title       = $individual_option_data['title'];
-			$this->individual_article_description = $individual_option_data['description'];
-		}
 
 		/**
 		 * It is possible user has purchased individual article, which was later deleted by merchant,
-		 * we need to make sure user has access to it, if user has purchased then the post will be free,
-		 * else it will add pricing dynamically based on post content.
+		 * we need to make sure user has access to it, if user has purchased then the post will be free.
 		 */
-		if ( true === $individual_option_existed ) {
-			$deleted_options[] = sprintf( 'article_%s', $this->current_post_id );
+		$deleted_options[] = sprintf( 'article_%s', $this->current_post_id );
+
+		if ( ! empty( $individual_option_data ) ) {
+			$this->individual_article_title       = isset( $individual_option_data['title'] ) ? $individual_option_data['title'] : '';
+			$this->individual_article_description = isset( $individual_option_data['description'] ) ? $individual_option_data['description'] : '';
 		}
 
 		return $deleted_options;
@@ -628,11 +635,19 @@ class Frontend_Post {
 			$paywall_id   = $paywall_instance->get_connected_paywall_by_post( $post_id );
 			$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
 
+			// Check for Specific Post Paywall.
+			if ( ! $this->is_paywall_active( $paywall_data ) ) {
+				$paywall_id   = $paywall_instance->get_paywall_for_specific_post( $post_id );
+				$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
+			}
+
 			// If post doesn't have an individual paywall, check for paywall on categories.
 			if ( ! $this->is_paywall_active( $paywall_data ) ) {
 				// Check if paywall is found on post categories.
 				$post_terms = wp_get_post_categories( $post_id );
-				if ( ! empty( $post_terms ) ) {
+
+				// Check the post type and if post has categories.
+				if ( ! empty( $post_terms ) && 'post' === get_post_type( $post_id ) ) {
 					$paywall_id   = $paywall_instance->get_connected_paywall_by_categories( $post_terms );
 					$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
 
@@ -642,6 +657,12 @@ class Frontend_Post {
 						$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
 					}
 				}
+			}
+
+			// Get paywall applied for only post_type == post.
+			if ( ! $this->is_paywall_active( $paywall_data ) && 'post' === get_post_type( $post_id ) ) {
+				$paywall_id   = $paywall_instance->get_paywall_for_only_posts();
+				$paywall_data = $paywall_instance->get_purchase_option_data_by_paywall_id( $paywall_id );
 			}
 
 			// If no paywall found in categories and individual post, check for paywall applied on all posts as last resort.

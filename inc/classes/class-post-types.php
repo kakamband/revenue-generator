@@ -11,7 +11,7 @@ use LaterPay\Revenue_Generator\Inc\Traits\Singleton;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Time_Pass;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Subscription;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Paywall;
-
+use LaterPay\Revenue_Generator\Inc\Post_Types\Contribution;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -47,6 +47,7 @@ class Post_Types {
 			Time_Pass::SLUG    => Time_Pass::get_instance(),
 			Subscription::SLUG => Subscription::get_instance(),
 			Paywall::SLUG      => Paywall::get_instance(),
+			Contribution::SLUG => Contribution::get_instance(),
 		];
 
 	}
@@ -176,6 +177,7 @@ class Post_Types {
 			'title'        => $post_data->post_title,
 			'excerpt'      => $post_data->post_excerpt,
 			'teaser'       => $teaser_content,
+			'type'         => $post_data->post_type,
 			'post_content' => empty( $post_data->post_excerpt ) ? $post_content_for_preview : $post_data->post_excerpt,
 		];
 	}
@@ -433,11 +435,6 @@ class Post_Types {
 		$individual_purchase_option        = isset( $purchase_options['individual'] ) ? $purchase_options['individual'] : [];
 		$time_passes_purchase_option       = isset( $purchase_options['time_passes'] ) ? $purchase_options['time_passes'] : [];
 		$subscriptions_purchase_option     = isset( $purchase_options['subscriptions'] ) ? $purchase_options['subscriptions'] : [];
-
-		// Reset individual option as empty if none exists currently.
-		if ( isset( $individual_purchase_option['individual'] ) && 'option_did_exist' === $individual_purchase_option['individual'] ) {
-			$individual_purchase_option = [];
-		}
 
 		// Check if an order exists for the paywall.
 		if ( isset( $final_purchase_options['paywall']['order'] ) ) {

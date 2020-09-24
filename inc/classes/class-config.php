@@ -38,9 +38,13 @@ class Config {
 	 * Setup plugin options.
 	 */
 	protected function setup_options() {
-		// Check if plugin installation is fresh install.
-		if ( false === get_option( 'lp_rg_version' ) ) {
-			update_option( 'lp_rg_version', REVENUE_GENERATOR_VERSION );
+
+		// Get version from constant.
+		$version = REVENUE_GENERATOR_VERSION;
+
+		// Compare constant version with DB version.
+		if ( $version <= get_option( 'lp_rg_version' ) ) {
+			return;
 		}
 
 		// Fresh install.
@@ -50,14 +54,29 @@ class Config {
 			update_option(
 				'lp_rg_global_options',
 				[
-					'average_post_publish_count' => '',
-					'merchant_currency'          => 'USD',
-					'merchant_region'            => 'US',
-					'is_tutorial_completed'      => 0,
-					'is_merchant_verified'       => 0,
+					'is_welcome_done'                    => '',
+					'average_post_publish_count'         => '',
+					'merchant_currency'                  => 'USD',
+					'merchant_region'                    => 'US',
+					'is_paywall_tutorial_completed'      => 0,
+					'is_contribution_tutorial_completed' => 0,
+					'is_merchant_verified'               => 0,
 				]
 			);
 		}
+
+		// Update settings on version 1.0.1.
+		if ( '1.0.1' >= $version ) {
+
+			$settings_options                         = get_option( 'lp_rg_settings_options' );
+			$settings_options['rg_laterpay_ga_ua_id'] = 'UA-50448165-9';
+			// Enables GA for laterpay by default for already installed plugin.
+			$settings_options['rg_ga_enabled_status'] = 1;
+			update_option( 'lp_rg_settings_options', $settings_options );
+		}
+
+		// Update new version.
+		update_option( 'lp_rg_version', REVENUE_GENERATOR_VERSION );
 	}
 
 	/**
@@ -95,7 +114,7 @@ class Config {
 			'low'  => [
 				'single_article' => [
 					'tier_1' => [ // 0-250 content length.
-						'price'   => 1.49,
+						'price'   => 1.99,
 						'revenue' => 'sis',
 					],
 					'tier_2' => [ // 251-500 content length.
