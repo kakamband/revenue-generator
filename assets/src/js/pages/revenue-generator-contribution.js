@@ -10,6 +10,7 @@
  */
 import '../utils';
 import { __, sprintf } from '@wordpress/i18n';
+import { RevGenModal } from '../utils/rev-gen-modal';
 
 ( function( $ ) {
 	$( function() {
@@ -54,9 +55,9 @@ import { __, sprintf } from '@wordpress/i18n';
 				// Account Activation Modal.
 				activationModal: '.rev-gen-preview-main-account-modal',
 				accountActionId:
-					'.rev-gen-preview-main-account-modal-fields-merchant-id',
+					'#rev-gen-merchant-id',
 				accountActionKey:
-					'.rev-gen-preview-main-account-modal-fields-merchant-key',
+					'#rev-gen-api-key',
 
 				// Tour elements.
 				exitTour: '.rev-gen-exit-tour',
@@ -861,25 +862,81 @@ import { __, sprintf } from '@wordpress/i18n';
 				} );
 			};
 
-			/**
-			 * Display account activation modal for new merchant.
-			 */
 			const showAccountActivationModal = function() {
-				$o.rgContributionWrapper.find( $o.activationModal ).remove();
+				new RevGenModal( {
+					id: 'rg-modal-account-activation',
+					keepOpen: true,
+					templateData: {
 
-				// Get the template for account verification.
-				const template = wp.template(
-					'revgen-account-activation-modal'
-				);
-				$o.rgContributionWrapper.append( template );
+					},
+					onConfirm: async () => {
+						showAccountModal();
+					},
+					onCancel: async ( e, el ) => {
+						if (
+							revenueGeneratorGlobalOptions.globalOptions
+								.merchant_region.length
+						) {
+							const currentRegion =
+								revenueGeneratorGlobalOptions.globalOptions
+									.merchant_region;
+							const signUpURL =
+								revenueGeneratorGlobalOptions.signupURL;
+							if ( 'US' === currentRegion ) {
+								window.open( signUpURL.US, '_blank' );
+							} else {
+								window.open( signUpURL.EU, '_blank' );
+							}
+							const closeEvent = new Event( 'rev-gen-modal-close' );
+							el.dispatchEvent( closeEvent );
+							showAccountModal();
+						}
+						// Send GA Event.
+						const eventCategory = 'LP RevGen Account';
+						const eventLabel = 'Signup';
+						const eventAction = 'Connect Account';
+						rgGlobal.sendLPGAEvent(
+							eventAction,
+							eventCategory,
+							eventLabel,
+							0,
+							true
+						);
+					}
+				} );
+			};
 
-				// Blur out the background.
-				$o.body.addClass( 'modal-blur' );
-				$o.contributionBox.addClass( 'modal-blur' );
-				$o.body
-					.find( 'input' )
-					.not( $o.accountActionId + ',' + $o.accountActionKey )
-					.addClass( 'input-blur' );
+			const showAccountModal = function() {
+				new RevGenModal( {
+					id: 'rg-modal-connect-account',
+					keepOpen: true,
+					templateData: {
+
+					},
+					onConfirm: async ( e, el ) => {
+						const closeEvent = new Event( 'rev-gen-modal-close' );
+						const $el = $( el );
+						const merchantID = $( '#rev-gen-merchant-id', $el ).val();
+						const merchantKey = $( '#rev-gen-api-key', $el ).val();
+						const $tryAgain = $( '#rg_js_restartVerification', $el );
+
+						$el.addClass( 'loading' );
+
+						const verify = verifyAccountCredentials( merchantID, merchantKey );
+
+						$tryAgain.on( 'click', function() {
+							el.dispatchEvent( closeEvent );
+							showAccountModal();
+						} );
+
+						if ( verify ) {
+							$el.removeClass( 'loading' );
+							el.dispatchEvent( closeEvent );
+						} else {
+							$el.removeClass( 'loading' ).addClass( 'modal-error' );
+						}
+					}
+				} );
 			};
 
 			/**
