@@ -524,7 +524,7 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 		<div class="rev-gen-modal__inner">
 			<a href="#" class="rev-gen-modal__close" id="rg_js_modal_close">x</a>
 
-			<?php if ( true || false === $is_merchant_verified ) : ?>
+			<?php if ( false === $is_merchant_verified ) : ?>
 				<h4 class="rev-gen-modal__title">
 					<?php esc_html_e( 'You’re almost done!', 'revenue-generator' ); ?>
 				</h4>
@@ -637,6 +637,8 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 <script type="text/template" id="tmpl-rg-modal-paywall-activation">
 	<div class="rev-gen-modal" id="rg-modal-paywall-activation">
 		<div class="rev-gen-modal__inner">
+			<a href="#" class="rev-gen-modal__close" id="rg_js_modal_close">x</a>
+
 			<h4 class="rev-gen-modal__title">
 				{{ data.paywallName }}
 			</h4>
