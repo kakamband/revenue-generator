@@ -613,24 +613,34 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 </script>
 
 <!-- Template for option update warning modal -->
-<script type="text/template" id="tmpl-revgen-new-paywall-warning">
-	<div class="rev-gen-preview-main-option-update search-paywall-warning-modal">
-		<h4 class="rev-gen-preview-main-option-update-title"><?php esc_html_e( 'This will create a new paywall.', 'revenue-generator' ); ?></h4>
-		<span class="rev-gen-preview-main-option-update-warning">!</span>
-		<p class="rev-gen-preview-main-option-update-message">
-			<?php
-			esc_html_e( 'By choosing to preview on a different article, you will create a new paywall. Would you like to proceed?', 'revenue-generator' );
-			?>
-		</p>
-		<div class="rev-gen-preview-main-option-update-buttons">
-			<button id="rg_js_continueSearch" class="rev-gen-preview-main-option-update-buttons-dark">
-				<?php esc_html_e( 'Continue', 'revenue-generator' ); ?>
-			</button>
-			<button id="rg_js_cancelSearch" class="rev-gen-preview-main-option-update-buttons-light">
-				<?php esc_html_e( 'Cancel', 'revenue-generator' ); ?>
-			</button>
+<script type="text/template" id="tmpl-rg-modal-search-paywall-warning">
+	<div class="rev-gen-modal" id="rg-modal-search-paywall-warning">
+		<div class="rev-gen-modal__inner">
+			<a href="#" class="rev-gen-modal__close" id="rg_js_modal_close">x</a>
+
+			<h4 class="rev-gen-modal__title">
+				<?php esc_html_e( 'This will create a new paywall.', 'revenue-generator' ); ?>
+			</h4>
+
+			<span class="rev-gen-modal__icon rev-gen-modal__icon--warning">!</span>
+
+			<p class="rev-gen-modal__message">
+				<?php
+				esc_html_e( 'By choosing to preview on a different article, you will create a new paywall. Would you like to proceed?', 'revenue-generator' );
+				?>
+			</p>
+
+			<div class="rev-gen-modal__buttons">
+				<button id="rg_js_modal_confirm" class="rev-gen__button">
+					<?php esc_html_e( 'Continue', 'revenue-generator' ); ?>
+				</button>
+				<button id="rg_js_modal_cancel" class="rev-gen__button rev-gen__button--secondary">
+					<?php esc_html_e( 'Cancel', 'revenue-generator' ); ?>
+				</button>
+			</div>
 		</div>
 	</div>
+	<div class="rev-gen-modal-overlay"></div>
 </script>
 
 <!-- Template for paywall activation modal -->

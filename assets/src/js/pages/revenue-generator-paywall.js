@@ -389,68 +389,11 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						return false;
 					}
 
-					// take promise for popupbox.
-					return new Promise( ( complete ) => {
-						const template = wp.template(
-							'revgen-new-paywall-warning'
-						);
-						$o.previewWrapper.append( template );
-
-						$o.body.addClass( 'modal-blur' );
-						$o.actionsWrapper.css( 'background-color', '#a9a9a9' );
-						$o.layoutWrapper.css( {
-							'pointer-events': 'unset',
-						} );
-						$o.body
-							.find( 'input, select, button' )
-							.not(
-								'#rg_js_searchContent,' +
-									$o.newPaywallWarningContinue +
-									',' +
-									$o.newPaywallWarningCancel
-							)
-							.addClass( 'input-blur' );
-
-						$( $o.newPaywallWarningContinue ).off( 'click' );
-						$( $o.newPaywallWarningCancel ).off( 'click' );
-
-						// On Continue button click.
-						$( $o.newPaywallWarningContinue ).on( 'click', () => {
-							$o.postPreviewWrapper.addClass( 'blury' );
-							$( 'html, body' ).animate(
-								{ scrollTop: 0 },
-								'slow'
-							);
-							$o.body.css( {
-								overflow: 'hidden',
-								height: '100%',
-							} );
-							$o.body.removeClass( 'modal-blur' );
-							$o.body
-								.find( 'input, select, button' )
-								.removeClass( 'input-blur' );
-							$o.layoutWrapper.css( {
-								'pointer-events': 'unset',
-							} );
-							$o.actionsWrapper.css( 'background-color', '#fff' );
-							$( '.search-paywall-warning-modal' ).remove();
-							$( this ).focus();
-							complete( true );
-						} );
-
-						// On Cancel button click.
-						$( $o.newPaywallWarningCancel ).on( 'click', () => {
-							$o.body.removeClass( 'modal-blur' );
-							$o.body
-								.find( 'input, select, button' )
-								.removeClass( 'input-blur' );
-							$o.actionsWrapper.css( 'background-color', '#fff' );
-							$o.layoutWrapper.css( {
-								'pointer-events': 'unset',
-							} );
-							$( '.search-paywall-warning-modal' ).remove();
-							complete( false );
-						} );
+					new RevGenModal( {
+						id: 'rg-modal-search-paywall-warning',
+						onConfirm: async () => {
+							$o.searchContent.focus();
+						},
 					} );
 				} );
 
