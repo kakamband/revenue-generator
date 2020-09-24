@@ -2130,7 +2130,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				 */
 				$o.activatePaywall.on( 'click', function() {
 					if (
-						0 ===
+						1 ===
 						parseInt(
 							revenueGeneratorGlobalOptions.globalOptions
 								.is_merchant_verified
@@ -2211,57 +2211,6 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							}, 1500 );
 						}
 					}
-				} );
-
-				/**
-				 * Handle Connect Account button handler.
-				 */
-				$o.body.on( 'click', $o.connectAccount, function() {
-					showAccountVerificationFields();
-					// Send GA Event.
-					const eventCategory = 'LP RevGen Account';
-					const eventLabel = 'Connect Account';
-					const eventAction = 'Connect Account';
-					rgGlobal.sendLPGAEvent(
-						eventAction,
-						eventCategory,
-						eventLabel,
-						0,
-						true
-					);
-				} );
-
-				/**
-				 * Handle initial account signup button click event and show account fields.
-				 */
-				$o.body.on( 'click', $o.accountSignup, function() {
-					if (
-						revenueGeneratorGlobalOptions.globalOptions
-							.merchant_region.length
-					) {
-						const currentRegion =
-							revenueGeneratorGlobalOptions.globalOptions
-								.merchant_region;
-						const signUpURL =
-							revenueGeneratorGlobalOptions.signupURL;
-						if ( 'US' === currentRegion ) {
-							window.open( signUpURL.US, '_blank' );
-						} else {
-							window.open( signUpURL.EU, '_blank' );
-						}
-						showAccountVerificationFields();
-					}
-					// Send GA Event.
-					const eventCategory = 'LP RevGen Account';
-					const eventLabel = 'Signup';
-					const eventAction = 'Connect Account';
-					rgGlobal.sendLPGAEvent(
-						eventAction,
-						eventCategory,
-						eventLabel,
-						0,
-						true
-					);
 				} );
 
 				/**
@@ -2443,51 +2392,77 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						const selectedCategoryID = $o.searchPaywallContent.val();
 						const specificPostIDs = $o.searchPost.val();
 
-						if ( 1 === parseInt(
-							revenueGeneratorGlobalOptions.globalOptions
-							.is_merchant_verified
-						) ) {
-							new RevGenModal( {
-								id: 'rg-modal-paywall-activation',
-								templateData: {
-									paywallID: paywallId,
-									paywallName: paywallName,
-									appliedTo: appliedTo,
-									categoryName: categoryName,
-									postTitle: $( $o.postTitle )
-											.text()
-											.trim()
-								},
-								onConfirm: async() => {
-									if ( postPreviewID ) {
-										viewPost(
-											postPreviewID,
-											selectedCategoryID,
-											appliedTo,
-											specificPostIDs
-										);
-									}
-								},
-								onCancel: async ( e ) => {
-									window.location.href = e.target.dataset.dashboard_url;
+						new RevGenModal( {
+							id: 'rg-modal-paywall-activation',
+							templateData: {
+								paywallID: paywallId,
+								paywallName: paywallName,
+								appliedTo: appliedTo,
+								categoryName: categoryName,
+								postTitle: $( $o.postTitle )
+										.text()
+										.trim()
+							},
+							onConfirm: async() => {
+								if ( postPreviewID ) {
+									viewPost(
+										postPreviewID,
+										selectedCategoryID,
+										appliedTo,
+										specificPostIDs
+									);
 								}
-							} );
-						} else {
-							new RevGenModal( {
-								id: 'rg-modal-account-activation',
-								templateData: {
-
-								},
-								onConfirm: async () => {
-									showAccountModal();
-								},
-								onCancel: async () => {
-
-								}
-							} );
-						}
+							},
+							onCancel: async ( e ) => {
+								window.location.href = e.target.dataset.dashboard_url;
+							}
+						} );
 					} );
 				}
+			};
+
+			const showAccountActivationModal = function() {
+				new RevGenModal( {
+					id: 'rg-modal-account-activation',
+					keepOpen: true,
+					templateData: {
+
+					},
+					onConfirm: async () => {
+						showAccountModal();
+					},
+					onCancel: async ( e, el ) => {
+						if (
+							revenueGeneratorGlobalOptions.globalOptions
+								.merchant_region.length
+						) {
+							const currentRegion =
+								revenueGeneratorGlobalOptions.globalOptions
+									.merchant_region;
+							const signUpURL =
+								revenueGeneratorGlobalOptions.signupURL;
+							if ( 'US' === currentRegion ) {
+								window.open( signUpURL.US, '_blank' );
+							} else {
+								window.open( signUpURL.EU, '_blank' );
+							}
+							const closeEvent = new Event( 'rev-gen-modal-close' );
+							el.dispatchEvent( closeEvent );
+							showAccountModal();
+						}
+						// Send GA Event.
+						const eventCategory = 'LP RevGen Account';
+						const eventLabel = 'Signup';
+						const eventAction = 'Connect Account';
+						rgGlobal.sendLPGAEvent(
+							eventAction,
+							eventCategory,
+							eventLabel,
+							0,
+							true
+						);
+					}
+				} );
 			};
 
 			const showAccountModal = function() {
