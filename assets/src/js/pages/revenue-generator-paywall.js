@@ -2064,7 +2064,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				 */
 				$o.activatePaywall.on( 'click', function() {
 					if (
-						1 ===
+						0 ===
 						parseInt(
 							revenueGeneratorGlobalOptions.globalOptions
 								.is_merchant_verified
