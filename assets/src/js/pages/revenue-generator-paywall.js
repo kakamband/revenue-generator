@@ -129,12 +129,8 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				paywallAppliesTo: '.rev-gen-preview-main-paywall-applies-to',
 
 				// Currency modal.
-				currencyOverlay: '.rev-gen-preview-main-currency-modal',
 				currencyRadio:
-					'.rev-gen-preview-main-currency-modal-inputs-currency',
-				currencyButton: '.rev-gen-preview-main-currency-modal-button',
-				currencyModalClose:
-					'.rev-gen-preview-main-currency-modal-cross',
+					'[name=currency]',
 
 				// Purchase options info modal.
 				purchaseOptionInfoButton: '.rg-purchase-overlay-option-info',
@@ -1342,18 +1338,6 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					);
 
 				/**
-				 * Handle currency selection.
-				 */
-				$o.body.on( 'change', $o.currencyRadio, function() {
-					if ( $( this ).val().length ) {
-						const currencyButton = $( $o.currencyOverlay ).find(
-							$o.currencyButton
-						);
-						currencyButton.removeProp( 'disabled' );
-					}
-				} );
-
-				/**
 				 * Handle paywall applicable dropdown.
 				 */
 				$o.body.on( 'change', $o.paywallAppliesTo, function() {
@@ -1398,56 +1382,6 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							$o.postPreviewWrapper.attr( 'data-preview-id' )
 						);
 					}
-				} );
-
-				/**
-				 * Handle currency submission.
-				 */
-				$o.body.on( 'click', $o.currencyButton, function() {
-					// form data for currency.
-					const formData = {
-						action: 'rg_update_currency_selection',
-						config_key: 'merchant_currency',
-						config_value: $(
-							'input:radio[name=currency]:checked'
-						).val(),
-						security:
-							revenueGeneratorGlobalOptions.rg_paywall_nonce,
-					};
-
-					$.ajax( {
-						url: revenueGeneratorGlobalOptions.ajaxUrl,
-						method: 'POST',
-						data: formData,
-						dataType: 'json',
-					} ).done( function( r ) {
-						$( $o.currencyModalClose ).trigger( 'click' );
-						$o.snackBar.showSnackbar( r.msg, 1500 );
-
-						const purchaseOptions = $( $o.purchaseOptionItems );
-						purchaseOptions
-							.children( $o.purchaseOptionItem )
-							.each( function() {
-								const priceSymbol = $( this ).find(
-									$o.purchaseOptionPriceSymbol
-								);
-								const symbol =
-									'USD' === formData.config_value ? '$' : '€';
-								priceSymbol.empty().text( symbol );
-							} );
-					} );
-				} );
-
-				/**
-				 * Close currency modal.
-				 */
-				$o.body.on( 'click', $o.currencyModalClose, function() {
-					$o.previewWrapper.find( $o.currencyOverlay ).remove();
-					$o.body.removeClass( 'modal-blur' );
-					$o.purchaseOverlay.css( {
-						filter: 'unset',
-						'pointer-events': 'unset',
-					} );
 				} );
 
 				/**
@@ -2269,6 +2203,15 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				 */
 				$o.body.on( 'input change', $o.accountActionKey, function() {
 					if ( areCredentialsFilled() ) {
+						$( '#rg_js_modal_confirm', $o.body ).removeAttr( 'disabled' );
+					}
+				} );
+
+				/**
+				 * Handle currency change radio.
+				 */
+				$o.body.on( 'input change', $o.currencyRadio, function() {
+					if ( $o.currencyRadio ) {
 						$( '#rg_js_modal_confirm', $o.body ).removeAttr( 'disabled' );
 					}
 				} );
@@ -3770,16 +3713,44 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 			 * Add currency modal.
 			 */
 			const showCurrencySelectionModal = function() {
-				$o.previewWrapper.find( $o.currencyOverlay ).remove();
-				// Get the template for currency popup and add it.
-				const template = wp.template(
-					'revgen-purchase-currency-overlay'
-				);
-				$o.previewWrapper.append( template );
-				$o.body.addClass( 'modal-blur' );
-				$o.purchaseOverlay.css( {
-					filter: 'blur(5px)',
-					'pointer-events': 'none',
+				new RevGenModal( {
+					id: 'rg-modal-choose-currency',
+					onConfirm: async ( e, el ) => {
+						const closeEvent = new Event( 'rev-gen-modal-close' );
+
+						const formData = {
+							action: 'rg_update_currency_selection',
+							config_key: 'merchant_currency',
+							config_value: $(
+								'input:radio[name=currency]:checked'
+							).val(),
+							security:
+								revenueGeneratorGlobalOptions.rg_paywall_nonce,
+						};
+
+						$.ajax( {
+							url: revenueGeneratorGlobalOptions.ajaxUrl,
+							method: 'POST',
+							data: formData,
+							dataType: 'json',
+						} ).done( function( r ) {
+							$o.snackBar.showSnackbar( r.msg, 1500 );
+
+							el.dispatchEvent( closeEvent );
+
+							const purchaseOptions = $( $o.purchaseOptionItems );
+							purchaseOptions
+								.children( $o.purchaseOptionItem )
+								.each( function() {
+									const priceSymbol = $( this ).find(
+										$o.purchaseOptionPriceSymbol
+									);
+									const symbol =
+										'USD' === formData.config_value ? '$' : '€';
+									priceSymbol.empty().text( symbol );
+								} );
+						} );
+					}
 				} );
 			};
 

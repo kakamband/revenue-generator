@@ -521,6 +521,11 @@ body.modal-blur select.rev-gen__select2 + .select2-container .select2-selection-
 			&:last-child {
 				margin-bottom: 0;
 			}
+			&:disabled {
+				background-color: #a9a9a9;
+				border: 2px solid #a9a9a9;
+				cursor: not-allowed;
+			}
 		}
 	}
 	&__icon {
@@ -550,6 +555,21 @@ body.modal-blur select.rev-gen__select2 + .select2-container .select2-selection-
 	}
 	&__error {
 		display: none;
+	}
+	&__fields {
+		max-width: 260px;
+		margin: 0 auto;
+		input[type="radio"] {
+			background: #fff;
+
+			&:checked {
+				background: #1e1e1e;
+
+				&::before {
+					background-color: #fff;
+				}
+			}
+		}
 	}
 	&-overlay {
 		position: fixed;
@@ -590,8 +610,6 @@ body.modal-blur select.rev-gen__select2 + .select2-container .select2-selection-
 
 .rev-gen-modal--connect {
 	.rev-gen-modal__fields {
-		max-width: 260px;
-		margin: 0 auto;
 		input {
 			border: 0;
 			border-bottom: 2px solid #333;

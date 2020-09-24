@@ -332,25 +332,42 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 </script>
 
 <!-- Template for currency confirmation modal -->
-<script type="text/template" id="tmpl-revgen-purchase-currency-overlay">
-	<div class="rev-gen-preview-main-currency-modal">
-		<span class="rev-gen-preview-main-currency-modal-cross">X</span>
-		<h4 class="rev-gen-preview-main-currency-modal-title"><?php esc_html_e( 'Choose your currency', 'revenue-generator' ); ?></h4>
-		<span class="rev-gen-preview-main-currency-modal-question"><?php esc_html_e( 'In what currency do you sell content?', 'revenue-generator' ); ?></span>
-		<div class="rev-gen-preview-main-currency-modal-inputs">
-			<label>
-				<input class="rev-gen-preview-main-currency-modal-inputs-currency" type="radio" name="currency" value="USD" />
-				<?php esc_html_e( 'USD', 'revenue-generator' ); ?> $
-			</label>
-			<label>
-				<input class="rev-gen-preview-main-currency-modal-inputs-currency" type="radio" name="currency" value="EUR" />
-				<?php esc_html_e( 'EURO', 'revenue-generator' ); ?> €
-			</label>
+<script type="text/template" id="tmpl-rg-modal-choose-currency">
+	<div class="rev-gen-modal" id="rg-modal-choose-currency">
+		<div class="rev-gen-modal__inner">
+			<a href="#" class="rev-gen-modal__close" id="rg_js_modal_close">x</a>
+
+			<h4 class="rev-gen-modal__title">
+				<?php esc_html_e( 'Choose your currency.', 'revenue-generator' ); ?>
+			</h4>
+
+			<span class="rev-gen-modal__icon rev-gen-modal__icon--warning">!</span>
+
+			<p class="rev-gen-modal__message">
+				<?php
+				esc_html_e( 'In what currency do you sell content?', 'revenue-generator' );
+				?>
+			</p>
+
+			<div class="rev-gen-modal__fields">
+				<label>
+					<input class="rev-gen-preview-main-currency-modal-inputs-currency" type="radio" name="currency" value="USD" />
+					<?php esc_html_e( 'USD', 'revenue-generator' ); ?> $
+				</label>
+				<label>
+					<input class="rev-gen-preview-main-currency-modal-inputs-currency" type="radio" name="currency" value="EUR" />
+					<?php esc_html_e( 'EURO', 'revenue-generator' ); ?> €
+				</label>
+			</div>
+
+			<div class="rev-gen-modal__buttons">
+				<button id="rg_js_modal_confirm" class="rev-gen__button" disabled>
+					<?php esc_html_e( 'Apply currency', 'revenue-generator' ); ?>
+				</button>
+			</div>
 		</div>
-		<button disabled="disabled" class="rev-gen-preview-main-currency-modal-button">
-			<?php esc_html_e( 'Apply currency', 'revenue-generator' ); ?>
-		</button>
 	</div>
+	<div class="rev-gen-modal-overlay"></div>
 </script>
 
 <!-- Template for option item -->
