@@ -10,7 +10,7 @@
  */
 import '../utils';
 import { debounce } from '../helpers';
-import { __, sprintf, _n } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { RevGenModal } from '../utils/rev-gen-modal';
 
 ( function( $ ) {
@@ -345,53 +345,52 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 									newTitle = periodCount;
 									switch ( periodSelection ) {
 										case 'h':
-											newTitle += _n(
+											newTitle += __(
 												' Hour',
-												' Hours',
-												periodCount,
 												'revenue-generator'
 											);
 											break;
 										case 'd':
-											newTitle += _n(
+											newTitle += __(
 												' Day',
-												' Days',
-												periodCount,
 												'revenue-generator'
 											);
 											break;
 										case 'w':
-											newTitle += _n(
+											newTitle += __(
 												' Week',
-												' Weeks',
-												periodCount,
 												'revenue-generator'
 											);
 											break;
 										case 'm':
-											newTitle += _n(
+											newTitle += __(
 												' Month',
-												' Months',
-												periodCount,
 												'revenue-generator'
 											);
 											break;
-										case 'Y':
-											newTitle += _n(
+										case 'y':
+											newTitle += __(
 												' Year',
-												' Years',
-												periodCount,
 												'revenue-generator'
 											);
 											break;
 									}
 
-									const newDescription = sprintf(
+									let newDescription = sprintf(
 										__(
 											'Enjoy unlimited access to all our content for %1$s'
 										),
 										newTitle
 									);
+
+									if ( periodCount && periodCount > 1 ) {
+										newDescription = sprintf(
+											__(
+												'Enjoy unlimited access to all our content for %1$ss'
+											),
+											newTitle
+										);
+									}
 
 									switch ( currentPurchaseType ) {
 										case 'subscription':
@@ -422,7 +421,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 								},
 							} );
 							hideLoader();
-						}, 500 );
+						}, 1000 );
 					}
 				);
 
