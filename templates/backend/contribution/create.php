@@ -141,4 +141,3 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 <?php include( REVENUE_GENERATOR_PLUGIN_DIR . '/templates/backend/modal-account-activation.php' ); ?>
-

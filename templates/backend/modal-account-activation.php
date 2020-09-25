@@ -1,3 +1,15 @@
+<?php
+/**
+ * Revenue Generator account activation modal template.
+ *
+ * @package revenue-generator
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	// prevent direct access to this file.
+	exit;
+}
+?>
 <!-- Template for account activation modal. -->
 <script type="text/template" id="tmpl-rg-modal-account-activation">
 	<div class="rev-gen-modal" id="rg-modal-account-activation">

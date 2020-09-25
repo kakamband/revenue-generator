@@ -644,19 +644,19 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 			<p class="rev-gen-modal__message">
 				<# if ( 'category' === data.appliedTo || 'exclude_category' !== data.appliedTo ) { #>
 					<# if ( 'category' === data.appliedTo ) { #>
-						<?php _e( 'Has been published to <b>all posts</b> in category', 'revenue-generator' ); ?> <b>{{ data.categoryName }}</b>.
+						<?php esc_html_e( 'Has been published to <b>all posts</b> in category', 'revenue-generator' ); ?> <b>{{ data.categoryName }}</b>.
 					<# } #>
 
 					<# if ( 'exclude_category' === data.appliedTo ) { #>
-						<?php _e( 'Has been published to <b>all posts, except posts under</b> in category', 'revenue-generator' ); ?> <b>{{ data.categoryName }}
+						<?php esc_html_e( 'Has been published to <b>all posts, except posts under</b> in category', 'revenue-generator' ); ?> <b>{{ data.categoryName }}
 					<# } #>
 				<# } else { #>
 					<# if ( 'supported' === data.appliedTo ) { #>
-						<?php _e( 'Has been published on', 'revenue-generator' ); ?> <b>{{ data.postTitle }}</b>.
+						<?php esc_html_e( 'Has been published on', 'revenue-generator' ); ?> <b>{{ data.postTitle }}</b>.
 					<# } else if ( 'specific_post' === data.appliedTo ) { #>
-						<?php _e( 'Has been published on <b>Specific Posts & Pages</b>.', 'revenue-generator' ); ?>
+						<?php esc_html_e( 'Has been published on <b>Specific Posts & Pages</b>.', 'revenue-generator' ); ?>
 					<# } else { #>
-						<?php _e( 'Has been published on <b>all posts</b>.', 'revenue-generator' ); ?>
+						<?php esc_html_e( 'Has been published on <b>all posts</b>.', 'revenue-generator' ); ?>
 					<# } #>
 				<# } #>
 			</p>
