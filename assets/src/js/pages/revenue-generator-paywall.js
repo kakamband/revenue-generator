@@ -129,18 +129,15 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				paywallAppliesTo: '.rev-gen-preview-main-paywall-applies-to',
 
 				// Currency modal.
-				currencyRadio:
-					'[name=currency]',
+				currencyRadio: '[name=currency]',
 
 				// Purchase options info modal.
 				purchaseOptionInfoButton: '.rg-purchase-overlay-option-info',
 				purchaseOptionInfoModal: '.rev-gen-preview-main-info-modal',
 
 				// Account activation modal.
-				accountActionId:
-					'#rev-gen-merchant-id',
-				accountActionKey:
-					'#rev-gen-api-key',
+				accountActionId: '#rev-gen-merchant-id',
+				accountActionKey: '#rev-gen-api-key',
 				activateSignup: '#rg_js_activateSignup',
 				warningSignup: '#rg_js_warningSignup',
 				viewPost: '#rg_js_viewPost',
@@ -1020,7 +1017,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						new RevGenModal( {
 							id: 'rg-modal-purchase-option-update',
 							templateData: {
-								optionType: type
+								optionType: type,
 							},
 							onConfirm: async () => {
 								purchaseItem.remove();
@@ -1180,19 +1177,13 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						new RevGenModal( {
 							id: 'rg-modal-purchase-option-update',
 							templateData: {
-								optionType: optionType
+								optionType: optionType,
 							},
 							onConfirm: async () => {
 								if ( revenueSelection.prop( 'checked' ) ) {
-									priceItem.attr(
-										'data-pay-model',
-										'ppu'
-									);
+									priceItem.attr( 'data-pay-model', 'ppu' );
 									revenueSelection.val( 1 );
-									validatePricingRevenue(
-										optionItem,
-										true
-									);
+									validatePricingRevenue( optionItem, true );
 									revenueWrapper
 										.find( '.pay-later' )
 										.removeClass( 'unchecked' );
@@ -1200,15 +1191,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 										.find( '.pay-now' )
 										.addClass( 'unchecked' );
 								} else {
-									priceItem.attr(
-										'data-pay-model',
-										'sis'
-									);
+									priceItem.attr( 'data-pay-model', 'sis' );
 									revenueSelection.val( 0 );
-									validatePricingRevenue(
-										optionItem,
-										false
-									);
+									validatePricingRevenue( optionItem, false );
 									revenueWrapper
 										.find( '.pay-later' )
 										.addClass( 'unchecked' );
@@ -1246,7 +1231,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 										.find( '.pay-now' )
 										.removeClass( 'unchecked' );
 								}
-							}
+							},
 						} );
 					}
 
@@ -1415,7 +1400,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 											optionItem
 										);
 									},
-									onCancel: async() => {
+									onCancel: async () => {
 										const validatedPrice = validatePrice(
 											currentPrice,
 											'subscription' === optionType
@@ -1427,7 +1412,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 											validatedPrice,
 											optionItem
 										);
-									}
+									},
 								} );
 							} else {
 								const validatedPrice = validatePrice(
@@ -1703,7 +1688,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				$o.body.on( 'click', $o.purchaseOverlayRemove, function() {
 					new RevGenModal( {
 						id: 'rg-modal-remove-paywall',
-						onConfirm: async() => {
+						onConfirm: async () => {
 							const paywall = $( $o.purchaseOptionItems );
 							const paywallId = paywall.attr( 'data-paywall-id' );
 
@@ -1711,7 +1696,8 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							const formData = {
 								action: 'rg_remove_paywall',
 								id: paywallId,
-								security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
+								security:
+									revenueGeneratorGlobalOptions.rg_paywall_nonce,
 							};
 
 							// Delete the option.
@@ -1730,12 +1716,15 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 								// Update paywall actions bar with new button.
 								$o.actionsWrapper.css( {
 									width: '75%',
-									'background-color': 'rgba(239, 239, 239, 0.3)',
+									'background-color':
+										'rgba(239, 239, 239, 0.3)',
 									'backdrop-filter': 'blur(10px)',
 								} );
 
 								// Get the template for confirmation popup and add it.
-								const template = wp.template( 'revgen-add-paywall' );
+								const template = wp.template(
+									'revgen-add-paywall'
+								);
 								$o.actionsWrapper.empty().append( template );
 
 								// Add preview url for new paywall.
@@ -1747,7 +1736,8 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 								}
 
 								// Send GA Event.
-								const eventCategory = 'LP RevGen Configure Paywall';
+								const eventCategory =
+									'LP RevGen Configure Paywall';
 								const eventAction = 'Paywall Deleted';
 								rgGlobal.sendLPGAEvent(
 									eventAction,
@@ -1757,7 +1747,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 									true
 								);
 							} );
-						}
+						},
 					} );
 				} );
 
@@ -1891,14 +1881,14 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 									$o.isPublish = true;
 									$o.savePaywall.trigger( 'click' );
 								},
-								onCancel: async() => {
+								onCancel: async () => {
 									optionItem.attr(
 										'data-purchase-type',
 										currentType
 									);
 									$( this ).val( currentType );
 									return false;
-								}
+								},
 							} );
 						}
 
@@ -2248,7 +2238,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							new RevGenModal( {
 								id: 'rg-modal-purchase-option-update',
 								templateData: {
-									optionType: 'newPurchaseOption'
+									optionType: 'newPurchaseOption',
 								},
 								onConfirm: async () => {
 									/**
@@ -2329,7 +2319,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				 */
 				$o.body.on( 'input change', $o.accountActionId, function() {
 					if ( areCredentialsFilled() ) {
-						$( '#rg_js_modal_confirm', $o.body ).removeAttr( 'disabled' );
+						$( '#rg_js_modal_confirm', $o.body ).removeAttr(
+							'disabled'
+						);
 					}
 				} );
 
@@ -2338,7 +2330,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				 */
 				$o.body.on( 'input change', $o.accountActionKey, function() {
 					if ( areCredentialsFilled() ) {
-						$( '#rg_js_modal_confirm', $o.body ).removeAttr( 'disabled' );
+						$( '#rg_js_modal_confirm', $o.body ).removeAttr(
+							'disabled'
+						);
 					}
 				} );
 
@@ -2347,7 +2341,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				 */
 				$o.body.on( 'input change', $o.currencyRadio, function() {
 					if ( $o.currencyRadio ) {
-						$( '#rg_js_modal_confirm', $o.body ).removeAttr( 'disabled' );
+						$( '#rg_js_modal_confirm', $o.body ).removeAttr(
+							'disabled'
+						);
 					}
 				} );
 
@@ -2383,8 +2379,14 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 			};
 
 			const areCredentialsFilled = function() {
-				const merchantID = $o.body.find( $o.accountActionId ).val().trim();
-				const merchantKey = $o.body.find( $o.accountActionKey ).val().trim();
+				const merchantID = $o.body
+					.find( $o.accountActionId )
+					.val()
+					.trim();
+				const merchantKey = $o.body
+					.find( $o.accountActionKey )
+					.val()
+					.trim();
 
 				if ( merchantID && merchantKey ) {
 					return true;
@@ -2464,7 +2466,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						const postPreviewID = $o.postPreviewWrapper.attr(
 							'data-preview-id'
 						);
-						const categoryName = $o.searchPaywallContent.text().trim();
+						const categoryName = $o.searchPaywallContent
+							.text()
+							.trim();
 						const paywallName = $o.paywallName.text().trim();
 						const appliedTo = $( $o.paywallAppliesTo ).val();
 						const selectedCategoryID = $o.searchPaywallContent.val();
@@ -2478,10 +2482,10 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 								appliedTo: appliedTo,
 								categoryName: categoryName,
 								postTitle: $( $o.postTitle )
-										.text()
-										.trim()
+									.text()
+									.trim(),
 							},
-							onConfirm: async() => {
+							onConfirm: async () => {
 								if ( postPreviewID ) {
 									viewPost(
 										postPreviewID,
@@ -2492,8 +2496,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 								}
 							},
 							onCancel: async ( e ) => {
-								window.location.href = e.target.dataset.dashboard_url;
-							}
+								window.location.href =
+									e.target.dataset.dashboard_url;
+							},
 						} );
 					} );
 				}
@@ -2503,9 +2508,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				new RevGenModal( {
 					id: 'rg-modal-account-activation',
 					keepOpen: true,
-					templateData: {
-
-					},
+					templateData: {},
 					onConfirm: async () => {
 						showAccountModal();
 					},
@@ -2524,7 +2527,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							} else {
 								window.open( signUpURL.EU, '_blank' );
 							}
-							const closeEvent = new Event( 'rev-gen-modal-close' );
+							const closeEvent = new Event(
+								'rev-gen-modal-close'
+							);
 							el.dispatchEvent( closeEvent );
 							showAccountModal();
 						}
@@ -2539,7 +2544,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							0,
 							true
 						);
-					}
+					},
 				} );
 			};
 
@@ -2547,19 +2552,26 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				new RevGenModal( {
 					id: 'rg-modal-connect-account',
 					keepOpen: true,
-					templateData: {
-
-					},
+					templateData: {},
 					onConfirm: async ( e, el ) => {
 						const closeEvent = new Event( 'rev-gen-modal-close' );
 						const $el = $( el );
-						const merchantID = $( '#rev-gen-merchant-id', $el ).val();
+						const merchantID = $(
+							'#rev-gen-merchant-id',
+							$el
+						).val();
 						const merchantKey = $( '#rev-gen-api-key', $el ).val();
-						const $tryAgain = $( '#rg_js_restartVerification', $el );
+						const $tryAgain = $(
+							'#rg_js_restartVerification',
+							$el
+						);
 
 						$el.addClass( 'loading' );
 
-						const verify = verifyAccountCredentials( merchantID, merchantKey );
+						const verify = verifyAccountCredentials(
+							merchantID,
+							merchantKey
+						);
 
 						$tryAgain.on( 'click', function() {
 							el.dispatchEvent( closeEvent );
@@ -2570,9 +2582,11 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							$el.removeClass( 'loading' );
 							el.dispatchEvent( closeEvent );
 						} else {
-							$el.removeClass( 'loading' ).addClass( 'modal-error' );
+							$el.removeClass( 'loading' ).addClass(
+								'modal-error'
+							);
 						}
-					}
+					},
 				} );
 			};
 
@@ -3881,11 +3895,13 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 										$o.purchaseOptionPriceSymbol
 									);
 									const symbol =
-										'USD' === formData.config_value ? '$' : '€';
+										'USD' === formData.config_value
+											? '$'
+											: '€';
 									priceSymbol.empty().text( symbol );
 								} );
 						} );
-					}
+					},
 				} );
 			};
 

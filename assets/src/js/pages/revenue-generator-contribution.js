@@ -54,10 +54,8 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 
 				// Account Activation Modal.
 				activationModal: '.rev-gen-preview-main-account-modal',
-				accountActionId:
-					'#rev-gen-merchant-id',
-				accountActionKey:
-					'#rev-gen-api-key',
+				accountActionId: '#rev-gen-merchant-id',
+				accountActionKey: '#rev-gen-api-key',
 
 				// Tour elements.
 				exitTour: '.rev-gen-exit-tour',
@@ -866,9 +864,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				new RevGenModal( {
 					id: 'rg-modal-account-activation',
 					keepOpen: true,
-					templateData: {
-
-					},
+					templateData: {},
 					onConfirm: async () => {
 						showAccountModal();
 					},
@@ -887,7 +883,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							} else {
 								window.open( signUpURL.EU, '_blank' );
 							}
-							const closeEvent = new Event( 'rev-gen-modal-close' );
+							const closeEvent = new Event(
+								'rev-gen-modal-close'
+							);
 							el.dispatchEvent( closeEvent );
 							showAccountModal();
 						}
@@ -902,7 +900,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							0,
 							true
 						);
-					}
+					},
 				} );
 			};
 
@@ -910,19 +908,26 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				new RevGenModal( {
 					id: 'rg-modal-connect-account',
 					keepOpen: true,
-					templateData: {
-
-					},
+					templateData: {},
 					onConfirm: async ( e, el ) => {
 						const closeEvent = new Event( 'rev-gen-modal-close' );
 						const $el = $( el );
-						const merchantID = $( '#rev-gen-merchant-id', $el ).val();
+						const merchantID = $(
+							'#rev-gen-merchant-id',
+							$el
+						).val();
 						const merchantKey = $( '#rev-gen-api-key', $el ).val();
-						const $tryAgain = $( '#rg_js_restartVerification', $el );
+						const $tryAgain = $(
+							'#rg_js_restartVerification',
+							$el
+						);
 
 						$el.addClass( 'loading' );
 
-						const verify = verifyAccountCredentials( merchantID, merchantKey );
+						const verify = verifyAccountCredentials(
+							merchantID,
+							merchantKey
+						);
 
 						$tryAgain.on( 'click', function() {
 							el.dispatchEvent( closeEvent );
@@ -933,9 +938,11 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							$el.removeClass( 'loading' );
 							el.dispatchEvent( closeEvent );
 						} else {
-							$el.removeClass( 'loading' ).addClass( 'modal-error' );
+							$el.removeClass( 'loading' ).addClass(
+								'modal-error'
+							);
 						}
-					}
+					},
 				} );
 			};
 

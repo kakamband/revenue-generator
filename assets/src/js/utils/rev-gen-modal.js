@@ -120,7 +120,10 @@ class RevGenModal {
 				.addEventListener( 'click', this.hide.bind( this ) );
 		}
 
-		this.el.addEventListener( 'rev-gen-modal-close', this.hide.bind( this ) );
+		this.el.addEventListener(
+			'rev-gen-modal-close',
+			this.hide.bind( this )
+		);
 	}
 
 	/**
