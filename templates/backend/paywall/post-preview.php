@@ -519,6 +519,7 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 </script>
 
 <?php include( REVENUE_GENERATOR_PLUGIN_DIR . '/templates/backend/modal-remove-paywall.php' ); ?>
+<?php include( REVENUE_GENERATOR_PLUGIN_DIR . '/templates/backend/modal-account-activation.php' ); ?>
 
 <!-- Template for action to add paywall. -->
 <script type="text/template" id="tmpl-revgen-add-paywall">
@@ -534,8 +535,6 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 		</button>
 	</div>
 </script>
-
-<?php include( REVENUE_GENERATOR_PLUGIN_DIR . '/templates/backend/modal-account-activation.php' ); ?>
 
 <!-- Template for account activation modal. -->
 <script type="text/template" id="tmpl-rg-modal-connect-account">
