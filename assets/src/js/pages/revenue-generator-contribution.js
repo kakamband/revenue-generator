@@ -947,6 +947,84 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 			};
 
 			/**
+			 * Verify merchant credentials and allow paywall publishing.
+			 *
+			 * @param {string}  merchantId  Merchant ID.
+			 * @param {string}  merchantKey Merchant Key.
+			 */
+			const verifyAccountCredentials = function(
+				merchantId,
+				merchantKey
+			) {
+				if ( ! $o.requestSent ) {
+					$o.requestSent = true;
+
+					// Create form data.
+					const formData = {
+						action: 'rg_verify_account_credentials',
+						merchant_id: merchantId,
+						merchant_key: merchantKey,
+						security:
+							revenueGeneratorGlobalOptions.rg_paywall_nonce,
+					};
+
+					let eventLabel = '';
+					let success = false;
+
+					// Validate merchant details.
+					$.ajax( {
+						url: revenueGeneratorGlobalOptions.ajaxUrl,
+						method: 'POST',
+						async: false,
+						data: formData,
+						dataType: 'json',
+					} ).done( function( r ) {
+						$o.requestSent = false;
+
+						// set connecting merchant ID.
+						revenueGeneratorGlobalOptions.merchant_id =
+							r.merchant_id;
+
+						if ( true === r.success ) {
+							$o.isPublish = true;
+							showLoader();
+
+							setTimeout( function() {
+								// Explicitly change loclized data.
+								revenueGeneratorGlobalOptions.globalOptions.is_merchant_verified =
+									'1';
+								hideLoader();
+								// Display message about Credentails.
+								$o.snackBar.showSnackbar( r.msg, 1500 );
+							}, 2000 );
+							eventLabel = 'Success';
+
+							success = true;
+						} else {
+							// If there is error show Modal Error.
+							$o.isPublish = true;
+							eventLabel = 'Failure - ' + r.msg;
+
+							success = false;
+						}
+
+						// Send GA Event.
+						const eventCategory = 'LP RevGen Account';
+						const eventAction = 'Connect Account';
+						rgGlobal.sendLPGAEvent(
+							eventAction,
+							eventCategory,
+							eventLabel,
+							0,
+							true
+						);
+					} );
+
+					return success;
+				}
+			};
+
+			/**
 			 * Check if provided URL is valid or not.
 			 *
 			 * @param {string} url URL to validate

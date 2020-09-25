@@ -2632,78 +2632,38 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						revenueGeneratorGlobalOptions.merchant_id =
 							r.merchant_id;
 
-						// Check for Screen to perform actions paywall.
-						if (
-							allPurchaseOptions &&
-							allPurchaseOptions.length > 0
-						) {
-							if ( true === r.success ) {
-								const paywallId = allPurchaseOptions.attr(
-									'data-paywall-id'
-								);
+						if ( true === r.success ) {
+							const paywallId = allPurchaseOptions.attr(
+								'data-paywall-id'
+							);
 
-								/**
-								 * If paywall id exists, then publish directly, else wait to save paywall data to
-								 * get new paywall id and wait for some time to publish the paywall.
-								 */
-								if ( paywallId.length ) {
-									publishPaywall();
-								} else {
-									// Save the paywall as well, so that we don't miss any new changes if merchant as done any.
-									$o.isPublish = true;
-									$o.savePaywall.trigger( 'click' );
-									showLoader();
-									setTimeout( function() {
-										// Explicitly change loclized data.
-										revenueGeneratorGlobalOptions.globalOptions.is_merchant_verified =
-											'1';
-										publishPaywall();
-										hideLoader();
-									}, 2000 );
-								}
-								eventLabel = 'Success';
-
-								success = true;
+							/**
+							 * If paywall id exists, then publish directly, else wait to save paywall data to
+							 * get new paywall id and wait for some time to publish the paywall.
+							 */
+							if ( paywallId.length ) {
+								publishPaywall();
 							} else {
 								// Save the paywall as well, so that we don't miss any new changes if merchant as done any.
 								$o.isPublish = true;
 								$o.savePaywall.trigger( 'click' );
-								eventLabel = 'Failure - ' + r.msg;
-
-								success = false;
-							}
-
-							// Check for Screen to perform actions Contribution.
-						} else if (
-							$o.contributionBox &&
-							$o.contributionBox.length > 0
-						) {
-							if ( true === r.success ) {
-								$o.isPublish = true;
 								showLoader();
-
 								setTimeout( function() {
 									// Explicitly change loclized data.
 									revenueGeneratorGlobalOptions.globalOptions.is_merchant_verified =
 										'1';
+									publishPaywall();
 									hideLoader();
-									// Display message about Credentails.
-									$o.snackBar.showSnackbar( r.msg, 1500 );
 								}, 2000 );
-								eventLabel = 'Success';
-
-								success = true;
-							} else {
-								// If there is error show Modal Error.
-								$o.isPublish = true;
-								eventLabel = 'Failure - ' + r.msg;
-
-								success = false;
 							}
+							eventLabel = 'Success';
+
+							success = true;
 						} else {
-							// If there is error show Modal Error.
+							// Save the paywall as well, so that we don't miss any new changes if merchant as done any.
 							$o.isPublish = true;
-							eventLabel = 'Failure - Unknow Error';
+							$o.savePaywall.trigger( 'click' );
+							eventLabel = 'Failure - ' + r.msg;
 
 							success = false;
 						}
