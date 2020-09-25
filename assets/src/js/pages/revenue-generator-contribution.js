@@ -865,10 +865,10 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					id: 'rg-modal-account-activation',
 					keepOpen: true,
 					templateData: {},
-					onConfirm: async () => {
+					onConfirm: () => {
 						showAccountModal();
 					},
-					onCancel: async ( e, el ) => {
+					onCancel: ( e, el ) => {
 						if (
 							revenueGeneratorGlobalOptions.globalOptions
 								.merchant_region.length
