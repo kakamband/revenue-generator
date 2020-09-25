@@ -128,9 +128,11 @@ class RevGenModal {
 
 	/**
 	 * Callback when `confirm` button is clicked.
+	 
+- Calls `onConfirm` callback function as defined in options passed to the instance.
+- Closes modal.
 	 *
-	 * - Calls `onConfirm` callback function as defined in options passed to the instance.
-	 * - Closes modal.
+	 * @param {Object} e Event.
 	 */
 	onConfirm( e ) {
 		this.options.onConfirm( e, this.el );
@@ -142,9 +144,11 @@ class RevGenModal {
 
 	/**
 	 * Callback when `cancel` button is clicked.
+	 
+- Calls `onCancel` callback function as defined in options passed to the instance.
+- Closes modal.
 	 *
-	 * - Calls `onCancel` callback function as defined in options passed to the instance.
-	 * - Closes modal.
+	 * @param {Object} e Event.
 	 */
 	onCancel( e ) {
 		this.options.onCancel( e, this.el );

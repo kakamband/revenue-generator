@@ -1177,7 +1177,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						new RevGenModal( {
 							id: 'rg-modal-purchase-option-update',
 							templateData: {
-								optionType: optionType,
+								optionType,
 							},
 							onConfirm: async () => {
 								if ( revenueSelection.prop( 'checked' ) ) {
@@ -1385,7 +1385,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 								new RevGenModal( {
 									id: 'rg-modal-purchase-option-update',
 									templateData: {
-										optionType: optionType,
+										optionType,
 									},
 									onConfirm: async () => {
 										const validatedPrice = validatePrice(
@@ -2458,7 +2458,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						method: 'POST',
 						data: formData,
 						dataType: 'json',
-					} ).done( function( r ) {
+					} ).done( function() {
 						$o.requestSent = false;
 						hideLoader();
 
@@ -2478,9 +2478,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							id: 'rg-modal-paywall-activation',
 							templateData: {
 								paywallID: paywallId,
-								paywallName: paywallName,
-								appliedTo: appliedTo,
-								categoryName: categoryName,
+								paywallName,
+								appliedTo,
+								categoryName,
 								postTitle: $( $o.postTitle )
 									.text()
 									.trim(),
