@@ -675,3 +675,25 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 	</div>
 	<div class="rev-gen-modal-overlay"></div>
 </script>
+<script type="text/template" id="tmpl-rg-modal-dynamic-title-desc">
+	<div class="rev-gen-modal" id="rg-modal-dynamic-title-desc">
+		<div class="rev-gen-modal__inner">
+			<h4 class="rev-gen-modal__title">
+				<?php esc_html_e( 'Update title and description for purchase options?', 'revenue-generator' ); ?>
+			</h4>
+
+			<p class="rev-gen-modal__message">
+					<?php esc_html_e( 'Looks like you updated your time period, would you like to update your paywall to match?', 'revenue-generator' ); ?>
+				</p>
+			<div class="rev-gen-modal__buttons">
+				<button id="rg_js_modal_confirm" class="rev-gen__button">
+					<?php esc_html_e( 'Yes, update title and description', 'revenue-generator' ); ?>
+				</button>
+				<button id="rg_js_modal_cancel" class="rev-gen__button rev-gen__button--secondary">
+					<?php esc_html_e( 'No, keep current title and description', 'revenue-generator' ); ?>
+				</button>
+			</div>
+		</div>
+	</div>
+	<div class="rev-gen-modal-overlay"></div>
+</script>

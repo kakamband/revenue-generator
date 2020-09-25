@@ -243,6 +243,141 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				} );
 
 				/**
+				 * Adds data attribute if custom title or description is added to purchase option.
+				 */
+				$o.body.on( 'click', $o.purchaseOptionItemTitle, function() {
+					this.addEventListener( 'input', function() {
+						$( this )
+							.closest( $o.purchaseOptionItem )
+							.attr( 'data-custom-title', '1' );
+					} );
+				} );
+
+				$o.body.on( 'click', $o.purchaseOptionItemDesc, function() {
+					this.addEventListener( 'input', function() {
+						$( this )
+							.closest( $o.purchaseOptionItem )
+							.attr( 'data-custom-desc', '1' );
+					} );
+				} );
+
+				/**
+				 * Handles Dynamic Title and Descirpitons.
+				 */
+				$o.body.on(
+					'change',
+					$o.periodCountSelection + ', ' + $o.periodSelection,
+					function() {
+						const $this = $( this );
+
+						//Prevent user actions after dropdown change.
+						showLoader();
+
+						// Timeout is added to wait for changeDurationOptions to perform operations on change first.
+						setTimeout( function() {
+							// Get selection values.
+							const periodCount = parseInt(
+								$this
+									.closest( $o.purchaseOptionItem )
+									.find( $o.periodCountSelection )
+									.val()
+							);
+							const periodSelection = $this
+								.closest( $o.purchaseOptionItem )
+								.find( $o.periodSelection )
+								.val();
+							const currentPurchaseType = $this
+								.closest( $o.purchaseOptionItem )
+								.data( 'purchase-type' );
+
+							new RevGenModal( {
+								id: 'rg-modal-dynamic-title-desc',
+								onConfirm: async () => {
+									let newTitle;
+									newTitle = periodCount;
+									switch ( periodSelection ) {
+										case 'h':
+											newTitle += __(
+												' Hour',
+												'revenue-generator'
+											);
+											break;
+										case 'd':
+											newTitle += __(
+												' Day',
+												'revenue-generator'
+											);
+											break;
+										case 'w':
+											newTitle += __(
+												' Week',
+												'revenue-generator'
+											);
+											break;
+										case 'm':
+											newTitle += __(
+												' Month',
+												'revenue-generator'
+											);
+											break;
+										case 'y':
+											newTitle += __(
+												' Year',
+												'revenue-generator'
+											);
+											break;
+									}
+
+									let newDescription = sprintf(
+										__(
+											'Enjoy unlimited access to all our content for %1$s'
+										),
+										newTitle
+									);
+
+									if ( periodCount && periodCount > 1 ) {
+										newDescription = sprintf(
+											__(
+												'Enjoy unlimited access to all our content for %1$ss'
+											),
+											newTitle
+										);
+									}
+
+									switch ( currentPurchaseType ) {
+										case 'subscription':
+											newTitle += __(
+												' Subscription',
+												'revenue-generator'
+											);
+											break;
+										case 'timepass':
+											newTitle += __(
+												' Pass',
+												'revenue-generator'
+											);
+											break;
+									}
+
+									$this
+										.closest( $o.purchaseOptionItem )
+										.find( $o.purchaseOptionItemTitle )
+										.text( newTitle );
+									$this
+										.closest( $o.purchaseOptionItem )
+										.find( $o.purchaseOptionItemDesc )
+										.text( newDescription );
+								},
+								onCancel: () => {
+									// do nothing.
+								},
+							} );
+							hideLoader();
+						}, 1000 );
+					}
+				);
+
+				/**
 				 * Handle the next button events of the tour and update preview accordingly.
 				 */
 				$o.body.on( 'click', '.shepherd-button', function() {
