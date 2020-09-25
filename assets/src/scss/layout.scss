@@ -585,23 +585,19 @@ body.modal-blur select.rev-gen__select2 + .select2-container .select2-selection-
 		display: none;
 	}
 	&.loading {
+		.show-on-loading,
 		.rev-gen-modal__loader {
 			display: block;
 		}
 		.hide-on-loading {
 			display: none;
 		}
-		.show-on-loading {
-			display: block;
-		}
 	}
 	&.modal-error {
 		.rev-gen-modal__inner > * {
 			display: none;
 		}
-		.rev-gen-modal__error {
-			display: block;
-		}
+		.rev-gen-modal__error,
 		.rev-gen-modal__close {
 			display: block;
 		}
