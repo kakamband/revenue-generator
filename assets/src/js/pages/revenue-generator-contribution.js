@@ -10,6 +10,7 @@
  */
 import '../utils';
 import { __, sprintf } from '@wordpress/i18n';
+import { RevGenModal } from '../utils/rev-gen-modal';
 
 ( function( $ ) {
 	$( function() {
@@ -53,10 +54,8 @@ import { __, sprintf } from '@wordpress/i18n';
 
 				// Account Activation Modal.
 				activationModal: '.rev-gen-preview-main-account-modal',
-				accountActionId:
-					'.rev-gen-preview-main-account-modal-fields-merchant-id',
-				accountActionKey:
-					'.rev-gen-preview-main-account-modal-fields-merchant-key',
+				accountActionId: '#rev-gen-merchant-id',
+				accountActionKey: '#rev-gen-api-key',
 
 				// Tour elements.
 				exitTour: '.rev-gen-exit-tour',
@@ -861,25 +860,168 @@ import { __, sprintf } from '@wordpress/i18n';
 				} );
 			};
 
-			/**
-			 * Display account activation modal for new merchant.
-			 */
 			const showAccountActivationModal = function() {
-				$o.rgContributionWrapper.find( $o.activationModal ).remove();
+				new RevGenModal( {
+					id: 'rg-modal-account-activation',
+					keepOpen: true,
+					templateData: {},
+					onConfirm: () => {
+						showAccountModal();
+					},
+					onCancel: ( e, el ) => {
+						if (
+							revenueGeneratorGlobalOptions.globalOptions
+								.merchant_region.length
+						) {
+							const currentRegion =
+								revenueGeneratorGlobalOptions.globalOptions
+									.merchant_region;
+							const signUpURL =
+								revenueGeneratorGlobalOptions.signupURL;
+							if ( 'US' === currentRegion ) {
+								window.open( signUpURL.US, '_blank' );
+							} else {
+								window.open( signUpURL.EU, '_blank' );
+							}
+							const closeEvent = new Event(
+								'rev-gen-modal-close'
+							);
+							el.dispatchEvent( closeEvent );
+							showAccountModal();
+						}
+						// Send GA Event.
+						const eventCategory = 'LP RevGen Account';
+						const eventLabel = 'Signup';
+						const eventAction = 'Connect Account';
+						rgGlobal.sendLPGAEvent(
+							eventAction,
+							eventCategory,
+							eventLabel,
+							0,
+							true
+						);
+					},
+				} );
+			};
 
-				// Get the template for account verification.
-				const template = wp.template(
-					'revgen-account-activation-modal'
-				);
-				$o.rgContributionWrapper.append( template );
+			const showAccountModal = function() {
+				new RevGenModal( {
+					id: 'rg-modal-connect-account',
+					keepOpen: true,
+					templateData: {},
+					onConfirm: async ( e, el ) => {
+						const closeEvent = new Event( 'rev-gen-modal-close' );
+						const $el = $( el );
+						const merchantID = $(
+							'#rev-gen-merchant-id',
+							$el
+						).val();
+						const merchantKey = $( '#rev-gen-api-key', $el ).val();
+						const $tryAgain = $(
+							'#rg_js_restartVerification',
+							$el
+						);
 
-				// Blur out the background.
-				$o.body.addClass( 'modal-blur' );
-				$o.contributionBox.addClass( 'modal-blur' );
-				$o.body
-					.find( 'input' )
-					.not( $o.accountActionId + ',' + $o.accountActionKey )
-					.addClass( 'input-blur' );
+						$el.addClass( 'loading' );
+
+						const verify = verifyAccountCredentials(
+							merchantID,
+							merchantKey
+						);
+
+						$tryAgain.on( 'click', function() {
+							el.dispatchEvent( closeEvent );
+							showAccountModal();
+						} );
+
+						if ( verify ) {
+							$el.removeClass( 'loading' );
+							el.dispatchEvent( closeEvent );
+						} else {
+							$el.removeClass( 'loading' ).addClass(
+								'modal-error'
+							);
+						}
+					},
+				} );
+			};
+
+			/**
+			 * Verify merchant credentials and allow paywall publishing.
+			 *
+			 * @param {string}  merchantId  Merchant ID.
+			 * @param {string}  merchantKey Merchant Key.
+			 */
+			const verifyAccountCredentials = function(
+				merchantId,
+				merchantKey
+			) {
+				if ( ! $o.requestSent ) {
+					$o.requestSent = true;
+
+					// Create form data.
+					const formData = {
+						action: 'rg_verify_account_credentials',
+						merchant_id: merchantId,
+						merchant_key: merchantKey,
+						security:
+							revenueGeneratorGlobalOptions.rg_paywall_nonce,
+					};
+
+					let eventLabel = '';
+					let success = false;
+
+					// Validate merchant details.
+					$.ajax( {
+						url: revenueGeneratorGlobalOptions.ajaxUrl,
+						method: 'POST',
+						async: false,
+						data: formData,
+						dataType: 'json',
+					} ).done( function( r ) {
+						$o.requestSent = false;
+
+						// set connecting merchant ID.
+						revenueGeneratorGlobalOptions.merchant_id =
+							r.merchant_id;
+
+						if ( true === r.success ) {
+							$o.isPublish = true;
+							showLoader();
+
+							setTimeout( function() {
+								// Explicitly change loclized data.
+								revenueGeneratorGlobalOptions.globalOptions.is_merchant_verified =
+									'1';
+								hideLoader();
+								// Display message about Credentails.
+								$o.snackBar.showSnackbar( r.msg, 1500 );
+							}, 2000 );
+							eventLabel = 'Success';
+
+							success = true;
+						} else {
+							// If there is error show Modal Error.
+							$o.isPublish = true;
+							eventLabel = 'Failure - ' + r.msg;
+
+							success = false;
+						}
+
+						// Send GA Event.
+						const eventCategory = 'LP RevGen Account';
+						const eventAction = 'Connect Account';
+						rgGlobal.sendLPGAEvent(
+							eventAction,
+							eventCategory,
+							eventLabel,
+							0,
+							true
+						);
+					} );
+
+					return success;
+				}
 			};
 
 			/**
