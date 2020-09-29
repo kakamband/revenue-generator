@@ -49,6 +49,9 @@ class Plugin {
 		// Intialize Shortcode class.
 		Shortcodes::get_instance();
 
+		// Intialize Post Preview Class.
+		Post_Preview::get_instance();
+
 		// Setup required hooks.
 		$this->setup_hooks();
 	}
