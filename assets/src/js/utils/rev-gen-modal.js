@@ -123,7 +123,7 @@ class RevGenModal {
 
 		if ( this.options.closeOutside ) {
 			document.addEventListener( 'click', this.hide.bind( this ), {
-				once: true
+				once: true,
 			} );
 
 			this.el.addEventListener( 'click', ( e ) => {
@@ -139,7 +139,7 @@ class RevGenModal {
 
 	/**
 	 * Callback when `confirm` button is clicked.
-
+	 
 - Calls `onConfirm` callback function as defined in options passed to the instance.
 - Closes modal.
 	 *
@@ -155,7 +155,7 @@ class RevGenModal {
 
 	/**
 	 * Callback when `cancel` button is clicked.
-
+	 
 - Calls `onCancel` callback function as defined in options passed to the instance.
 - Closes modal.
 	 *

@@ -1531,7 +1531,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				/**
 				 * Handle tooltip button events for info modals.
 				 */
-				$o.body.on( 'click', $o.purchaseOptionInfoButton, function( e ) {
+				$o.body.on( 'click', $o.purchaseOptionInfoButton, function(
+					e
+				) {
 					e.stopPropagation();
 
 					const infoButton = $( this );
