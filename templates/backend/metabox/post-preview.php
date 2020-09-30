@@ -42,7 +42,7 @@ if ( ! empty( $paywall_data ) && ! empty( $payload ) ) :
 	<?php
 else :
 	?>
-	<div rg-post-preview--container>
+	<div class="rg-post-preview--container">
 		<div class="rg-post-preview--edit">
 			<a href="<?php echo esc_url( $new_paywall_url ); ?>" class="rg-post-preview--button-black"><?php esc_html_e( 'Add New Paywall', 'revenue-generator' ); ?></a>
 		</div>

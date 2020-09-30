@@ -11,7 +11,7 @@ use \LaterPay\Revenue_Generator\Inc\Traits\Singleton;
 use \LaterPay\Revenue_Generator\Inc\Frontend_Post;
 use \LaterPay\Revenue_Generator\Inc\View;
 use \LaterPay\Revenue_Generator\Inc\Config;
-use LaterPay\Revenue_Generator\Inc\Admin;
+use \LaterPay\Revenue_Generator\Inc\Admin;
 
 /**
  * Class Post Preview Meta box.
@@ -27,12 +27,6 @@ class Post_Preview {
 	 */
 	const SLUG = 'rg-paywall-preview';
 
-	/**
-	 * Meta box label.
-	 *
-	 * @var string Meta box label.
-	 */
-	const LABEL = 'Paywall for this Post';
 
 	/**
 	 * Context of meta box.
@@ -78,7 +72,7 @@ class Post_Preview {
 
 		add_meta_box(
 			static::SLUG,
-			static::LABEL,
+			esc_html__( 'Paywall for this Post', 'revenue-generator' ),
 			[ $this, 'render_meta_box' ],
 			$this->get_post_type(),
 			$this->context,
@@ -111,21 +105,17 @@ class Post_Preview {
 		$post_payload_data = $frontend_post->get_post_payload();
 		$paywall_data      = $frontend_post->get_connected_paywall_id( $post->ID );
 		$template_data     = array();
-		$config_data       = Config::get_global_options();
-		$symbol            = '';
+		$symbol            = Config::get_currency_symbol();
 
-		if ( ! empty( $config_data['merchant_currency'] ) ) {
-			$symbol = 'USD' === $config_data['merchant_currency'] ? '$' : '€';
-		}
-
+		// Get Payload data.
 		if ( ! empty( $post_payload_data['payload'] ) ) {
 
 			$post_payloads = json_decode( $post_payload_data['payload'] );
 			$paywall       = array();
 
 			foreach ( $post_payloads->purchase_options as $key => $purchase_option ) {
-				$purcahse_price            = $purchase_option->price->amount / 100;
-				$purchase_option_price     = number_format( $purcahse_price, 2 );
+				$purchase_price            = $purchase_option->price->amount / 100;
+				$purchase_option_price     = number_format( $purchase_price, 2 );
 				$paywall[ $key ]['title']  = $purchase_option->title;
 				$paywall[ $key ]['amount'] = $symbol . $purchase_option_price;
 			}
@@ -133,14 +123,12 @@ class Post_Preview {
 			$template_data['payload'] = $paywall;
 		}
 
+		// Get Paywall Data.
 		if ( ! empty( $paywall_data ) ) {
 
-			$last_id = get_post_meta( $post->ID, '_edit_last', true );
-			if ( $last_id ) {
-				return $last_id;
-			}
+			$edit_last_user_id = get_post_meta( $post->ID, '_edit_last', true );
 
-			$post_author        = empty( $last_id ) ? $post->post_author : $last_id;
+			$post_author        = empty( $edit_last_user_id ) ? $post->post_author : $edit_last_user_id;
 			$post_modified_date = get_the_modified_date( '', $post->ID );
 			$post_modified_time = get_the_modified_time( '', $post->ID );
 			$post_updated_info  = sprintf(
@@ -151,8 +139,10 @@ class Post_Preview {
 				get_the_author_meta( 'display_name', $post_author )
 			);
 
-			$paywall_data['updated']           = $post_updated_info;
-			$template_data['paywall_data']     = $paywall_data;
+			$paywall_data['updated']       = $post_updated_info;
+			$template_data['paywall_data'] = $paywall_data;
+
+			// Edit Paywall URL.
 			$template_data['edit_paywall_url'] = add_query_arg(
 				[
 					'page'            => $admin_menus['paywall']['url'],
@@ -162,6 +152,7 @@ class Post_Preview {
 			);
 		}
 
+		// New Paywall URL.
 		$template_data['new_paywall_url'] = add_query_arg(
 			[
 				'page'            => $admin_menus['paywall']['url'],
