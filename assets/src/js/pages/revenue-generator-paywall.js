@@ -909,9 +909,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						);
 						if ( 'subscription' === entityType ) {
 							// Add extra height to get proper styling.
-							actionManager
-								.find( 'div' )
-								.css( { height: ' 55px' } );
+							actionManager.find( 'div' ).css( {
+								height: ' 55px',
+							} );
 							revenueWrapper.hide();
 						} else {
 							// Set revenue model for selected option.
@@ -986,7 +986,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					actionOptions.show();
 
 					// Reset current action manager back to original state.
-					actionManager.css( { display: actionManagerCurrentState } );
+					actionManager.css( {
+						display: actionManagerCurrentState,
+					} );
 				} );
 
 				/**
@@ -1111,7 +1113,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							const validatedPrice = validatePrice(
 								dynamicPrice
 							);
-							dynamicStar.css( { display: 'none' } );
+							dynamicStar.css( {
+								display: 'none',
+							} );
 							priceItem.text( validatedPrice );
 							optionItem.attr( 'data-pricing-type', 'dynamic' );
 							optionItem.find( $o.purchaseItemPriceIcon ).show();
@@ -1422,7 +1426,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 								const dynamicStar = $(
 									$o.purchaseItemPriceIcon
 								);
-								dynamicStar.css( { display: 'none' } );
+								dynamicStar.css( {
+									display: 'none',
+								} );
 								$( this ).text( validatedPrice );
 								validateRevenue( validatedPrice, optionItem );
 							}
@@ -1858,9 +1864,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 									.find( $o.purchaseOptionItemDesc )
 									.text( timePassDefaultValues.description );
 
-								optionManager
-									.find( 'div' )
-									.css( { height: ' 45px' } );
+								optionManager.find( 'div' ).css( {
+									height: ' 45px',
+								} );
 							} else if (
 								'subscription' === selectedEntityType
 							) {
@@ -1896,17 +1902,17 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 										subscriptionDefaultValues.description
 									);
 
-								optionManager
-									.find( 'div' )
-									.css( { height: ' 55px' } );
+								optionManager.find( 'div' ).css( {
+									height: ' 55px',
+								} );
 							}
 						} else {
 							// Set static pricing by default if individual.
 							optionItem.attr( 'data-pricing-type', 'static' );
 							optionItem.attr( 'data-paywall-id', '' );
-							optionManager
-								.find( 'div' )
-								.css( { height: ' 45px' } );
+							optionManager.find( 'div' ).css( {
+								height: ' 45px',
+							} );
 						}
 					}
 				} );
@@ -2598,7 +2604,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 			 * @param {string} elementIdentifier Selector matching elements on the document
 			 */
 			const initializeTooltip = function( elementIdentifier ) {
-				tippy( elementIdentifier, { arrow: tippy.roundArrow } );
+				tippy( elementIdentifier, {
+					arrow: tippy.roundArrow,
+				} );
 			};
 
 			/**
@@ -3382,7 +3390,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 			 * Show the loader.
 			 */
 			const showLoader = function() {
-				$o.laterpayLoader.css( { display: 'flex' } );
+				$o.laterpayLoader.css( {
+					display: 'flex',
+				} );
 			};
 
 			/**
@@ -3628,7 +3638,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 
 					if ( 'individual' === optionType ) {
 						const dynamicStar = $( $o.purchaseItemPriceIcon );
-						dynamicStar.css( { display: 'none' } );
+						dynamicStar.css( {
+							display: 'none',
+						} );
 						priceItem.text( validatedPrice );
 					} else {
 						priceItem.empty().text( validatedPrice );
@@ -3651,7 +3663,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 
 					if ( 'individual' === optionType ) {
 						const dynamicStar = $( $o.purchaseItemPriceIcon );
-						dynamicStar.css( { display: 'none' } );
+						dynamicStar.css( {
+							display: 'none',
+						} );
 						priceItem.text( validatedPrice );
 					} else {
 						priceItem.empty().text( validatedPrice );

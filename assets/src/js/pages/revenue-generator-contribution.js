@@ -469,7 +469,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 			 * Show the loader.
 			 */
 			const showLoader = function() {
-				$o.laterpayLoader.css( { display: 'flex' } );
+				$o.laterpayLoader.css( {
+					display: 'flex',
+				} );
 			};
 
 			/**
