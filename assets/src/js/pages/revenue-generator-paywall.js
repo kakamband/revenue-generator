@@ -2,12 +2,13 @@
 /**
  * JS to handle plugin paywall preview screen interactions.
  *
- * @package revenue-generator
  */
 
 /**
  * Internal dependencies.
  */
+
+/* global Event */
 import '../utils';
 import { debounce } from '../helpers';
 import { __, sprintf } from '@wordpress/i18n';
@@ -326,6 +327,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 									}
 
 									let newDescription = sprintf(
+										/* translators: %1$s new value */
 										__(
 											'Enjoy unlimited access to all our content for %1$s'
 										),
@@ -334,8 +336,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 
 									if ( periodCount && periodCount > 1 ) {
 										newDescription = sprintf(
+											/* translators: %1$s new value */
 											__(
-												'Enjoy unlimited access to all our content for %1$ss'
+												'Enjoy unlimited access to all our content for %1$s'
 											),
 											newTitle
 										);
@@ -1261,6 +1264,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						revenueSelection.val( 0 );
 						const previewPostTitle = $o.searchContent.val();
 						const newmsg = sprintf(
+							/* translators: %1$s post title */
 							__(
 								'Get lifetime access to %1$s now!',
 								'revenue-generator'
@@ -2287,7 +2291,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					const dashboardURL = $( this ).attr( 'data-dashboard-url' );
 
 					if ( dashboardURL ) {
-						location.href = dashboardURL;
+						window.location.href = dashboardURL;
 					}
 				} );
 			};
