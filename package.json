@@ -27,7 +27,7 @@
 		"build": "NODE_ENV=production webpack --mode=production",
 		"language:make-po": "wp i18n make-pot . --exclude=\"build\" languages/revenue-generator.po --headers='{\"Last-Translator\":\"Kimberly Moore <kmoore@laterpay.net>\"}'",
 		"language": "run-s \"language:*\"",
-    "packages-update": "wp-scripts packages-update",
+		"packages-update": "wp-scripts packages-update",
 		"zip": "npm run build && composer install --no-dev --optimize-autoloader && wp dist-archive . revenue-generator.zip"
 	},
 	"dependencies": {},

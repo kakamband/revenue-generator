@@ -1,8 +1,6 @@
 /* global revenueGeneratorGlobalOptions rgGlobal */
 /**
  * JS to handle plugin dashboard screen interactions.
- *
- * @package revenue-generator
  */
 
 /**
