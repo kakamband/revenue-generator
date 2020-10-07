@@ -1025,12 +1025,14 @@ class Admin {
 		$paywall_id = $paywall_instance->update_paywall( $paywall );
 
 		if ( ! empty( $individual_data ) ) {
-			$individual['title']       = sanitize_text_field( wp_unslash( $individual_data['title'] ) );
-			$individual['description'] = sanitize_text_field( wp_unslash( $individual_data['desc'] ) );
-			$individual['price']       = floatval( $individual_data['price'] );
-			$individual['revenue']     = sanitize_text_field( $individual_data['revenue'] );
-			$individual['type']        = sanitize_text_field( $individual_data['type'] );
-			$order_items['individual'] = absint( $individual_data['order'] );
+			$individual['title']        = sanitize_text_field( wp_unslash( $individual_data['title'] ) );
+			$individual['description']  = sanitize_text_field( wp_unslash( $individual_data['desc'] ) );
+			$individual['price']        = floatval( $individual_data['price'] );
+			$individual['revenue']      = sanitize_text_field( $individual_data['revenue'] );
+			$individual['type']         = sanitize_text_field( $individual_data['type'] );
+			$individual['custom_title'] = sanitize_text_field( $individual_data['custom_title'] );
+			$individual['custom_desc']  = sanitize_text_field( $individual_data['custom_desc'] );
+			$order_items['individual']  = absint( $individual_data['order'] );
 
 			// Add Individual option to paywall.
 			$paywall_instance->update_paywall_individual_option( $paywall_id, $individual );
@@ -1052,13 +1054,15 @@ class Admin {
 				if ( isset( $time_pass['tlp_id'] ) ) {
 					$timepass['id'] = sanitize_text_field( $time_pass['tlp_id'] );
 				}
-				$timepass['title']       = sanitize_text_field( wp_unslash( $time_pass['title'] ) );
-				$timepass['description'] = sanitize_text_field( wp_unslash( $time_pass['desc'] ) );
-				$timepass['price']       = floatval( $time_pass['price'] );
-				$timepass['revenue']     = sanitize_text_field( $time_pass['revenue'] );
-				$timepass['duration']    = sanitize_text_field( $time_pass['duration'] );
-				$timepass['period']      = sanitize_text_field( $time_pass['period'] );
-				$timepass['access_to']   = 'all'; // @todo make it dynamic
+				$timepass['title']        = sanitize_text_field( wp_unslash( $time_pass['title'] ) );
+				$timepass['description']  = sanitize_text_field( wp_unslash( $time_pass['desc'] ) );
+				$timepass['price']        = floatval( $time_pass['price'] );
+				$timepass['revenue']      = sanitize_text_field( $time_pass['revenue'] );
+				$timepass['duration']     = sanitize_text_field( $time_pass['duration'] );
+				$timepass['period']       = sanitize_text_field( $time_pass['period'] );
+				$timepass['access_to']    = 'all'; // @todo make it dynamic
+				$timepass['custom_title'] = sanitize_text_field( $time_pass['custom_title'] );
+				$timepass['custom_desc']  = sanitize_text_field( $time_pass['custom_desc'] );
 
 				$tp_id                                   = $time_pass_instance->update_time_pass( $timepass );
 				$time_pass_response[ $time_pass['uid'] ] = $tp_id;
@@ -1075,13 +1079,15 @@ class Admin {
 				if ( isset( $subscription_data['sub_id'] ) ) {
 					$subscription['id'] = sanitize_text_field( $subscription_data['sub_id'] );
 				}
-				$subscription['title']       = sanitize_text_field( wp_unslash( $subscription_data['title'] ) );
-				$subscription['description'] = sanitize_text_field( wp_unslash( $subscription_data['desc'] ) );
-				$subscription['price']       = floatval( $subscription_data['price'] );
-				$subscription['revenue']     = sanitize_text_field( $subscription_data['revenue'] );
-				$subscription['duration']    = sanitize_text_field( $subscription_data['duration'] );
-				$subscription['period']      = sanitize_text_field( $subscription_data['period'] );
-				$subscription['access_to']   = 'all'; // @todo make it dynamic
+				$subscription['title']        = sanitize_text_field( wp_unslash( $subscription_data['title'] ) );
+				$subscription['description']  = sanitize_text_field( wp_unslash( $subscription_data['desc'] ) );
+				$subscription['price']        = floatval( $subscription_data['price'] );
+				$subscription['revenue']      = sanitize_text_field( $subscription_data['revenue'] );
+				$subscription['duration']     = sanitize_text_field( $subscription_data['duration'] );
+				$subscription['period']       = sanitize_text_field( $subscription_data['period'] );
+				$subscription['access_to']    = 'all'; // @todo make it dynamic
+				$subscription['custom_title'] = sanitize_text_field( $subscription_data['custom_title'] );
+				$subscription['custom_desc']  = sanitize_text_field( $subscription_data['custom_desc'] );
 
 				$sub_id                                             = $subscription_instance->update_subscription( $subscription );
 				$subscription_response[ $subscription_data['uid'] ] = $sub_id;

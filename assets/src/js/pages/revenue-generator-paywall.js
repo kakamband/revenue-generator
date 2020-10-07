@@ -67,6 +67,8 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					'.rg-purchase-overlay-purchase-options-item-price-span',
 				purchaseOptionPriceSymbol:
 					'.rg-purchase-overlay-purchase-options-item-price-symbol',
+				purchaseOptionAction:
+					'.rg-purchase-overlay-purchase-options-item-actions',
 				optionArea: '.rg-purchase-overlay-option-area',
 				addOptionArea: '.rg-purchase-overlay-option-area-add-option',
 				previewSecondItem:
@@ -257,122 +259,6 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							.attr( 'data-custom-desc', '1' );
 					} );
 				} );
-
-				/**
-				 * Handles Dynamic Title and Descirpitons.
-				 */
-				$o.body.on(
-					'change',
-					$o.periodCountSelection + ', ' + $o.periodSelection,
-					function() {
-						const $this = $( this );
-
-						//Prevent user actions after dropdown change.
-						showLoader();
-
-						// Timeout is added to wait for changeDurationOptions to perform operations on change first.
-						setTimeout( function() {
-							// Get selection values.
-							const periodCount = parseInt(
-								$this
-									.closest( $o.purchaseOptionItem )
-									.find( $o.periodCountSelection )
-									.val()
-							);
-							const periodSelection = $this
-								.closest( $o.purchaseOptionItem )
-								.find( $o.periodSelection )
-								.val();
-							const currentPurchaseType = $this
-								.closest( $o.purchaseOptionItem )
-								.data( 'purchase-type' );
-
-							new RevGenModal( {
-								id: 'rg-modal-dynamic-title-desc',
-								onConfirm: async () => {
-									let newTitle;
-									newTitle = periodCount;
-									switch ( periodSelection ) {
-										case 'h':
-											newTitle += __(
-												' Hour',
-												'revenue-generator'
-											);
-											break;
-										case 'd':
-											newTitle += __(
-												' Day',
-												'revenue-generator'
-											);
-											break;
-										case 'w':
-											newTitle += __(
-												' Week',
-												'revenue-generator'
-											);
-											break;
-										case 'm':
-											newTitle += __(
-												' Month',
-												'revenue-generator'
-											);
-											break;
-										case 'y':
-											newTitle += __(
-												' Year',
-												'revenue-generator'
-											);
-											break;
-									}
-
-									let newDescription = sprintf(
-										__(
-											'Enjoy unlimited access to all our content for %1$s'
-										),
-										newTitle
-									);
-
-									if ( periodCount && periodCount > 1 ) {
-										newDescription = sprintf(
-											__(
-												'Enjoy unlimited access to all our content for %1$ss'
-											),
-											newTitle
-										);
-									}
-
-									switch ( currentPurchaseType ) {
-										case 'subscription':
-											newTitle += __(
-												' Subscription',
-												'revenue-generator'
-											);
-											break;
-										case 'timepass':
-											newTitle += __(
-												' Pass',
-												'revenue-generator'
-											);
-											break;
-									}
-
-									$this
-										.closest( $o.purchaseOptionItem )
-										.find( $o.purchaseOptionItemTitle )
-										.text( newTitle );
-									$this
-										.closest( $o.purchaseOptionItem )
-										.find( $o.purchaseOptionItemDesc )
-										.text( newDescription );
-								},
-								onCancel: () => {
-									// do nothing.
-								},
-							} );
-							hideLoader();
-						}, 1000 );
-					}
-				);
 
 				/**
 				 * Handle the next button events of the tour and update preview accordingly.
@@ -788,6 +674,8 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				 * Handle purchase option edit operations.
 				 */
 				$o.body.on( 'click', $o.editOption, function() {
+					const $this = $( this );
+
 					const optionItem = $( this ).parents(
 						'.rg-purchase-overlay-purchase-options-item'
 					);
@@ -798,6 +686,8 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					const optionHighlight = $( this ).children(
 						'.rg-purchase-overlay-purchase-options-item-highlight'
 					);
+
+					const entityType = optionItem.attr( 'data-purchase-type' );
 
 					// Get all purchase options.
 					const allPurchaseOptions = $( $o.purchaseOptionItems );
@@ -816,10 +706,6 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						} );
 
 					if ( ! actionManager.length ) {
-						const entityType = optionItem.attr(
-							'data-purchase-type'
-						);
-
 						// Send the data to our new template function, get the HTML markup back.
 						const data = {
 							entityType,
@@ -985,6 +871,22 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						.hide();
 					actionOptions.show();
 
+					// The following code checks if title and descirption is customized.
+					if ( 'none' === actionManagerCurrentState ) {
+						const isCustomTitle = optionItem.attr(
+							'data-custom-title'
+						);
+						const isCustomDesc = optionItem.attr(
+							'data-custom-desc'
+						);
+
+						// if it has no custom title or custom description.
+						dynamicTitleDescription(
+							$this,
+							isCustomTitle,
+							isCustomDesc
+						);
+					}
 					// Reset current action manager back to original state.
 					actionManager.css( { display: actionManagerCurrentState } );
 				} );
@@ -1953,6 +1855,12 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 								optionManager
 									.find( 'div' )
 									.css( { height: ' 45px' } );
+								optionManager
+									.find( $o.periodCountSelection )
+									.val( timePassDefaultValues.period );
+								optionManager
+									.find( $o.periodSelection )
+									.val( timePassDefaultValues.duration );
 							} else if (
 								'subscription' === selectedEntityType
 							) {
@@ -1991,6 +1899,12 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 								optionManager
 									.find( 'div' )
 									.css( { height: ' 55px' } );
+								optionManager
+									.find( $o.periodCountSelection )
+									.val( subscriptionDefaultValues.period );
+								optionManager
+									.find( $o.periodSelection )
+									.val( subscriptionDefaultValues.duration );
 							}
 						} else {
 							// Set static pricing by default if individual.
@@ -2055,6 +1969,12 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 								.attr( 'data-pay-model' ),
 							type: individualOption.attr( 'data-pricing-type' ),
 							order: individualOption.attr( 'data-order' ),
+							custom_title: individualOption.attr(
+								'data-custom-title'
+							),
+							custom_desc: individualOption.attr(
+								'data-custom-desc'
+							),
 						};
 					}
 
@@ -2092,6 +2012,12 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							tlp_id: $( timePass ).attr( 'data-tlp-id' ),
 							uid: $( timePass ).attr( 'data-uid' ),
 							order: $( timePass ).attr( 'data-order' ),
+							custom_title: $( timePass ).attr(
+								'data-custom-title'
+							),
+							custom_desc: $( timePass ).attr(
+								'data-custom-desc'
+							),
 						};
 						timePasses.push( timePassObj );
 					} );
@@ -2132,6 +2058,12 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							sub_id: $( subscription ).attr( 'data-sub-id' ),
 							uid: $( subscription ).attr( 'data-uid' ),
 							order: $( subscription ).attr( 'data-order' ),
+							custom_title: $( subscription ).attr(
+								'data-custom-title'
+							),
+							custom_desc: $( subscription ).attr(
+								'data-custom-desc'
+							),
 						};
 						subscriptions.push( subscriptionObj );
 					} );
@@ -2376,6 +2308,119 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						location.href = dashboardURL;
 					}
 				} );
+			};
+
+			/**
+			 * Generates Dynamic title and Description for purchase option.
+			 *
+			 * @param {Object} $this Dom Element.
+			 * @param {string} isCustomTitle
+			 * @param {string} isCustomDesc
+			 * @return {void}
+			 */
+			const dynamicTitleDescription = function(
+				$this,
+				isCustomTitle,
+				isCustomDesc
+			) {
+				const OptionItem = $this.closest( $o.purchaseOptionItem );
+				//Prevent user actions after dropdown change.
+				showLoader();
+
+				// Timeout is added to wait for changeDurationOptions to perform operations on change first.
+				setTimeout( function() {
+					// Get selection values.
+					const periodCount = parseInt(
+						OptionItem.find( $o.periodCountSelection ).val()
+					);
+					const periodSelection = OptionItem.find(
+						$o.periodSelection
+					).val();
+					const currentPurchaseType = OptionItem.attr(
+						'data-purchase-type'
+					);
+
+					let newTitle;
+					newTitle = periodCount;
+					switch ( periodSelection ) {
+						case 'h':
+							newTitle += __( ' Hour', 'revenue-generator' );
+							break;
+						case 'd':
+							newTitle += __( ' Day', 'revenue-generator' );
+							break;
+						case 'w':
+							newTitle += __( ' Week', 'revenue-generator' );
+							break;
+						case 'm':
+							newTitle += __( ' Month', 'revenue-generator' );
+							break;
+						case 'y':
+							newTitle += __( ' Year', 'revenue-generator' );
+							break;
+					}
+
+					let newDescription = sprintf(
+						__(
+							'Enjoy unlimited access to all our content for %1$s'
+						),
+						newTitle
+					);
+
+					if ( periodCount && periodCount > 1 ) {
+						newDescription = sprintf(
+							__(
+								'Enjoy unlimited access to all our content for %1$ss'
+							),
+							newTitle
+						);
+					}
+
+					switch ( currentPurchaseType ) {
+						case 'subscription':
+							newTitle += __(
+								' Subscription',
+								'revenue-generator'
+							);
+							break;
+						case 'timepass':
+							newTitle += __( ' Pass', 'revenue-generator' );
+							break;
+					}
+
+					// if its custom title and description display modal.
+					if (
+						( isCustomTitle && '1' === isCustomTitle ) ||
+						( isCustomDesc && '1' === isCustomDesc )
+					) {
+						new RevGenModal( {
+							id: 'rg-modal-dynamic-title-desc',
+							onConfirm: async () => {
+								// User reset to default remove custom flag.
+								OptionItem.attr( 'data-custom-desc', '' );
+								OptionItem.attr( 'data-custom-title', '' );
+
+								OptionItem.find(
+									$o.purchaseOptionItemTitle
+								).text( newTitle );
+								OptionItem.find(
+									$o.purchaseOptionItemDesc
+								).text( newDescription );
+							},
+							onCancel: () => {
+								// do nothing.
+							},
+						} );
+					} else {
+						OptionItem.find( $o.purchaseOptionItemTitle ).text(
+							newTitle
+						);
+						OptionItem.find( $o.purchaseOptionItemDesc ).text(
+							newDescription
+						);
+					}
+					hideLoader();
+				}, 1000 );
 			};
 
 			const areCredentialsFilled = function() {

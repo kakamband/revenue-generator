@@ -248,6 +248,8 @@ class Subscription extends Base {
 		$subscription['is_active']     = $is_active;
 		$subscription['access_to']     = $post_meta['access_to'];
 		$subscription['access_entity'] = $post_meta['access_entity'];
+		$subscription['custom_title']  = $post_meta['custom_title'];
+		$subscription['custom_desc']   = $post_meta['custom_desc'];
 
 		return $subscription;
 	}
@@ -274,6 +276,8 @@ class Subscription extends Base {
 		$post_meta_data['period']        = ( isset( $post_meta['_rg_period'][0] ) ) ? $post_meta['_rg_period'][0] : '';
 		$post_meta_data['access_to']     = ( isset( $post_meta['_rg_access_to'][0] ) ) ? $post_meta['_rg_access_to'][0] : '';
 		$post_meta_data['access_entity'] = ( isset( $post_meta['_rg_access_entity'][0] ) ) ? $post_meta['_rg_access_entity'][0] : '';
+		$post_meta_data['custom_title']  = ( isset( $post_meta['_rg_custom_title'][0] ) ) ? $post_meta['_rg_custom_title'][0] : '';
+		$post_meta_data['custom_desc']   = ( isset( $post_meta['_rg_custom_desc'][0] ) ) ? $post_meta['_rg_custom_desc'][0] : '';
 
 		return $post_meta_data;
 	}
@@ -341,11 +345,13 @@ class Subscription extends Base {
 					'post_status'  => 'publish',
 					'post_type'    => static::SLUG,
 					'meta_input'   => [
-						'_rg_price'     => $subscription_data['price'],
-						'_rg_revenue'   => $subscription_data['revenue'],
-						'_rg_duration'  => $subscription_data['duration'],
-						'_rg_period'    => $subscription_data['period'],
-						'_rg_access_to' => $subscription_data['access_to'],
+						'_rg_price'        => $subscription_data['price'],
+						'_rg_revenue'      => $subscription_data['revenue'],
+						'_rg_duration'     => $subscription_data['duration'],
+						'_rg_period'       => $subscription_data['period'],
+						'_rg_access_to'    => $subscription_data['access_to'],
+						'_rg_custom_title' => $subscription_data['custom_title'],
+						'_rg_custom_desc'  => $subscription_data['custom_desc'],
 					],
 				]
 			);
@@ -363,6 +369,9 @@ class Subscription extends Base {
 			update_post_meta( $subscription_id, '_rg_revenue', $subscription_data['revenue'] );
 			update_post_meta( $subscription_id, '_rg_duration', $subscription_data['duration'] );
 			update_post_meta( $subscription_id, '_rg_access_to', $subscription_data['access_to'] );
+			update_post_meta( $subscription_id, '_rg_period', $subscription_data['period'] );
+			update_post_meta( $subscription_id, '_rg_custom_title', $subscription_data['custom_title'] );
+			update_post_meta( $subscription_id, '_rg_custom_desc', $subscription_data['custom_desc'] );
 		}
 
 		return $subscription_id;
