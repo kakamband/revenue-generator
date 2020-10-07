@@ -2,12 +2,13 @@
 /**
  * JS to handle plugin paywall preview screen interactions.
  *
- * @package revenue-generator
  */
 
 /**
  * Internal dependencies.
  */
+
+/* global Event */
 import '../utils';
 import { debounce } from '../helpers';
 import { __, sprintf } from '@wordpress/i18n';
@@ -583,7 +584,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						! currentTarget.parents(
 							'.rg-purchase-overlay-option-manager'
 						).length &&
-						! $( $o.purchaseOptionInfoModal ).length &&
+						! $( '.rev-gen-modal' ).length &&
 						! isEditButton
 					) {
 						$o.body
@@ -795,9 +796,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						);
 						if ( 'subscription' === entityType ) {
 							// Add extra height to get proper styling.
-							actionManager
-								.find( 'div' )
-								.css( { height: ' 55px' } );
+							actionManager.find( 'div' ).css( {
+								height: ' 55px',
+							} );
 							revenueWrapper.hide();
 						} else {
 							// Set revenue model for selected option.
@@ -888,7 +889,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						);
 					}
 					// Reset current action manager back to original state.
-					actionManager.css( { display: actionManagerCurrentState } );
+					actionManager.css( {
+						display: actionManagerCurrentState,
+					} );
 				} );
 
 				/**
@@ -1013,7 +1016,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							const validatedPrice = validatePrice(
 								dynamicPrice
 							);
-							dynamicStar.css( { display: 'none' } );
+							dynamicStar.css( {
+								display: 'none',
+							} );
 							priceItem.text( validatedPrice );
 							optionItem.attr( 'data-pricing-type', 'dynamic' );
 							optionItem.find( $o.purchaseItemPriceIcon ).show();
@@ -1159,6 +1164,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						revenueSelection.val( 0 );
 						const previewPostTitle = $o.searchContent.val();
 						const newmsg = sprintf(
+							/* translators: %1$s post title */
 							__(
 								'Get lifetime access to %1$s now!',
 								'revenue-generator'
@@ -1324,7 +1330,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 								const dynamicStar = $(
 									$o.purchaseItemPriceIcon
 								);
-								dynamicStar.css( { display: 'none' } );
+								dynamicStar.css( {
+									display: 'none',
+								} );
 								$( this ).text( validatedPrice );
 								validateRevenue( validatedPrice, optionItem );
 							}
@@ -1433,131 +1441,39 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				/**
 				 * Handle tooltip button events for info modals.
 				 */
-				$o.body.on( 'click', $o.purchaseOptionInfoButton, function() {
+				$o.body.on( 'click', $o.purchaseOptionInfoButton, function(
+					e
+				) {
+					e.stopPropagation();
+
 					const infoButton = $( this );
 					const modalType = infoButton.attr( 'data-info-for' );
-					const existingModal = $o.previewWrapper.find(
-						$o.purchaseOptionInfoModal
-					);
 
-					// Remove any existing modal.
-					if ( existingModal.length ) {
-						$o.body.removeClass( 'modal-blur' );
-						existingModal.remove();
+					$( '.rev-gen-modal, .rev-gen-modal-overlay' ).remove();
 
-						// Reset the background for all greyed out elements.
-						$( $o.optionManager ).css( {
-							'background-color': '#fff',
-						} );
-						$( '.rg-purchase-overlay-option-manager div' ).css( {
-							'border-bottom-color': '#a9a9a9',
-						} );
-						$( $o.optionManager )
-							.find( 'select' )
-							.css( {
-								'background-color': '#fff',
-								'border-bottom-color': '#a9a9a9',
-							} );
-						$( $o.purchaseOptionItem ).css( {
-							'background-color': '#fff',
-						} );
+					new RevGenModal( {
+						id: `rg-modal-info-${ modalType }`,
+						closeOutside: true,
+					} );
 
-						$( $o.optionManager ).removeClass(
-							'border-blur-after'
-						);
+					let eventLabel = '';
 
-						$o.actionsWrapper.css( {
-							'background-color': '#fff',
-						} );
-						$o.actionButtons.css( { opacity: '1' } );
-						$o.searchContentWrapper.css( {
-							'background-color': '#fff',
-						} );
-						$( $o.purchaseRevenueWrapper ).css( {
-							'background-color': '#fff',
-							'border-bottom-color': 'unset !important',
-						} );
-						$( $o.individualPricingWrapper ).css( {
-							'background-color': '#fff',
-							'border-color': 'unset !important',
-						} );
-					} else {
-						const template = wp.template(
-							`revgen-info-${ modalType }`
-						);
-						$o.previewWrapper.append( template );
-
-						// Change background color and highlight the clicked parent.
-						$o.body.addClass( 'modal-blur' );
-
-						// Grey out the option manager and overlay elements in it.
-						$( $o.optionManager ).css( {
-							'background-color': '#a9a9a9',
-						} );
-						$( '.rg-purchase-overlay-option-manager div' ).css( {
-							'border-bottom-color': '#000',
-						} );
-						$( $o.optionManager )
-							.find( 'select' )
-							.css( {
-								'background-color': '#a9a9a9',
-								'border-color': '#a9a9a9',
-							} );
-						$( $o.purchaseOptionItem ).css( {
-							'background-color': '#a9a9a9',
-						} );
-
-						$( $o.optionManager ).addClass( 'border-blur-after' );
-
-						// Grey out the paywall actions and change position.
-						$o.actionsWrapper.css( {
-							'background-color': '#a9a9a9',
-						} );
-						$o.actionButtons.css( { opacity: '0.5' } );
-						$o.searchContentWrapper.css( {
-							'background-color': '#a9a9a9',
-						} );
-
-						// Highlight selected info modal parent based on type.
-						if ( 'revenue' === modalType ) {
-							$( $o.purchaseRevenueWrapper ).css( {
-								'background-color': '#fff',
-								cursor: 'pointer',
-								'pointer-events': 'all',
-							} );
-							$( $o.individualPricingWrapper ).css( {
-								'background-color': '#a9a9a9',
-							} );
-						} else {
-							$( $o.individualPricingWrapper ).css( {
-								'background-color': '#fff',
-								cursor: 'pointer',
-								'pointer-events': 'all',
-							} );
-							$( $o.purchaseRevenueWrapper ).css( {
-								'background-color': '#a9a9a9',
-							} );
-						}
-
-						let eventLabel = '';
-
-						if ( 'revenue' === modalType ) {
-							eventLabel = 'Pay Now v Pay Later';
-						} else if ( 'pricing' === modalType ) {
-							eventLabel = 'Static Pricing v Dynamic Pricing';
-						}
-
-						// Send GA Event.
-						const eventCategory = 'LP RevGen Configure Paywall';
-						const eventAction = 'Help';
-						rgGlobal.sendLPGAEvent(
-							eventAction,
-							eventCategory,
-							eventLabel,
-							0,
-							true
-						);
+					if ( 'revenue' === modalType ) {
+						eventLabel = 'Pay Now v Pay Later';
+					} else if ( 'pricing' === modalType ) {
+						eventLabel = 'Static Pricing v Dynamic Pricing';
 					}
+
+					// Send GA Event.
+					const eventCategory = 'LP RevGen Configure Paywall';
+					const eventAction = 'Help';
+					rgGlobal.sendLPGAEvent(
+						eventAction,
+						eventCategory,
+						eventLabel,
+						0,
+						true
+					);
 				} );
 
 				/**
@@ -1910,9 +1826,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							// Set static pricing by default if individual.
 							optionItem.attr( 'data-pricing-type', 'static' );
 							optionItem.attr( 'data-paywall-id', '' );
-							optionManager
-								.find( 'div' )
-								.css( { height: ' 45px' } );
+							optionManager.find( 'div' ).css( {
+								height: ' 45px',
+							} );
 						}
 					}
 				} );
@@ -2305,7 +2221,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					const dashboardURL = $( this ).attr( 'data-dashboard-url' );
 
 					if ( dashboardURL ) {
-						location.href = dashboardURL;
+						window.location.href = dashboardURL;
 					}
 				} );
 			};
@@ -2735,7 +2651,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 			 * @param {string} elementIdentifier Selector matching elements on the document
 			 */
 			const initializeTooltip = function( elementIdentifier ) {
-				tippy( elementIdentifier, { arrow: tippy.roundArrow } );
+				tippy( elementIdentifier, {
+					arrow: tippy.roundArrow,
+				} );
 			};
 
 			/**
@@ -3519,7 +3437,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 			 * Show the loader.
 			 */
 			const showLoader = function() {
-				$o.laterpayLoader.css( { display: 'flex' } );
+				$o.laterpayLoader.css( {
+					display: 'flex',
+				} );
 			};
 
 			/**
@@ -3765,7 +3685,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 
 					if ( 'individual' === optionType ) {
 						const dynamicStar = $( $o.purchaseItemPriceIcon );
-						dynamicStar.css( { display: 'none' } );
+						dynamicStar.css( {
+							display: 'none',
+						} );
 						priceItem.text( validatedPrice );
 					} else {
 						priceItem.empty().text( validatedPrice );
@@ -3788,7 +3710,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 
 					if ( 'individual' === optionType ) {
 						const dynamicStar = $( $o.purchaseItemPriceIcon );
-						dynamicStar.css( { display: 'none' } );
+						dynamicStar.css( {
+							display: 'none',
+						} );
 						priceItem.text( validatedPrice );
 					} else {
 						priceItem.empty().text( validatedPrice );

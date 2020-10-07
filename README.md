@@ -2,8 +2,11 @@
 
 <h1 align="center"> Revenue Generator by Laterpay </h1>
 
-[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+
+
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#wip)
 [![License](https://img.shields.io/github/license/laterpay/revenue-generator)](https://github.com/laterpay/revenue-generator/blob/master/LICENSE)
+[![laterpay](https://circleci.com/gh/laterpay/revenue-generator.svg?style=svg)](https://app.circleci.com/pipelines/github/laterpay/revenue-generator)
 
 ##### Revenue Generator is the official WordPress plugin for selling digital content using Laterpay’s patented [Pay Later model](https://www.laterpay.net/blog/how-to-laterpay-dos-and-donts-from-8-years-expertise).
 <hr/>

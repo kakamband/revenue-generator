@@ -439,87 +439,97 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 </script>
 
 <!-- Template for revenue info modal -->
-<script type="text/template" id="tmpl-revgen-info-revenue">
-	<div class="rev-gen-preview-main-info-modal revenue-info-modal">
-		<h4 class="rev-gen-preview-main-info-modal-title"><?php esc_html_e( 'Pay Now v Pay Later?', 'revenue-generator' ); ?></h4>
-		<p class="rev-gen-preview-main-info-modal-message">
-			<?php
-			esc_html_e( 'Choose the pricing model that best suits your needs!', 'revenue-generator' );
-			?>
-		</p>
-		<p class="rev-gen-preview-main-info-modal-message">
-			<?php
-			printf(
-				wp_kses(
-					__(
-						'<b>Pay Later</b> means users agree to pay for content or timed access later - once their tab reaches $5 or 5€. Think of it as ‘the internet’s running tab.’',
-						'revenue-generator'
-					),
-					[
-						'b' => [],
-					]
-				)
-			);
-			?>
-		</p>
-		<p class="rev-gen-preview-main-info-modal-message">
-			<?php
-			printf(
-				wp_kses(
-					__(
-						'<b>Pay Now</b> is the traditional upfront payment method that everyone is familiar with. Recurring subscriptions automatically work on a pay now basis.',
-						'revenue-generator'
-					),
-					[
-						'b' => [],
-					]
-				)
-			);
-			?>
-		</p>
+<script type="text/template" id="tmpl-rg-modal-info-revenue">
+	<div class="rev-gen-modal" id="rg-modal-info-revenue">
+		<div class="rev-gen-modal__inner">
+			<h4 class="rev-gen-modal__title">
+				<?php esc_html_e( 'Pay Now v Pay Later?', 'revenue-generator' ); ?>
+			</h4>
+			<p class="rev-gen-modal__message">
+				<?php
+				esc_html_e( 'Choose the pricing model that best suits your needs!', 'revenue-generator' );
+				?>
+			</p>
+			<p class="rev-gen-modal__message">
+				<?php
+				printf(
+					wp_kses(
+						__(
+							'<b>Pay Later</b> means users agree to pay for content or timed access later - once their tab reaches $5 or 5€. Think of it as ‘the internet’s running tab.’',
+							'revenue-generator'
+						),
+						[
+							'b' => [],
+						]
+					)
+				);
+				?>
+			</p>
+			<p class="rev-gen-modal__message">
+				<?php
+				printf(
+					wp_kses(
+						__(
+							'<b>Pay Now</b> is the traditional upfront payment method that everyone is familiar with. Recurring subscriptions automatically work on a pay now basis.',
+							'revenue-generator'
+						),
+						[
+							'b' => [],
+						]
+					)
+				);
+				?>
+			</p>
+		</div>
 	</div>
+	<div class="rev-gen-modal-overlay"></div>
 </script>
 
 <!-- Template for pricing info modal -->
-<script type="text/template" id="tmpl-revgen-info-pricing">
-	<div class="rev-gen-preview-main-info-modal pricing-info-modal">
-		<h4 class="rev-gen-preview-main-info-modal-title"><?php esc_html_e( 'Static Pricing and Dynamic Pricing', 'revenue-generator' ); ?></h4>
-		<p class="rev-gen-preview-main-info-modal-message">
-			<?php
-			esc_html_e( 'Revenue Generator allows you two ways to go about pricing content.', 'revenue-generator' );
-			?>
-		</p>
-		<p class="rev-gen-preview-main-info-modal-message">
-			<?php
-			printf(
-				wp_kses(
-					__(
-						'Select <b>Static Pricing</b> to manually set the prices of individual articles based on your own pricing strategy. Charge as little - or as much - as you want.',
-						'revenue-generator'
-					),
-					[
-						'b' => [],
-					]
-				)
-			);
-			?>
-		</p>
-		<p class="rev-gen-preview-main-info-modal-message">
-			<?php
-			printf(
-				wp_kses(
-					__(
-						'If you select <b>Dynamic Pricing</b>, Laterpay’s AI will “dynamically” adjust the price based on our own data, analytics and algorithms based on the length of each article.',
-						'revenue-generator'
-					),
-					[
-						'b' => [],
-					]
-				)
-			);
-			?>
-		</p>
+<script type="text/template" id="tmpl-rg-modal-info-pricing">
+	<div class="rev-gen-modal" id="rg-modal-info-pricing">
+		<div class="rev-gen-modal__inner">
+			<h4 class="rev-gen-modal__title">
+				<?php esc_html_e( 'Static Pricing and Dynamic Pricing', 'revenue-generator' ); ?>
+			</h4>
+			<p class="rev-gen-modal__message">
+				<?php
+				esc_html_e( 'Revenue Generator allows you two ways to go about pricing content.', 'revenue-generator' );
+				?>
+			</p>
+			<p class="rev-gen-modal__message">
+				<?php
+				printf(
+					wp_kses(
+						__(
+							'Select <b>Static Pricing</b> to manually set the prices of individual articles based on your own pricing strategy. Charge as little - or as much - as you want.',
+							'revenue-generator'
+						),
+						[
+							'b' => [],
+						]
+					)
+				);
+				?>
+			</p>
+			<p class="rev-gen-modal__message">
+				<?php
+				printf(
+					wp_kses(
+						__(
+							'If you select <b>Dynamic Pricing</b>, Laterpay’s AI will “dynamically” adjust the price based on our own data, analytics and algorithms based on the length of each article.',
+							'revenue-generator'
+						),
+						[
+							'b' => [],
+						]
+					)
+				);
+				?>
+			</p>
+		</div>
 	</div>
+	<div class="rev-gen-modal-overlay"></div>
 </script>
 
 <?php include( REVENUE_GENERATOR_PLUGIN_DIR . '/templates/backend/modal-remove-paywall.php' ); ?>
@@ -648,19 +658,50 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 			<p class="rev-gen-modal__message">
 				<# if ( 'category' === data.appliedTo || 'exclude_category' !== data.appliedTo ) { #>
 					<# if ( 'category' === data.appliedTo ) { #>
-						<?php esc_html_e( 'Has been published to <b>all posts</b> in category', 'revenue-generator' ); ?> <b>{{ data.categoryName }}</b>.
+						<?php
+						printf(
+							'%s <b>%s</b> %s <b>{{ data.categoryName }}</b>.',
+							esc_html__( 'Has been published to', 'revenue-generator' ),
+							esc_html__( 'all posts', 'revenue-generator' ),
+							esc_html__( 'in category', 'revenue-generator' )
+						);
+						?>
 					<# } #>
 
 					<# if ( 'exclude_category' === data.appliedTo ) { #>
-						<?php esc_html_e( 'Has been published to <b>all posts, except posts under</b> in category', 'revenue-generator' ); ?> <b>{{ data.categoryName }}
+						<?php
+						printf(
+							'%s <b>%s</b> %s <b>{{ data.categoryName }}</b>.',
+							esc_html__( 'Has been published to', 'revenue-generator' ),
+							esc_html__( 'all posts, except posts under', 'revenue-generator' ),
+							esc_html__( 'category', 'revenue-generator' )
+						);
+						?>
 					<# } #>
 				<# } else { #>
 					<# if ( 'supported' === data.appliedTo ) { #>
-						<?php esc_html_e( 'Has been published on', 'revenue-generator' ); ?> <b>{{ data.postTitle }}</b>.
+						<?php
+						printf(
+							'%s <b>{{ data.postTitle }}</b>.',
+							esc_html__( 'Has been published on', 'revenue-generator' )
+						);
+						?>
 					<# } else if ( 'specific_post' === data.appliedTo ) { #>
-						<?php esc_html_e( 'Has been published on <b>Specific Posts & Pages</b>.', 'revenue-generator' ); ?>
+						<?php
+						printf(
+							'%s <b>%s</b>.',
+							esc_html__( 'Has been published on', 'revenue-generator' ),
+							esc_html__( 'Specific Posts & Pages', 'revenue-generator' )
+						);
+						?>
 					<# } else { #>
-						<?php esc_html_e( 'Has been published on <b>all posts</b>.', 'revenue-generator' ); ?>
+						<?php
+						printf(
+							'%s <b>%s</b>.',
+							esc_html__( 'Has been published on', 'revenue-generator' ),
+							esc_html__( 'all posts', 'revenue-generator' )
+						);
+						?>
 					<# } #>
 				<# } #>
 			</p>

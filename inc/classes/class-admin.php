@@ -426,10 +426,7 @@ class Admin {
 		$config_data           = Config::get_global_options();
 
 		// Ge Currencey Symbol.
-		$symbol = '';
-		if ( ! empty( $config_data['merchant_currency'] ) ) {
-			$symbol = 'USD' === $config_data['merchant_currency'] ? '$' : '€';
-		}
+		$symbol = Config::get_currency_symbol();
 
 		// Contributions sorting orders.
 		$sort_order               = filter_input( INPUT_GET, 'sort_by', FILTER_SANITIZE_STRING );

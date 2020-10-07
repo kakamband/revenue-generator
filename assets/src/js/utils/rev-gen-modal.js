@@ -42,6 +42,7 @@ class RevGenModal {
 			},
 			autoShow: true,
 			keepOpen: false,
+			closeOutside: false,
 		};
 
 		/** @type {Object} */
@@ -118,6 +119,16 @@ class RevGenModal {
 			this.el
 				.querySelector( '#rg_js_modal_close' )
 				.addEventListener( 'click', this.hide.bind( this ) );
+		}
+
+		if ( this.options.closeOutside ) {
+			document.addEventListener( 'click', this.hide.bind( this ), {
+				once: true,
+			} );
+
+			this.el.addEventListener( 'click', ( e ) => {
+				e.stopPropagation();
+			} );
 		}
 
 		this.el.addEventListener(

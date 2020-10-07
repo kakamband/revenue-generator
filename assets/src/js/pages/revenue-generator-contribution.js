@@ -1,8 +1,6 @@
 /* global revenueGeneratorGlobalOptions, Shepherd, rgGlobal */
 /**
  * JS to handle plugin settings screen interactions.
- *
- * @package revenue-generator
  */
 
 /**
@@ -469,7 +467,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 			 * Show the loader.
 			 */
 			const showLoader = function() {
-				$o.laterpayLoader.css( { display: 'flex' } );
+				$o.laterpayLoader.css( {
+					display: 'flex',
+				} );
 			};
 
 			/**
@@ -590,6 +590,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					.addStep( {
 						id: 'rg-contribution-amount-second',
 						text: sprintf(
+							/* translators: %1$s laterpay.net link tag, %2$s laterpay.net link closing tag */
 							__(
 								'Amounts less than $5 will default to %1$s pay later %2$s',
 								'revenue-generator'
@@ -679,6 +680,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					.addStep( {
 						id: 'rg-contribution-generate-button',
 						text: sprintf(
+							/* translators: %1$s WP.org shortcodes support page opening link tag, %2$s WP.org shortcodes support page closing link tag */
 							__(
 								'When you’re ready, click here to copy your customized %1$s shortcode %2$s',
 								'revenue-generator'
@@ -855,7 +857,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					dataType: 'json',
 				} ).done( function( r ) {
 					if ( r.success ) {
-						location.reload();
+						window.location.reload();
 					}
 				} );
 			};
@@ -883,6 +885,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							} else {
 								window.open( signUpURL.EU, '_blank' );
 							}
+							/* global Event */
 							const closeEvent = new Event(
 								'rev-gen-modal-close'
 							);
