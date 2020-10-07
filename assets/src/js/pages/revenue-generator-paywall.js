@@ -688,8 +688,6 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						'.rg-purchase-overlay-purchase-options-item-highlight'
 					);
 
-					const entityType = optionItem.attr( 'data-purchase-type' );
-
 					// Get all purchase options.
 					const allPurchaseOptions = $( $o.purchaseOptionItems );
 					let doesIndividualOptionExist = false;
@@ -707,6 +705,10 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						} );
 
 					if ( ! actionManager.length ) {
+						const entityType = optionItem.attr(
+							'data-purchase-type'
+						);
+
 						// Send the data to our new template function, get the HTML markup back.
 						const data = {
 							entityType,
@@ -881,7 +883,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							'data-custom-desc'
 						);
 
-						// if it has no custom title or custom description.
+						// Generate Dynamic Title and Description.
 						dynamicTitleDescription(
 							$this,
 							isCustomTitle,
