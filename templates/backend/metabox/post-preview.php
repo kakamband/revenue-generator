@@ -34,7 +34,7 @@ if ( ! empty( $paywall_data ) && ! empty( $payload ) ) :
 			endforeach;
 			?>
 			<div class="rg-post-preview--edit">
-				<a class="rg-post-preview--button-black" href="<?php echo esc_url( $edit_paywall_url ); ?>"><?php esc_html_e( 'Edit', 'revenue-generator' ); ?></a>
+				<a target="_blank" class="rg-post-preview--button-black" href="<?php echo esc_url( $edit_paywall_url ); ?>"><?php esc_html_e( 'Edit', 'revenue-generator' ); ?></a>
 			</div>
 		</div>
 		<?php endif; ?>
@@ -44,7 +44,7 @@ else :
 	?>
 	<div class="rg-post-preview--container">
 		<div class="rg-post-preview--edit">
-			<a href="<?php echo esc_url( $new_paywall_url ); ?>" class="rg-post-preview--button-black"><?php esc_html_e( 'Add New Paywall', 'revenue-generator' ); ?></a>
+			<a target="_blank" href="<?php echo esc_url( $new_paywall_url ); ?>" class="rg-post-preview--button-black"><?php esc_html_e( 'Add New Paywall', 'revenue-generator' ); ?></a>
 		</div>
 	</div>
 	<?php

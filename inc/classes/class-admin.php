@@ -682,6 +682,7 @@ class Admin {
 		$post_types = Post_Types::get_instance();
 
 		$current_paywall    = filter_input( INPUT_GET, 'current_paywall', FILTER_SANITIZE_NUMBER_INT );
+		$prepare_paywall    = filter_input( INPUT_GET, 'prepare_paywall', FILTER_SANITIZE_NUMBER_INT );
 		$rg_categories_data = array();
 		$rg_specific_posts  = array();
 
@@ -744,6 +745,11 @@ class Admin {
 			// Get paywall options data.
 			$purchase_options_data = $post_types->get_post_purchase_options_by_post_id( $target_post_id, $formatted_post_data );
 			$purchase_options      = $post_types->convert_to_purchase_options( $purchase_options_data );
+		}
+
+		// Previews Paywall from Metabox and preselect posts.
+		if ( $prepare_paywall ) {
+			$purchase_options['paywall']['access_to'] = 'supported';
 		}
 
 		// Get individual article pricing based on post content word count, i.e "tier".

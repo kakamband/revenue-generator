@@ -157,6 +157,7 @@ class Post_Preview {
 			[
 				'page'            => $admin_menus['paywall']['url'],
 				'preview_post_id' => $post->ID,
+				'prepare_paywall' => '1',
 			],
 			admin_url( 'admin.php' )
 		);
