@@ -332,25 +332,42 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 </script>
 
 <!-- Template for currency confirmation modal -->
-<script type="text/template" id="tmpl-revgen-purchase-currency-overlay">
-	<div class="rev-gen-preview-main-currency-modal">
-		<span class="rev-gen-preview-main-currency-modal-cross">X</span>
-		<h4 class="rev-gen-preview-main-currency-modal-title"><?php esc_html_e( 'Choose your currency', 'revenue-generator' ); ?></h4>
-		<span class="rev-gen-preview-main-currency-modal-question"><?php esc_html_e( 'In what currency do you sell content?', 'revenue-generator' ); ?></span>
-		<div class="rev-gen-preview-main-currency-modal-inputs">
-			<label>
-				<input class="rev-gen-preview-main-currency-modal-inputs-currency" type="radio" name="currency" value="USD" />
-				<?php esc_html_e( 'USD', 'revenue-generator' ); ?> $
-			</label>
-			<label>
-				<input class="rev-gen-preview-main-currency-modal-inputs-currency" type="radio" name="currency" value="EUR" />
-				<?php esc_html_e( 'EURO', 'revenue-generator' ); ?> €
-			</label>
+<script type="text/template" id="tmpl-rg-modal-choose-currency">
+	<div class="rev-gen-modal" id="rg-modal-choose-currency">
+		<div class="rev-gen-modal__inner">
+			<a href="#" class="rev-gen-modal__close" id="rg_js_modal_close">x</a>
+
+			<h4 class="rev-gen-modal__title">
+				<?php esc_html_e( 'Choose your currency.', 'revenue-generator' ); ?>
+			</h4>
+
+			<span class="rev-gen-modal__icon rev-gen-modal__icon--warning">!</span>
+
+			<p class="rev-gen-modal__message">
+				<?php
+				esc_html_e( 'In what currency do you sell content?', 'revenue-generator' );
+				?>
+			</p>
+
+			<div class="rev-gen-modal__fields">
+				<label>
+					<input class="rev-gen-preview-main-currency-modal-inputs-currency" type="radio" name="currency" value="USD" />
+					<?php esc_html_e( 'USD', 'revenue-generator' ); ?> $
+				</label>
+				<label>
+					<input class="rev-gen-preview-main-currency-modal-inputs-currency" type="radio" name="currency" value="EUR" />
+					<?php esc_html_e( 'EURO', 'revenue-generator' ); ?> €
+				</label>
+			</div>
+
+			<div class="rev-gen-modal__buttons">
+				<button id="rg_js_modal_confirm" class="rev-gen__button" disabled>
+					<?php esc_html_e( 'Apply currency', 'revenue-generator' ); ?>
+				</button>
+			</div>
 		</div>
-		<button disabled="disabled" class="rev-gen-preview-main-currency-modal-button">
-			<?php esc_html_e( 'Apply currency', 'revenue-generator' ); ?>
-		</button>
 	</div>
+	<div class="rev-gen-modal-overlay"></div>
 </script>
 
 <!-- Template for option item -->
@@ -382,129 +399,137 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 </script>
 
 <!-- Template for option update warning modal -->
-<script type="text/template" id="tmpl-revgen-purchase-option-update">
-	<div class="rev-gen-preview-main-option-update">
-		<h4 class="rev-gen-preview-main-option-update-title"><?php esc_html_e( 'This will affect all your paywalls.', 'revenue-generator' ); ?></h4>
-		<span class="rev-gen-preview-main-option-update-warning">!</span>
-		<p class="rev-gen-preview-main-option-update-message">
-			<?php
-			esc_html_e( 'The changes you have made will impact this subscription offer on all paywalls across your entire site.', 'revenue-generator' );
-			?>
-		</p>
-		<div class="rev-gen-preview-main-option-update-buttons">
-			<button id="rg_js_continueOperation" class="rev-gen-preview-main-option-update-buttons-dark">
-				<?php esc_html_e( 'Continue', 'revenue-generator' ); ?>
-			</button>
-			<button id="rg_js_cancelOperation" class="rev-gen-preview-main-option-update-buttons-light">
-				<?php esc_html_e( 'Cancel', 'revenue-generator' ); ?>
-			</button>
+<script type="text/template" id="tmpl-rg-modal-purchase-option-update">
+	<div class="rev-gen-modal" id="rg-modal-purchase-option-update">
+		<div class="rev-gen-modal__inner">
+			<h4 class="rev-gen-modal__title">
+				<?php esc_html_e( 'This will affect all your paywalls.', 'revenue-generator' ); ?>
+			</h4>
+			<span class="rev-gen-modal__icon rev-gen-modal__icon--warning">!</span>
+			<p class="rev-gen-modal__message">
+				<# if ( 'timepass' === data.optionType ) { #>
+					<?php
+					esc_html_e( 'The changes you have made will impact this time pass offer on all paywalls across your entire site.', 'revenue-generator' );
+					?>
+				<# } else if ( 'subscription' === data.optionType ) { #>
+					<?php
+					esc_html_e( 'The changes you have made will impact this subscription offer on all paywalls across your entire site.', 'revenue-generator' );
+					?>
+				<# } else { #>
+					<?php
+					esc_html_e( 'It looks like you have added a new Global Time Pass or Subscription to this Paywall. Global Time Passes and Subscriptions will show up on all paywalls across your entire site.', 'revenue-generator' );
+					?>
+				<# } #>
+			</p>
+			<div class="rev-gen-modal__buttons">
+				<button id="rg_js_modal_confirm" class="rev-gen__button">
+					<?php esc_html_e( 'Continue', 'revenue-generator' ); ?>
+				</button>
+				<button id="rg_js_modal_cancel" class="rev-gen__button rev-gen__button--secondary">
+					<?php esc_html_e( 'Cancel', 'revenue-generator' ); ?>
+				</button>
+			</div>
 		</div>
 	</div>
+	<div class="rev-gen-modal-overlay"></div>
 </script>
 
 <!-- Template for revenue info modal -->
-<script type="text/template" id="tmpl-revgen-info-revenue">
-	<div class="rev-gen-preview-main-info-modal revenue-info-modal">
-		<h4 class="rev-gen-preview-main-info-modal-title"><?php esc_html_e( 'Pay Now v Pay Later?', 'revenue-generator' ); ?></h4>
-		<p class="rev-gen-preview-main-info-modal-message">
-			<?php
-			esc_html_e( 'Choose the pricing model that best suits your needs!', 'revenue-generator' );
-			?>
-		</p>
-		<p class="rev-gen-preview-main-info-modal-message">
-			<?php
-			printf(
-				wp_kses(
-					__(
-						'<b>Pay Later</b> means users agree to pay for content or timed access later - once their tab reaches $5 or 5€. Think of it as ‘the internet’s running tab.’',
-						'revenue-generator'
-					),
-					[
-						'b' => [],
-					]
-				)
-			);
-			?>
-		</p>
-		<p class="rev-gen-preview-main-info-modal-message">
-			<?php
-			printf(
-				wp_kses(
-					__(
-						'<b>Pay Now</b> is the traditional upfront payment method that everyone is familiar with. Recurring subscriptions automatically work on a pay now basis.',
-						'revenue-generator'
-					),
-					[
-						'b' => [],
-					]
-				)
-			);
-			?>
-		</p>
+<script type="text/template" id="tmpl-rg-modal-info-revenue">
+	<div class="rev-gen-modal" id="rg-modal-info-revenue">
+		<div class="rev-gen-modal__inner">
+			<h4 class="rev-gen-modal__title">
+				<?php esc_html_e( 'Pay Now v Pay Later?', 'revenue-generator' ); ?>
+			</h4>
+			<p class="rev-gen-modal__message">
+				<?php
+				esc_html_e( 'Choose the pricing model that best suits your needs!', 'revenue-generator' );
+				?>
+			</p>
+			<p class="rev-gen-modal__message">
+				<?php
+				printf(
+					wp_kses(
+						__(
+							'<b>Pay Later</b> means users agree to pay for content or timed access later - once their tab reaches $5 or 5€. Think of it as ‘the internet’s running tab.’',
+							'revenue-generator'
+						),
+						[
+							'b' => [],
+						]
+					)
+				);
+				?>
+			</p>
+			<p class="rev-gen-modal__message">
+				<?php
+				printf(
+					wp_kses(
+						__(
+							'<b>Pay Now</b> is the traditional upfront payment method that everyone is familiar with. Recurring subscriptions automatically work on a pay now basis.',
+							'revenue-generator'
+						),
+						[
+							'b' => [],
+						]
+					)
+				);
+				?>
+			</p>
+		</div>
 	</div>
+	<div class="rev-gen-modal-overlay"></div>
 </script>
 
 <!-- Template for pricing info modal -->
-<script type="text/template" id="tmpl-revgen-info-pricing">
-	<div class="rev-gen-preview-main-info-modal pricing-info-modal">
-		<h4 class="rev-gen-preview-main-info-modal-title"><?php esc_html_e( 'Static Pricing and Dynamic Pricing', 'revenue-generator' ); ?></h4>
-		<p class="rev-gen-preview-main-info-modal-message">
-			<?php
-			esc_html_e( 'Revenue Generator allows you two ways to go about pricing content.', 'revenue-generator' );
-			?>
-		</p>
-		<p class="rev-gen-preview-main-info-modal-message">
-			<?php
-			printf(
-				wp_kses(
-					__(
-						'Select <b>Static Pricing</b> to manually set the prices of individual articles based on your own pricing strategy. Charge as little - or as much - as you want.',
-						'revenue-generator'
-					),
-					[
-						'b' => [],
-					]
-				)
-			);
-			?>
-		</p>
-		<p class="rev-gen-preview-main-info-modal-message">
-			<?php
-			printf(
-				wp_kses(
-					__(
-						'If you select <b>Dynamic Pricing</b>, Laterpay’s AI will “dynamically” adjust the price based on our own data, analytics and algorithms based on the length of each article.',
-						'revenue-generator'
-					),
-					[
-						'b' => [],
-					]
-				)
-			);
-			?>
-		</p>
-	</div>
-</script>
-
-<!-- Template for paywall removal confirmation. -->
-<script type="text/template" id="tmpl-revgen-remove-paywall">
-	<div class="rev-gen-preview-main-remove-paywall">
-		<h4 class="rev-gen-preview-main-remove-paywall-title"><?php esc_html_e( 'Are you sure you want to remove the paywall?', 'revenue-generator' ); ?></h4>
-		<p class="rev-gen-preview-main-remove-paywall-message">
-			<?php
-			esc_html_e( 'This content will be visible to all users.', 'revenue-generator' );
-			?>
-		</p>
-		<div class="rev-gen-preview-main-remove-paywall-buttons">
-			<button id="rg_js_removePaywall" class="rev-gen-preview-main-remove-paywall-buttons-dark">
-				<?php esc_html_e( 'Yes, remove Paywall', 'revenue-generator' ); ?>
-			</button>
-			<button id="rg_js_cancelPaywallRemoval" class="rev-gen-preview-main-remove-paywall-buttons-light">
-				<?php esc_html_e( 'No, keep Paywall', 'revenue-generator' ); ?>
-			</button>
+<script type="text/template" id="tmpl-rg-modal-info-pricing">
+	<div class="rev-gen-modal" id="rg-modal-info-pricing">
+		<div class="rev-gen-modal__inner">
+			<h4 class="rev-gen-modal__title">
+				<?php esc_html_e( 'Static Pricing and Dynamic Pricing', 'revenue-generator' ); ?>
+			</h4>
+			<p class="rev-gen-modal__message">
+				<?php
+				esc_html_e( 'Revenue Generator allows you two ways to go about pricing content.', 'revenue-generator' );
+				?>
+			</p>
+			<p class="rev-gen-modal__message">
+				<?php
+				printf(
+					wp_kses(
+						__(
+							'Select <b>Static Pricing</b> to manually set the prices of individual articles based on your own pricing strategy. Charge as little - or as much - as you want.',
+							'revenue-generator'
+						),
+						[
+							'b' => [],
+						]
+					)
+				);
+				?>
+			</p>
+			<p class="rev-gen-modal__message">
+				<?php
+				printf(
+					wp_kses(
+						__(
+							'If you select <b>Dynamic Pricing</b>, Laterpay’s AI will “dynamically” adjust the price based on our own data, analytics and algorithms based on the length of each article.',
+							'revenue-generator'
+						),
+						[
+							'b' => [],
+						]
+					)
+				);
+				?>
+			</p>
 		</div>
 	</div>
+	<div class="rev-gen-modal-overlay"></div>
 </script>
+
+<?php include( REVENUE_GENERATOR_PLUGIN_DIR . '/templates/backend/modal-remove-paywall.php' ); ?>
+<?php include( REVENUE_GENERATOR_PLUGIN_DIR . '/templates/backend/modal-account-activation.php' ); ?>
 
 <!-- Template for action to add paywall. -->
 <script type="text/template" id="tmpl-revgen-add-paywall">
@@ -522,48 +547,42 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 </script>
 
 <!-- Template for account activation modal. -->
-<script type="text/template" id="tmpl-revgen-account-activation-modal">
-	<div class="rev-gen-preview-main-account-modal">
-		<span class="rev-gen-preview-main-account-modal-cross">X</span>
-		<?php if ( false === $is_merchant_verified ) : ?>
-			<div class="rev-gen-preview-main-account-modal-action">
-				<h4 class="rev-gen-preview-main-account-modal-action-title"><?php esc_html_e( 'You’re almost done!', 'revenue-generator' ); ?></h4>
-				<span class="rev-gen-preview-main-account-modal-action-info"><?php esc_html_e( 'To make sure you get your revenues, we need you to connect your Laterpay account.', 'revenue-generator' ); ?></span>
-				<div class="rev-gen-preview-main-account-modal-actions">
-					<button id="rg_js_connectAccount" class="rev-gen-preview-main-account-modal-actions-dark">
-						<?php esc_html_e( 'Connect Account', 'revenue-generator' ); ?>
-					</button>
-					<button id="rg_js_signUp" class="rev-gen-preview-main-account-modal-actions-light">
-						<?php esc_html_e( 'Signup', 'revenue-generator' ); ?>
-					</button>
-					<a href="https://support.laterpay.net/what-is-laterpay/" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Learn more', 'revenue-generator' ); ?></a>
-				</div>
+<script type="text/template" id="tmpl-rg-modal-connect-account">
+	<div class="rev-gen-modal rev-gen-modal--connect" id="rg-modal-connect-account">
+		<div class="rev-gen-modal__inner">
+			<a href="#" class="rev-gen-modal__close" id="rg_js_modal_close">x</a>
+
+			<h4 class="rev-gen-modal__title hide-on-loading">
+				<?php esc_html_e( 'Connect your account to activate paywall', 'revenue-generator' ); ?>
+			</h4>
+			<h4 class="rev-gen-modal__title show-on-loading">
+				<?php esc_html_e( 'Just a second…', 'revenue-generator' ); ?>
+			</h4>
+			<p class="rev-gen-modal__message hide-on-loading">
+				<?php esc_html_e( 'Unsure where to find this information?', 'revenue-generator' ); ?>
+				<a target="_blank" rel="noopener noreferrer" href="https://support.laterpay.net/what-is-my-laterpay-merchant-id-api-key-and-where-can-i-find-them">
+					<?php esc_html_e( 'Click here.', 'revenue-generator' ); ?>
+				</a>
+			</p>
+
+			<div class="rev-gen-modal__fields hide-on-loading">
+				<input id="rev-gen-merchant-id" type="text" placeholder="<?php esc_attr_e( 'Merchant ID', 'revenue-generator' ); ?>" maxlength="22" />
+				<input id="rev-gen-api-key" type="text" placeholder="<?php esc_attr_e( 'API Key', 'revenue-generator' ); ?>" maxlength="32" />
 			</div>
-			<div class="rev-gen-preview-main-account-modal-fields">
-				<h5 class="rev-gen-preview-main-account-modal-fields-title"><?php esc_html_e( 'Connect your account to activate paywall', 'revenue-generator' ); ?></h5>
-				<p class="rev-gen-preview-main-account-modal-credentials-info">
-					<?php esc_html_e( 'Unsure where to find this information?', 'revenue-generator' ); ?>
-					<a target="_blank" rel="noopener noreferrer" href="https://support.laterpay.net/what-is-my-laterpay-merchant-id-api-key-and-where-can-i-find-them">
-						<?php esc_html_e( 'Click here.', 'revenue-generator' ); ?>
-					</a>
+
+			<div class="rev-gen-modal__buttons hide-on-loading">
+				<button disabled="disabled" id="rg_js_modal_confirm" class="rev-gen__button">
+					<?php esc_html_e( 'Connect Account', 'revenue-generator' ); ?>
+				</button>
+				<p>
+					<?php esc_html_e( 'Don’t have an account?', 'revenue-generator' ); ?>
+					<a id="rg_js_activateSignup" href="#"><?php esc_html_e( 'Signup', 'revenue-generator' ); ?></a>
 				</p>
-				<input class="rev-gen-preview-main-account-modal-fields-merchant-id" type="text" placeholder="<?php esc_attr_e( 'Merchant ID', 'revenue-generator' ); ?>" maxlength="22" />
-				<input class="rev-gen-preview-main-account-modal-fields-merchant-key" type="text" placeholder="<?php esc_attr_e( 'API Key', 'revenue-generator' ); ?>" maxlength="32" />
-				<div class="rev-gen-preview-main-account-modal-actions">
-					<button disabled="disabled" id="rg_js_verifyAccount" class="rev-gen-preview-main-account-modal-actions-dark">
-						<?php esc_html_e( 'Connect Account', 'revenue-generator' ); ?>
-					</button>
-					<p>
-						<?php esc_html_e( 'Don’t have an account?', 'revenue-generator' ); ?>
-						<a id="rg_js_activateSignup" href="#"><?php esc_html_e( 'Signup', 'revenue-generator' ); ?></a>
-					</p>
-				</div>
-				<span class="rev-gen-preview-main-account-modal-fields-loader"></span>
 			</div>
-			<div class="rev-gen-preview-main-account-modal-error">
-				<h4 class="rev-gen-preview-main-account-modal-error-title"><?php esc_html_e( 'Sorry, something went wrong.', 'revenue-generator' ); ?></h4>
-				<span class="rev-gen-preview-main-account-modal-error-warning">!</span>
-				<div class="rev-gen-preview-main-account-modal-error-message">
+			<div class="rev-gen-modal__error">
+				<h4 class="rev-gen-modal__title"><?php esc_html_e( 'Sorry, something went wrong.', 'revenue-generator' ); ?></h4>
+				<span class="rev-gen-modal__icon rev-gen-modal__icon--warning">!</span>
+				<p class="rev-gen-modal__message">
 					<?php
 					echo wp_kses(
 						sprintf(
@@ -583,59 +602,118 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 						]
 					);
 					?>
-				</div>
+				</p>
 			</div>
-		<?php endif; ?>
-		<div class="rev-gen-preview-main-account-modal-success">
-			<h4 class="rev-gen-preview-main-account-modal-success-title"></h4>
-			<div class="rev-gen-preview-main-account-modal-success-message"></div>
-			<div class="rev-gen-preview-main-account-modal-warning-message">
+			<div class="rev-gen-modal__loader"></div>
+		</div>
+	</div>
+	<div class="rev-gen-modal-overlay"></div>
+</script>
+
+<!-- Template for option update warning modal -->
+<script type="text/template" id="tmpl-rg-modal-search-paywall-warning">
+	<div class="rev-gen-modal" id="rg-modal-search-paywall-warning">
+		<div class="rev-gen-modal__inner">
+			<a href="#" class="rev-gen-modal__close" id="rg_js_modal_close">x</a>
+
+			<h4 class="rev-gen-modal__title">
+				<?php esc_html_e( 'This will create a new paywall.', 'revenue-generator' ); ?>
+			</h4>
+
+			<span class="rev-gen-modal__icon rev-gen-modal__icon--warning">!</span>
+
+			<p class="rev-gen-modal__message">
 				<?php
-				echo wp_kses(
-					__(
-						'Now that you have more than one paywall, please be aware that the most specific will be applied to an article. <a href="mailto:wordpress@laterpay.net">Contact us</a> if you have any questions or feedback.',
-						'revenue-generator'
-					),
-					[
-						'a' => [
-							'href' => [],
-						],
-					]
-				);
+				esc_html_e( 'By choosing to preview on a different article, you will create a new paywall. Would you like to proceed?', 'revenue-generator' );
 				?>
+			</p>
+
+			<div class="rev-gen-modal__buttons">
+				<button id="rg_js_modal_confirm" class="rev-gen__button">
+					<?php esc_html_e( 'Continue', 'revenue-generator' ); ?>
+				</button>
+				<button id="rg_js_modal_cancel" class="rev-gen__button rev-gen__button--secondary">
+					<?php esc_html_e( 'Cancel', 'revenue-generator' ); ?>
+				</button>
 			</div>
-			<div class="rev-gen-preview-main-account-modal-success-actions">
-				<button id="rg_js_viewPost" data-target-id="" class="rev-gen-preview-main-account-modal-actions-dark">
+		</div>
+	</div>
+	<div class="rev-gen-modal-overlay"></div>
+</script>
+
+<!-- Template for paywall activation modal -->
+<script type="text/template" id="tmpl-rg-modal-paywall-activation">
+	<div class="rev-gen-modal" id="rg-modal-paywall-activation">
+		<div class="rev-gen-modal__inner">
+			<a href="#" class="rev-gen-modal__close" id="rg_js_modal_close">x</a>
+
+			<h4 class="rev-gen-modal__title">
+				{{ data.paywallName }}
+			</h4>
+
+			<p class="rev-gen-modal__message">
+				<# if ( 'category' === data.appliedTo || 'exclude_category' !== data.appliedTo ) { #>
+					<# if ( 'category' === data.appliedTo ) { #>
+						<?php
+						printf(
+							'%s <b>%s</b> %s <b>{{ data.categoryName }}</b>.',
+							esc_html__( 'Has been published to', 'revenue-generator' ),
+							esc_html__( 'all posts', 'revenue-generator' ),
+							esc_html__( 'in category', 'revenue-generator' )
+						);
+						?>
+					<# } #>
+
+					<# if ( 'exclude_category' === data.appliedTo ) { #>
+						<?php
+						printf(
+							'%s <b>%s</b> %s <b>{{ data.categoryName }}</b>.',
+							esc_html__( 'Has been published to', 'revenue-generator' ),
+							esc_html__( 'all posts, except posts under', 'revenue-generator' ),
+							esc_html__( 'category', 'revenue-generator' )
+						);
+						?>
+					<# } #>
+				<# } else { #>
+					<# if ( 'supported' === data.appliedTo ) { #>
+						<?php
+						printf(
+							'%s <b>{{ data.postTitle }}</b>.',
+							esc_html__( 'Has been published on', 'revenue-generator' )
+						);
+						?>
+					<# } else if ( 'specific_post' === data.appliedTo ) { #>
+						<?php
+						printf(
+							'%s <b>%s</b>.',
+							esc_html__( 'Has been published on', 'revenue-generator' ),
+							esc_html__( 'Specific Posts & Pages', 'revenue-generator' )
+						);
+						?>
+					<# } else { #>
+						<?php
+						printf(
+							'%s <b>%s</b>.',
+							esc_html__( 'Has been published on', 'revenue-generator' ),
+							esc_html__( 'all posts', 'revenue-generator' )
+						);
+						?>
+					<# } #>
+				<# } #>
+			</p>
+
+			<div class="rev-gen-modal__buttons">
+				<button id="rg_js_modal_confirm" class="rev-gen__button">
 					<?php esc_html_e( 'View on live post', 'revenue-generator' ); ?>
 				</button>
-				<button id="rg_js_viewDashboard" data-dashboard-url="<?php echo esc_url( $dashboard_url ); ?>" class="rev-gen-preview-main-account-modal-actions-light">
+				<button id="rg_js_modal_cancel" class="rev-gen__button rev-gen__button--secondary" data-dashboard_url="<?php echo esc_url( $dashboard_url ); ?>">
 					<?php esc_html_e( 'View paywall dashboard', 'revenue-generator' ); ?>
 				</button>
 				<a href="<?php echo esc_url( $new_paywall_url ); ?>"><?php esc_html_e( 'Create another paywall', 'revenue-generator' ); ?></a>
 			</div>
 		</div>
 	</div>
-</script>
-
-<!-- Template for option update warning modal -->
-<script type="text/template" id="tmpl-revgen-new-paywall-warning">
-	<div class="rev-gen-preview-main-option-update search-paywall-warning-modal">
-		<h4 class="rev-gen-preview-main-option-update-title"><?php esc_html_e( 'This will create a new paywall.', 'revenue-generator' ); ?></h4>
-		<span class="rev-gen-preview-main-option-update-warning">!</span>
-		<p class="rev-gen-preview-main-option-update-message">
-			<?php
-			esc_html_e( 'By choosing to preview on a different article, you will create a new paywall. Would you like to proceed?', 'revenue-generator' );
-			?>
-		</p>
-		<div class="rev-gen-preview-main-option-update-buttons">
-			<button id="rg_js_continueSearch" class="rev-gen-preview-main-option-update-buttons-dark">
-				<?php esc_html_e( 'Continue', 'revenue-generator' ); ?>
-			</button>
-			<button id="rg_js_cancelSearch" class="rev-gen-preview-main-option-update-buttons-light">
-				<?php esc_html_e( 'Cancel', 'revenue-generator' ); ?>
-			</button>
-		</div>
-	</div>
+	<div class="rev-gen-modal-overlay"></div>
 </script>
 <script type="text/template" id="tmpl-rg-modal-dynamic-title-desc">
 	<div class="rev-gen-modal" id="rg-modal-dynamic-title-desc">
