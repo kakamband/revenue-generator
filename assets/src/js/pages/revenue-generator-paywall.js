@@ -1674,6 +1674,14 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					const optionManager = optionItem.find(
 						'.rg-purchase-overlay-option-manager'
 					);
+
+					// We are using all div to add styling.
+					const childsOfOptionManager = optionManager.find( 'div' );
+
+					const editActionbutton = $( optionItem ).find(
+						$o.editOption
+					);
+
 					let entityId;
 
 					if ( currentType !== selectedEntityType ) {
@@ -1770,9 +1778,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 									.find( $o.purchaseOptionItemDesc )
 									.text( timePassDefaultValues.description );
 
-								optionManager
-									.find( 'div' )
-									.css( { height: ' 45px' } );
+								childsOfOptionManager.removeClass(
+									'rg-purchase-overlay-option-manager-subscription'
+								);
 								optionManager
 									.find( $o.periodCountSelection )
 									.val( timePassDefaultValues.period );
@@ -1814,9 +1822,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 										subscriptionDefaultValues.description
 									);
 
-								optionManager
-									.find( 'div' )
-									.css( { height: ' 55px' } );
+								childsOfOptionManager.addClass(
+									'rg-purchase-overlay-option-manager-subscription'
+								);
 								optionManager
 									.find( $o.periodCountSelection )
 									.val( subscriptionDefaultValues.period );
@@ -1828,11 +1836,14 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							// Set static pricing by default if individual.
 							optionItem.attr( 'data-pricing-type', 'static' );
 							optionItem.attr( 'data-paywall-id', '' );
-							optionManager.find( 'div' ).css( {
-								height: ' 45px',
-							} );
+							childsOfOptionManager.removeClass(
+								'rg-purchase-overlay-option-manager-subscription'
+							);
 						}
 					}
+
+					// Trigger click to update purchase options.
+					editActionbutton.trigger( 'click' );
 				} );
 
 				/**
@@ -2258,26 +2269,50 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						'data-purchase-type'
 					);
 
-					let newTitle;
-					newTitle = periodCount;
+					let newTitle, newDescriptionTitle;
+					newTitle = periodCount + ' ';
+					newDescriptionTitle = periodCount + ' ';
 					switch ( periodSelection ) {
 						case 'h':
-							newTitle += __( ' Hour', 'revenue-generator' );
+							newTitle += __( 'Hour', 'revenue-generator' );
+							newDescriptionTitle += __(
+								'Hours',
+								'revenue-generator'
+							);
 							break;
 						case 'd':
-							newTitle += __( ' Day', 'revenue-generator' );
+							newTitle += __( 'Day', 'revenue-generator' );
+							newDescriptionTitle += __(
+								'Days',
+								'revenue-generator'
+							);
 							break;
 						case 'w':
-							newTitle += __( ' Week', 'revenue-generator' );
+							newTitle += __( 'Week', 'revenue-generator' );
+							newDescriptionTitle += __(
+								'Weeks',
+								'revenue-generator'
+							);
 							break;
 						case 'm':
-							newTitle += __( ' Month', 'revenue-generator' );
+							newTitle += __( 'Month', 'revenue-generator' );
+							newDescriptionTitle += __(
+								'Months',
+								'revenue-generator'
+							);
 							break;
 						case 'y':
-							newTitle += __( ' Year', 'revenue-generator' );
+							newTitle += __( 'Year', 'revenue-generator' );
+							newDescriptionTitle += __(
+								'Years',
+								'revenue-generator'
+							);
 							break;
 					}
 
+					/**
+					 * translators: %1$s auto generated period string.
+					 */
 					let newDescription = sprintf(
 						__(
 							'Enjoy unlimited access to all our content for %1$s'
@@ -2286,23 +2321,24 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					);
 
 					if ( periodCount && periodCount > 1 ) {
+						/**
+						 * translators: %1$s auto generated period string.
+						 */
 						newDescription = sprintf(
 							__(
-								'Enjoy unlimited access to all our content for %1$ss'
+								'Enjoy unlimited access to all our content for %1$s'
 							),
-							newTitle
+							newDescriptionTitle
 						);
 					}
 
 					switch ( currentPurchaseType ) {
 						case 'subscription':
-							newTitle += __(
-								' Subscription',
-								'revenue-generator'
-							);
+							newTitle +=
+								' ' + __( 'Subscription', 'revenue-generator' );
 							break;
 						case 'timepass':
-							newTitle += __( ' Pass', 'revenue-generator' );
+							newTitle += ' ' + __( 'Pass', 'revenue-generator' );
 							break;
 					}
 
