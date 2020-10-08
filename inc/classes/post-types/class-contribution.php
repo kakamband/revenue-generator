@@ -80,6 +80,7 @@ class Contribution extends Base {
 						'_rg_dialog_description'   => $contribution_data['dialog_description'],
 						'_rg_all_revenues'         => $contribution_data['all_revenues'],
 						'_rg_selected_amount'      => $contribution_data['selected_amount'],
+						'_rg_layout_type'          => $contribution_data['layout_type'],
 					],
 				]
 			);
@@ -278,6 +279,7 @@ class Contribution extends Base {
 			'all_revenues'       => '',
 			'selected_amount'    => '',
 			'code'               => '',
+			'layout_type'        => 'box',
 		];
 	}
 
