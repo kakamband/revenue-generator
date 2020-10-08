@@ -2310,10 +2310,8 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							break;
 					}
 
-					/**
-					 * translators: %1$s auto generated period string.
-					 */
 					let newDescription = sprintf(
+						/* translators: %1$s auto generated period string */
 						__(
 							'Enjoy unlimited access to all our content for %1$s'
 						),
@@ -2321,10 +2319,8 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					);
 
 					if ( periodCount && periodCount > 1 ) {
-						/**
-						 * translators: %1$s auto generated period string.
-						 */
 						newDescription = sprintf(
+							/* translators: %1$s auto generated period string. */
 							__(
 								'Enjoy unlimited access to all our content for %1$s'
 							),
