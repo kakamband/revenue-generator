@@ -470,6 +470,9 @@ body.modal-blur select.rev-gen__select2 + .select2-container .select2-selection-
 	background: #fff;
 	max-width: 415px;
 	width: 100%;
+	&--wide {
+		max-width: 640px;
+	}
 	&__inner {
 		padding: 60px 40px;
 		text-align: center;
@@ -521,6 +524,23 @@ body.modal-blur select.rev-gen__select2 + .select2-container .select2-selection-
 				background-color: #a9a9a9;
 				border: 2px solid #a9a9a9;
 				cursor: not-allowed;
+			}
+		}
+	}
+	&__cards {
+		display: flex;
+		flex-flow: row;
+		justify-content: center;
+		.rev-gen-card {
+			display: flex;
+			flex-flow: column;
+			justify-content: space-between;
+			margin-right: 25px;
+			&:last-child {
+				margin-right: 0;
+			}
+			&__title {
+				justify-self: flex-end;
 			}
 		}
 	}

@@ -203,6 +203,10 @@ class Admin {
 					'period'      => '1',
 				],
 			],
+			'welcome' => [
+				'isMainWelcomeDone'    => ! empty( $current_global_options['is_welcome_done'] ),
+				'isPaywallWelcomeDone' => ! empty( $current_global_options['average_post_publish_count'] ),
+			],
 		];
 
 		$rg_script_data['rg_global_config_nonce'] = wp_create_nonce( 'rg_global_config_nonce' );
@@ -531,25 +535,6 @@ class Admin {
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
 		echo View::render_template( 'backend/contribution/create', $dashboard_page_data );
-
-		return '';
-	}
-
-	/**
-	 * Load admin welcome screen.
-	 *
-	 * @return string
-	 *
-	 * @codeCoverageIgnore -- Test will be covered in e2e tests.
-	 */
-	public function load_welcome_screen_paywall() {
-		self::load_assets();
-		$welcome_page_data = [
-			'low_count_icon'  => Config::$plugin_defaults['img_dir'] . 'low-publish.svg',
-			'high_count_icon' => Config::$plugin_defaults['img_dir'] . 'high-publish.svg',
-		];
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
-		echo View::render_template( 'backend/welcome/welcome-paywall', $welcome_page_data );
 
 		return '';
 	}
