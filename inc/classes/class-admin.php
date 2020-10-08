@@ -240,14 +240,14 @@ class Admin {
 		// Check if setup is done, and load page accordingly.
 		$is_paywall_setup_done = empty( $current_global_options['average_post_publish_count'] ) ? false : true;
 		$is_welcome_setup_done = ( ! empty( $current_global_options['is_welcome_done'] ) ) ? $current_global_options['is_welcome_done'] : false;
-		$dashboard_callback    = '';
+		$dashboard_callback    = 'load_welcome_screen';
 
-		if ( ! empty( $is_welcome_setup_done ) && 'contribution' === $is_welcome_setup_done ) {
-			$dashboard_callback = 'load_contribution';
-		} elseif ( ! empty( $is_welcome_setup_done ) && 'paywall' === $is_welcome_setup_done ) {
-			$dashboard_callback = ( ! empty( $is_paywall_setup_done ) ) ? 'load_dashboard' : 'load_welcome_screen_paywall';
-		} else {
-			$dashboard_callback = 'load_welcome_screen';
+		if ( ! empty( $is_welcome_setup_done ) ) {
+			if ( 'contribution' === $is_welcome_setup_done ) {
+				$dashboard_callback = 'load_contribution';
+			} else if ( 'paywall' === $is_welcome_setup_done && ! empty( $is_paywall_setup_done ) ) {
+				$dashboard_callback = 'load_dashboard';
+			}
 		}
 
 		// Add main menu page.
@@ -266,10 +266,7 @@ class Admin {
 		if ( ! empty( $menus ) ) {
 			foreach ( $menus as $key => $page_data ) {
 				$slug          = $page_data['url'];
-				$page_callback = (
-					'dashboard' === $page_data['method'] && false === $is_paywall_setup_done ) ?
-					'load_welcome_screen_paywall' :
-					'load_' . $page_data['method'];
+				$page_callback = 'load_' . $page_data['method'];
 
 				add_submenu_page(
 					'revenue-generator',
