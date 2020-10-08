@@ -17,7 +17,7 @@ import '../utils';
 				body: $( 'body' ),
 
 				// Welcome screen wrapper.
-				welcomeScreenWrapper: $( '.welcome-screen-wrapper' ),
+				welcomeScreenWrapper: $( '.rev-gen-welcome' ),
 
 				// Welcome Paywall Cards.
 				lowPostCard: $( '#rg_js_lowPostCard' ),
@@ -26,7 +26,7 @@ import '../utils';
 				// Welcome Cards.
 				isContribution: $( '#rg_Contribution' ),
 				isPaywall: $( '#rg_Paywall' ),
-				laterpayTrackingStatus: $( '.welcome-screen-tracking' ),
+				laterpayTrackingStatus: $( '#welcome-screen-tracking' ),
 
 				snackBar: $( '#rg_js_SnackBar' ),
 			};
