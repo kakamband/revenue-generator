@@ -102,6 +102,19 @@ class Assets {
 			true
 		);
 
+		$current_global_options = Config::get_global_options();
+
+		wp_localize_script(
+			'revenue-generator',
+			'_rgAdminProps',
+			[
+				'welcome' => [
+					'isMainWelcomeDone'    => ! empty( $current_global_options['is_welcome_done'] ),
+					'isPaywallWelcomeDone' => ! empty( $current_global_options['average_post_publish_count'] ),
+				],
+			]
+		);
+
 		// Sets translated strings for JS script.
 		wp_set_script_translations(
 			'revenue-generator',
