@@ -236,15 +236,17 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 		<?php
 		if ( ! empty( $purchase_option_items ) ) :
 			foreach ( $purchase_option_items as $purchase_option ) {
-				$purchase_option_id       = empty( $purchase_option['id'] ) ? '' : $purchase_option['id'];
-				$purchase_option_price    = number_format( $purchase_option['price'], 2 );
-				$purchase_option_type     = $purchase_option['purchase_type'];
-				$is_individual            = 'individual' === $purchase_option_type;
-				$individual_type          = '';
-				$purchase_option_revenue  = $purchase_option['revenue'];
-				$purchase_option_duration = $is_individual ? '' : $purchase_option['duration'];
-				$purchase_option_period   = $is_individual ? '' : $purchase_option['period'];
-				$purchase_option_order    = $purchase_option['order'];
+				$purchase_option_id           = empty( $purchase_option['id'] ) ? '' : $purchase_option['id'];
+				$purchase_option_price        = number_format( $purchase_option['price'], 2 );
+				$purchase_option_type         = $purchase_option['purchase_type'];
+				$is_individual                = 'individual' === $purchase_option_type;
+				$individual_type              = '';
+				$purchase_option_revenue      = $purchase_option['revenue'];
+				$purchase_option_duration     = $is_individual ? '' : $purchase_option['duration'];
+				$purchase_option_period       = $is_individual ? '' : $purchase_option['period'];
+				$purchase_option_order        = $purchase_option['order'];
+				$purchase_option_custom_title = ( ! empty( $purchase_option['custom_title'] ) ) ? $purchase_option['custom_title'] : '';
+				$purchase_option_custom_desc  = ( ! empty( $purchase_option['custom_desc'] ) ) ? $purchase_option['custom_desc'] : '';
 
 				$additional_class = '';
 				if ( 2 === $purchase_option_order ) {
@@ -275,6 +277,8 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 					<?php endif; ?>
 					data-uid=""
 					data-order="<?php echo esc_attr( $purchase_option_order ); ?>"
+					data-custom-title="<?php echo esc_attr( $purchase_option_custom_title ); ?>"
+					data-custom-desc="<?php echo esc_attr( $purchase_option_custom_desc ); ?>"
 				>
 				<div class="rg-purchase-overlay-purchase-options-item-highlight"></div>
 					<div class="rg-purchase-overlay-purchase-options-item-info">
