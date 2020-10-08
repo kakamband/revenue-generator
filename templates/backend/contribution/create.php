@@ -5,7 +5,8 @@
  * @package revenue-generator
  */
 
-use LaterPay\Revenue_Generator\Inc\View;
+use \LaterPay\Revenue_Generator\Inc\View;
+use \LaterPay\Revenue_Generator\Inc\Post_Types\Contribution;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	// prevent direct access to this file.
@@ -64,7 +65,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</form>
 			</section>
 			<section class="rg-contribution-builder__preview">
-				<iframe src="<?php echo esc_url( site_url() ); ?>" width="100%" height="100%">
+				<iframe src="<?php echo esc_url( Contribution::get_preview_post_url() ); ?>" width="100%" height="100%"></iframe>
 			</section>
 		</div>
 	</div>

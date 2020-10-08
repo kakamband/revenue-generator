@@ -10,6 +10,7 @@ namespace LaterPay\Revenue_Generator\Inc\Post_Types;
 use LaterPay\Revenue_Generator\Inc\Config;
 use LaterPay\Revenue_Generator\Inc\Post_Types;
 use LaterPay\Revenue_Generator\Inc\View;
+use LaterPay\Revenue_Generator\Inc\Post_Types\Contribution_Preview;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -442,6 +443,47 @@ class Contribution extends Base {
 		}
 
 		return $sql;
+	}
+
+	/**
+	 * Get preview URL of Contribution preview.
+	 *
+	 * @return string $url Post preview URL.
+	 */
+	public static function get_preview_post_url() {
+		$url     = '';
+		$post_id = 0;
+
+		$posts = get_posts(
+			[
+				'post_type'      => Contribution_Preview::SLUG,
+				'posts_per_page' => 1,
+				'post_status'    => 'draft',
+				'fields'         => 'ids',
+			]
+		);
+
+		if ( ! empty( $posts ) ) {
+			$post_id = $posts[0];
+		} else {
+			$post_id = wp_insert_post(
+				[
+					'post_type' => Contribution_Preview::SLUG,
+					'post_status' => 'draft',
+				]
+			);
+		}
+
+		$url = add_query_arg(
+			[
+				'p'         => $post_id,
+				'post_type' => Contribution_Preview::SLUG,
+				'preview'   => 'true',
+			],
+			site_url()
+		);
+
+		return $url;
 	}
 
 }
