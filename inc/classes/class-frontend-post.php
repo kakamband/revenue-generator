@@ -11,6 +11,7 @@ use LaterPay\Revenue_Generator\Inc\Post_Types\Paywall;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Subscription;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Time_Pass;
 use \LaterPay\Revenue_Generator\Inc\Traits\Singleton;
+use \LaterPay\Revenue_Generator\Inc\Post_Types\Contribution_Preview;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -130,6 +131,7 @@ class Frontend_Post {
 	 */
 	protected function setup_hooks() {
 		add_action( 'wp_enqueue_scripts', [ $this, 'register_connector_assets' ] );
+		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_preview_styles' ] );
 		add_filter( 'wp_head', [ $this, 'add_connector_config' ] );
 		add_filter( 'the_content', [ $this, 'revenue_generator_post_content' ] );
 	}
@@ -225,7 +227,7 @@ class Frontend_Post {
 		// @todo make sure to select eu based on locale, once upstream LaterPay starts supporting them.
 		$connector_url = $region_connector_urls['us'];
 
-		if ( is_singular( Post_Types::get_allowed_post_types() ) ) {
+		if ( is_singular( Post_Types::get_allowed_post_types() ) || Contribution_Preview::SLUG === get_post_type() ) {
 			$assets_instance = Assets::get_instance();
 
 			// Enqueue connector script based on region and environment.
@@ -682,5 +684,21 @@ class Frontend_Post {
 		} else {
 			return $paywall_instance->get_purchase_option_data_by_paywall_id( $this->connected_paywall_id );
 		}
+	}
+
+	/**
+	 * Enqueue styles needed for preview pane.
+	 *
+	 * @hooked action `wp_enqueue_scripts`
+	 *
+	 * @return void
+	 */
+	public function enqueue_preview_styles() {
+		wp_enqueue_style(
+			'revenue-generator-preview',
+			REVENUE_GENERATOR_BUILD_URL . '/css/revenue-generator-preview.css',
+			array(),
+			REVENUE_GENERATOR_VERSION
+		);
 	}
 }
