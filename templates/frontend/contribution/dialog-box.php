@@ -38,8 +38,8 @@ $is_preview = Contribution_Preview::SLUG === get_post_type();
 <?php } else { ?>
 	<div class="rev-gen-contribution-main is-style-wide">
 			<div class="rev-gen-contribution-main--box">
-				<div class="rev-gen-contribution-main--box-header rev-gen-contribution-tooltip-right"<?php echo ( $is_preview ) ? ' contenteditable="true"' : ''; ?>><?php echo esc_html( $dialog_header ); ?></div>
-				<div class="rev-gen-contribution-main--box-description rev-gen-contribution-tooltip-right"<?php echo ( $is_preview ) ? ' contenteditable="true"' : ''; ?>><?php echo esc_html( $dialog_description ); ?></div>
+				<div class="rev-gen-contribution-main--box-header rev-gen-contribution-tooltip-right"<?php echo ( $is_preview ) ? ' contenteditable="true" data-bind="dialog_header"' : ''; ?>><?php echo esc_html( $dialog_header ); ?></div>
+				<div class="rev-gen-contribution-main--box-description rev-gen-contribution-tooltip-right"<?php echo ( $is_preview ) ? ' contenteditable="true" data-bind="dialog_description"' : ''; ?>><?php echo esc_html( $dialog_description ); ?></div>
 				<div class="rev-gen-contribution-main--box-donation-wrapper">
 					<?php
 					foreach ( $payment_config['amounts'] as $amount_info ) {
@@ -56,7 +56,7 @@ $is_preview = Contribution_Preview::SLUG === get_post_type();
 						?>
 						<div data-href="<?php echo esc_url( $amount_info['url'] ); ?>" data-revenue="<?php echo esc_attr( $amount_info['revenue'] ); ?>" data-campid="<?php echo esc_attr( $campaign_id ); ?>" class="rev-gen-contribution-main--box-donation">
 							<?php if ( $is_preview ) : ?>
-								<?php echo esc_html( $currency_symbol ); ?><span contenteditable="true"><?php echo esc_html( $lp_amount ); ?></span>
+								<?php echo esc_html( $currency_symbol ); ?><span contenteditable="true" data-bind="all_amounts"><?php echo esc_html( $lp_amount ); ?></span>
 							<?php else : ?>
 								<?php echo esc_html( $lp_amount ); ?>
 							<?php endif; ?>

@@ -17,6 +17,13 @@ window.RevGenApp = {
 	views: {},
 };
 
+window.handlePreviewUpdate = ( attr, value ) => {
+	window.RevGenApp.views.app.trigger( 'preview-update', {
+		attr,
+		value,
+	} );
+};
+
 ( ( $, Backbone ) => {
 	$( function() {
 		const $o = {
@@ -48,6 +55,7 @@ window.RevGenApp = {
 
 				this.initializeTour();
 
+				this.listenTo( this, 'preview-update', this.onPreviewUpdate );
 				this.listenTo( this.model, 'change', this.onModelChange );
 			},
 
@@ -60,6 +68,14 @@ window.RevGenApp = {
 					addTourSteps( tour );
 					startWelcomeTour( tour );
 				}
+			},
+
+			onPreviewUpdate( data ) {
+				if ( ! data || ! data.attr || ! data.value ) {
+					return;
+				}
+
+				this.model.set( data.attr, data.value );
 			},
 
 			onInputChange( e ) {

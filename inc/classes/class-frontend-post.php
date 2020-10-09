@@ -131,7 +131,7 @@ class Frontend_Post {
 	 */
 	protected function setup_hooks() {
 		add_action( 'wp_enqueue_scripts', [ $this, 'register_connector_assets' ] );
-		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_preview_styles' ] );
+		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_preview_scripts_and_styles' ] );
 		add_filter( 'wp_head', [ $this, 'add_connector_config' ] );
 		add_filter( 'the_content', [ $this, 'revenue_generator_post_content' ] );
 	}
@@ -687,17 +687,27 @@ class Frontend_Post {
 	}
 
 	/**
-	 * Enqueue styles needed for preview pane.
+	 * Enqueue styles and scripts needed for preview pane.
 	 *
 	 * @hooked action `wp_enqueue_scripts`
 	 *
 	 * @return void
 	 */
-	public function enqueue_preview_styles() {
+	public function enqueue_preview_scripts_and_styles() {
 		wp_enqueue_style(
 			'revenue-generator-preview',
 			REVENUE_GENERATOR_BUILD_URL . '/css/revenue-generator-preview.css',
 			array(),
+			REVENUE_GENERATOR_VERSION
+		);
+
+		wp_enqueue_script(
+			'revenue-generator-preview-script',
+			REVENUE_GENERATOR_BUILD_URL . '/revenue-generator-preview.js',
+			array(
+				'jquery',
+				'backbone',
+			),
 			REVENUE_GENERATOR_VERSION
 		);
 	}
