@@ -21,7 +21,11 @@ main {
 		background: #fff;
 		color: #1d1d1d;
 	}
-	.rev-gen-contribution-main--box-donation span {
+	*[contenteditable="true"] {
 		cursor: text;
+		&:focus {
+			border-radius: 10px;
+			outline: 2px solid #1d1d1d;
+		}
 	}
 }
