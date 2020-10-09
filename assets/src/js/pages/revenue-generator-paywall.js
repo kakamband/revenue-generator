@@ -219,7 +219,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						0 ===
 							parseInt(
 								revenueGeneratorGlobalOptions.globalOptions
-									.is_paywall_tutorial_completed
+									.paywall_tutorial_done
 							) &&
 						allPurchaseOptions &&
 						allPurchaseOptions.length > 0
@@ -3313,7 +3313,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				// Create form data.
 				const formData = {
 					action: 'rg_complete_tour',
-					config_key: 'is_paywall_tutorial_completed',
+					config_key: 'paywall_tutorial_done',
 					config_value: 1,
 					security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
 				};

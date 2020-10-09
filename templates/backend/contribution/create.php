@@ -13,12 +13,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
+
+<script>
+	var RevGenContributionData = <?php echo json_encode( $contribution_data ); ?>;
+</script>
+
 <div class="wrap">
 	<div class="rev-gen-layout-wrapper">
 		<div class="laterpay-loader-wrapper">
 			<img alt="<?php esc_attr_e( 'Laterpay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
 		</div>
-		<div class="rg-contribution-builder">
+		<div class="rg-contribution-builder" id="contribution-builder-app">
 			<section class="rg-contribution-builder__left">
 				<form class="rg-contribution-builder__form" id="rg_js_form">
 					<h1 class="rg-contribution-builder__title"><?php esc_html_e( 'Create Your Contribution', 'revenue-generator' ); ?></h1>
@@ -28,21 +33,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 						<div class="rg-contribution-layout-select__options">
 							<label class="rg-contribution-layout-type">
-								<input type="radio" class="rg-visuallyhidden" name="layout_type">
+								<input type="radio" class="rg-visuallyhidden" name="layout_type" value="box" <?php checked( 'box', $contribution_data['layout_type'] ); ?>>
 								<div class="rg-contribution-layout-type__preview">
 									<div class="rg-contribution-layout-type__box"></div>
 									<?php esc_html_e( 'Box', 'revenue-generator' ); ?>
 								</div>
 							</label>
 							<label class="rg-contribution-layout-type">
-								<input type="radio"  class="rg-visuallyhidden" name="layout_type">
+								<input type="radio"  class="rg-visuallyhidden" name="layout_type" value="button" <?php checked( 'button', $contribution_data['layout_type'] ); ?>>
 								<div class="rg-contribution-layout-type__preview">
 									<div class="rg-contribution-layout-type__box rg-contribution-layout-type__box--pill"></div>
 									<span class="rg-contribution-layout-type__label"><?php esc_html_e( 'Button', 'revenue-generator' ); ?></span>
 								</div>
 							</label>
 							<label class="rg-contribution-layout-type">
-								<input type="radio"  class="rg-visuallyhidden" name="layout_type">
+								<input type="radio"  class="rg-visuallyhidden" name="layout_type" value="bar" <?php checked( 'bar', $contribution_data['layout_type'] ); ?>>
 								<div class="rg-contribution-layout-type__preview">
 									<div class="rg-contribution-layout-type__box rg-contribution-layout-type__box--complex">
 										<div class="rg-contribution-layout-type__inner"></div>
@@ -55,17 +60,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 					<section class="rg-contribution-builder-inputs">
 						<div class="rg-contribution-builder__input-wrap">
-							<input type="text" placeholder="<?php esc_html_e( 'Campaign Name', 'revenue-generator' ); ?>">
+							<input type="text" placeholder="<?php esc_html_e( 'Campaign Name', 'revenue-generator' ); ?>" data-bind="name" required data-validate>
+							<p class="input-error-text"><?php esc_html_e( 'This field is required' ); ?></p>
 						</div>
 						<div class="rg-contribution-builder__input-wrap">
-							<input type="text" placeholder="<?php esc_html_e( 'Link to Thank You Page', 'revenue-generator' ); ?>">
+							<input type="text" placeholder="<?php esc_html_e( 'Link to Thank You Page', 'revenue-generator' ); ?>" data-bind="thank_you" data-validate data-validation="url">
+							<p class="input-error-text"><?php esc_html_e( 'Please enter valid URL.', 'revenue-generator' ); ?></p>
 						</div>
-						<input type="submit" class="rev-gen__button" value="<?php esc_html_e( 'Save', 'revenue-generator' ); ?>">
+						<input type="submit" class="rev-gen__button" value="<?php esc_html_e( 'Save', 'revenue-generator' ); ?>" disabled="disabled" data-default-text="<?php esc_html_e( 'Save', 'revenue-generator' ); ?>">
 					</section>
+
+					<input type="hidden" name="security" value="<?php echo esc_attr( wp_create_nonce( 'rg_contribution_nonce' ) ); ?>">
+					<input type="hidden" name="action" value="rg_contribution_save">
+					<input type="hidden" name="ID" value="<?php echo esc_attr( $contribution_data['ID'] ); ?>">
+					<input type="hidden" name="amounts" value="">
+					<input type="hidden" name="dialog_header" value="<?php echo esc_attr( $contribution_data['dialog_header'] ); ?>">
+					<input type="hidden" name="dialog_description" value="<?php echo esc_attr( $contribution_data['dialog_description'] ); ?>">
+
+					<p class="rg-contribution-builder__helper-message"><?php esc_html_e( 'To include the Contribution Box on your site, paste the code where you would like it to appear.', 'revenue-generator' ); ?></p>
+
+					<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
 				</form>
 			</section>
 			<section class="rg-contribution-builder__preview">
-				<iframe src="<?php echo esc_url( Contribution::get_preview_post_url() ); ?>" width="100%" height="100%"></iframe>
+				<iframe src="<?php echo esc_url( Contribution::get_preview_post_url() ); ?>" width="100%" height="100%" id="contribution-builder-preview"></iframe>
 			</section>
 		</div>
 	</div>

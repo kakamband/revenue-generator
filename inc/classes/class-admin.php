@@ -572,11 +572,11 @@ class Admin {
 		if ( in_array( $current_screen->id, $dashboard_pages, true ) && ! empty( $admin_menus ) ) {
 			// Check if tutorial is completed, and load page accordingly.
 			$is_welcome_setup_done         = empty( $current_global_options['average_post_publish_count'] ) ? false : true;
-			$is_paywall_tutorial_completed = (bool) $current_global_options['is_paywall_tutorial_completed'];
+			$paywall_tutorial_done = (bool) $current_global_options['paywall_tutorial_done'];
 
 			$paywall_page = add_query_arg( [ 'page' => $admin_menus['paywall']['url'] ], admin_url( 'admin.php' ) );
 
-			if ( true === $is_welcome_setup_done && false === $is_paywall_tutorial_completed ) {
+			if ( true === $is_welcome_setup_done && false === $paywall_tutorial_done ) {
 				wp_safe_redirect( $paywall_page );
 				exit;
 			}
@@ -1649,7 +1649,7 @@ class Admin {
 		// Get all data and sanitize it.
 		$should_restart = filter_input( INPUT_POST, 'restart_tour', FILTER_SANITIZE_NUMBER_INT );
 		$tour_type      = filter_input( INPUT_POST, 'tour_type', FILTER_SANITIZE_STRING );
-		$config_key     = ( ! empty( $tour_type ) ) ? $tour_type : 'is_paywall_tutorial_completed';
+		$config_key     = ( ! empty( $tour_type ) ) ? $tour_type : 'paywall_tutorial_done';
 
 		// Check and verify data exits.
 		if ( 1 === absint( $should_restart ) ) {

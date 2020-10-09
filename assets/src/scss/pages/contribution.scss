@@ -437,6 +437,12 @@ body.revenue-generator_page_revenue-generator-contribution {
 				padding: 14px 30px;
 				font-size: 1.2em;
 				cursor: pointer;
+				&[disabled="disabled"] {
+					cursor: not-allowed;
+					border-color: transparent;
+					background-color: rgba(0, 0, 0, 0.5);
+					color: #fff;
+				}
 			}
 		}
 		&-inputs {
@@ -450,6 +456,24 @@ body.revenue-generator_page_revenue-generator-contribution {
 				border: 1px solid transparent;
 				font-size: 1.2em;
 				background-color: #a0a0a01f;
+			}
+		}
+		&__helper-message {
+			display: none;
+		}
+
+		.input-error-text {
+			display: none;
+			margin: -10px 0 10px;
+			padding: 0;
+			font-size: 1.1em;
+			color: #ff1939;
+		}
+
+		input.error {
+			border-color: #ff1939;
+			+ .input-error-text {
+				display: block;
 			}
 		}
 	}
