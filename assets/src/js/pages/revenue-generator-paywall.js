@@ -919,9 +919,11 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					'option-manager-close',
 					$o.optionManager,
 					function() {
-						$( this ).hide();
 						const $this = $( this );
-						const purchaseOptionItem = $( this ).closest(
+
+						$this.hide();
+
+						const purchaseOptionItem = $this.closest(
 							$o.purchaseOptionItem
 						);
 
