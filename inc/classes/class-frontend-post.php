@@ -427,7 +427,7 @@ class Frontend_Post {
 	 *
 	 * @return array
 	 */
-	private function get_post_payload() {
+	public function get_post_payload() {
 		// Required class instances.
 		$config_data           = Config::get_global_options();
 		$post_types            = Post_Types::get_instance();
@@ -629,7 +629,7 @@ class Frontend_Post {
 	 *
 	 * @return array
 	 */
-	private function get_connected_paywall_id( $post_id ) {
+	public function get_connected_paywall_id( $post_id ) {
 		$paywall_instance = Paywall::get_instance();
 		if ( empty( $this->connected_paywall_id ) ) {
 			$paywall_id   = $paywall_instance->get_connected_paywall_by_post( $post_id );

@@ -2,8 +2,6 @@
 
 /**
  * JS to handle plugin welcome screen interactions.
- *
- * @package revenue-generator
  */
 
 /**

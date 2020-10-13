@@ -41,6 +41,8 @@ class RevGenModal {
 				// noop
 			},
 			autoShow: true,
+			keepOpen: false,
+			closeOutside: false,
 		};
 
 		/** @type {Object} */
@@ -101,36 +103,70 @@ class RevGenModal {
 	 * Binds events on modal's action buttons.
 	 */
 	bindEvents() {
-		this.el
-			.querySelector( '#rg_js_modal_confirm' )
-			.addEventListener( 'click', this.onConfirm.bind( this ) );
-		this.el
-			.querySelector( '#rg_js_modal_cancel' )
-			.addEventListener( 'click', this.onCancel.bind( this ) );
+		if ( this.el.querySelector( '#rg_js_modal_confirm' ) ) {
+			this.el
+				.querySelector( '#rg_js_modal_confirm' )
+				.addEventListener( 'click', this.onConfirm.bind( this ) );
+		}
+
+		if ( this.el.querySelector( '#rg_js_modal_cancel' ) ) {
+			this.el
+				.querySelector( '#rg_js_modal_cancel' )
+				.addEventListener( 'click', this.onCancel.bind( this ) );
+		}
+
+		if ( this.el.querySelector( '#rg_js_modal_close' ) ) {
+			this.el
+				.querySelector( '#rg_js_modal_close' )
+				.addEventListener( 'click', this.hide.bind( this ) );
+		}
+
+		if ( this.options.closeOutside ) {
+			document.addEventListener( 'click', this.hide.bind( this ), {
+				once: true,
+			} );
+
+			this.el.addEventListener( 'click', ( e ) => {
+				e.stopPropagation();
+			} );
+		}
+
+		this.el.addEventListener(
+			'rev-gen-modal-close',
+			this.hide.bind( this )
+		);
 	}
 
 	/**
 	 * Callback when `confirm` button is clicked.
+	 
+- Calls `onConfirm` callback function as defined in options passed to the instance.
+- Closes modal.
 	 *
-	 * - Calls `onConfirm` callback function as defined in options passed to the instance.
-	 * - Closes modal.
+	 * @param {Object} e Event.
 	 */
-	onConfirm() {
-		this.options.onConfirm();
+	onConfirm( e ) {
+		this.options.onConfirm( e, this.el );
 
-		this.hide();
+		if ( ! this.options.keepOpen ) {
+			this.hide();
+		}
 	}
 
 	/**
 	 * Callback when `cancel` button is clicked.
+	 
+- Calls `onCancel` callback function as defined in options passed to the instance.
+- Closes modal.
 	 *
-	 * - Calls `onCancel` callback function as defined in options passed to the instance.
-	 * - Closes modal.
+	 * @param {Object} e Event.
 	 */
-	onCancel() {
-		this.options.onCancel();
+	onCancel( e ) {
+		this.options.onCancel( e, this.el );
 
-		this.hide();
+		if ( ! this.options.keepOpen ) {
+			this.hide();
+		}
 	}
 }
 

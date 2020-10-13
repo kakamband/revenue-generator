@@ -231,4 +231,18 @@ class Config {
 		];
 	}
 
+	/**
+	 * Get currency symbol.
+	 *
+	 * @return string
+	 */
+	public static function get_currency_symbol() {
+		$config_data = self::get_global_options();
+		$symbol      = '';
+		if ( ! empty( $config_data['merchant_currency'] ) ) {
+			$symbol = 'USD' === $config_data['merchant_currency'] ? '$' : '€';
+		}
+		return $symbol;
+	}
+
 }
