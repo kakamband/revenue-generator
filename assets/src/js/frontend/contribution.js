@@ -2,8 +2,6 @@
 
 /**
  * JS to handle plugin Contribution Dailog.
- *
- * @package revenue-generator
  */
 
 /**

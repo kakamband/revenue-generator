@@ -249,6 +249,8 @@ class Time_Pass extends Base {
 		$time_pass['is_active']     = $is_active;
 		$time_pass['access_to']     = $post_meta['access_to'];
 		$time_pass['access_entity'] = $post_meta['access_entity'];
+		$time_pass['custom_title']  = $post_meta['custom_title'];
+		$time_pass['custom_desc']   = $post_meta['custom_desc'];
 
 		return $time_pass;
 	}
@@ -275,6 +277,8 @@ class Time_Pass extends Base {
 		$post_meta_data['period']        = ( isset( $post_meta['_rg_period'][0] ) ) ? $post_meta['_rg_period'][0] : '';
 		$post_meta_data['access_to']     = ( isset( $post_meta['_rg_access_to'][0] ) ) ? $post_meta['_rg_access_to'][0] : '';
 		$post_meta_data['access_entity'] = ( isset( $post_meta['_rg_access_entity'][0] ) ) ? $post_meta['_rg_access_entity'][0] : '';
+		$post_meta_data['custom_title']  = ( isset( $post_meta['_rg_custom_title'][0] ) ) ? $post_meta['_rg_custom_title'][0] : '';
+		$post_meta_data['custom_desc']   = ( isset( $post_meta['_rg_custom_desc'][0] ) ) ? $post_meta['_rg_custom_desc'][0] : '';
 
 		return $post_meta_data;
 	}
@@ -341,11 +345,13 @@ class Time_Pass extends Base {
 					'post_status'  => 'publish',
 					'post_type'    => static::SLUG,
 					'meta_input'   => [
-						'_rg_price'     => $time_pass_data['price'],
-						'_rg_revenue'   => $time_pass_data['revenue'],
-						'_rg_duration'  => $time_pass_data['duration'],
-						'_rg_period'    => $time_pass_data['period'],
-						'_rg_access_to' => $time_pass_data['access_to'],
+						'_rg_price'        => $time_pass_data['price'],
+						'_rg_revenue'      => $time_pass_data['revenue'],
+						'_rg_duration'     => $time_pass_data['duration'],
+						'_rg_period'       => $time_pass_data['period'],
+						'_rg_access_to'    => $time_pass_data['access_to'],
+						'_rg_custom_title' => $time_pass_data['custom_title'],
+						'_rg_custom_desc'  => $time_pass_data['custom_desc'],
 					],
 				]
 			);
@@ -364,6 +370,8 @@ class Time_Pass extends Base {
 			update_post_meta( $time_pass_id, '_rg_duration', $time_pass_data['duration'] );
 			update_post_meta( $time_pass_id, '_rg_period', $time_pass_data['period'] );
 			update_post_meta( $time_pass_id, '_rg_access_to', $time_pass_data['access_to'] );
+			update_post_meta( $time_pass_id, '_rg_custom_title', $time_pass_data['custom_title'] );
+			update_post_meta( $time_pass_id, '_rg_custom_desc', $time_pass_data['custom_desc'] );
 		}
 
 		return $time_pass_id;
