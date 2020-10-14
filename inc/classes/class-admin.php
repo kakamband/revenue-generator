@@ -307,6 +307,7 @@ class Admin {
 			'dialog_description' => ( isset( $_REQUEST['dialog_description'] ) ) ? sanitize_text_field( $_REQUEST['dialog_description'] ) : '',
 			'custom_amount'      => ( isset( $_REQUEST['custom-amount'] ) ) ? floatval( $_REQUEST['custom-amount'] ) : '',
 			'code'               => ( isset( $_REQUEST['code'] ) ) ? sanitize_text_field( $_REQUEST['code'] ) : '',
+			'layout_type'        => ( isset( $_REQUEST['layout_type'] ) ) ? sanitize_text_field( $_REQUEST['layout_type'] ) : '',
 		];
 
 		$is_edit = false;

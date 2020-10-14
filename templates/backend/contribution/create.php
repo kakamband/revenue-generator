@@ -33,21 +33,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 						<div class="rg-contribution-layout-select__options">
 							<label class="rg-contribution-layout-type">
-								<input type="radio" class="rg-visuallyhidden" name="layout_type" value="box" <?php checked( 'box', $contribution_data['layout_type'] ); ?>>
+								<input type="radio" class="rg-visuallyhidden" name="layout_type" value="box" data-bind="layout_type" <?php checked( 'box', $contribution_data['layout_type'] ); ?>>
 								<div class="rg-contribution-layout-type__preview">
 									<div class="rg-contribution-layout-type__box"></div>
 									<?php esc_html_e( 'Box', 'revenue-generator' ); ?>
 								</div>
 							</label>
 							<label class="rg-contribution-layout-type">
-								<input type="radio"  class="rg-visuallyhidden" name="layout_type" value="button" <?php checked( 'button', $contribution_data['layout_type'] ); ?>>
+								<input type="radio"  class="rg-visuallyhidden" name="layout_type" value="button" data-bind="layout_type" <?php checked( 'button', $contribution_data['layout_type'] ); ?>>
 								<div class="rg-contribution-layout-type__preview">
 									<div class="rg-contribution-layout-type__box rg-contribution-layout-type__box--pill"></div>
 									<span class="rg-contribution-layout-type__label"><?php esc_html_e( 'Button', 'revenue-generator' ); ?></span>
 								</div>
 							</label>
 							<label class="rg-contribution-layout-type">
-								<input type="radio"  class="rg-visuallyhidden" name="layout_type" value="bar" <?php checked( 'bar', $contribution_data['layout_type'] ); ?>>
+								<input type="radio"  class="rg-visuallyhidden" name="layout_type" value="bar" data-bind="layout_type" <?php checked( 'bar', $contribution_data['layout_type'] ); ?>>
 								<div class="rg-contribution-layout-type__preview">
 									<div class="rg-contribution-layout-type__box rg-contribution-layout-type__box--complex">
 										<div class="rg-contribution-layout-type__inner"></div>
@@ -80,6 +80,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</form>
 			</section>
 			<section class="rg-contribution-builder__preview">
+				<a href="#" id="rg_js_toggle_preview" class="rg-contribution-builder__preview-toggle" data-expand-text="<?php esc_html_e( 'Expand preview', 'revenue-generator' ); ?>" data-collapse-text="<?php esc_html_e( 'Collapse preview', 'revenue-generator' ); ?>"><?php esc_html_e( 'Expand preview', 'revenue-generator' ); ?></a>
+
 				<iframe src="<?php echo esc_url( Contribution::get_preview_post_url() ); ?>&id=<?php echo esc_attr( $contribution_data['ID'] ); ?>" width="100%" height="100%" id="rg-contribution-builder-preview"></iframe>
 			</section>
 		</div>
