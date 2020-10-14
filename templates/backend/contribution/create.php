@@ -61,11 +61,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<section class="rg-contribution-builder-inputs">
 						<div class="rg-contribution-builder__input-wrap">
 							<input type="text" placeholder="<?php esc_html_e( 'Campaign Name', 'revenue-generator' ); ?>" value="<?php echo esc_attr( $contribution_data['post_title'] ); ?>" data-bind="name" required data-validate>
-							<p class="input-error-text"><?php esc_html_e( 'This field is required' ); ?></p>
+							<p class="input-error-text"><?php esc_html_e( 'This field is required' ); ?>.</p>
 						</div>
 						<div class="rg-contribution-builder__input-wrap">
 							<input type="text" placeholder="<?php esc_html_e( 'Link to Thank You Page', 'revenue-generator' ); ?>" value="<?php echo esc_attr( $contribution_data['thank_you'] ); ?>" data-bind="thank_you" data-validate data-validation="url">
-							<p class="input-error-text"><?php esc_html_e( 'Please enter valid URL.', 'revenue-generator' ); ?></p>
+							<p class="input-error-text"><?php esc_html_e( 'Please enter valid URL', 'revenue-generator' ); ?>.</p>
 						</div>
 						<input type="submit" class="rev-gen__button" value="<?php esc_html_e( 'Save', 'revenue-generator' ); ?>" disabled="disabled" data-default-text="<?php esc_html_e( 'Save', 'revenue-generator' ); ?>">
 					</section>

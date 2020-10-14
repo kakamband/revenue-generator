@@ -159,62 +159,76 @@ window.handlePreviewUpdate = ( attr, value ) => {
 				} );
 			},
 
-			isFormValid() {
-				let isValid = true;
-
-				$( '[data-bind]', this.$el ).each( function() {
-					const $this = $( this );
-
-					if ( $this.attr( 'required' ) && ! $this.val() ) {
-						isValid = false;
-					}
-				} );
-
-				return isValid;
-			},
-
 			onValidatedFieldFocusOut( e ) {
 				const $input = $( e.target );
-				const validation = $input.data( 'validation' );
-				const value = $input.val();
-				const isRequired = $input.attr( 'required' );
+				const isValid = this.validateInput( $input );
 
-				if ( validation ) {
-					const isValid = this.validateInput( validation, value );
-
-					if ( ! isValid ) {
-						$input.addClass( 'error' );
-					} else {
-						$input.removeClass( 'error' );
-					}
-				}
-
-				if ( ! value && isRequired ) {
+				if ( ! isValid ) {
 					$input.addClass( 'error' );
 				} else {
 					$input.removeClass( 'error' );
 				}
 			},
 
-			validateInput( validationType, value ) {
-				if ( ! validationType || ! value ) {
+			validateInput( $input ) {
+				if ( ! $input ) {
 					return;
 				}
 
-				let isValid = false;
+				let isValid = true;
+
+				const validationType = $input.attr( 'data-validation' );
+				const isRequired = $input.attr( 'required' );
+				const value = $input.val();
 
 				switch ( validationType ) {
 					case 'url':
-						const test = value.match(
-							/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
-						);
+						if ( value ) {
+							const test = value.match(
+								/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
+							);
 
-						isValid = test !== null;
+							isValid = test !== null;
+						}
+
+						break;
+
+					default:
+						isValid = value;
 
 						break;
 				}
 
+				if ( isRequired && ! value ) {
+					isValid = false;
+				}
+
 				return isValid;
+			},
+
+			isFormValid() {
+				const self = this;
+
+				$( '[data-bind]', this.$el ).each( function( i, el ) {
+					const $el = $( el );
+					const value = $el.val();
+					const isValid = self.validateInput(
+						$el.attr( 'data-validation' ),
+						value
+					);
+
+					if ( ! isValid ) {
+						$el.addClass( 'error' );
+					} else {
+						$el.removeClass( 'error' );
+					}
+				} );
+
+				if ( ! $( '[data-bind].error', this.$el ).length ) {
+					return true;
+				}
+
+				return false;
 			},
 
 			getJSONData() {
@@ -317,6 +331,10 @@ window.handlePreviewUpdate = ( attr, value ) => {
 		} );
 
 		const initApp = function() {
+			if ( ! $( '#rg-contribution-builder-app' ).length ) {
+				return;
+			}
+
 			const data = RevGenContributionData;
 			data.amounts = {};
 
