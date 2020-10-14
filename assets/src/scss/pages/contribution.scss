@@ -419,9 +419,17 @@ body.revenue-generator_page_revenue-generator-contribution {
 		&__left {
 			flex: 1;
 			max-width: 470px;
+			transition: all 0.2s ease-in;
 		}
 		&__preview {
+			position: relative;
 			flex: 1;
+		}
+		&.preview-focus {
+			.rg-contribution-builder__left {
+				max-width: 80px;
+				transform: translateX(-350px);
+			}
 		}
 		h1.rg-contribution-builder__title {
 			line-height: 1.15;
@@ -474,6 +482,46 @@ body.revenue-generator_page_revenue-generator-contribution {
 			border-color: #ff1939;
 			+ .input-error-text {
 				display: block;
+			}
+		}
+
+		@mixin preview-toggle-arrow() {
+			content: '';
+			display: inline-block;
+			width: 15px;
+			height: 22px;
+			margin-right: 5px;
+			background: url(../img/back-arrow.svg);
+			background-size: 15px 20px;
+			vertical-align: middle;
+		}
+
+		&__preview-toggle {
+			position: absolute;
+			top: 20px;
+			left: 40px;
+			font-weight: bold;
+			color: #1d1d1d;
+			text-transform: uppercase;
+			text-decoration: none;
+			&:hover,
+			&:focus {
+				color: #1d1d1d;
+			}
+			&:before {
+				@include preview-toggle-arrow();
+			}
+			&.mode-collapse {
+				&:before {
+					display: none;
+				}
+				&:after {
+					@include preview-toggle-arrow();
+					height: 18px;
+					margin-right: 0;
+					margin-left: 5px;
+					transform: rotate(180deg);
+				}
 			}
 		}
 	}

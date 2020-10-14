@@ -38,6 +38,7 @@ window.handlePreviewUpdate = ( attr, value ) => {
 				'change [data-bind]': 'onInputChange',
 				'focusout [data-validate]': 'onValidatedFieldFocusOut',
 				'submit form': 'onFormSubmit',
+				'click #rg_js_toggle_preview': 'onPreviewToggleClick',
 			},
 
 			initialize() {
@@ -314,6 +315,20 @@ window.handlePreviewUpdate = ( attr, value ) => {
 
 						hideLoader();
 					} );
+				}
+			},
+
+			onPreviewToggleClick( e ) {
+				const $link = $( e.target );
+
+				if ( ! this.$el.hasClass( 'preview-focus' ) ) {
+					this.$el.addClass( 'preview-focus' );
+					$link.addClass( 'mode-collapse' );
+					$link.text( $link.data( 'collapse-text' ) );
+				} else {
+					this.$el.removeClass( 'preview-focus' );
+					$link.removeClass( 'mode-collapse' );
+					$link.text( $link.data( 'expand-text' ) );
 				}
 			},
 		} );
