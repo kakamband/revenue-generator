@@ -31,7 +31,7 @@ window.handlePreviewUpdate = ( attr, value ) => {
 		};
 
 		const MainView = Backbone.View.extend( {
-			el: '#contribution-builder-app',
+			el: '#rg-contribution-builder-app',
 
 			events: {
 				'keyup [data-bind]': 'onInputChange',
@@ -211,11 +211,7 @@ window.handlePreviewUpdate = ( attr, value ) => {
 
 				$( '[data-bind]', this.$el ).each( function( i, el ) {
 					const $el = $( el );
-					const value = $el.val();
-					const isValid = self.validateInput(
-						$el.attr( 'data-validation' ),
-						value
-					);
+					const isValid = self.validateInput( $el );
 
 					if ( ! isValid ) {
 						$el.addClass( 'error' );
@@ -323,7 +319,7 @@ window.handlePreviewUpdate = ( attr, value ) => {
 		} );
 
 		const PreviewView = Backbone.View.extend( {
-			el: '#contribution-builder-preview',
+			el: '#rg-contribution-builder-preview',
 
 			events: {},
 

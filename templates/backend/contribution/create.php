@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="laterpay-loader-wrapper">
 			<img alt="<?php esc_attr_e( 'Laterpay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
 		</div>
-		<div class="rg-contribution-builder" id="contribution-builder-app">
+		<div class="rg-contribution-builder" id="rg-contribution-builder-app">
 			<section class="rg-contribution-builder__left">
 				<form class="rg-contribution-builder__form" id="rg_js_form">
 					<h1 class="rg-contribution-builder__title"><?php esc_html_e( 'Create Your Contribution', 'revenue-generator' ); ?></h1>
@@ -80,7 +80,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</form>
 			</section>
 			<section class="rg-contribution-builder__preview">
-				<iframe src="<?php echo esc_url( Contribution::get_preview_post_url() ); ?>&id=<?php echo esc_attr( $contribution_data['ID'] ); ?>" width="100%" height="100%" id="contribution-builder-preview"></iframe>
+				<iframe src="<?php echo esc_url( Contribution::get_preview_post_url() ); ?>&id=<?php echo esc_attr( $contribution_data['ID'] ); ?>" width="100%" height="100%" id="rg-contribution-builder-preview"></iframe>
 			</section>
 		</div>
 	</div>
