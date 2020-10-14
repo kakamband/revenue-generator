@@ -307,11 +307,11 @@ window.handlePreviewUpdate = ( attr, value ) => {
 								true
 							);
 
-							//if ( window.location.href !== r.edit_link ) {
-							//	setTimeout( function() {
-							//		window.location.href = r.edit_link;
-							//	}, 1500 );
-							//}
+							if ( window.location.href !== r.edit_link ) {
+								setTimeout( function() {
+									window.location.href = r.edit_link;
+								}, 1500 );
+							}
 						}
 
 						self.doing_ajax = false;
