@@ -492,7 +492,7 @@ body.revenue-generator_page_revenue-generator-contribution {
 		}
 
 		@mixin preview-toggle-arrow() {
-			content: '';
+			content: "";
 			display: inline-block;
 			width: 15px;
 			height: 22px;
@@ -514,14 +514,14 @@ body.revenue-generator_page_revenue-generator-contribution {
 			&:focus {
 				color: #1d1d1d;
 			}
-			&:before {
+			&::before {
 				@include preview-toggle-arrow();
 			}
 			&.mode-collapse {
-				&:before {
+				&::before {
 					display: none;
 				}
-				&:after {
+				&::after {
 					@include preview-toggle-arrow();
 					height: 18px;
 					margin-right: 0;

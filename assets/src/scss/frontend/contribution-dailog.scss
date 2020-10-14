@@ -227,3 +227,54 @@ $box-white:#fff;
 	display: inline-block;
 	position: relative;
 }
+
+.rev-gen-contribution {
+	&__inner {
+		position: relative;
+		padding: 30px 25px 18px;
+		border-radius: 5px;
+		overflow: hidden;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+		box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
+		background-color: #fff;
+	}
+
+	&__title {
+		max-width: 100%;
+		border: 1px solid transparent;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+		font-weight: bold;
+		line-height: 1.33;
+		font-size: 21px;
+		text-align: center;
+		color: #1d1d1d;
+	}
+
+	&__description {
+		max-width: 100%;
+		font-size: 14px;
+		text-align: center;
+	}
+
+	&__donate {
+		display: flex;
+		flex-flow: row nowrap;
+		justify-content: center;
+		margin: 15px 0;
+	}
+
+	&--box {
+		max-width: 380px;
+		min-height: 227px;
+	}
+
+	&--bar {
+		width: 100%;
+		.rev-gen-contribution {
+			&__inner {
+				max-width: 100%;
+				padding: 15px 25px;
+			}
+		}
+	}
+}

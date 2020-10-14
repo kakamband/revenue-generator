@@ -36,7 +36,7 @@ $is_preview = Contribution_Preview::SLUG === get_post_type();
 		</div>
 	</div>
 <?php } else { ?>
-	<div class="rev-gen-contribution-main is-style-wide">
+	<div class="rev-gen-contribution is-style-wide">
 			<div class="rev-gen-contribution-main--box">
 				<div class="rev-gen-contribution-main--box-header rev-gen-contribution-tooltip-right"<?php echo ( $is_preview ) ? ' contenteditable="true" data-bind="dialog_header"' : ''; ?>><?php echo esc_html( $dialog_header ); ?></div>
 				<div class="rev-gen-contribution-main--box-description rev-gen-contribution-tooltip-right"<?php echo ( $is_preview ) ? ' contenteditable="true" data-bind="dialog_description"' : ''; ?>><?php echo esc_html( $dialog_description ); ?></div>

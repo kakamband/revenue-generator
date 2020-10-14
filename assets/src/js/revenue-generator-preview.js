@@ -2,7 +2,7 @@
 ( ( $ ) => {
 	$( function() {
 		const ContributionView = Backbone.View.extend( {
-			el: '.rev-gen-contribution-main',
+			el: '.rev-gen-contribution',
 
 			events: {
 				'keyup [contenteditable]': 'onEditableContentChange',
