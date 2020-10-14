@@ -15,7 +15,7 @@
 				const attr = $el.data( 'bind' );
 				let value = $el.text();
 
-				if ( 'all_amounts' === attr ) {
+				if ( 'amounts' === attr ) {
 					value = this.getAllAmounts();
 				}
 
@@ -23,7 +23,7 @@
 			},
 
 			getAllAmounts() {
-				const amounts = $( '[data-bind="all_amounts"]', this.$el );
+				const amounts = $( '[data-bind="amounts"]', this.$el );
 
 				if ( ! amounts.length ) {
 					return;
@@ -33,26 +33,12 @@
 
 				amounts.each( ( i, el ) => {
 					const $el = $( el );
-					let price = $el.text().trim();
+					const price = $el.text().trim();
 
-					if ( 'custom' === price ) {
-						return true;
-					}
-
-					const obj = {};
-
-					if ( 0.0 < parseFloat( price ) ) {
-						price = price * 100;
-						obj.price = price;
-					}
-
-					obj.revenue = 199 < price ? 'sis' : 'ppu';
-					obj.is_selected = 0 === i;
-
-					validatedValue.push( obj );
+					validatedValue.push( price );
 				} );
 
-				return JSON.stringify( validatedValue );
+				return validatedValue;
 			},
 		} );
 

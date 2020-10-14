@@ -157,6 +157,7 @@ class Contribution extends Base {
 			}
 
 			$contribution_post = $contribution_post->to_array();
+			$contribution_post = array_intersect_key( $contribution_post, $this->get_default_post() );
 			$contribution_meta = get_post_meta( $id, '', true );
 
 			$meta = $this->unprefix_meta( $contribution_meta );

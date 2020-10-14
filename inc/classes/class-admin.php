@@ -301,7 +301,7 @@ class Admin {
 
 		$contribution_data = [
 			'ID'                 => ( isset( $_REQUEST['ID'] ) ) ? intval( $_REQUEST['ID'] ) : 0,
-			'name'               => ( isset( $_REQUEST['title'] ) ) ? sanitize_text_field( $_REQUEST['title'] ) : '',
+			'name'               => ( isset( $_REQUEST['name'] ) ) ? sanitize_text_field( $_REQUEST['name'] ) : '',
 			'thank_you'          => ( isset( $_REQUEST['thank_you'] ) ) ? esc_url_raw( $_REQUEST['thank_you'] ) : '',
 			'dialog_header'      => ( isset( $_REQUEST['dialog_header'] ) ) ? sanitize_text_field( $_REQUEST['dialog_header'] ) : '',
 			'dialog_description' => ( isset( $_REQUEST['dialog_description'] ) ) ? sanitize_text_field( $_REQUEST['dialog_description'] ) : '',
@@ -318,7 +318,7 @@ class Admin {
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$amounts = isset( $_REQUEST['amounts'] ) ? $_REQUEST['amounts'] : [];
 
-		$all_amounts     = ( ! empty( $amounts ) ) ? json_decode( wp_unslash( $amounts ), true ) : array();
+		$all_amounts     = ( ! empty( $amounts ) ) ? wp_unslash( $amounts ) : array();
 		$filtered_prices = [];
 
 		// Sanitize the all amounts input.

@@ -13,18 +13,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 use \LaterPay\Revenue_Generator\Inc\Post_Types\Contribution;
 
 $contribution_instance = Contribution::get_instance();
-$default_metas         = $contribution_instance->get_default_meta();
-$layout_type           = ( isset( $_GET['layout_type'] ) ) ? sanitize_text_field( $_GET['layout_type'] ) : 'box';
+$contribution_id       = ( isset( $_GET['id'] ) ) ? (int) $_GET['id'] : 0;
+$contribution_data     = $contribution_instance->get( $contribution_id );
+
+$layout_type           = ( isset( $_GET['layout_type'] ) ) ? sanitize_text_field( $_GET['layout_type'] ) : $contribution_data['layout_type'];
+
 $shortcode             = sprintf(
 	'[laterpay_contribution name="%s" thank_you="%s" type="%s" custom_amount="%s" all_amounts="%s" all_revenues="%s" selected_amount="1" dialog_header="%s" dialog_description="%s" layout_type="%s"]',
-	$default_metas['name'],
-	$default_metas['thank_you'],
-	$default_metas['type'],
-	$default_metas['custom_amount'],
-	join( ',', $default_metas['all_amounts'] ),
-	$default_metas['all_revenues'],
-	$default_metas['dialog_header'],
-	$default_metas['dialog_description'],
+	$contribution_data['name'],
+	$contribution_data['thank_you'],
+	$contribution_data['type'],
+	$contribution_data['custom_amount'],
+	join( ',', $contribution_data['all_amounts'] ),
+	$contribution_data['all_revenues'],
+	$contribution_data['dialog_header'],
+	$contribution_data['dialog_description'],
 	$layout_type
 );
 ?>

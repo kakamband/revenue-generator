@@ -1,4 +1,4 @@
-/* global revenueGeneratorGlobalOptions, Shepherd, rgGlobal, Backbone, RevGenContributionData */
+/* global revenueGeneratorGlobalOptions, Shepherd, rgGlobal, Backbone, _, RevGenContributionData */
 /**
  * JS to handle plugin settings screen interactions.
  */
@@ -45,6 +45,7 @@ window.handlePreviewUpdate = ( attr, value ) => {
 				this.originalData = this.model.toJSON();
 
 				this.$o = {
+					form: $( '#rg_js_form', this.$el ),
 					snackBar: $( '#rg_js_SnackBar', this.$el ),
 					submitButton: $( 'input[type=submit]', this.$el ),
 					helperMessage: $(
@@ -52,6 +53,8 @@ window.handlePreviewUpdate = ( attr, value ) => {
 						this.$el
 					),
 				};
+
+				this.setAmounts();
 
 				this.initializeTour();
 
@@ -75,13 +78,62 @@ window.handlePreviewUpdate = ( attr, value ) => {
 					return;
 				}
 
-				this.model.set( data.attr, data.value );
+				const value = this.validateValue( data.attr, data.value );
+
+				this.model.set( data.attr, value );
+			},
+
+			setAmounts() {
+				const values = _( this.model.get( 'all_amounts' ) ).clone();
+
+				for ( let i = 0; i < values.length; i++ ) {
+					values[ i ] = parseInt( values[ i ], 10 ) / 100;
+				}
+
+				const validated = this.validateValue( 'amounts', values );
+				this.model.set( 'amounts', validated );
+			},
+
+			validateValue( attribute, value ) {
+				let validatedValue = value;
+
+				switch ( attribute ) {
+					case 'amounts':
+						validatedValue = [];
+
+						for ( let i = 0; i < value.length; i++ ) {
+							let price = value[ i ];
+
+							if ( 'custom' === price ) {
+								return true;
+							}
+
+							const obj = {};
+
+							if ( 0.0 < parseFloat( price ) ) {
+								price = price * 100;
+								obj.price = price;
+							}
+
+							obj.revenue = 199 < price ? 'sis' : 'ppu';
+							obj.is_selected = 0 === i;
+
+							validatedValue.push( obj );
+						}
+						break;
+					default:
+						break;
+				}
+
+				return validatedValue;
 			},
 
 			onInputChange( e ) {
 				const $input = $( e.target );
 				const attr = $input.attr( 'data-bind' );
-				const value = $input.val();
+				let value = $input.val();
+
+				value = this.validateValue( attr, value );
 
 				this.model.set( attr, value );
 			},
@@ -113,7 +165,7 @@ window.handlePreviewUpdate = ( attr, value ) => {
 				$( '[data-bind]', this.$el ).each( function() {
 					const $this = $( this );
 
-					if ( $this.hasAttr( 'required' ) && ! $this.val() ) {
+					if ( $this.attr( 'required' ) && ! $this.val() ) {
 						isValid = false;
 					}
 				} );
@@ -165,14 +217,22 @@ window.handlePreviewUpdate = ( attr, value ) => {
 				return isValid;
 			},
 
+			getJSONData() {
+				let data = {};
+
+				const formInputs = this.$o.form.serializeArray();
+				const modelData = this.model.toJSON();
+
+				_( formInputs ).each( function( item ) {
+					data[ item.name ] = item.value;
+				} );
+
+				data = { ...data, ...modelData };
+
+				return data;
+			},
+
 			onFormSubmit( e ) {
-				/**
-				 * @todo
-				 *
-				 * - Submit button text
-				 * - Contribution amounts
-				 * - Tracking
-				 */
 				e.preventDefault();
 
 				if ( ! this.isFormValid() ) {
@@ -195,7 +255,7 @@ window.handlePreviewUpdate = ( attr, value ) => {
 
 					showLoader();
 
-					const formData = JSON.stringify( this.model.toJSON() );
+					const formData = this.getJSONData();
 
 					$.ajax( {
 						url: options.ajaxUrl,
@@ -216,18 +276,14 @@ window.handlePreviewUpdate = ( attr, value ) => {
 							const eventAction = 'New ShortCode	';
 							const eventCategory = 'LP RevGen Contributions';
 							const merchantId = getMerchantId();
-							const eventLabel =
-								merchantId + ' - ' + formData.heading;
-							//const amounts = $o.contributionAmounts;
-							//amounts.each( function() {
-							//	const price = $( this )
-							//		.text()
-							//		.trim();
-							//	if ( 'custom' === price ) {
-							//		return true;
-							//	}
-							//	eventLabel += ' - ' + price;
-							//} );
+							const amounts = self.model.get( 'amounts' );
+
+							let eventLabel = merchantId + ' - ' + formData.name;
+
+							_( amounts ).each( function( item ) {
+								const price = item.price;
+								eventLabel += ' - ' + price;
+							} );
 
 							rgGlobal.sendLPGAEvent(
 								eventAction,
@@ -237,11 +293,11 @@ window.handlePreviewUpdate = ( attr, value ) => {
 								true
 							);
 
-							if ( window.location.href !== r.edit_link ) {
-								setTimeout( function() {
-									window.location.href = r.edit_link;
-								}, 1500 );
-							}
+							//if ( window.location.href !== r.edit_link ) {
+							//	setTimeout( function() {
+							//		window.location.href = r.edit_link;
+							//	}, 1500 );
+							//}
 						}
 
 						self.doing_ajax = false;
@@ -261,6 +317,9 @@ window.handlePreviewUpdate = ( attr, value ) => {
 		} );
 
 		const initApp = function() {
+			const data = RevGenContributionData;
+			data.amounts = {};
+
 			const model = new Backbone.Model( RevGenContributionData );
 
 			window.RevGenApp.views.app = new MainView( {
@@ -292,7 +351,7 @@ window.handlePreviewUpdate = ( attr, value ) => {
 		 */
 		const copyToClipboard = function( codeText ) {
 			const $temp = $( '<input>' );
-			$o.body.append( $temp );
+			$( 'body' ).append( $temp );
 			$temp.val( codeText ).select();
 			document.execCommand( 'copy' );
 			$temp.remove();

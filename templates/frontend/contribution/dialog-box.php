@@ -56,7 +56,7 @@ $is_preview = Contribution_Preview::SLUG === get_post_type();
 						?>
 						<div data-href="<?php echo esc_url( $amount_info['url'] ); ?>" data-revenue="<?php echo esc_attr( $amount_info['revenue'] ); ?>" data-campid="<?php echo esc_attr( $campaign_id ); ?>" class="rev-gen-contribution-main--box-donation">
 							<?php if ( $is_preview ) : ?>
-								<?php echo esc_html( $currency_symbol ); ?><span contenteditable="true" data-bind="all_amounts"><?php echo esc_html( $lp_amount ); ?></span>
+								<?php echo esc_html( $currency_symbol ); ?><span contenteditable="true" data-bind="amounts"><?php echo esc_html( $lp_amount ); ?></span>
 							<?php else : ?>
 								<?php echo esc_html( $lp_amount ); ?>
 							<?php endif; ?>

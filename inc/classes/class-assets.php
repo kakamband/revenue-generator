@@ -92,6 +92,7 @@ class Assets {
 			[
 				'jquery',
 				'backbone',
+				'underscore',
 				'revenue-generator-shepherd',
 				'revenue-generator-select2',
 				'revenue-generator-tippy',
