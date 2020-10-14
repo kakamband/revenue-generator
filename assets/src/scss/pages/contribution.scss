@@ -424,6 +424,12 @@ body.revenue-generator_page_revenue-generator-contribution {
 		&__preview {
 			position: relative;
 			flex: 1;
+			iframe {
+				&.loading {
+					opacity: 0.3;
+					transition: opacity 0.2s ease-in;
+				}
+			}
 		}
 		&.preview-focus {
 			.rg-contribution-builder__left {

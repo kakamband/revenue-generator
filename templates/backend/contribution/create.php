@@ -82,7 +82,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<section class="rg-contribution-builder__preview">
 				<a href="#" id="rg_js_toggle_preview" class="rg-contribution-builder__preview-toggle" data-expand-text="<?php esc_html_e( 'Expand preview', 'revenue-generator' ); ?>" data-collapse-text="<?php esc_html_e( 'Collapse preview', 'revenue-generator' ); ?>"><?php esc_html_e( 'Expand preview', 'revenue-generator' ); ?></a>
 
-				<iframe src="<?php echo esc_url( Contribution::get_preview_post_url() ); ?>&id=<?php echo esc_attr( $contribution_data['ID'] ); ?>" width="100%" height="100%" id="rg-contribution-builder-preview"></iframe>
+				<iframe src="<?php echo esc_url( Contribution::get_preview_post_url() ); ?>&id=<?php echo esc_attr( $contribution_data['ID'] ); ?>" width="100%" height="100%" id="rg-contribution-builder-preview" onload="javascript:handleIframeLoad(this)" class="loading"></iframe>
 			</section>
 		</div>
 	</div>

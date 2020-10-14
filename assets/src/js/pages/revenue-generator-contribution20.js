@@ -9,6 +9,7 @@
 import '../utils';
 import { __, sprintf } from '@wordpress/i18n';
 import { RevGenModal } from '../utils/rev-gen-modal';
+import { addQueryArgs } from '@wordpress/url';
 
 const options = revenueGeneratorGlobalOptions;
 
@@ -24,6 +25,10 @@ window.handlePreviewUpdate = ( attr, value ) => {
 	} );
 };
 
+window.handleIframeLoad = ( iframe ) => {
+	iframe.classList.remove( 'loading' );
+};
+
 ( ( $, Backbone ) => {
 	$( function() {
 		const $o = {
@@ -36,6 +41,7 @@ window.handlePreviewUpdate = ( attr, value ) => {
 			events: {
 				'keyup [data-bind]': 'onInputChange',
 				'change [data-bind]': 'onInputChange',
+				'change [data-bind=layout_type]': 'onLayoutTypeChange',
 				'focusout [data-validate]': 'onValidatedFieldFocusOut',
 				'submit form': 'onFormSubmit',
 				'click #rg_js_toggle_preview': 'onPreviewToggleClick',
@@ -51,6 +57,10 @@ window.handlePreviewUpdate = ( attr, value ) => {
 					submitButton: $( 'input[type=submit]', this.$el ),
 					helperMessage: $(
 						'.rg-contribution-builder__helper-message',
+						this.$el
+					),
+					previewIframe: $(
+						'#rg-contribution-builder-preview',
 						this.$el
 					),
 				};
@@ -148,6 +158,17 @@ window.handlePreviewUpdate = ( attr, value ) => {
 				} else {
 					this.disableSubmit();
 				}
+			},
+
+			onLayoutTypeChange( e ) {
+				const value = $( e.target ).val();
+
+				this.$o.previewIframe.addClass( 'loading' );
+
+				let url = this.$o.previewIframe.attr( 'src' );
+				url = addQueryArgs( url, { layout_type: value } );
+
+				this.$o.previewIframe.attr( 'src', url );
 			},
 
 			enableSubmit() {
