@@ -587,9 +587,25 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						! $( '.rev-gen-modal' ).length &&
 						! isEditButton
 					) {
-						$o.body
-							.find( '.rg-purchase-overlay-option-manager' )
-							.hide();
+						e.preventDefault();
+						const opendOptionManagers = $o.body.find(
+							'.rg-purchase-overlay-option-manager'
+						);
+
+						$.each( opendOptionManagers, function(
+							key,
+							opendOptionManager
+						) {
+							// Don't trigger when there is no manager open.
+							if (
+								'none' !==
+								$( opendOptionManager ).css( 'display' )
+							) {
+								$( opendOptionManager ).trigger(
+									'option-manager-close'
+								);
+							}
+						} );
 					}
 
 					if (
@@ -895,6 +911,37 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						display: actionManagerCurrentState,
 					} );
 				} );
+
+				/**
+				 * Custom Event to tigger close option mangaer and generate dynamic title and description.
+				 */
+				$o.body.on(
+					'option-manager-close',
+					$o.optionManager,
+					function() {
+						const $this = $( this );
+
+						$this.hide();
+
+						const purchaseOptionItem = $this.closest(
+							$o.purchaseOptionItem
+						);
+
+						const isCustomTitle = purchaseOptionItem.attr(
+							'data-custom-title'
+						);
+						const isCustomDesc = purchaseOptionItem.attr(
+							'data-custom-desc'
+						);
+
+						// Generate Dynamic Title and Description.
+						dynamicTitleDescription(
+							$this,
+							isCustomTitle,
+							isCustomDesc
+						);
+					}
+				);
 
 				/**
 				 * Remove purchase option.
@@ -2180,7 +2227,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				 */
 				$o.body.on( 'input change', $o.accountActionId, function() {
 					if ( areCredentialsFilled() ) {
-						$( '#rg_js_modal_confirm', $o.body ).removeAttr(
+						$( 'body #rg_js_modal_confirm' ).removeAttr(
 							'disabled'
 						);
 					}
@@ -2191,7 +2238,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				 */
 				$o.body.on( 'input change', $o.accountActionKey, function() {
 					if ( areCredentialsFilled() ) {
-						$( '#rg_js_modal_confirm', $o.body ).removeAttr(
+						$( 'body #rg_js_modal_confirm' ).removeAttr(
 							'disabled'
 						);
 					}
