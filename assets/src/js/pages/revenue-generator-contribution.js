@@ -9,7 +9,7 @@
 import '../utils';
 import { __, sprintf } from '@wordpress/i18n';
 import { RevGenModal } from '../utils/rev-gen-modal';
-import { addQueryArgs } from '@wordpress/url';
+import { isURL, addQueryArgs } from '@wordpress/url';
 
 const options = revenueGeneratorGlobalOptions;
 
@@ -206,11 +206,7 @@ window.handleIframeLoad = ( iframe ) => {
 				switch ( validationType ) {
 					case 'url':
 						if ( value ) {
-							const test = value.match(
-								/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
-							);
-
-							isValid = test !== null;
+							isValid = isURL( value );
 						}
 
 						break;
