@@ -317,43 +317,22 @@ class Admin {
 		}
 
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$amounts = isset( $_REQUEST['amounts'] ) ? $_REQUEST['amounts'] : [];
+		$amounts      = isset( $_REQUEST['amounts'] ) ? $_REQUEST['amounts'] : [];
+		$all_amounts  = [];
+		$all_revenues = [];
 
-		$all_amounts     = ( ! empty( $amounts ) ) ? wp_unslash( $amounts ) : array();
-		$filtered_prices = [];
+		foreach ( $amounts as $index => $amount ) {
+			$float_amount = (float) $amount;
 
-		// Sanitize the all amounts input.
-		$filters = [
-			'price'       => FILTER_SANITIZE_STRING,
-			'revenue'     => FILTER_SANITIZE_STRING,
-			'is_selected' => FILTER_VALIDATE_BOOLEAN,
-		];
-
-		$options = [
-			'price'       => [
-				'flags' => FILTER_NULL_ON_FAILURE,
-			],
-			'revenue'     => [
-				'flags' => FILTER_NULL_ON_FAILURE,
-			],
-			'is_selected' => [
-				'flags' => FILTER_NULL_ON_FAILURE,
-			],
-		];
-
-		$selected_amount = 1;
-		// Loop through the user input an build an array to be processed by shortcode generator.
-		foreach ( $all_amounts as $id => $amount_array ) {
-			foreach ( $amount_array as $key => $value ) {
-				$filtered_prices[ $id ][ $key ] = filter_var( $value, $filters[ $key ], $options[ $key ] );
-				if ( true === $amount_array['is_selected'] ) {
-					$selected_amount = $id + 1;
-				}
+			if ( 0.0 < $float_amount ) {
+				$all_amounts[] = $float_amount * 100;
 			}
+
+			$all_revenues[] = ( 1.99 < $float_amount ) ? 'sis' : 'ppu';
 		}
 
-		$contribution_data['all_amounts']  = array_column( $filtered_prices, 'price' );
-		$contribution_data['all_revenues'] = array_column( $filtered_prices, 'revenue' );
+		$contribution_data['all_amounts']  = $all_amounts;
+		$contribution_data['all_revenues'] = $all_revenues;
 
 		$contribution_id   = $contribution_instance->save( $contribution_data );
 		$message           = __( 'Oops! Something went wrong. Please try again.', 'revenue-generator' );

@@ -65,8 +65,6 @@ window.handleIframeLoad = ( iframe ) => {
 					),
 				};
 
-				this.setAmounts();
-
 				this.initializeTour();
 
 				this.listenTo( this, 'preview-update', this.onPreviewUpdate );
@@ -94,17 +92,6 @@ window.handleIframeLoad = ( iframe ) => {
 				this.model.set( data.attr, value );
 			},
 
-			setAmounts() {
-				const values = _( this.model.get( 'all_amounts' ) ).clone();
-
-				for ( let i = 0; i < values.length; i++ ) {
-					values[ i ] = parseInt( values[ i ], 10 ) / 100;
-				}
-
-				const validated = this.validateValue( 'amounts', values );
-				this.model.set( 'amounts', validated );
-			},
-
 			validateValue( attribute, value ) {
 				let validatedValue = value;
 
@@ -113,23 +100,11 @@ window.handleIframeLoad = ( iframe ) => {
 						validatedValue = [];
 
 						for ( let i = 0; i < value.length; i++ ) {
-							let price = value[ i ];
-
-							if ( 'custom' === price ) {
-								return true;
+							if ( 'custom' !== value ) {
+								validatedValue.push( parseFloat( value[i] ) );
+							} else {
+								validatedValue.push( value );
 							}
-
-							const obj = {};
-
-							if ( 0.0 < parseFloat( price ) ) {
-								price = price * 100;
-								obj.price = price;
-							}
-
-							obj.revenue = 199 < price ? 'sis' : 'ppu';
-							obj.is_selected = 0 === i;
-
-							validatedValue.push( obj );
 						}
 						break;
 					default:

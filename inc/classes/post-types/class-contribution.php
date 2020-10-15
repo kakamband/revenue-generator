@@ -41,6 +41,17 @@ class Contribution extends Base {
 	const ADMIN_EDIT_SLUG = 'revenue-generator-contribution';
 
 	/**
+	 * Extends parent `setup_hooks()` method to add its own hooks.
+	 *
+	 * @return void
+	 */
+	protected function setup_hooks() {
+		parent::setup_hooks();
+
+		add_filter( 'rg_contribution_builder_data', [ $this, 'filter_builder_contribution_data' ] );
+	}
+
+	/**
 	 * To get list of labels for paywall post type.
 	 *
 	 * @return array
@@ -485,6 +496,24 @@ class Contribution extends Base {
 		);
 
 		return $url;
+	}
+
+	/**
+	 * Filters contribution data before passing it to builder.
+	 *
+	 * @hooked filter `rg_contribution_builder_data`
+	 *
+	 * @param array $data Contribution data.
+	 *
+	 * @return array
+	 */
+	public function filter_builder_contribution_data( $data ) {
+		// Convert amounts from cents back to floats for use in the builder.
+		foreach ( $data['all_amounts'] as $key => $amount ) {
+			$data['all_amounts'][ $key ] = (int) $amount / 100;
+		}
+
+		return $data;
 	}
 
 }

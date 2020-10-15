@@ -12,10 +12,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	// prevent direct access to this file.
 	exit;
 }
+
+$contribution_builder_data = apply_filters( 'rg_contribution_builder_data', $contribution_data );
 ?>
 
 <script>
-	var RevGenContributionData = <?php echo json_encode( $contribution_data ); ?>;
+	var RevGenContributionData = <?php echo json_encode( $contribution_builder_data ); ?>;
 </script>
 
 <div class="wrap">
