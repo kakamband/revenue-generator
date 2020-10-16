@@ -513,6 +513,8 @@ class Contribution extends Base {
 			$data['all_amounts'][ $key ] = (int) $amount / 100;
 		}
 
+		$data['amounts'] = $data['all_amounts'];
+
 		return $data;
 	}
 
