@@ -68,10 +68,10 @@ $is_preview = Contribution_Preview::SLUG === get_post_type();
 				</div>
 			</div>
 		</div>
-		<span class="rg-amount-tip">
-				<?php esc_html_e( 'Contribute Now, Pay Later with your Tab', 'revenue-generator' ); ?>
-			</span>
-		<div class="rev-gen-contribution-main--box-footer-logo">
+		<div class="rev-gen-contribution__tip">
+			<?php esc_html_e( 'Contribute Now, Pay Later with your Tab', 'revenue-generator' ); ?>
+		</div>
+		<div class="rev-gen-contribution__footer rev-gen-contribution-footer">
 			<?php View::render_footer_backend(); ?>
 		</div>
 	</div>
