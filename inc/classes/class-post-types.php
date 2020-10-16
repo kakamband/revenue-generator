@@ -12,6 +12,7 @@ use LaterPay\Revenue_Generator\Inc\Post_Types\Time_Pass;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Subscription;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Paywall;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Contribution;
+use LaterPay\Revenue_Generator\Inc\Post_Types\Contribution_Preview;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -48,6 +49,7 @@ class Post_Types {
 			Subscription::SLUG => Subscription::get_instance(),
 			Paywall::SLUG      => Paywall::get_instance(),
 			Contribution::SLUG => Contribution::get_instance(),
+			Contribution_Preview::SLUG => Contribution_Preview::get_instance(),
 		];
 
 	}

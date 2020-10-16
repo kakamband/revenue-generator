@@ -162,6 +162,7 @@ class Shortcodes {
 			'all_amounts'        => null,
 			'all_revenues'       => null,
 			'selected_amount'    => null,
+			'layout_type'        => 'box',
 		);
 
 		if ( isset( $atts['id'] ) && ! empty( $atts['id'] ) ) {
@@ -352,7 +353,7 @@ class Shortcodes {
 		);
 
 		// Load the contributions dialog for User.
-		return View::render_template( 'frontend/contribution-dialog', $view_args );
+		return View::render_template( "frontend/contribution/dialog-{$config_data['layout_type']}", $view_args );
 
 	}
 

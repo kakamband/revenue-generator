@@ -7,6 +7,7 @@
 
 use LaterPay\Revenue_Generator\Inc\View;
 use LaterPay\Revenue_Generator\Inc\Post_Types;
+use LaterPay\Revenue_Generator\Inc\Config;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	// prevent direct access to this file.
@@ -719,6 +720,8 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 	</div>
 	<div class="rev-gen-modal-overlay"></div>
 </script>
+
+<!-- Template for dynamic title confirmation modal -->
 <script type="text/template" id="tmpl-rg-modal-dynamic-title-desc">
 	<div class="rev-gen-modal" id="rg-modal-dynamic-title-desc">
 		<div class="rev-gen-modal__inner">
@@ -736,6 +739,53 @@ $paywall_hide_class      = ( 'publish' === get_post_status( $paywall_id ) ) ? 'h
 				<button id="rg_js_modal_cancel" class="rev-gen__button rev-gen__button--secondary">
 					<?php esc_html_e( 'No, keep current title and description', 'revenue-generator' ); ?>
 				</button>
+			</div>
+		</div>
+	</div>
+	<div class="rev-gen-modal-overlay"></div>
+</script>
+
+<!-- Template for publishing frequency modal -->
+<script type="text/template" id="tmpl-rg-modal-publishing-frequency">
+	<div class="rev-gen-modal rev-gen-modal--wide" id="rg-modal-publishing-frequency">
+		<div class="rev-gen-modal__inner">
+			<a href="#" class="rev-gen-modal__close" id="rg_js_modal_close">x</a>
+
+			<h4 class="rev-gen-modal__title">
+				<?php esc_html_e( 'How often do you publish premium content?', 'revenue-generator' ); ?>
+			</h4>
+
+			<div class="rev-gen-modal__cards">
+				<div id="rg_js_modal_confirm" class="rev-gen-card">
+					<div>
+						<img class="rev-gen-card__icon" alt="<?php esc_attr_e( 'Fewer posts icon', 'revenue-generator' ); ?>" src="<?php echo esc_url( Config::$plugin_defaults['img_dir'] . 'low-publish.svg' ); ?>">
+					</div>
+					<h4 class="rev-gen-card__title">
+						<?php
+						printf(
+							/* translators: %1$s Opening HTML bold tag %2$s Closing HTML bold tag */
+							esc_html__( '%1$sFewer%2$s than 10 posts per month', 'revenue-generator' ),
+							'<b>',
+							'</b>'
+						);
+						?>
+					</h4>
+				</div>
+				<div id="rg_js_modal_cancel" class="rev-gen-card">
+					<div>
+						<img class="rev-gen-card__icon" alt="<?php esc_attr_e( 'More posts icon', 'revenue-generator' ); ?>" src="<?php echo esc_url( Config::$plugin_defaults['img_dir'] . 'high-publish.svg' ); ?>">
+					</div>
+					<h4 class="rev-gen-card__title">
+						<?php
+						printf(
+							/* translators: %1$s Opening HTML bold tag %2$s Closing HTML bold tag */
+							esc_html__( '%1$sMore%2$s than 10 posts per month', 'revenue-generator' ),
+							'<b>',
+							'</b>'
+						);
+						?>
+					</h4>
+				</div>
 			</div>
 		</div>
 	</div>

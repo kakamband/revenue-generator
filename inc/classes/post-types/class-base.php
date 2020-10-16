@@ -39,6 +39,15 @@ abstract class Base {
 	}
 
 	/**
+	 * Get all arguments for `register_post_type`.
+	 *
+	 * @return array
+	 */
+	protected function get_args() {
+		return [];
+	}
+
+	/**
 	 * To register post type.
 	 *
 	 * @return void
@@ -49,7 +58,7 @@ abstract class Base {
 			return;
 		}
 
-		$args = [];
+		$args = $this->get_args();
 
 		$labels = $this->get_labels();
 		$labels = ( ! empty( $labels ) && is_array( $labels ) ) ? $labels : [];

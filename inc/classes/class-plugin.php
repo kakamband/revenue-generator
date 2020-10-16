@@ -79,6 +79,7 @@ class Plugin {
 	 */
 	protected function add_constants() {
 		define( 'REVENUE_GENERATOR_VERSION', '1.3.0' );
+		define( 'REVENUE_GENERATOR_PLUGIN_URL', plugins_url( '', REVENUE_GENERATOR_PLUGIN_FILE ) );
 		define( 'REVENUE_GENERATOR_BUILD_DIR', REVENUE_GENERATOR_PLUGIN_DIR . '/assets/build/' );
 		define( 'REVENUE_GENERATOR_BUILD_URL', plugins_url( '/assets/build/', REVENUE_GENERATOR_PLUGIN_FILE ) );
 	}
