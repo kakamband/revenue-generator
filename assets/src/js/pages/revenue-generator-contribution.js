@@ -101,7 +101,7 @@ window.handleIframeLoad = ( iframe ) => {
 
 						for ( let i = 0; i < value.length; i++ ) {
 							if ( 'custom' !== value ) {
-								validatedValue.push( parseFloat( value[i] ) );
+								validatedValue.push( parseFloat( value[ i ] ) );
 							} else {
 								validatedValue.push( value );
 							}
