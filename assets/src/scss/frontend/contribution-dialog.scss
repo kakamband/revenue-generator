@@ -94,7 +94,7 @@ $box-white:#fff;
 	}
 
 	&__custom {
-		&.rev-gen-hidden {
+		&.rev-gen-hidden:not[hidden] {
 			display: none;
 		}
 	}
@@ -107,6 +107,10 @@ $box-white:#fff;
 			flex-flow: row nowrap;
 			align-items: flex-end;
 			justify-content: space-between;
+		}
+		&__form {
+			display: flex;
+			align-items: flex-end;
 		}
 		h3.rev-gen-contribution-custom__title {
 			margin: 0;

@@ -6,6 +6,7 @@ export default class RevGenContribution {
 			donateBox: el.querySelector( '.rev-gen-contribution__donate' ),
 			customBox: {
 				el: el.querySelector( '.rev-gen-contribution__custom' ),
+				form: el.querySelector( 'form' ),
 				input: el.querySelector( '.rev-gen-contribution-custom input' ),
 				backButton: el.querySelector(
 					'.rev-gen-contribution-custom__back'
@@ -76,13 +77,24 @@ export default class RevGenContribution {
 			}
 		} );
 
-		this.$o.customBox.send.addEventListener( 'click', ( e ) => {
+		this.$o.customBox.form.addEventListener( 'submit', ( e ) => {
 			e.preventDefault();
 
-			this.validateAmount();
+			const data = new FormData( this.$o.customBox.form );
+			const req = new XMLHttpRequest();
 
-			const url = this.getCustomAmountURL();
-			window.open( url );
+			req.open( 'POST', this.$o.customBox.form.getAttribute( 'action' ), true );
+			req.send( data );
+
+			req.onreadystatechange = function() {
+				if ( 4 === this.readyState && 200 == this.status ) {
+					const res = JSON.parse( this.response );
+
+					if ( res.data ) {
+						window.open( res.data );
+					}
+				}
+			}
 		} );
 	}
 

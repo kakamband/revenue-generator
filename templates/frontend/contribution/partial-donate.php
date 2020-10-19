@@ -9,7 +9,7 @@ use LaterPay\Revenue_Generator\Inc\View;
 
 defined( 'ABSPATH' ) || exit;
 ?>
-<div class="rev-gen-contribution__donate">
+<div class="rev-gen-contribution__donate" id="<?php echo esc_attr( $html_id ); ?>_donate">
 	<?php
 	foreach ( $payment_config['amounts'] as $amount_info ) {
 		if ( true === $amount_info['selected'] ) {
@@ -33,7 +33,7 @@ defined( 'ABSPATH' ) || exit;
 		<?php
 	}
 	?>
-	<div class="rev-gen-contribution__donation rev-gen-contribution__donation--custom" on="tap:amount-wrapper.toggleVisibility,donation-wrapper.toggleVisibility">
+	<div class="rev-gen-contribution__donation rev-gen-contribution__donation--custom" on="tap:<?php echo esc_attr( $html_id ); ?>_donate.toggleVisibility,<?php echo esc_attr( $html_id ); ?>_custom.toggleVisibility">
 		<a href="#"><?php esc_html_e( 'Custom', 'revenue-generator' ); ?></a>
 	</div>
 </div>
