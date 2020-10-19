@@ -17,16 +17,12 @@ import '../utils';
 				body: $( 'body' ),
 
 				// Welcome screen wrapper.
-				welcomeScreenWrapper: $( '.welcome-screen-wrapper' ),
-
-				// Welcome Paywall Cards.
-				lowPostCard: $( '#rg_js_lowPostCard' ),
-				highPostCard: $( '#rg_js_highPostCard' ),
+				welcomeScreenWrapper: $( '.rev-gen-welcome' ),
 
 				// Welcome Cards.
 				isContribution: $( '#rg_Contribution' ),
 				isPaywall: $( '#rg_Paywall' ),
-				laterpayTrackingStatus: $( '.welcome-screen-tracking' ),
+				laterpayTrackingStatus: $( '#welcome-screen-tracking' ),
 
 				snackBar: $( '#rg_js_SnackBar' ),
 			};
@@ -36,39 +32,7 @@ import '../utils';
 			 */
 			const bindEvents = function() {
 				const WelcomeEventCategory = 'LP RevGen';
-				const PostCountEventCategory = 'LP RevGen Paywall Tutorial';
 				const WelcomeEventAction = 'Welcome Landing Page';
-				const PostCoutEventAction = 'Paywall Landing Page';
-
-				/**
-				 * Triggers Low Post card Selection.
-				 */
-				$o.lowPostCard.on( 'click', function() {
-					storePostPublishCount( 'low' );
-
-					rgGlobal.sendLPGAEvent(
-						PostCoutEventAction,
-						PostCountEventCategory,
-						'Fewer than 10',
-						0,
-						true
-					);
-				} );
-
-				/**
-				 * Triggers High Post card Selection.
-				 */
-				$o.highPostCard.on( 'click', function() {
-					storePostPublishCount( 'high' );
-
-					rgGlobal.sendLPGAEvent(
-						PostCoutEventAction,
-						PostCountEventCategory,
-						'10+',
-						0,
-						true
-					);
-				} );
 
 				/**
 				 * Triggers Contribution card Selection.
@@ -137,23 +101,6 @@ import '../utils';
 					config_key: 'is_welcome_done',
 					config_value: isWelcomeDone,
 					rg_ga_enabled_status: lpayTrackingStatus,
-					security:
-						revenueGeneratorGlobalOptions.rg_global_config_nonce,
-				};
-				updateGlobalConfig(
-					revenueGeneratorGlobalOptions.ajaxUrl,
-					formData
-				);
-			};
-
-			/*
-			 * Update and store merchant selection for post publish rate.
-			 */
-			const storePostPublishCount = function( type = 'low' ) {
-				const formData = {
-					action: 'rg_update_global_config',
-					config_key: 'average_post_publish_count',
-					config_value: type,
 					security:
 						revenueGeneratorGlobalOptions.rg_global_config_nonce,
 				};

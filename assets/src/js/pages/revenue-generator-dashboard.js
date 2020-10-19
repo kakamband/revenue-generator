@@ -70,7 +70,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					// Create form data.
 					const formData = {
 						action: 'rg_restart_tour',
-						tour_type: 'is_paywall_tutorial_completed',
+						tour_type: 'paywall_tutorial_done',
 						restart_tour: '1',
 						security:
 							revenueGeneratorGlobalOptions.rg_paywall_nonce,

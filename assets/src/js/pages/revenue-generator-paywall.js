@@ -219,7 +219,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 						0 ===
 							parseInt(
 								revenueGeneratorGlobalOptions.globalOptions
-									.is_paywall_tutorial_completed
+									.paywall_tutorial_done
 							) &&
 						allPurchaseOptions &&
 						allPurchaseOptions.length > 0
@@ -3360,7 +3360,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				// Create form data.
 				const formData = {
 					action: 'rg_complete_tour',
-					config_key: 'is_paywall_tutorial_completed',
+					config_key: 'paywall_tutorial_done',
 					config_value: 1,
 					security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
 				};
@@ -4189,8 +4189,71 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				}
 			};
 
+			/**
+			 * Displays Welcome modal when visiting screen for the first time.
+			 */
+			const handleWelcomeModal = function() {
+				if (
+					! revenueGeneratorGlobalOptions.welcome.isPaywallWelcomeDone
+				) {
+					const PostCoutEventAction = 'Paywall Landing Page';
+					const PostCountEventCategory = 'LP RevGen Paywall Tutorial';
+
+					new RevGenModal( {
+						id: 'rg-modal-publishing-frequency',
+						// onConfirm handles 'Fewer than 10 posts per month' option
+						onConfirm: () => {
+							storePostPublishCount( 'low' );
+
+							rgGlobal.sendLPGAEvent(
+								PostCoutEventAction,
+								PostCountEventCategory,
+								'Fewer than 10',
+								0,
+								true
+							);
+						},
+						// onCancel handles 'More than 10 posts per month' option
+						onCancel: () => {
+							storePostPublishCount( 'high' );
+
+							rgGlobal.sendLPGAEvent(
+								PostCoutEventAction,
+								PostCountEventCategory,
+								'10+',
+								0,
+								true
+							);
+						},
+					} );
+				}
+
+				/**
+				 * Saves publish count selected in Welcome modal to database.
+				 *
+				 * @param {string} count
+				 */
+				const storePostPublishCount = function( count ) {
+					const formData = {
+						action: 'rg_update_global_config',
+						config_key: 'average_post_publish_count',
+						config_value: count,
+						security:
+							revenueGeneratorGlobalOptions.rg_global_config_nonce,
+					};
+
+					$.ajax( {
+						url: revenueGeneratorGlobalOptions.ajaxUrl,
+						method: 'POST',
+						data: formData,
+						dataType: 'json',
+					} );
+				};
+			};
+
 			// Initialize all required events.
 			const initializePage = function() {
+				handleWelcomeModal();
 				bindEvents();
 				addPaywall();
 			};

@@ -5,93 +5,88 @@
  * @package revenue-generator
  */
 
-use LaterPay\Revenue_Generator\Inc\View;
+use \LaterPay\Revenue_Generator\Inc\View;
+use \LaterPay\Revenue_Generator\Inc\Post_Types\Contribution;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	// prevent direct access to this file.
 	exit;
 }
+
+$contribution_builder_data = apply_filters( 'rg_contribution_builder_data', $contribution_data );
 ?>
+
+<script>
+	var RevGenContributionData = <?php echo json_encode( $contribution_builder_data ); ?>;
+</script>
+
 <div class="wrap">
 	<div class="rev-gen-layout-wrapper">
 		<div class="laterpay-loader-wrapper">
 			<img alt="<?php esc_attr_e( 'Laterpay Logo', 'revenue-generator' ); ?>" src="<?php echo esc_url( $action_icons['lp_icon'] ); ?>" />
 		</div>
-		<div class="rev-gen-contribution-main">
-			<h2 class="rev-gen-contribution-main--header">
-				<?php if ( ! empty( $contribution_data['ID'] ) ) : ?>
-					<?php esc_html_e( 'Edit your Contribution box', 'revenue-generator' ); ?>
-				<?php else : ?>
-					<?php esc_html_e( 'Create your Contribution box', 'revenue-generator' ); ?>
-				<?php endif; ?>
-			</h2>
-			<div class="rev-gen-contribution-main--box">
-				<div id="rev-gen-contribution-main-header-section">
-					<h3 class="rev-gen-contribution-main--box-header" contenteditable="true"><?php echo esc_html( $contribution_data['dialog_header'] ); ?></h3>
-					<p class="rev-gen-contribution-main--box-description" contenteditable="true"><?php echo esc_html( $contribution_data['dialog_description'] ); ?></p>
-				</div>
-				<div class="rev-gen-contribution-main--box-donation-wrapper">
-					<?php foreach ( $contribution_data['all_amounts'] as $amount ) : ?>
-						<div class="rev-gen-contribution-main--box-donation">
-							<span class="rev-gen-contribution-main--box-donation-currency"><?php echo esc_html( $currency_symbol ); ?></span>
-							<span class="rev-gen-contribution-main--box-donation-amount" contenteditable="true"><?php echo esc_attr( View::format_number( floatval( (int) $amount / 100 ), 2 ) ); ?></span>
-						</div>
-					<?php endforeach; ?>
-					<div class="rev-gen-contribution-main--box-donation">
-						<span class="rev-gen-contribution-main--box-donation-currency"><?php echo esc_html( $currency_symbol ); ?></span>
-						<span class="rev-gen-contribution-main--box-donation-amount"><?php esc_html_e( 'custom', 'revenue-generator' ); ?></span>
-					</div>
-				</div>
-				<div class="rev-gen-contribution-main--box-footer-logo">
-					<?php View::render_footer_backend(); ?>
-				</div>
-			</div>
-		</div>
-		<form method="post" class="rev-gen-contribution-form">
-			<input type="hidden" name="security" value="<?php echo esc_attr( wp_create_nonce( 'rg_contribution_nonce' ) ); ?>">
-			<input type="hidden" name="ID" value="<?php echo esc_attr( $contribution_data['ID'] ); ?>">
-			<input type="hidden" name="action" value="rg_contribution_save">
-			<input type="hidden" name="amounts" value="">
-			<input type="hidden" name="dialog_header" value="<?php echo esc_attr( $contribution_data['dialog_header'] ); ?>">
-			<input type="hidden" name="dialog_description" value="<?php echo esc_attr( $contribution_data['dialog_description'] ); ?>">
+		<div class="rg-contribution-builder" id="rg-contribution-builder-app">
+			<section class="rg-contribution-builder__left">
+				<form class="rg-contribution-builder__form" id="rg_js_form">
+					<h1 class="rg-contribution-builder__title"><?php esc_html_e( 'Create Your Contribution', 'revenue-generator' ); ?></h1>
 
-			<div class="rev-gen-contribution-main-inputs-wrapper">
-				<label id="rg_contribution_campaign_name" class="rev-gen-contribution-main-input-label" data-has-help>
-					<?php esc_html_e( 'Campaign name', 'revenue-generator' ); ?>
-					<input type="text" class="rev-gen-contribution-main-input" id="rg_contribution_title" name="title" value="<?php echo esc_attr( $contribution_data['post_title'] ); ?>" />
-					<button data-info-for="campaignName" id="rev-gen-contribution-help-campaign-name" class="rev-gen-settings-main-option-info rev-gen-contribution-main--help" onclick="javascript: return false;">
-						<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
-					</button>
-				</label>
-				<label id="rg_contribution_thankyou_label" class="rev-gen-contribution-main-input-label" data-has-help>
-					<?php esc_html_e( 'Thank you Page (optional)', 'revenue-generator' ); ?>
-					<input type="text" class="rev-gen-contribution-main-input" id="rg_contribution_thankyou" name="thank_you" value="<?php echo esc_attr( $contribution_data['thank_you'] ); ?>" />
-					<button data-info-for="thankYouPage" id="rev-gen-contribution-help-thank-you" class="rev-gen-settings-main-option-info rev-gen-contribution-main--help" onclick="javascript: return false;">
-						<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
-					</button>
-				</label>
-				<?php if ( ! empty( $contribution_data['ID'] ) && ! empty( $contribution_data['code'] ) ) : ?>
-				<p class="rev-gen-contribution-main__p"><?php esc_html_e( 'You\'re editing an older version of the Contribution shortcode. For the changes to take effect, you’ll need to replace existing codes in your content with the new one that will be generated by clicking below.', 'revenue-generator' ); ?><br><?php esc_html_e( 'In the future, your Contribution offering will be automatically updated throughout your site when you edit it here.', 'revenue-generator' ); ?></p>
-				<?php endif; ?>
-				<label id="rg_contribution_generate" class="rev-gen-contribution-main-input-label rev-gen-contribution-main-button" data-has-help>
-					<button class="rev-gen-contribution-main-generate-button" type="submit" disabled>
-						<?php if ( ! empty( $contribution_data['ID'] ) ) : ?>
-							<?php esc_html_e( 'Update and copy code', 'revenue-generator' ); ?>
-						<?php else : ?>
-							<?php esc_html_e( 'Save and copy code', 'revenue-generator' ); ?>
-						<?php endif; ?>
-					</button>
-					<button data-info-for="shortcode" id="rev-gen-contribution-help-shortcode" class="rev-gen-settings-main-option-info rev-gen-contribution-main--help rev-gen-contribution-main--shortcode" onclick="javascript: return false;">
-						<img src="<?php echo esc_url( $action_icons['option_info'] ); ?>">
-					</button>
-				</label>
-				<p class="rev-gen-contribution-main-copy-message"><?php esc_html_e( 'To include the Contribution Box on your site, paste the code where you would like it to appear.', 'revenue-generator' ); ?></p>
-			</div>
-			</div>
-			<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
-			<a href="https://wordpress.org/support/plugin/revenue-generator" target="_blank" class="rev-gen__button rev-gen__button--secondary rev-gen__button--help rev-gen-email-support"><?php esc_html_e( 'Email Support', 'revenue-generator' ); ?></a>
-			<div class="rev-gen-exit-tour rev-gen__button rev-gen__button--secondary rev-gen__button--help"><?php esc_html_e( 'Exit Tour', 'revenue-generator' ); ?></div>
-		</form>
+					<section class="rg-contribution-builder__layout-select rg-contribution-layout-select">
+						<h3 class="rg-contribution-layout-select__title"><?php esc_html_e( 'Select contribution type', 'revenue-generator' ); ?></h3>
+
+						<div class="rg-contribution-layout-select__options">
+							<label class="rg-contribution-layout-type">
+								<input type="radio" class="rg-visuallyhidden" name="layout_type" value="box" data-bind="layout_type" <?php checked( 'box', $contribution_data['layout_type'] ); ?>>
+								<div class="rg-contribution-layout-type__preview">
+									<div class="rg-contribution-layout-type__box"></div>
+									<?php esc_html_e( 'Box', 'revenue-generator' ); ?>
+								</div>
+							</label>
+							<label class="rg-contribution-layout-type">
+								<input type="radio"  class="rg-visuallyhidden" name="layout_type" value="button" data-bind="layout_type" <?php checked( 'button', $contribution_data['layout_type'] ); ?>>
+								<div class="rg-contribution-layout-type__preview">
+									<div class="rg-contribution-layout-type__box rg-contribution-layout-type__box--pill"></div>
+									<span class="rg-contribution-layout-type__label"><?php esc_html_e( 'Button', 'revenue-generator' ); ?></span>
+								</div>
+							</label>
+							<label class="rg-contribution-layout-type">
+								<input type="radio"  class="rg-visuallyhidden" name="layout_type" value="bar" data-bind="layout_type" <?php checked( 'bar', $contribution_data['layout_type'] ); ?>>
+								<div class="rg-contribution-layout-type__preview">
+									<div class="rg-contribution-layout-type__box rg-contribution-layout-type__box--complex">
+										<div class="rg-contribution-layout-type__inner"></div>
+									</div>
+									<?php esc_html_e( 'Bar', 'revenue-generator' ); ?>
+								</div>
+							</label>
+						</div>
+					</section>
+
+					<section class="rg-contribution-builder-inputs">
+						<div class="rg-contribution-builder__input-wrap">
+							<input type="text" placeholder="<?php esc_html_e( 'Campaign Name', 'revenue-generator' ); ?>" value="<?php echo esc_attr( $contribution_data['post_title'] ); ?>" data-bind="name" required data-validate>
+							<p class="input-error-text"><?php esc_html_e( 'This field is required' ); ?>.</p>
+						</div>
+						<div class="rg-contribution-builder__input-wrap">
+							<input type="text" placeholder="<?php esc_html_e( 'Link to Thank You Page', 'revenue-generator' ); ?>" value="<?php echo esc_attr( $contribution_data['thank_you'] ); ?>" data-bind="thank_you" data-validate data-validation="url">
+							<p class="input-error-text"><?php esc_html_e( 'Please enter valid URL', 'revenue-generator' ); ?>.</p>
+						</div>
+						<input type="submit" class="rev-gen__button" value="<?php esc_html_e( 'Save', 'revenue-generator' ); ?>" disabled="disabled" data-default-text="<?php esc_html_e( 'Save', 'revenue-generator' ); ?>">
+					</section>
+
+					<input type="hidden" name="security" value="<?php echo esc_attr( wp_create_nonce( 'rg_contribution_nonce' ) ); ?>">
+					<input type="hidden" name="action" value="rg_contribution_save">
+					<input type="hidden" name="ID" value="<?php echo esc_attr( $contribution_data['ID'] ); ?>">
+
+					<p class="rg-contribution-builder__helper-message"><?php esc_html_e( 'To include the Contribution Box on your site, paste the code where you would like it to appear.', 'revenue-generator' ); ?></p>
+
+					<div id="rg_js_SnackBar" class="rev-gen-snackbar"></div>
+				</form>
+			</section>
+			<section class="rg-contribution-builder__preview">
+				<a href="#" id="rg_js_toggle_preview" class="rg-contribution-builder__preview-toggle" data-expand-text="<?php esc_html_e( 'Expand preview', 'revenue-generator' ); ?>" data-collapse-text="<?php esc_html_e( 'Collapse preview', 'revenue-generator' ); ?>"><?php esc_html_e( 'Expand preview', 'revenue-generator' ); ?></a>
+
+				<iframe src="<?php echo esc_url( Contribution::get_preview_post_url() ); ?>&id=<?php echo esc_attr( $contribution_data['ID'] ); ?>" width="100%" height="100%" id="rg-contribution-builder-preview" onload="javascript:handleIframeLoad(this)" class="loading"></iframe>
+			</section>
+		</div>
 	</div>
 </div>
 <?php View::render_footer_backend(); ?>
