@@ -24,10 +24,10 @@ global $wp;
 		?>
 		<form class="rev-gen-contribution-custom__form" action="<?php echo esc_url( admin_url() ); ?>/admin-ajax.php" id="<?php echo esc_attr( $html_id ); ?>_form">
 			<input type="hidden" name="action" value="rg_contribution_contribute">
-			<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'rg_contribution_contribute' ); ?>">
+			<input type="hidden" name="nonce" value="<?php echo esc_attr( wp_create_nonce( 'rg_contribution_contribute' ) ); ?>">
 			<input type="hidden" name="campaign_id" value="<?php echo esc_attr( $campaign_id ); ?>">
-			<input type="hidden" name="title" value="asdfg">
-			<input type="hidden" name="url" value="<?php echo home_url( $wp->request ); ?>">
+			<input type="hidden" name="title" value="<?php echo esc_attr( $campaign_name ); ?>">
+			<input type="hidden" name="url" value="<?php echo esc_url_raw( home_url( $wp->request ) ); ?>">
 			<div class="rev-gen-contribution__input-wrap">
 				<label for="<?php echo esc_attr( $html_id ); ?>_custom_input"><?php esc_html_e( 'Enter custom amount', 'revenue-generator' ); ?></label>
 				<div class="rev-gen-contribution-custom__input">
