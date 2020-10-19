@@ -1,4 +1,4 @@
-/* global rgVars */
+/* global rgVars, FormData, XMLHttpRequest */
 export default class RevGenContribution {
 	constructor( el ) {
 		this.el = el;
@@ -83,18 +83,22 @@ export default class RevGenContribution {
 			const data = new FormData( this.$o.customBox.form );
 			const req = new XMLHttpRequest();
 
-			req.open( 'POST', this.$o.customBox.form.getAttribute( 'action' ), true );
+			req.open(
+				'POST',
+				this.$o.customBox.form.getAttribute( 'action' ),
+				true
+			);
 			req.send( data );
 
 			req.onreadystatechange = function() {
-				if ( 4 === this.readyState && 200 == this.status ) {
+				if ( 4 === this.readyState && 200 === this.status ) {
 					const res = JSON.parse( this.response );
 
 					if ( res.data ) {
 						window.open( res.data );
 					}
 				}
-			}
+			};
 		} );
 	}
 
