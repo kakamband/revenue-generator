@@ -34,11 +34,40 @@ class Test_Frontend_Post extends \WP_UnitTestCase {
 	protected $_instance = false;
 
 	/**
-	 * Admin ID.
+	 * Admin.
 	 *
-	 * @var int
+	 * @var object
 	 */
-	protected static $admin_id  = 0;
+	protected static $admin;
+
+	/**
+	 * Paywall.
+	 *
+	 * @var object
+	 */
+	protected static $paywall;
+
+	/**
+	 * Post.
+	 *
+	 * @var object
+	 */
+	protected static $post;
+
+
+	/**
+	 * Subscription.
+	 *
+	 * @var object
+	 */
+	protected static $subscription;
+
+	/**
+	 * Time Pass.
+	 *
+	 * @var object
+	 */
+	protected static $time_pass;
 
 	/**
 	 * Setup Initial Data before.
@@ -46,7 +75,84 @@ class Test_Frontend_Post extends \WP_UnitTestCase {
 	 * @param object $factory factory.
 	 */
 	public static function wpSetUpBeforeClass( $factory ) {
-		self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
+		self::$admin = $factory->user->create_and_get( array( 'role' => 'administrator' ) );
+
+		self::$subscription = $factory->post->create_and_get(
+			array(
+				'post_type'    => 'rg_subscription',
+				'post_title'   => '1 Month Subscription',
+				'post_content' => 'Enjoy unlimited access to all our content for 1 Month',
+				'post_status'  => 'publish',
+				'post_author'  => self::$admin->ID,
+				'meta_input'   => array(
+					'_rg_price'        => '4.99',
+					'_rg_revenue'      => 'sis',
+					'_rg_duration'     => 'm',
+					'_rg_period'       => '1',
+					'_rg_access_to'    => 'all',
+					'_rg_custom_title' => '',
+					'_rg_custom_desc'  => '',
+				),
+			)
+		);
+
+		self::$time_pass = $factory->post->create_and_get(
+			array(
+				'post_type'    => 'rg_pass',
+				'post_title'   => '24 Hour Pass',
+				'post_content' => 'Enjoy unlimited access to all our content for 24 Hours',
+				'post_status'  => 'publish',
+				'post_author'  => self::$admin->ID,
+				'meta_input'   => array(
+					'_rg_price'        => '2.49',
+					'_rg_revenue'      => 'sis',
+					'_rg_duration'     => 'h',
+					'_rg_period'       => '24',
+					'_rg_access_to'    => 'all',
+					'_rg_custom_title' => '',
+					'_rg_custom_desc'  => '',
+				),
+			)
+		);
+
+		self::$paywall = $factory->post->create_and_get(
+			array(
+				'post_type'    => 'rg_paywall',
+				'post_title'   => 'Paywall 1',
+				'post_content' => 'Support http://revgen.test to get access to this content and more.',
+				'post_status'  => 'publish',
+				'post_author'  => self::$admin->ID,
+				'meta_input'   => array(
+					'_rg_title'             => 'Keep Reading',
+					'_rg_access_to'         => 'all',
+					'_rg_access_entity'     => '2',
+					'_rg_preview_id'        => '2',
+					'_rg_specific_posts'    => '',
+					'_rg_individual_option' => maybe_serialize(
+						array(
+							'title'        => 'Access Article Now',
+							'description'  => 'You\'ll only be charged once you\'ve reached $5.',
+							'price'        => '0.49',
+							'revenue'      => 'ppu',
+							'type'         => 'dynamic',
+							'custom_title' => '',
+							'custom_desc'  => '',
+						)
+					),
+					'_rg_options_order'     => maybe_serialize(
+						array(
+							'individual'                  => '1',
+							'tlp_' . self::$time_pass->ID => '2',
+							'sub_' . self::$subscription->ID => '3',
+						)
+					),
+					'_rg_is_active'         => '1',
+				),
+			)
+		);
+
+		self::$post = $factory->post->create_and_get();
+
 	}
 
 	/**
@@ -55,7 +161,7 @@ class Test_Frontend_Post extends \WP_UnitTestCase {
 	public function setUp() {
 		parent::setUp();
 		$this->_instance = Frontend_Post::get_instance();
-		wp_set_current_user( self::$admin_id );
+		wp_set_current_user( self::$admin->ID );
 	}
 
 	/**
@@ -120,4 +226,86 @@ class Test_Frontend_Post extends \WP_UnitTestCase {
 		}
 
 	}
+
+	/**
+	 * Test Connector config.
+	 *
+	 * @covers Frontend_Post::add_connector_config
+	 *
+	 * @todo Giving error still debuging.
+	 */
+	/*public function test_add_connector_config() {
+		$post_id = self::$post->ID;
+		$this->go_to( get_permalink( $post_id ) );
+		$connect_configs = Utility::invoke_method( $this->_instance, 'add_connector_config' );
+		$this->assertQueryTrue( 'is_single', 'is_singular' );
+
+	}*/
+
+	/**
+	 * Test Connected Paywall ID.
+	 *
+	 * @covers Frontend_Post::get_connected_paywall_id
+	 */
+	public function test_get_connected_paywall_id() {
+
+		$all_paywall = Utility::invoke_method( $this->_instance, 'get_connected_paywall_id', array( self::$post->ID ) );
+		$this->assertArrayHasKey( 'id', $all_paywall );
+		$this->assertEquals( 'Paywall 1', $all_paywall['name'] );
+	}
+
+	/**
+	 * Test Register Connected Assets.
+	 *
+	 * @covers Frontend_Post::register_connector_assets
+	 */
+	public function register_connector_assets() {
+
+		Utility::invoke_method( $this->_instance, 'get_connected_paywall_id', array( self::$post->ID ) );
+		$this->assertTrue( wp_script_is( 'revenue-generator-classic-connector' ) );
+		$this->assertTrue( wp_style_is( 'revenue-generator-frontend' ) );
+
+	}
+
+	/**
+	 * Test Post Content Teaser.
+	 *
+	 * @param string $content Content to be tested.
+	 *
+	 * @covers Frontend_Post::revenue_generator_post_content
+	 *
+	 * @dataProvider data_revenue_generator_post_content
+	 */
+	public function test_revenue_generator_post_content( $content ) {
+		$post_id = self::$post->ID;
+		$this->go_to( get_permalink( $post_id ) );
+		$post_content = Utility::invoke_method( $this->_instance, 'revenue_generator_post_content', array( $content ) );
+		$this->assertContains( 'lp-teaser-content', $post_content );
+		$this->assertContains( 'lp-main-content', $post_content );
+		$this->assertContains( 'data-lp-show-on-access', $post_content );
+	}
+
+	/**
+	 * Data provider for revenue_generator_post_content.
+	 *
+	 * Passes diffrent type of data.
+	 *
+	 * @return array {
+	 *    @type array{
+	 *        @type string $content The Content.
+	 *    }
+	 * }
+	 */
+	public function data_revenue_generator_post_content() {
+
+		return array(
+			array(
+				"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+			),
+			array(
+				'[hello world=start]Where are you?[/hello]',
+			),
+		);
+	}
+
 }
