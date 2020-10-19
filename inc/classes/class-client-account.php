@@ -61,6 +61,13 @@ class Client_Account {
 	protected $secret_algo = 'sha224';
 
 	/**
+	 * Flag whether it's sandbox environment.
+	 *
+	 * @var boolean
+	 */
+	protected $is_sandbox = false;
+
+	/**
 	 * Store connector endpoint used in the plugin.
 	 *
 	 * @var array Common values used for api related info throughout the plugin.
@@ -165,6 +172,7 @@ class Client_Account {
 
 		// If development mode is enabled use snbox environment.
 		if ( defined( 'REVENUE_GENERATOR_ENABLE_SANDBOX' ) && true === REVENUE_GENERATOR_ENABLE_SANDBOX ) {
+			$this->is_sandbox     = true;
 			$this->connector_root = $region_connector_endpoints['sandbox'];
 			$this->api_root       = $region_api_endpoints['sandbox'];
 		}
@@ -298,5 +306,38 @@ class Client_Account {
 	 */
 	private function get_validate_signature_url() {
 		return $this->api_root . '/validatesignature';
+	}
+	/**
+	 * Get connector, API, and Web endpoints from merchant credentials.
+	 *
+	 * @return WP_Error|array
+	 */
+	public function get_endpoints() {
+		if ( ! $this->validate_merchant_account() ) {
+			return new \WP_Error( 'Endpoints could not be retrieved because merchant account is not valid.', 'revenue-generator' );
+		}
+
+		$web_endpoint = self::$web_endpoints[ $this->merchant_region ]['live'];
+
+		if ( $this->is_sandbox ) {
+			$web_endpoint = self::$web_endpoints[ $this->merchant_region ]['sandbox'];
+		}
+
+		$endpoints = [
+			'connector' => $this->connector_root,
+			'api'       => $this->api_root,
+			'web'       => $web_endpoint,
+		];
+
+		return $endpoints;
+	}
+
+	/**
+	 * Get currency from region.
+	 *
+	 * @return string
+	 */
+	public function get_currency() {
+		return ( 'US' === $this->merchant_region ) ? 'USD' : 'EUR';
 	}
 }
