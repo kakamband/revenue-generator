@@ -1,0 +1,204 @@
+$box-text-color:#1d1d1d;
+$box-dark-grey:#333;
+$box-font-helvetica: HelveticaNeue, serif;
+$box-font-worksans:"LaterPay WorkSans", serif;
+$box-white:#fff;
+
+.amount-text {
+	font-family: $box-font-helvetica;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.21;
+	text-align: center;
+	color: $box-dark-grey;
+}
+
+.rev-gen-contribution {
+	margin: 0 auto;
+	&__inner {
+		position: relative;
+		padding: 30px 25px 18px;
+		border-radius: 5px;
+		overflow: hidden;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+		box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
+		background-color: #fff;
+	}
+
+	h2.rev-gen-contribution__title {
+		margin: 0;
+		max-width: 100%;
+		border: 1px solid transparent;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+		font-weight: bold;
+		line-height: 1.33;
+		font-size: 21px;
+		text-align: center;
+		color: #1d1d1d;
+	}
+
+	&__description {
+		max-width: 100%;
+		font-size: 14px;
+		text-align: center;
+	}
+
+	&__donate {
+		display: flex;
+		flex-flow: row nowrap;
+		justify-content: center;
+		margin: 15px 0;
+		&.rev-gen-hidden {
+			display: none;
+		}
+	}
+
+	&__donation {
+		border: solid 2px $box-text-color;
+		border-radius: 5px;
+		margin: 0 2px;
+		display: flex;
+		align-items: center;
+		text-align: center;
+		justify-content: center;
+		overflow: hidden;
+		cursor: pointer;
+		word-break: normal;
+		@extend .amount-text;
+
+		a {
+			display: block;
+			padding: 15px;
+			background: $box-white;
+			color: $box-text-color;
+			&:hover {
+				background: $box-text-color;
+				color: $box-white;
+			}
+		}
+		&-wrapper {
+			position: relative;
+			display: flex;
+			justify-content: center;
+		}
+	}
+
+	&__tip {
+		margin: 0 0 5px;
+		line-height: 1;
+		font-size: 13px;
+		text-align: center;
+		&.rev-gen-hidden {
+			visibility: hidden;
+		}
+	}
+
+	&__custom {
+		&.rev-gen-hidden {
+			display: none;
+		}
+	}
+
+	&-custom {
+		max-width: 335px;
+		margin: 0 auto 10px;
+		&__inner {
+			display: flex;
+			flex-flow: row nowrap;
+			align-items: flex-end;
+			justify-content: space-between;
+		}
+		h3.rev-gen-contribution-custom__title {
+			margin: 0;
+			border: 1px solid transparent;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+			line-height: 1.33;
+			font-size: 14px;
+			color: #1d1d1d;
+		}
+		&__back {
+			cursor: pointer;
+			margin-right: 15px;
+			&-arrow {
+				height: 45px;
+			}
+		}
+		&__input {
+			display: flex;
+			align-items: center;
+			margin-right: 10px;
+			&-wrap {
+				flex: 1;
+			}
+			input {
+				width: 95%;
+				font-size: 16px;
+				color: $box-text-color;
+			}
+		}
+		&__symbol {
+			width: 15px;
+			text-align: center;
+		}
+		label {
+			margin-left: 15px;
+			font-size: 12px;
+		}
+		&__send {
+			min-width: 90px;
+			max-height: 50px;
+			margin: 0;
+			padding: 14px 10px;
+			border-radius: 5px;
+			color: $box-white;
+			background-color: $box-text-color;
+		}
+	}
+
+	&-footer {
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+
+		&__inner {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		a {
+			flex: 1;
+			margin-left: 5px;
+			max-width: 75px;
+			opacity: 0.6;
+			transition: opacity 0.2s ease-in;
+			&:hover {
+				opacity: 1;
+			}
+		}
+
+		span {
+			position: relative;
+			top: 2px;
+			line-height: 1.1;
+			font-size: 11px;
+			color: #808080;
+		}
+	}
+
+	&--box {
+		max-width: 380px;
+		min-height: 227px;
+	}
+
+	&--bar {
+		width: 100%;
+		.rev-gen-contribution {
+			&__donate {
+				margin: 5px 0;
+			}
+			&__inner {
+				max-width: 100%;
+				padding: 15px 25px;
+			}
+		}
+	}
+}

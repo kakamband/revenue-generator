@@ -1,191 +1,164 @@
 /* global rgVars */
+export default class RevGenContribution {
+	constructor( el ) {
+		this.el = el;
+		this.$o = {
+			donateBox: el.querySelector( '.rev-gen-contribution__donate' ),
+			customBox: {
+				el: el.querySelector( '.rev-gen-contribution__custom' ),
+				input: el.querySelector( '.rev-gen-contribution-custom input' ),
+				backButton: el.querySelector(
+					'.rev-gen-contribution-custom__back'
+				),
+				send: el.querySelector( '.rev-gen-contribution-custom__send' ),
+			},
+			amounts: el.getElementsByClassName(
+				'rev-gen-contribution__donation'
+			),
+			customAmount: el.querySelector(
+				'.rev-gen-contribution__donation--custom'
+			),
+			tip: el.querySelector( '.rev-gen-contribution__tip' ),
+		};
 
-/**
- * JS to handle plugin Contribution Dailog.
- */
+		this.bindEvents();
+	}
 
-/**
- * Internal dependencies.
- */
-import '../utils';
-import { debounce } from '../helpers';
+	bindEvents() {
+		for ( const amount of this.$o.amounts ) {
+			const link = amount.querySelector( 'a' );
 
-( function( $ ) {
-	$( function() {
-		function revenueGeneratorContributionDailog() {
-			// Welcome screen elements.
-			const $o = {
-				body: $( 'body' ),
+			link.addEventListener( 'mouseover', () => {
+				const type = amount.dataset.revenue;
 
-				// Contribution Element.
-				rgAmountTip: '.rg-amount-tip',
-
-				// Action element.
-				rg_preset_buttons: '.rev-gen-contribution-main--box-donation',
-				rg_contribution_amounts:
-					'.rev-gen-contribution-main--box-donation-wrapper',
-				rg_customAmountButton: '.rev-gen-contribution-main-custom',
-
-				rg_custom_amount: $( '.rg-custom-amount-input' ),
-				rg_custom_amount_wrapper: $( '.rg-custom-amount-wrapper' ),
-				rg_custom_amout_goBack: $( '.rg-custom-amount-goback' ),
-				rg_singleContribution: $( '.rg-link-single' ),
-
-				snackBar: $( '#rg_js_SnackBar' ),
-			};
-
-			// Binding events for contribution dialog.
-			const bindContributionEvents = function() {
-				// Event handler for clicking on the amounts in contribution dialog.
-				$( $o.rg_preset_buttons ).on( 'mouseover', function() {
-					const revenueType = $( this ).data( 'revenue' );
-
-					if ( 'ppu' === revenueType ) {
-						$( $o.rgAmountTip ).css( 'visibility', 'visible' );
-					} else {
-						$( $o.rgAmountTip ).css( 'visibility', 'hidden' );
-					}
-				} );
-
-				/**
-				 * Removes tip message on mouseout.
-				 */
-				$( $o.rg_preset_buttons ).on( 'mouseout', function() {
-					$( $o.rgAmountTip ).css( 'visibility', 'hidden' );
-				} );
-
-				/**
-				 * Open up Contribution Payment URL.
-				 */
-				$( $o.rg_preset_buttons )
-					.not( $o.rg_customAmountButton )
-					.on( 'click', function() {
-						const contributionURL = $( this ).data( 'href' );
-						window.open( contributionURL );
-					} );
-
-				// Handle custom amount input.
-				$o.rg_custom_amount.on(
-					'change',
-					debounce( function() {
-						const validatedPrice = validatePrice( $( this ).val() );
-						$( this ).val( validatedPrice );
-
-						// Get Price amount.
-						const lpAmount = Math.round( $( this ).val() * 100 );
-
-						// Compare price amount.
-						if ( lpAmount <= 199 ) {
-							$( $o.rgAmountTip ).css( 'visibility', 'visible' );
-						} else {
-							$( $o.rgAmountTip ).css( 'visibility', 'hidden' );
-						}
-					}, 800 )
-				);
-
-				// Handle multiple contribution button click.
-				$( '.rg-custom-amount-send' ).on( 'click', function() {
-					let payurl = '';
-
-					const customAmount = $o.rg_custom_amount.val() * 100;
-					if ( customAmount > 199 ) {
-						payurl =
-							$o.rg_custom_amount_wrapper.data( 'sis-url' ) +
-							'&custom_pricing=' +
-							rgVars.default_currency +
-							customAmount;
-					} else {
-						payurl =
-							$o.rg_custom_amount_wrapper.data( 'ppu-url' ) +
-							'&custom_pricing=' +
-							rgVars.default_currency +
-							customAmount;
-					}
-					// Open payment url in new tab.
-					window.open( payurl );
-				} );
-
-				/**
-				 * Handles custom button click.
-				 */
-				$( $o.rg_customAmountButton ).on( 'click', function() {
-					$( $o.rg_contribution_amounts ).fadeOut(
-						'slow',
-						function() {
-							$o.rg_custom_amount_wrapper.show();
-							$o.rg_custom_amount_wrapper
-								.removeClass( 'slide-out' )
-								.addClass( 'slide-in' );
-						}
-					);
-				} );
-
-				/**
-				 * Handles back button event on custom amount box.
-				 */
-				$o.rg_custom_amout_goBack.on( 'click', function() {
-					$o.rg_custom_amount_wrapper
-						.removeClass( 'slide-in' )
-						.addClass( 'slide-out' );
-					setTimeout( function() {
-						$o.rg_custom_amount_wrapper.hide();
-						$( $o.rg_contribution_amounts ).fadeIn( 'slow' );
-					}, 1900 );
-				} );
-
-				// Handle multiple contribution button click.
-				$o.rg_singleContribution.on( 'click', function() {
-					window.open(
-						$( this ).data( 'url' ) +
-							'&custom_pricing=' +
-							rgVars.default_currency +
-							$( this ).data( 'amount' )
-					);
-				} );
-			};
-
-			// Validate custom input price.
-			const validatePrice = function( price ) {
-				// strip non-number characters
-				price = price.toString().replace( /[^0-9\,\.]/g, '' );
-
-				// convert price to proper float value
-				if ( typeof price === 'string' && price.indexOf( ',' ) > -1 ) {
-					price = parseFloat( price.replace( ',', '.' ) ).toFixed(
-						2
-					);
+				if ( 'ppu' === type ) {
+					this.$o.tip.classList.remove( 'rev-gen-hidden' );
 				} else {
-					price = parseFloat( price ).toFixed( 2 );
+					this.$o.tip.classList.add( 'rev-gen-hidden' );
 				}
+			} );
 
-				// prevent non-number prices
-				if ( isNaN( price ) ) {
-					price = 0.05;
-				}
-
-				// prevent negative prices
-				price = Math.abs( price );
-
-				// correct prices outside the allowed range of 0.05 - 1000.00
-				if ( price > 1000.0 ) {
-					price = 1000.0;
-				} else if ( price < 0.05 ) {
-					price = 0.05;
-				}
-
-				// format price with two digits
-				price = price.toFixed( 2 );
-
-				return price;
-			};
-
-			// Initialize all required events.
-			const initializePage = function() {
-				bindContributionEvents();
-			};
-			initializePage();
+			link.addEventListener( 'mouseout', () => {
+				this.$o.tip.classList.add( 'rev-gen-hidden' );
+			} );
 		}
 
-		revenueGeneratorContributionDailog();
-	} );
-} )( jQuery ); // eslint-disable-line no-undef
+		this.$o.customAmount.addEventListener( 'click', ( e ) => {
+			e.preventDefault();
+
+			this.$o.donateBox.classList.add( 'rev-gen-hidden' );
+			this.$o.customBox.el.classList.remove( 'rev-gen-hidden' );
+			this.$o.customBox.el.removeAttribute( 'hidden' );
+			this.$o.customBox.input.focus();
+		} );
+
+		this.$o.customBox.backButton.addEventListener( 'click', () => {
+			this.$o.customBox.el.classList.add( 'rev-gen-hidden' );
+			this.$o.customBox.el.setAttribute( 'hidden', '' );
+			this.$o.donateBox.classList.remove( 'rev-gen-hidden' );
+		} );
+
+		this.$o.customBox.input.addEventListener( 'change', () => {
+			this.validateAmount();
+
+			if ( 199 >= this.getCustomAmount( true ) ) {
+				this.$o.tip.classList.remove( 'rev-gen-hidden' );
+			} else {
+				this.$o.tip.classList.add( 'rev-gen-hidden' );
+			}
+		} );
+
+		this.$o.customBox.input.addEventListener( 'keyup', () => {
+			if ( 199 >= this.getCustomAmount( true ) ) {
+				this.$o.tip.classList.remove( 'rev-gen-hidden' );
+			} else {
+				this.$o.tip.classList.add( 'rev-gen-hidden' );
+			}
+		} );
+
+		this.$o.customBox.send.addEventListener( 'click', ( e ) => {
+			e.preventDefault();
+
+			this.validateAmount();
+
+			const url = this.getCustomAmountURL();
+			window.open( url );
+		} );
+	}
+
+	validateAmount() {
+		let amount = this.$o.customBox.input.value;
+
+		amount = amount.toString().replace( /[^0-9\,\.]/g, '' );
+
+		// convert price to proper float value
+		if ( typeof amount === 'string' && amount.indexOf( ',' ) > -1 ) {
+			amount = parseFloat( amount.replace( ',', '.' ) ).toFixed( 2 );
+		} else {
+			amount = parseFloat( amount ).toFixed( 2 );
+		}
+
+		// prevent non-number prices
+		if ( isNaN( amount ) ) {
+			amount = 0.05;
+		}
+
+		// prevent negative prices
+		amount = Math.abs( amount );
+
+		// correct prices outside the allowed range of 0.05 - 1000.00
+		if ( amount > 1000.0 ) {
+			amount = 1000.0;
+		} else if ( amount < 0.05 ) {
+			amount = 0.05;
+		}
+
+		// format price with two digits
+		amount = amount.toFixed( 2 );
+
+		this.$o.customBox.input.value = amount;
+
+		return amount;
+	}
+
+	getCustomAmount( giveMeInt ) {
+		let amount = this.$o.customBox.input.value;
+
+		if ( giveMeInt ) {
+			amount = amount * 100;
+		}
+
+		return amount;
+	}
+
+	getCustomAmountURL() {
+		let url = '';
+		const amount = this.getCustomAmount( true );
+
+		if ( 199 < amount ) {
+			url =
+				this.$o.customBox.el.dataset.sisUrl +
+				'&custom_pricing=' +
+				rgVars.default_currency +
+				amount;
+		} else {
+			url =
+				this.$o.customBox.el.dataset.ppuUrl +
+				'&custom_pricing=' +
+				rgVars.default_currency +
+				amount;
+		}
+
+		return url;
+	}
+}
+
+document.addEventListener( 'DOMContentLoaded', () => {
+	const contributions = document.getElementsByClassName(
+		'rev-gen-contribution'
+	);
+
+	for ( const item of contributions ) {
+		new RevGenContribution( item );
+	}
+} );

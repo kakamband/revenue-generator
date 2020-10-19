@@ -339,6 +339,7 @@ class Shortcodes {
 		// View data for revenue-generator/views/contribution-dialog.php.
 		$view_args = array(
 			'currency_symbol'    => 'USD' === $currency_config ? '$' : '€',
+			'contribution_id'    => $config_data['ID'],
 			'campaign_id'        => $campaign_id,
 			'dialog_header'      => $config_data['dialog_header'],
 			'dialog_description' => $config_data['dialog_description'],
