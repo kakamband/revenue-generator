@@ -54,6 +54,13 @@ class Client_Account {
 	protected $merchant_region;
 
 	/**
+	 * Web endpoint.
+	 *
+	 * @var string
+	 */
+	protected $web_endpoint;
+
+	/**
 	 * Algorithm used to sign the key.
 	 *
 	 * @var string
@@ -169,12 +176,14 @@ class Client_Account {
 		$region_api_endpoints       = self::$api_endpoints[ $region ];
 		$this->connector_root       = $region_connector_endpoints['live'];
 		$this->api_root             = $region_api_endpoints['live'];
+		$this->web_endpoint         = self::$web_endpoints[ $this->merchant_region ]['live'];
 
 		// If development mode is enabled use snbox environment.
 		if ( defined( 'REVENUE_GENERATOR_ENABLE_SANDBOX' ) && true === REVENUE_GENERATOR_ENABLE_SANDBOX ) {
 			$this->is_sandbox     = true;
 			$this->connector_root = $region_connector_endpoints['sandbox'];
 			$this->api_root       = $region_api_endpoints['sandbox'];
+			$this->web_endpoint   = self::$web_endpoints[ $this->merchant_region ]['sandbox'];
 		}
 
 		// Setup merchant credentials.
@@ -317,16 +326,10 @@ class Client_Account {
 			return new \WP_Error( 'Endpoints could not be retrieved because merchant account is not valid.', 'revenue-generator' );
 		}
 
-		$web_endpoint = self::$web_endpoints[ $this->merchant_region ]['live'];
-
-		if ( $this->is_sandbox ) {
-			$web_endpoint = self::$web_endpoints[ $this->merchant_region ]['sandbox'];
-		}
-
 		$endpoints = [
 			'connector' => $this->connector_root,
 			'api'       => $this->api_root,
-			'web'       => $web_endpoint,
+			'web'       => $this->web_endpoint,
 		];
 
 		return $endpoints;
