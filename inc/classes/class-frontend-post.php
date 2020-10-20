@@ -726,11 +726,11 @@ class Frontend_Post {
 	public function ajax_contribute_contribution() {
 		check_ajax_referer( 'rg_contribution_contribute', 'nonce' );
 
-		$amount = ( isset( $_REQUEST['amount'] ) ) ? (float) $_REQUEST['amount'] : 0;
+		$amount      = ( isset( $_REQUEST['amount'] ) ) ? (float) $_REQUEST['amount'] : 0;
 		$campaign_id = ( isset( $_REQUEST['campaign_id'] ) ) ? sanitize_text_field( $_REQUEST['campaign_id'] ) : '';
-		$title = ( isset( $_REQUEST['title'] ) ) ? sanitize_text_field( $_REQUEST['title'] ) : '';
-		$url = ( isset( $_REQUEST['url'] ) ) ? esc_url_raw( $_REQUEST['url'] ) : '';
-		$is_amp = ( isset( $_REQUEST['is_amp'] ) && 1 === (int) $_REQUEST['is_amp'] );
+		$title       = ( isset( $_REQUEST['title'] ) ) ? sanitize_text_field( $_REQUEST['title'] ) : '';
+		$url         = ( isset( $_REQUEST['url'] ) ) ? esc_url_raw( $_REQUEST['url'] ) : '';
+		$is_amp      = ( isset( $_REQUEST['is_amp'] ) && 1 === (int) $_REQUEST['is_amp'] );
 
 		if ( empty( $amount ) ) {
 			wp_send_json_error(
