@@ -724,14 +724,13 @@ class Frontend_Post {
 	 * @return void
 	 */
 	public function ajax_contribute_contribution() {
-		header( 'AMP-Redirect-To: https://www.google.com' );
-
 		check_ajax_referer( 'rg_contribution_contribute', 'nonce' );
 
 		$amount = ( isset( $_REQUEST['amount'] ) ) ? (float) $_REQUEST['amount'] : 0;
 		$campaign_id = ( isset( $_REQUEST['campaign_id'] ) ) ? sanitize_text_field( $_REQUEST['campaign_id'] ) : '';
 		$title = ( isset( $_REQUEST['title'] ) ) ? sanitize_text_field( $_REQUEST['title'] ) : '';
 		$url = ( isset( $_REQUEST['url'] ) ) ? esc_url_raw( $_REQUEST['url'] ) : '';
+		$is_amp = ( isset( $_REQUEST['is_amp'] ) && 1 === (int) $_REQUEST['is_amp'] );
 
 		if ( empty( $amount ) ) {
 			wp_send_json_error(
@@ -778,6 +777,11 @@ class Frontend_Post {
 			$client_account->get_currency() . $amount_in_cents,
 			$contribution_url
 		);
+
+		if ( $is_amp ) {
+			header( 'AMP-Redirect-To: ' . $contribution_url );
+			header( 'Access-Control-Expose-Headers: AMP-Redirect-To' );
+		}
 
 		wp_send_json_success(
 			$contribution_url

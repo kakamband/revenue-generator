@@ -8,6 +8,8 @@
 defined( 'ABSPATH' ) || exit;
 
 global $wp;
+
+$is_amp = function_exists( 'is_amp_endpoint' ) && is_amp_endpoint();
 ?>
 <div class="rev-gen-contribution__custom rev-gen-contribution-custom rev-gen-hidden" id="<?php echo esc_attr( $html_id ); ?>_custom" data-ppu-url="<?php echo esc_url( $contribution_urls['ppu'] ); ?>" data-sis-url="<?php echo esc_url( $contribution_urls['sis'] ); ?>" hidden>
 	<div class="rev-gen-contribution-custom__inner">
@@ -22,11 +24,12 @@ global $wp;
 			wp_json_encode( $default_amount )
 		);
 		?>
-		<form class="rev-gen-contribution-custom__form" action="<?php echo esc_url( admin_url() ); ?>/admin-ajax.php" id="<?php echo esc_attr( $html_id ); ?>_form">
+		<form class="rev-gen-contribution-custom__form" action="<?php echo esc_url( admin_url() ); ?>/admin-ajax.php" id="<?php echo esc_attr( $html_id ); ?>_form" action-xhr="<?php echo esc_url( admin_url() ); ?>/admin-ajax.php">
 			<input type="hidden" name="action" value="rg_contribution_contribute">
 			<input type="hidden" name="nonce" value="<?php echo esc_attr( wp_create_nonce( 'rg_contribution_contribute' ) ); ?>">
+			<input type="hidden" name="is_amp" value="<?php echo esc_attr( $is_amp ); ?>">
 			<input type="hidden" name="campaign_id" value="<?php echo esc_attr( $campaign_id ); ?>">
-			<input type="hidden" name="title" value="<?php echo esc_attr( $campaign_name ); ?>">
+			<input type="hidden" name="title" value="<?php echo esc_attr( $name ); ?>">
 			<input type="hidden" name="url" value="<?php echo esc_url_raw( home_url( $wp->request ) ); ?>">
 			<div class="rev-gen-contribution__input-wrap">
 				<label for="<?php echo esc_attr( $html_id ); ?>_custom_input"><?php esc_html_e( 'Enter custom amount', 'revenue-generator' ); ?></label>
