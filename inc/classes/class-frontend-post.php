@@ -732,27 +732,30 @@ class Frontend_Post {
 		$url         = ( isset( $_REQUEST['url'] ) ) ? esc_url_raw( $_REQUEST['url'] ) : '';
 		$is_amp      = ( isset( $_REQUEST['is_amp'] ) && 1 === (int) $_REQUEST['is_amp'] );
 
+		// If amount is empty, there's nothing to contribute so return early.
 		if ( empty( $amount ) ) {
 			wp_send_json_error(
 				__( 'Contribution amount cannot be empty.', 'revenue-generator' )
 			);
 		}
 
+		// We need campaign details in order to create URL, so no fun if not supplied.
 		if ( empty( $campaign_id ) || empty( $title ) || empty( $url ) ) {
 			wp_send_json_error(
 				__( 'Campaign details cannot be empty.', 'revenue-generator' )
 			);
 		}
 
-		$client_account       = Client_Account::get_instance();
-		$merchant_credentials = Client_Account::get_merchant_credentials();
-		$endpoints            = $client_account->get_endpoints();
+		$client_account = Client_Account::get_instance();
+		$endpoints      = $client_account->get_endpoints();
 
 		if ( is_wp_error( $endpoints ) ) {
 			wp_send_json_error(
 				__( 'Could not connect with merchant credentials.', 'revenue-generator' )
 			);
 		}
+
+		$merchant_credentials = Client_Account::get_merchant_credentials();
 
 		$client = new Revenue_Generator_Client(
 			$merchant_credentials['merchant_id'],
@@ -778,6 +781,7 @@ class Frontend_Post {
 			$contribution_url
 		);
 
+		// If it's a submit from AMP, pass headers so AMP handles redirect.
 		if ( $is_amp ) {
 			header( 'AMP-Redirect-To: ' . $contribution_url );
 			header( 'Access-Control-Expose-Headers: AMP-Redirect-To' );
