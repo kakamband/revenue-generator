@@ -1,4 +1,4 @@
-/* global rgVars, FormData, XMLHttpRequest */
+/* global FormData, XMLHttpRequest */
 
 /**
  * JS to handle contribution dialog.
@@ -115,7 +115,7 @@ export default class RevGenContribution {
 		/**
 		 * Handle custom contribution form submit.
 		 *
-		 * @param {object} e Event.
+		 * @param {Object} e Event.
 		 */
 		this.$o.customBox.form.addEventListener( 'submit', ( e ) => {
 			e.preventDefault();
@@ -203,7 +203,7 @@ export default class RevGenContribution {
 	/**
 	 * Returns amount from the custom amount input.
 	 *
-	 * @param {bool} giveMeInt Whether to return amount in cents or a float.
+	 * @param {boolean} amountInCents Whether to return amount in cents or a float.
 	 */
 	getCustomAmount( amountInCents ) {
 		let amount = this.$o.customBox.input.value;

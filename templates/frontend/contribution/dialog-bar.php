@@ -28,7 +28,7 @@ $html_id = "rev_gen_contribution_{$contribution_id}";
 			<?php esc_html_e( 'Contribute Now, Pay Later with your Tab', 'revenue-generator' ); ?>
 		</div>
 		<div class="rev-gen-contribution__footer rev-gen-contribution-footer">
-			<?php View::render_footer_backend(); ?>
+			<?php include REVENUE_GENERATOR_PLUGIN_DIR . '/templates/frontend/contribution/partial-footer.php'; ?>
 		</div>
 	</div>
 </div>
