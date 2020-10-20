@@ -71,20 +71,22 @@ $box-white:#fff;
 		word-break: normal;
 		@extend .amount-text;
 
+		/* stylelint-disable declaration-no-important */
 		a {
 			display: block;
 			padding: 15px;
 			background: $box-white;
-			color: $box-text-color !important; /* stylelint-disable-line declaration-no-important */
+			color: $box-text-color !important;
 			border: 0;
-			box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
-			transition: background-color 0.05s ease-in !important; /* stylelint-disable-line declaration-no-important */
-			text-decoration: none !important; /* stylelint-disable-line declaration-no-important */
+			box-shadow: none !important;
+			transition: background-color 0.05s ease-in !important;
+			text-decoration: none !important;
 			&:hover {
-				background: $box-text-color !important; /* stylelint-disable-line declaration-no-important */
-				color: $box-white !important; /* stylelint-disable-line declaration-no-important */
+				background: $box-text-color !important;
+				color: $box-white !important;
 			}
 		}
+		/* stylelint-enable declaration-no-important */
 		&-wrapper {
 			position: relative;
 			display: flex;
