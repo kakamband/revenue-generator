@@ -337,7 +337,7 @@ class Test_Admin extends \WP_Ajax_UnitTestCase {
 		// Load welcome screen.
 		$welcome_screen = Utility::buffer_and_return( array( Admin::get_instance(), 'load_welcome_screen' ) );
 
-		$this->assertContains( '<h1 class="welcome-screen--heading">Welcome to Revenue Generator</h1>', $welcome_screen );
+		$this->assertContains( '<h1 class="rev-gen-welcome__title">Welcome to the<br>Revenue Generator</h1>', $welcome_screen );
 	}
 
 	/**

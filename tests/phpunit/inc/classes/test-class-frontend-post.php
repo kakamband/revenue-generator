@@ -128,7 +128,7 @@ class Test_Frontend_Post extends \WP_UnitTestCase {
 					'_rg_access_entity'     => '2',
 					'_rg_preview_id'        => '2',
 					'_rg_specific_posts'    => '',
-					'_rg_individual_option' => maybe_serialize(
+					'_rg_individual_option' =>
 						array(
 							'title'        => 'Access Article Now',
 							'description'  => 'You\'ll only be charged once you\'ve reached $5.',
@@ -137,15 +137,13 @@ class Test_Frontend_Post extends \WP_UnitTestCase {
 							'type'         => 'dynamic',
 							'custom_title' => '',
 							'custom_desc'  => '',
-						)
-					),
-					'_rg_options_order'     => maybe_serialize(
+						),
+					'_rg_options_order'     =>
 						array(
 							'individual'                  => '1',
 							'tlp_' . self::$time_pass->ID => '2',
 							'sub_' . self::$subscription->ID => '3',
-						)
-					),
+						),
 					'_rg_is_active'         => '1',
 				),
 			)
@@ -234,13 +232,16 @@ class Test_Frontend_Post extends \WP_UnitTestCase {
 	 *
 	 * @todo Giving error still debuging.
 	 */
-	/*public function test_add_connector_config() {
+	public function test_add_connector_config() {
 		$post_id = self::$post->ID;
 		$this->go_to( get_permalink( $post_id ) );
-		$connect_configs = Utility::invoke_method( $this->_instance, 'add_connector_config' );
+		$connect_configs = Utility::buffer_and_return( array( $this->_instance, 'add_connector_config' ) );
 		$this->assertQueryTrue( 'is_single', 'is_singular' );
-
-	}*/
+		$this->assertContains( 'laterpay-connector', $connect_configs );
+		$this->assertContains( 'appearance', $connect_configs );
+		$this->assertContains( 'purchase_options', $connect_configs );
+		$this->assertContains( 'laterpay:connector:config_token', $connect_configs );
+	}
 
 	/**
 	 * Test Connected Paywall ID.
@@ -259,9 +260,10 @@ class Test_Frontend_Post extends \WP_UnitTestCase {
 	 *
 	 * @covers Frontend_Post::register_connector_assets
 	 */
-	public function register_connector_assets() {
-
-		Utility::invoke_method( $this->_instance, 'get_connected_paywall_id', array( self::$post->ID ) );
+	public function test_register_connector_assets() {
+		$post_id = self::$post->ID;
+		$this->go_to( get_permalink( $post_id ) );
+		Utility::invoke_method( $this->_instance, 'register_connector_assets' );
 		$this->assertTrue( wp_script_is( 'revenue-generator-classic-connector' ) );
 		$this->assertTrue( wp_style_is( 'revenue-generator-frontend' ) );
 
@@ -306,6 +308,33 @@ class Test_Frontend_Post extends \WP_UnitTestCase {
 				'[hello world=start]Where are you?[/hello]',
 			),
 		);
+	}
+
+	/**
+	 * Test Register Connected Assets.
+	 *
+	 * @covers Frontend_Post::get_post_payload
+	 */
+	public function test_get_post_payload() {
+		$post_id = self::$post->ID;
+		$this->go_to( get_permalink( $post_id ) );
+		$post_payload = Utility::invoke_method( $this->_instance, 'get_post_payload' );
+		$this->assertArrayHasKey( 'payload', $post_payload, 'Array Does not conatin payload' );
+		$this->assertArrayHasKey( 'token', $post_payload, 'Array Does not conatin token' );
+
+	}
+
+	/**
+	 * Test Register preview Scripts and styles.
+	 *
+	 * @covers Frontend_Post::enqueue_preview_scripts_and_styles
+	 */
+	public function test_enqueue_preview_scripts_and_styles() {
+		$post_id = self::$post->ID;
+		$this->go_to( get_permalink( $post_id ) );
+		Utility::invoke_method( $this->_instance, 'enqueue_preview_scripts_and_styles' );
+		$this->assertTrue( wp_script_is( 'revenue-generator-preview-script' ) );
+		$this->assertTrue( wp_style_is( 'revenue-generator-preview' ) );
 	}
 
 }
