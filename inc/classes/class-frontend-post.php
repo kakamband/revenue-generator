@@ -772,12 +772,13 @@ class Frontend_Post {
 			]
 		);
 
-		$amount_in_cents = $amount * 100;
+		$amount_in_cents  = $amount * 100;
 		$contribution_url = ( 500 <= $amount_in_cents ) ? $contribution_urls['sis'] : $contribution_urls['ppu'];
+		$currency         = $client_account->get_currency();
 
 		$contribution_url = add_query_arg(
 			'custom_pricing',
-			$client_account->get_currency() . $amount_in_cents,
+			$currency['code'] . $amount_in_cents,
 			$contribution_url
 		);
 

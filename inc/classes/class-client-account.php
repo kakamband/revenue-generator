@@ -338,9 +338,19 @@ class Client_Account {
 	/**
 	 * Get currency from region.
 	 *
-	 * @return string
+	 * @return array Currency code and symbol.
 	 */
 	public function get_currency() {
-		return ( 'US' === $this->merchant_region ) ? 'USD' : 'EUR';
+		$usd_currency_details = [
+			'code'   => 'USD',
+			'symbol' => '$',
+		];
+
+		$eur_currency_details = [
+			'code'   => 'EUR',
+			'symbol' => '€',
+		];
+
+		return ( 'US' === $this->merchant_region ) ? $usd_currency_details : $eur_currency_details;
 	}
 }

@@ -250,7 +250,7 @@ class Shortcodes {
 				$payment_config['amounts'][ $key ]['amount']   = $multiple_amounts[ $key ];
 				$payment_config['amounts'][ $key ]['revenue']  = $multiple_revenues[ $key ];
 				$payment_config['amounts'][ $key ]['selected'] = absint( $config_data['selected_amount'] ) === $key + 1;
-				$payment_config['amounts'][ $key ]['url']      = $contribute_url . '&custom_pricing=' . $currency_config . $multiple_amounts[ $key ];
+				$payment_config['amounts'][ $key ]['url']      = $contribute_url . '&custom_pricing=' . $currency_config['code'] . $multiple_amounts[ $key ];
 			}
 
 			// Only add custom amount if it was checked in backend.
@@ -270,7 +270,7 @@ class Shortcodes {
 
 		// View data for revenue-generator/views/contribution-dialog.php.
 		$view_args = array(
-			'currency_symbol'    => 'USD' === $currency_config ? '$' : '€',
+			'currency_symbol'    => $currency_config['symbol'],
 			'contribution_id'    => $config_data['ID'],
 			'campaign_id'        => $campaign_id,
 			'dialog_header'      => $config_data['dialog_header'],
