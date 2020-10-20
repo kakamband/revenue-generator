@@ -54,6 +54,7 @@ $box-white:#fff;
 	}
 
 	&__donation {
+		min-width: 60px;
 		border: solid 2px $box-text-color;
 		border-radius: 5px;
 		margin: 0 2px;
