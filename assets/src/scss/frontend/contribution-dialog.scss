@@ -35,6 +35,10 @@ $box-white:#fff;
 		font-size: 21px;
 		text-align: center;
 		color: #1d1d1d;
+		&:before,
+		&:after {
+			display: none !important; /* stylelint-disable-line declaration-no-important */
+		}
 	}
 
 	&__description {
@@ -71,10 +75,14 @@ $box-white:#fff;
 			display: block;
 			padding: 15px;
 			background: $box-white;
-			color: $box-text-color;
+			color: $box-text-color !important; /* stylelint-disable-line declaration-no-important */
+			border: 0;
+			box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
+			transition: background-color 0.05s ease-in !important; /* stylelint-disable-line declaration-no-important */
+			text-decoration: none !important; /* stylelint-disable-line declaration-no-important */
 			&:hover {
-				background: $box-text-color;
-				color: $box-white;
+				background: $box-text-color !important; /* stylelint-disable-line declaration-no-important */
+				color: $box-white !important; /* stylelint-disable-line declaration-no-important */
 			}
 		}
 		&-wrapper {
@@ -102,7 +110,7 @@ $box-white:#fff;
 
 	&-custom {
 		max-width: 335px;
-		margin: 0 auto 10px;
+		margin: 10px auto;
 		&__inner {
 			display: flex;
 			flex-flow: row nowrap;
@@ -127,6 +135,7 @@ $box-white:#fff;
 			margin-right: 15px;
 			&-arrow {
 				height: 45px;
+				vertical-align: middle;
 			}
 		}
 		&__input {
@@ -147,7 +156,11 @@ $box-white:#fff;
 			text-align: center;
 		}
 		label {
+			display: block;
 			margin-left: 15px;
+			margin-bottom: 5px;
+			line-height: 1;
+			font-weight: normal;
 			font-size: 12px;
 		}
 		&__send {
@@ -156,6 +169,8 @@ $box-white:#fff;
 			margin: 0;
 			padding: 14px 10px;
 			border-radius: 5px;
+			font-weight: normal;
+			font-size: 14px;
 			color: $box-white;
 			background-color: $box-text-color;
 		}
@@ -179,6 +194,9 @@ $box-white:#fff;
 			&:hover {
 				opacity: 1;
 			}
+			img {
+				vertical-align: middle;
+			}
 		}
 
 		span {
@@ -199,7 +217,7 @@ $box-white:#fff;
 		width: 100%;
 		.rev-gen-contribution {
 			&__donate {
-				margin: 5px 0;
+				margin: 15px 0 5px;
 			}
 			&__inner {
 				max-width: 100%;

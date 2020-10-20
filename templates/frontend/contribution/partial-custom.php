@@ -17,7 +17,7 @@ $is_amp = function_exists( 'is_amp_endpoint' ) && is_amp_endpoint();
 			<img class="rev-gen-contribution-custom__back-arrow" src="<?php echo esc_url( $action_icons['back_arrow_icon'] ); ?>" />
 		</div>
 		<?php
-		$default_amount = $currency_symbol . '20';
+		$default_amount = '10';
 
 		$onblur = sprintf(
 			'if ( "" === this.value ) { this.placeholder = %s; }',
@@ -35,7 +35,7 @@ $is_amp = function_exists( 'is_amp_endpoint' ) && is_amp_endpoint();
 				<label for="<?php echo esc_attr( $html_id ); ?>_custom_input"><?php esc_html_e( 'Enter custom amount', 'revenue-generator' ); ?></label>
 				<div class="rev-gen-contribution-custom__input">
 					<span class="rev-gen-contribution-custom__symbol">$</span>
-					<input id="<?php echo esc_attr( $html_id ); ?>_custom_input" name="amount" type="number" value="" step="0.01" min="0" placeholder="<?php echo esc_attr( $default_amount ); ?>" onfocus="this.value = (this.value ? this.value : 20);" onblur="<?php echo esc_attr( $onblur ); ?>">
+					<input id="<?php echo esc_attr( $html_id ); ?>_custom_input" name="amount" type="number" value="" step="0.01" min="0" placeholder="<?php echo esc_attr( $default_amount ); ?>" onfocus="this.value = (this.value ? this.value : <?php echo esc_attr( $default_amount ); ?>);" onblur="<?php echo esc_attr( $onblur ); ?>">
 				</div>
 			</div>
 
