@@ -311,7 +311,7 @@ class Test_Frontend_Post extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test Register Connected Assets.
+	 * Test Post Payload.
 	 *
 	 * @covers Frontend_Post::get_post_payload
 	 */
@@ -322,6 +322,32 @@ class Test_Frontend_Post extends \WP_UnitTestCase {
 		$this->assertArrayHasKey( 'payload', $post_payload, 'Array Does not conatin payload' );
 		$this->assertArrayHasKey( 'token', $post_payload, 'Array Does not conatin token' );
 
+	}
+
+	/**
+	 * Test singed token.
+	 *
+	 * @covers Frontend_Post::get_signed_token
+	 */
+	public function test_get_signed_token() {
+		$post_id = self::$post->ID;
+		$this->go_to( get_permalink( $post_id ) );
+		$post_payload = Utility::invoke_method( $this->_instance, 'get_post_payload' );
+		$signed_token = Utility::invoke_method( $this->_instance, 'get_signed_token', $post_payload );
+		$this->assertNotNull( $signed_token );
+	}
+
+	/**
+	 * Test gets deleted article ids.
+	 *
+	 * @covers Frontend_Post::get_deleted_article_ids
+	 */
+	public function test_get_deleted_article_ids() {
+		$post_id = self::$post->ID;
+		$this->go_to( get_permalink( $post_id ) );
+		$deleted_options = Utility::invoke_method( $this->_instance, 'get_deleted_article_ids' );
+		$this->assertNotEmpty( $deleted_options );
+		$this->assertStringStartsWith( 'article_', $deleted_options[0] );
 	}
 
 	/**
