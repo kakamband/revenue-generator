@@ -1,4 +1,4 @@
-/* global revenueGeneratorGlobalOptions, Shepherd, rgGlobal */
+/* global revenueGeneratorGlobalOptions, Shepherd, rgGlobal, Event */
 /**
  * JS to handle plugin settings screen interactions.
  */
@@ -863,11 +863,14 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 			};
 
 			const showAccountActivationModal = function() {
+				const closeEvent = new Event( 'rev-gen-modal-close' );
+
 				new RevGenModal( {
 					id: 'rg-modal-account-activation',
 					keepOpen: true,
 					templateData: {},
-					onConfirm: () => {
+					onConfirm: ( e, el ) => {
+						el.dispatchEvent( closeEvent );
 						showAccountModal();
 					},
 					onCancel: ( e, el ) => {
@@ -885,10 +888,6 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							} else {
 								window.open( signUpURL.EU, '_blank' );
 							}
-							/* global Event */
-							const closeEvent = new Event(
-								'rev-gen-modal-close'
-							);
 							el.dispatchEvent( closeEvent );
 							showAccountModal();
 						}
@@ -978,6 +977,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 					$.ajax( {
 						url: revenueGeneratorGlobalOptions.ajaxUrl,
 						method: 'POST',
+						cache: false,
 						async: false,
 						data: formData,
 						dataType: 'json',
