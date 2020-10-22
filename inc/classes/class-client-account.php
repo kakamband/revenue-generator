@@ -68,13 +68,6 @@ class Client_Account {
 	protected $secret_algo = 'sha224';
 
 	/**
-	 * Flag whether it's sandbox environment.
-	 *
-	 * @var boolean
-	 */
-	protected $is_sandbox = false;
-
-	/**
 	 * Store connector endpoint used in the plugin.
 	 *
 	 * @var array Common values used for api related info throughout the plugin.
@@ -180,7 +173,6 @@ class Client_Account {
 
 		// If development mode is enabled use snbox environment.
 		if ( defined( 'REVENUE_GENERATOR_ENABLE_SANDBOX' ) && true === REVENUE_GENERATOR_ENABLE_SANDBOX ) {
-			$this->is_sandbox     = true;
 			$this->connector_root = $region_connector_endpoints['sandbox'];
 			$this->api_root       = $region_api_endpoints['sandbox'];
 			$this->web_endpoint   = self::$web_endpoints[ $this->merchant_region ]['sandbox'];
