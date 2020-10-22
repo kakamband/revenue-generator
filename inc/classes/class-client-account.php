@@ -116,6 +116,22 @@ class Client_Account {
 	];
 
 	/**
+	 * Currency info.
+	 *
+	 * @var array Currencies categorized by the region.
+	 */
+	public static $currency_details = [
+		'EU' => [
+			'code'   => 'EUR',
+			'symbol' => '€',
+		],
+		'US' => [
+			'code'   => 'USD',
+			'symbol' => '$',
+		],
+	];
+
+	/**
 	 * Class Client_Account construct method.
 	 */
 	protected function __construct() {
@@ -333,16 +349,6 @@ class Client_Account {
 	 * @return array Currency code and symbol.
 	 */
 	public function get_currency() {
-		$usd_currency_details = [
-			'code'   => 'USD',
-			'symbol' => '$',
-		];
-
-		$eur_currency_details = [
-			'code'   => 'EUR',
-			'symbol' => '€',
-		];
-
-		return ( 'US' === $this->merchant_region ) ? $usd_currency_details : $eur_currency_details;
+		return $this->currency_details[ $this->merchant_region ];
 	}
 }
