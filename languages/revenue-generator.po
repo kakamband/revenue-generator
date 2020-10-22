@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Revenue Generator plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Revenue Generator 1.3.0\n"
+"Project-Id-Version: Revenue Generator 1.3.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/revenue-generator\n"
 "Last-Translator: Kimberly Moore <kmoore@laterpay.net>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
