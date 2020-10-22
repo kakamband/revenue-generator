@@ -171,10 +171,12 @@ export default class RevGenContribution {
 
 		// convert price to proper float value
 		if ( typeof amount === 'string' && amount.indexOf( ',' ) > -1 ) {
-			amount = parseFloat( amount.replace( ',', '.' ) ).toFixed( 2 );
+			amount = parseFloat( amount.replace( ',', '.' ) );
 		} else {
-			amount = parseFloat( amount ).toFixed( 2 );
+			amount = parseFloat( amount );
 		}
+
+		amount = amount.toFixed( 2 );
 
 		// prevent non-number prices
 		if ( isNaN( amount ) ) {
@@ -190,9 +192,6 @@ export default class RevGenContribution {
 		} else if ( amount < 0.05 ) {
 			amount = 0.05;
 		}
-
-		// format price with two digits
-		amount = amount.toFixed( 2 );
 
 		// Update input value to validated amount.
 		this.$o.customBox.input.value = amount;
