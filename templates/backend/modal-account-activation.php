@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="rev-gen-modal__inner">
 			<a href="#" class="rev-gen-modal__close" id="rg_js_modal_close">x</a>
 
-			<?php if ( true || false === $is_merchant_verified ) : ?>
+			<?php if ( false === $is_merchant_verified ) : ?>
 				<h4 class="rev-gen-modal__title">
 					<?php esc_html_e( 'You’re almost done!', 'revenue-generator' ); ?>
 				</h4>
