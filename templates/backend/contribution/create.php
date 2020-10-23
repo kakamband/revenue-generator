@@ -136,3 +136,4 @@ $contribution_builder_data = apply_filters( 'rg_contribution_builder_data', $con
 
 
 <?php include( REVENUE_GENERATOR_PLUGIN_DIR . '/templates/backend/modal-account-activation.php' ); ?>
+<?php include( REVENUE_GENERATOR_PLUGIN_DIR . '/templates/backend/modal-account-connect.php' ); ?>

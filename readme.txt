@@ -6,7 +6,7 @@ Tags: contribution, micropayment, paywall, sell content, subscription, conversio
 Requires at least: 5.3
 Tested up to: 5.5
 Requires PHP: 5.6
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 Author URI: https://laterpay.net
 Plugin URI: https://github.com/laterpay/revenue-generator/
 License: MIT
@@ -81,6 +81,9 @@ Laterpay’s fee amounts to 15% of the revenues that it collects for its Merchan
 
 == Changelog ==
 
+= 1.3.1 ( 22 October 2020 ) =
+* Fixed the issue that prevented admins from connecting their Laterpay account when adding a contribution box.
+
 = 1.3.0 ( 14 October 2020 ) =
 * Added a preview of active paywall as well as a link to add or edit a paywall to the Edit Post/Page screen.
 * Added dynamic updates to title and description of paywall purchase option when its settings are changed.
@@ -107,6 +110,9 @@ Laterpay’s fee amounts to 15% of the revenues that it collects for its Merchan
 * Initial Release.
 
 == Upgrade notice ==
+
+= 1.3.1 =
+Fixed the issue that prevented admins from connecting their Laterpay account when adding a contribution box.
 
 = 1.3.0 =
 Paywall preview in edit post/page screen, dynamic updates to title and description of paywall purchase options.
