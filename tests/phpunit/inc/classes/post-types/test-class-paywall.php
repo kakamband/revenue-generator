@@ -47,6 +47,20 @@ class Test_Paywall extends \WP_UnitTestCase {
 	 */
 	protected static $paywall;
 
+	/**
+	 * Paywall Supported.
+	 *
+	 * @var object
+	 */
+	protected static $paywall_supported;
+
+	/**
+	 * Paywall Specific.
+	 *
+	 * @var object
+	 */
+	protected static $paywall_specifc;
+
 
 	/**
 	 * Subscription.
@@ -61,6 +75,13 @@ class Test_Paywall extends \WP_UnitTestCase {
 	 * @var object
 	 */
 	protected static $time_pass;
+
+	/**
+	 * Post.
+	 *
+	 * @var object
+	 */
+	protected static $post;
 
 	/**
 	 * Setup Initial Data before.
@@ -111,7 +132,7 @@ class Test_Paywall extends \WP_UnitTestCase {
 		self::$paywall = $factory->post->create_and_get(
 			array(
 				'post_type'    => 'rg_paywall',
-				'post_title'   => 'Paywall 1',
+				'post_title'   => 'Paywall All',
 				'post_content' => 'Support http://revgen.test to get access to this content and more.',
 				'post_status'  => 'publish',
 				'post_author'  => self::$admin->ID,
@@ -121,6 +142,76 @@ class Test_Paywall extends \WP_UnitTestCase {
 					'_rg_access_entity'     => '2',
 					'_rg_preview_id'        => '2',
 					'_rg_specific_posts'    => '',
+					'_rg_individual_option' =>
+						array(
+							'title'        => 'Access Article Now',
+							'description'  => 'You\'ll only be charged once you\'ve reached $5.',
+							'price'        => '0.49',
+							'revenue'      => 'ppu',
+							'type'         => 'dynamic',
+							'custom_title' => '',
+							'custom_desc'  => '',
+						),
+					'_rg_options_order'     =>
+						array(
+							'individual'                  => '1',
+							'tlp_' . self::$time_pass->ID => '2',
+							'sub_' . self::$subscription->ID => '3',
+						),
+					'_rg_is_active'         => '1',
+				),
+			)
+		);
+
+		self::$post = $factory->post->create_and_get();
+
+		self::$paywall_supported = $factory->post->create_and_get(
+			array(
+				'post_type'    => 'rg_paywall',
+				'post_title'   => 'Paywall Supported',
+				'post_content' => 'Support http://revgen.test to get access to this content and more.',
+				'post_status'  => 'publish',
+				'post_author'  => self::$admin->ID,
+				'meta_input'   => array(
+					'_rg_title'             => 'Keep Reading',
+					'_rg_access_to'         => 'supported',
+					'_rg_access_entity'     => self::$post->ID,
+					'_rg_preview_id'        => '2',
+					'_rg_specific_posts'    => '',
+					'_rg_individual_option' =>
+						array(
+							'title'        => 'Access Article Now',
+							'description'  => 'You\'ll only be charged once you\'ve reached $5.',
+							'price'        => '0.49',
+							'revenue'      => 'ppu',
+							'type'         => 'dynamic',
+							'custom_title' => '',
+							'custom_desc'  => '',
+						),
+					'_rg_options_order'     =>
+						array(
+							'individual'                  => '1',
+							'tlp_' . self::$time_pass->ID => '2',
+							'sub_' . self::$subscription->ID => '3',
+						),
+					'_rg_is_active'         => '1',
+				),
+			)
+		);
+
+		self::$paywall_specifc = $factory->post->create_and_get(
+			array(
+				'post_type'    => 'rg_paywall',
+				'post_title'   => 'Paywall Supported',
+				'post_content' => 'Support http://revgen.test to get access to this content and more.',
+				'post_status'  => 'publish',
+				'post_author'  => self::$admin->ID,
+				'meta_input'   => array(
+					'_rg_title'             => 'Keep Reading',
+					'_rg_access_to'         => 'specific_post',
+					'_rg_access_entity'     => '2',
+					'_rg_preview_id'        => '2',
+					'_rg_specific_posts'    => array( (string) self::$post->ID ),
 					'_rg_individual_option' =>
 						array(
 							'title'        => 'Access Article Now',
@@ -236,6 +327,44 @@ class Test_Paywall extends \WP_UnitTestCase {
 				),
 			),
 		);
+	}
+
+	/**
+	 * Test purchase option data by post id.
+	 *
+	 * @covers Paywall::get_purchase_option_data_by_post_id
+	 */
+	public function test_get_purchase_option_data_by_post_id() {
+
+		$post_id                    = self::$post->ID;
+		$paywall_info               = Utility::invoke_method( $this->_instance, 'get_purchase_option_data_by_post_id', array( $post_id ) );
+		$expected_paywall_info_keys = array( 'id', 'name', 'description', 'title', 'access_to', 'access_entity', 'preview_id', 'order' );
+
+		if ( ! empty( $paywall_info ) ) {
+			foreach ( $expected_paywall_info_keys as $keys ) {
+				$this->assertArrayHasKey( $keys, $paywall_info );
+			}
+		}
+	}
+
+	/**
+	 * Test get paywall for specific post.
+	 *
+	 * @covers Paywall::get_paywall_for_specific_post
+	 */
+	public function test_get_paywall_for_specific_post() {
+		$post_id             = self::$post->ID;
+		$specific_paywall_id = Utility::invoke_method( $this->_instance, 'get_paywall_for_specific_post', array( $post_id ) );
+		$this->assertEquals( $specific_paywall_id, self::$paywall_specifc->ID );
+	}
+
+	/**
+	 * Test get paywall by categories
+	 *
+	 * @covers Paywall::get_connected_paywall_by_categories
+	 */
+	public function test_get_connected_paywall_by_categories( ) {
+		// WIP.
 	}
 
 }
