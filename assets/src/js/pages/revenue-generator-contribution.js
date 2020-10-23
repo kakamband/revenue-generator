@@ -339,9 +339,7 @@ window.handleIframeLoad = ( iframe ) => {
 			}
 
 			const data = RevGenContributionData;
-			data.amounts = {};
-
-			const model = new Backbone.Model( RevGenContributionData );
+			const model = new Backbone.Model( data );
 
 			window.RevGenApp.views.app = new MainView( {
 				model,

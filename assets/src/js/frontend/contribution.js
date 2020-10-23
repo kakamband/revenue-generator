@@ -1,191 +1,230 @@
-/* global rgVars */
+/* global FormData, XMLHttpRequest */
 
 /**
- * JS to handle plugin Contribution Dailog.
+ * JS to handle contribution dialog.
  */
+export default class RevGenContribution {
+	constructor( el ) {
+		this.el = el;
+		this.$o = {
+			donateBox: el.querySelector( '.rev-gen-contribution__donate' ),
+			customBox: {
+				el: el.querySelector( '.rev-gen-contribution__custom' ),
+				form: el.querySelector( 'form' ),
+				input: el.querySelector( '.rev-gen-contribution-custom input' ),
+				backButton: el.querySelector(
+					'.rev-gen-contribution-custom__back'
+				),
+				send: el.querySelector( '.rev-gen-contribution-custom__send' ),
+			},
+			amounts: el.getElementsByClassName(
+				'rev-gen-contribution__donation'
+			),
+			customAmount: el.querySelector(
+				'.rev-gen-contribution__donation--custom'
+			),
+			tip: el.querySelector( '.rev-gen-contribution__tip' ),
+		};
 
-/**
- * Internal dependencies.
- */
-import '../utils';
-import { debounce } from '../helpers';
+		this.bindEvents();
+	}
 
-( function( $ ) {
-	$( function() {
-		function revenueGeneratorContributionDailog() {
-			// Welcome screen elements.
-			const $o = {
-				body: $( 'body' ),
+	/**
+	 * Binds all events.
+	 */
+	bindEvents() {
+		for ( const amount of this.$o.amounts ) {
+			const link = amount.querySelector( 'a' );
 
-				// Contribution Element.
-				rgAmountTip: '.rg-amount-tip',
+			/**
+			 * On mouse over, we either show or hide the 'contribute now, pay later'
+			 * helper message depending on the amount.
+			 */
+			link.addEventListener( 'mouseover', () => {
+				const type = amount.dataset.revenue;
 
-				// Action element.
-				rg_preset_buttons: '.rev-gen-contribution-main--box-donation',
-				rg_contribution_amounts:
-					'.rev-gen-contribution-main--box-donation-wrapper',
-				rg_customAmountButton: '.rev-gen-contribution-main-custom',
-
-				rg_custom_amount: $( '.rg-custom-amount-input' ),
-				rg_custom_amount_wrapper: $( '.rg-custom-amount-wrapper' ),
-				rg_custom_amout_goBack: $( '.rg-custom-amount-goback' ),
-				rg_singleContribution: $( '.rg-link-single' ),
-
-				snackBar: $( '#rg_js_SnackBar' ),
-			};
-
-			// Binding events for contribution dialog.
-			const bindContributionEvents = function() {
-				// Event handler for clicking on the amounts in contribution dialog.
-				$( $o.rg_preset_buttons ).on( 'mouseover', function() {
-					const revenueType = $( this ).data( 'revenue' );
-
-					if ( 'ppu' === revenueType ) {
-						$( $o.rgAmountTip ).css( 'visibility', 'visible' );
-					} else {
-						$( $o.rgAmountTip ).css( 'visibility', 'hidden' );
-					}
-				} );
-
-				/**
-				 * Removes tip message on mouseout.
-				 */
-				$( $o.rg_preset_buttons ).on( 'mouseout', function() {
-					$( $o.rgAmountTip ).css( 'visibility', 'hidden' );
-				} );
-
-				/**
-				 * Open up Contribution Payment URL.
-				 */
-				$( $o.rg_preset_buttons )
-					.not( $o.rg_customAmountButton )
-					.on( 'click', function() {
-						const contributionURL = $( this ).data( 'href' );
-						window.open( contributionURL );
-					} );
-
-				// Handle custom amount input.
-				$o.rg_custom_amount.on(
-					'change',
-					debounce( function() {
-						const validatedPrice = validatePrice( $( this ).val() );
-						$( this ).val( validatedPrice );
-
-						// Get Price amount.
-						const lpAmount = Math.round( $( this ).val() * 100 );
-
-						// Compare price amount.
-						if ( lpAmount <= 199 ) {
-							$( $o.rgAmountTip ).css( 'visibility', 'visible' );
-						} else {
-							$( $o.rgAmountTip ).css( 'visibility', 'hidden' );
-						}
-					}, 800 )
-				);
-
-				// Handle multiple contribution button click.
-				$( '.rg-custom-amount-send' ).on( 'click', function() {
-					let payurl = '';
-
-					const customAmount = $o.rg_custom_amount.val() * 100;
-					if ( customAmount > 199 ) {
-						payurl =
-							$o.rg_custom_amount_wrapper.data( 'sis-url' ) +
-							'&custom_pricing=' +
-							rgVars.default_currency +
-							customAmount;
-					} else {
-						payurl =
-							$o.rg_custom_amount_wrapper.data( 'ppu-url' ) +
-							'&custom_pricing=' +
-							rgVars.default_currency +
-							customAmount;
-					}
-					// Open payment url in new tab.
-					window.open( payurl );
-				} );
-
-				/**
-				 * Handles custom button click.
-				 */
-				$( $o.rg_customAmountButton ).on( 'click', function() {
-					$( $o.rg_contribution_amounts ).fadeOut(
-						'slow',
-						function() {
-							$o.rg_custom_amount_wrapper.show();
-							$o.rg_custom_amount_wrapper
-								.removeClass( 'slide-out' )
-								.addClass( 'slide-in' );
-						}
-					);
-				} );
-
-				/**
-				 * Handles back button event on custom amount box.
-				 */
-				$o.rg_custom_amout_goBack.on( 'click', function() {
-					$o.rg_custom_amount_wrapper
-						.removeClass( 'slide-in' )
-						.addClass( 'slide-out' );
-					setTimeout( function() {
-						$o.rg_custom_amount_wrapper.hide();
-						$( $o.rg_contribution_amounts ).fadeIn( 'slow' );
-					}, 1900 );
-				} );
-
-				// Handle multiple contribution button click.
-				$o.rg_singleContribution.on( 'click', function() {
-					window.open(
-						$( this ).data( 'url' ) +
-							'&custom_pricing=' +
-							rgVars.default_currency +
-							$( this ).data( 'amount' )
-					);
-				} );
-			};
-
-			// Validate custom input price.
-			const validatePrice = function( price ) {
-				// strip non-number characters
-				price = price.toString().replace( /[^0-9\,\.]/g, '' );
-
-				// convert price to proper float value
-				if ( typeof price === 'string' && price.indexOf( ',' ) > -1 ) {
-					price = parseFloat( price.replace( ',', '.' ) ).toFixed(
-						2
-					);
+				if ( 'ppu' === type ) {
+					this.$o.tip.classList.remove( 'rev-gen-hidden' );
 				} else {
-					price = parseFloat( price ).toFixed( 2 );
+					this.$o.tip.classList.add( 'rev-gen-hidden' );
 				}
+			} );
 
-				// prevent non-number prices
-				if ( isNaN( price ) ) {
-					price = 0.05;
-				}
-
-				// prevent negative prices
-				price = Math.abs( price );
-
-				// correct prices outside the allowed range of 0.05 - 1000.00
-				if ( price > 1000.0 ) {
-					price = 1000.0;
-				} else if ( price < 0.05 ) {
-					price = 0.05;
-				}
-
-				// format price with two digits
-				price = price.toFixed( 2 );
-
-				return price;
-			};
-
-			// Initialize all required events.
-			const initializePage = function() {
-				bindContributionEvents();
-			};
-			initializePage();
+			/**
+			 * Hide the helper message on mouse out.
+			 */
+			link.addEventListener( 'mouseout', () => {
+				this.$o.tip.classList.add( 'rev-gen-hidden' );
+			} );
 		}
 
-		revenueGeneratorContributionDailog();
-	} );
-} )( jQuery ); // eslint-disable-line no-undef
+		/**
+		 * On 'Custom' item click, hide pre-defined amounts and display
+		 * custom contribution box with input and a button.
+		 */
+		this.$o.customAmount.addEventListener( 'click', ( e ) => {
+			e.preventDefault();
+
+			this.$o.donateBox.classList.add( 'rev-gen-hidden' );
+			this.$o.customBox.el.classList.remove( 'rev-gen-hidden' );
+			this.$o.customBox.el.removeAttribute( 'hidden' );
+			this.$o.customBox.input.focus();
+		} );
+
+		/**
+		 * On 'Back' button click in custom contribution box, display
+		 * pre-defined amounts and hide custom contribution elements.
+		 */
+		this.$o.customBox.backButton.addEventListener( 'click', () => {
+			this.$o.customBox.el.classList.add( 'rev-gen-hidden' );
+			this.$o.customBox.el.setAttribute( 'hidden', '' );
+			this.$o.donateBox.classList.remove( 'rev-gen-hidden' );
+		} );
+
+		/**
+		 * Handle `change` event in custom input. Two things going on here:
+		 *
+		 * - We validate the amount.
+		 * - We either hide or show the 'contribute now, pay later' message
+		 *   depending on the amount.
+		 */
+		this.$o.customBox.input.addEventListener( 'change', () => {
+			this.validateAmount();
+
+			if ( 199 >= this.getCustomAmount( true ) ) {
+				this.$o.tip.classList.remove( 'rev-gen-hidden' );
+			} else {
+				this.$o.tip.classList.add( 'rev-gen-hidden' );
+			}
+		} );
+
+		/**
+		 * Listens to `keyup` event in custom amount input.
+		 *
+		 * Hide or show 'contribute now, pay later' message depending
+		 * on the amount entered.
+		 */
+		this.$o.customBox.input.addEventListener( 'keyup', () => {
+			if ( 199 >= this.getCustomAmount( true ) ) {
+				this.$o.tip.classList.remove( 'rev-gen-hidden' );
+			} else {
+				this.$o.tip.classList.add( 'rev-gen-hidden' );
+			}
+		} );
+
+		/**
+		 * Handle custom contribution form submit.
+		 *
+		 * @param {Object} e Event.
+		 */
+		this.$o.customBox.form.addEventListener( 'submit', ( e ) => {
+			e.preventDefault();
+
+			// Store reference to this context.
+			const self = this;
+
+			// Get form data.
+			const data = new FormData( this.$o.customBox.form );
+
+			// Create ajax object.
+			const req = new XMLHttpRequest();
+
+			req.open(
+				'POST',
+				this.$o.customBox.form.getAttribute( 'action' ),
+				true
+			);
+			req.send( data );
+
+			/**
+			 * On success, redirect to the URL returned from backend.
+			 *
+			 * On failure, add error class to the form.
+			 */
+			req.onreadystatechange = function() {
+				if ( 4 === this.readyState ) {
+					if ( 200 === this.status ) {
+						const res = JSON.parse( this.response );
+
+						if ( res.data ) {
+							self.$o.customBox.form.classList.remove( 'error' );
+							window.open( res.data );
+						} else {
+							self.$o.customBox.form.classList.add( 'error' );
+						}
+					} else {
+						self.$o.customBox.form.classList.add( 'error' );
+					}
+				}
+			};
+		} );
+	}
+
+	/**
+	 * Validates user input to floats. This is basic client-side
+	 * validation before passing the value to backend.
+	 */
+	validateAmount() {
+		let amount = this.$o.customBox.input.value;
+
+		amount = amount.toString().replace( /[^0-9\,\.]/g, '' );
+
+		// convert price to proper float value
+		if ( typeof amount === 'string' && amount.indexOf( ',' ) > -1 ) {
+			amount = parseFloat( amount.replace( ',', '.' ) );
+		} else {
+			amount = parseFloat( amount );
+		}
+
+		amount = amount.toFixed( 2 );
+
+		// prevent non-number prices
+		if ( isNaN( amount ) ) {
+			amount = 0.05;
+		}
+
+		// prevent negative prices
+		amount = Math.abs( amount );
+
+		// correct prices outside the allowed range of 0.05 - 1000.00
+		if ( amount > 1000.0 ) {
+			amount = 1000.0;
+		} else if ( amount < 0.05 ) {
+			amount = 0.05;
+		}
+
+		// Update input value to validated amount.
+		this.$o.customBox.input.value = amount;
+
+		return amount;
+	}
+
+	/**
+	 * Returns amount from the custom amount input.
+	 *
+	 * @param {boolean} amountInCents Whether to return amount in cents or a float.
+	 */
+	getCustomAmount( amountInCents ) {
+		let amount = this.$o.customBox.input.value;
+
+		if ( amountInCents ) {
+			amount = amount * 100;
+		}
+
+		return amount;
+	}
+}
+
+/**
+ * Loop through contribution elements found on page and initialize
+ * `RevGenContribution` on DOM load.
+ */
+document.addEventListener( 'DOMContentLoaded', () => {
+	const contributions = document.getElementsByClassName(
+		'rev-gen-contribution'
+	);
+
+	for ( const item of contributions ) {
+		new RevGenContribution( item );
+	}
+} );

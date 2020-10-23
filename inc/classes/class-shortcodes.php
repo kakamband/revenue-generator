@@ -20,48 +20,6 @@ class Shortcodes {
 	use Singleton;
 
 	/**
-	 * API key.
-	 *
-	 * @var string
-	 */
-	protected $merchant_api_key;
-
-	/**
-	 * Connector endpoint root.
-	 *
-	 * @var string
-	 */
-	protected $connector_root;
-
-	/**
-	 * API endpoint root.
-	 *
-	 * @var string
-	 */
-	protected $api_root;
-
-	/**
-	 * Merchant ID.
-	 *
-	 * @var string
-	 */
-	protected $merchant_id;
-
-	/**
-	 * Merchant region.
-	 *
-	 * @var string
-	 */
-	protected $merchant_region;
-
-	/**
-	 * Merchant Web Endpoint.
-	 *
-	 * @var string
-	 */
-	protected $web_endpoints;
-
-	/**
 	 * Class Admin construct method.
 	 */
 	protected function __construct() {
@@ -88,9 +46,6 @@ class Shortcodes {
 			$global_options = Config::get_global_options();
 			$region         = $global_options['merchant_region'];
 
-			// Setup web roots for API Call.
-			$this->merchant_region = 'US' === $region ? 'USD' : 'EUR';
-
 			if ( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'laterpay_contribution' ) ) {
 				$assets_instance = Assets::get_instance();
 				// Enqueue frontend styling for shortcode.
@@ -115,7 +70,7 @@ class Shortcodes {
 					'revenue-generator-frontend-js',
 					'rgVars',
 					array(
-						'default_currency' => $this->merchant_region,
+						'default_currency' => 'US' === $region ? 'USD' : 'EUR',
 					)
 				);
 
@@ -215,40 +170,17 @@ class Shortcodes {
 		$global_options = Config::get_global_options();
 		$region         = $global_options['merchant_region'];
 
-		// Setup Merchant Currency.
-		$this->merchant_region = 'US' === $region ? 'USD' : 'EUR';
-
 		// Bail early, if no region set.
 		if ( empty( $region ) ) {
 			return false;
 		}
 
-		$region_connector_endpoints = Client_Account::$connector_endpoints[ $region ];
-		$region_api_endpoints       = Client_Account::$api_endpoints[ $region ];
-		$web_endpoints              = Client_Account::$web_endpoints[ $region ];
-		$this->connector_root       = $region_connector_endpoints['live'];
-		$this->api_root             = $region_api_endpoints['live'];
-		$this->web_endpoints        = $web_endpoints['live'];
-
-		// If development mode is enabled use snbox environment.
-		if ( defined( 'REVENUE_GENERATOR_ENABLE_SANDBOX' ) && true === REVENUE_GENERATOR_ENABLE_SANDBOX ) {
-			$this->connector_root = $region_connector_endpoints['sandbox'];
-			$this->api_root       = $region_api_endpoints['sandbox'];
-			$this->web_endpoints  = $web_endpoints['sandbox'];
-		}
-
-		// Setup merchant credentials.
+		$client_account = Client_Account::get_instance();
 		$merchant_credentials = Client_Account::get_merchant_credentials();
-		if ( ! empty( $merchant_credentials['merchant_id'] ) ) {
-			$this->merchant_id = $merchant_credentials['merchant_id'];
-		}
-
-		if ( ! empty( $merchant_credentials['merchant_key'] ) ) {
-			$this->merchant_api_key = $merchant_credentials['merchant_key'];
-		}
+		$endpoints = $client_account->get_endpoints();
 
 		// Display Error Message if there are no credrentails.
-		if ( empty( $this->merchant_id ) || empty( $this->merchant_api_key ) ) {
+		if ( is_wp_error( $endpoints ) ) {
 			// Display Shortcode error.
 			return sprintf( '<div class="rg-shortcode-error">%s</div>', __( 'Something went wrong, if you are a site admin please add merchant credentials in settings.', 'revenue-generator' ) );
 		}
@@ -256,7 +188,7 @@ class Shortcodes {
 		// Configure contribution values.
 		$payment_config    = [];
 		$contribution_urls = '';
-		$currency_config   = $this->merchant_region;
+		$currency_config   = $client_account->get_currency();
 
 		// backward compatibility.
 		$campaign_name = $config_data['name'];
@@ -267,10 +199,10 @@ class Shortcodes {
 		$campaign_id = str_replace( ' ', '-', strtolower( $campaign_name ) ) . '-' . (string) time();
 
 		$client = new Revenue_Generator_Client(
-			$this->merchant_id,
-			$this->merchant_api_key,
-			$this->api_root,
-			$this->web_endpoints
+			$merchant_credentials['merchant_id'],
+			$merchant_credentials['merchant_key'],
+			$endpoints['api'],
+			$endpoints['web']
 		);
 
 		if ( 'single' === $config_data['type'] ) {
@@ -318,7 +250,7 @@ class Shortcodes {
 				$payment_config['amounts'][ $key ]['amount']   = $multiple_amounts[ $key ];
 				$payment_config['amounts'][ $key ]['revenue']  = $multiple_revenues[ $key ];
 				$payment_config['amounts'][ $key ]['selected'] = absint( $config_data['selected_amount'] ) === $key + 1;
-				$payment_config['amounts'][ $key ]['url']      = $contribute_url . '&custom_pricing=' . $currency_config . $multiple_amounts[ $key ];
+				$payment_config['amounts'][ $key ]['url']      = $contribute_url . '&custom_pricing=' . $currency_config['code'] . $multiple_amounts[ $key ];
 			}
 
 			// Only add custom amount if it was checked in backend.
@@ -338,7 +270,8 @@ class Shortcodes {
 
 		// View data for revenue-generator/views/contribution-dialog.php.
 		$view_args = array(
-			'currency_symbol'    => 'USD' === $currency_config ? '$' : '€',
+			'currency_symbol'    => $currency_config['symbol'],
+			'contribution_id'    => $config_data['ID'],
 			'campaign_id'        => $campaign_id,
 			'dialog_header'      => $config_data['dialog_header'],
 			'dialog_description' => $config_data['dialog_description'],

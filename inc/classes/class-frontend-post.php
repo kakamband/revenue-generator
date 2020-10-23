@@ -12,6 +12,7 @@ use LaterPay\Revenue_Generator\Inc\Post_Types\Subscription;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Time_Pass;
 use \LaterPay\Revenue_Generator\Inc\Traits\Singleton;
 use \LaterPay\Revenue_Generator\Inc\Post_Types\Contribution_Preview;
+use \LaterPay\Revenue_Generator\Inc\Revenue_Generator_Client;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -134,6 +135,8 @@ class Frontend_Post {
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_preview_scripts_and_styles' ] );
 		add_filter( 'wp_head', [ $this, 'add_connector_config' ] );
 		add_filter( 'the_content', [ $this, 'revenue_generator_post_content' ] );
+		add_action( 'wp_ajax_rg_contribution_contribute', [ $this, 'ajax_contribute_contribution' ] );
+		add_action( 'wp_ajax_nopriv_rg_contribution_contribute', [ $this, 'ajax_contribute_contribution' ] );
 	}
 
 	/**
@@ -709,6 +712,84 @@ class Frontend_Post {
 				'backbone',
 			),
 			REVENUE_GENERATOR_VERSION
+		);
+	}
+
+	/**
+	 * Handle custom contribution form submit.
+	 *
+	 * @hooked action `wp_ajax_rg_contribution_contribute`
+	 * @hooked action `wp_ajax_nopriv_rg_contribution_contribute`
+	 *
+	 * @return void
+	 */
+	public function ajax_contribute_contribution() {
+		check_ajax_referer( 'rg_contribution_contribute', 'nonce' );
+
+		$amount      = ( isset( $_REQUEST['amount'] ) ) ? (float) $_REQUEST['amount'] : 0;
+		$campaign_id = ( isset( $_REQUEST['campaign_id'] ) ) ? sanitize_text_field( $_REQUEST['campaign_id'] ) : '';
+		$title       = ( isset( $_REQUEST['title'] ) ) ? sanitize_text_field( $_REQUEST['title'] ) : '';
+		$url         = ( isset( $_REQUEST['url'] ) ) ? esc_url_raw( $_REQUEST['url'] ) : '';
+		$is_amp      = ( isset( $_REQUEST['is_amp'] ) && 1 === (int) $_REQUEST['is_amp'] );
+
+		// If amount is empty, there's nothing to contribute so return early.
+		if ( empty( $amount ) ) {
+			wp_send_json_error(
+				__( 'Contribution amount cannot be empty.', 'revenue-generator' )
+			);
+		}
+
+		// We need campaign details in order to create URL, so no fun if not supplied.
+		if ( empty( $campaign_id ) || empty( $title ) || empty( $url ) ) {
+			wp_send_json_error(
+				__( 'Campaign details cannot be empty.', 'revenue-generator' )
+			);
+		}
+
+		$client_account = Client_Account::get_instance();
+		$endpoints      = $client_account->get_endpoints();
+
+		if ( is_wp_error( $endpoints ) ) {
+			wp_send_json_error(
+				__( 'Could not connect with merchant credentials.', 'revenue-generator' )
+			);
+		}
+
+		$merchant_credentials = Client_Account::get_merchant_credentials();
+
+		$client = new Revenue_Generator_Client(
+			$merchant_credentials['merchant_id'],
+			$merchant_credentials['merchant_key'],
+			$endpoints['api'],
+			$endpoints['web']
+		);
+
+		$contribution_urls = $client->get_contribution_urls(
+			[
+				'campaign_id' => $campaign_id,
+				'title' => $title,
+				'url' => $url,
+			]
+		);
+
+		$amount_in_cents  = $amount * 100;
+		$contribution_url = ( 500 <= $amount_in_cents ) ? $contribution_urls['sis'] : $contribution_urls['ppu'];
+		$currency         = $client_account->get_currency();
+
+		$contribution_url = add_query_arg(
+			'custom_pricing',
+			$currency['code'] . $amount_in_cents,
+			$contribution_url
+		);
+
+		// If it's a submit from AMP, pass headers so AMP handles redirect.
+		if ( $is_amp ) {
+			header( 'AMP-Redirect-To: ' . $contribution_url );
+			header( 'Access-Control-Expose-Headers: AMP-Redirect-To' );
+		}
+
+		wp_send_json_success(
+			$contribution_url
 		);
 	}
 }

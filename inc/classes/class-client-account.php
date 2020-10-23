@@ -54,6 +54,13 @@ class Client_Account {
 	protected $merchant_region;
 
 	/**
+	 * Web endpoint.
+	 *
+	 * @var string
+	 */
+	protected $web_endpoint;
+
+	/**
 	 * Algorithm used to sign the key.
 	 *
 	 * @var string
@@ -105,6 +112,22 @@ class Client_Account {
 		'US' => [
 			'sandbox' => 'https://web.sandbox.uselaterpaytest.com',
 			'live'    => 'https://web.uselaterpay.com',
+		],
+	];
+
+	/**
+	 * Currency info.
+	 *
+	 * @var array Currencies categorized by the region.
+	 */
+	public static $currency_details = [
+		'EU' => [
+			'code'   => 'EUR',
+			'symbol' => '€',
+		],
+		'US' => [
+			'code'   => 'USD',
+			'symbol' => '$',
 		],
 	];
 
@@ -162,11 +185,13 @@ class Client_Account {
 		$region_api_endpoints       = self::$api_endpoints[ $region ];
 		$this->connector_root       = $region_connector_endpoints['live'];
 		$this->api_root             = $region_api_endpoints['live'];
+		$this->web_endpoint         = self::$web_endpoints[ $this->merchant_region ]['live'];
 
 		// If development mode is enabled use snbox environment.
 		if ( defined( 'REVENUE_GENERATOR_ENABLE_SANDBOX' ) && true === REVENUE_GENERATOR_ENABLE_SANDBOX ) {
 			$this->connector_root = $region_connector_endpoints['sandbox'];
 			$this->api_root       = $region_api_endpoints['sandbox'];
+			$this->web_endpoint   = self::$web_endpoints[ $this->merchant_region ]['sandbox'];
 		}
 
 		// Setup merchant credentials.
@@ -298,5 +323,32 @@ class Client_Account {
 	 */
 	private function get_validate_signature_url() {
 		return $this->api_root . '/validatesignature';
+	}
+	/**
+	 * Get connector, API, and Web endpoints from merchant credentials.
+	 *
+	 * @return WP_Error|array
+	 */
+	public function get_endpoints() {
+		if ( ! $this->validate_merchant_account() ) {
+			return new \WP_Error( 'Endpoints could not be retrieved because merchant account is not valid.', 'revenue-generator' );
+		}
+
+		$endpoints = [
+			'connector' => $this->connector_root,
+			'api'       => $this->api_root,
+			'web'       => $this->web_endpoint,
+		];
+
+		return $endpoints;
+	}
+
+	/**
+	 * Get currency from region.
+	 *
+	 * @return array Currency code and symbol.
+	 */
+	public function get_currency() {
+		return $this->currency_details[ $this->merchant_region ];
 	}
 }
