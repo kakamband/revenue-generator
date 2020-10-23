@@ -8,6 +8,7 @@
 namespace LaterPay\Revenue_Generator\Inc;
 
 use \LaterPay\Revenue_Generator\Inc\Traits\Singleton;
+use \LaterPay\Revenue_Generator\Inc\Revenue_Generator_Client;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -211,7 +212,10 @@ class Client_Account {
 		if ( true === $are_credentials_valid ) {
 			return $this->test_merchant_domain();
 		} else {
-			return false;
+			return new \WP_Error(
+				'invalid_merchant_credentials',
+				__( 'Merchant credentials are invalid.', 'revenue-generator' )
+			);
 		}
 	}
 
@@ -349,6 +353,103 @@ class Client_Account {
 	 * @return array Currency code and symbol.
 	 */
 	public function get_currency() {
-		return $this->currency_details[ $this->merchant_region ];
+		return self::$currency_details[ $this->merchant_region ];
+	}
+
+	/**
+	 * Returns instance of `Revenue_Generator_Client` class.
+	 *
+	 * @return Revenue_Generator_Client
+	 */
+	public function get_client_instance() {
+		$validate = $this->validate_merchant_account();
+
+		if ( ! $validate ) {
+			return $validate;
+		}
+
+		return new Revenue_Generator_Client(
+			$this->merchant_id,
+			$this->merchant_api_key,
+			$this->api_root,
+			$this->web_endpoint
+		);
+	}
+
+	/**
+	 * Get contribution URL based on parameters.
+	 *
+	 * @param int    $amount_in_cents Amount in cents.
+	 * @param string $campaign_id     Campaign ID.
+	 * @param string $title           Campaign title.
+	 * @param string $referral_url    URL to redirect to after contribution.
+	 *
+	 * @return string URL to redirect to for completing contribution.
+	 */
+	public function get_custom_contribution_url( $amount_in_cents, $campaign_id, $title, $referral_url ) {
+		if ( 0 >= (int) $amount_in_cents ) {
+			return new \WP_Error( 'invalid_amount', __( 'Amount cannot be zero.', 'revenue-generator' ) );
+		}
+
+		if ( empty( $campaign_id ) || empty( $title ) ) {
+			return new \WP_Error(
+				'invalid_campaign_details',
+				__( 'Campaign ID and Title are required params.', 'revenue-generator' )
+			);
+		}
+
+		if ( empty( $referral_url ) ) {
+			return new \WP_Error(
+				'invalid_referral_url',
+				__( 'Referral URL cannot be empty.', 'revenue-generator' )
+			);
+		}
+
+		$client       = $this->get_client_instance();
+		$currency     = $this->get_currency();
+		$revenue_type = $this->get_revenue_type( $amount_in_cents );
+
+		// Params as required by `get_single_contribution_url`.
+		$params = [
+			'campaign_id' => $campaign_id,
+			'title'       => $title,
+			'url'         => $referral_url,
+			'revenue'     => $revenue_type,
+		];
+
+		$url = $client->get_single_contribution_url( $params );
+
+		// Append query arg with custom price to the URL.
+		$url = add_query_arg(
+			'custom_pricing',
+			$currency['code'] . $amount_in_cents,
+			$url
+		);
+
+		return $url;
+	}
+
+	/**
+	 * Get revenue type by amount.
+	 *
+	 * @param int $amount_in_cents Amount in cents.
+	 *
+	 * @return string Revenue type.
+	 */
+	public function get_revenue_type( $amount_in_cents ) {
+		$amount_in_cents = (int) $amount_in_cents;
+
+		if ( empty( $amount_in_cents ) ) {
+			return false;
+		}
+
+		// Default revenue type for amounts less than 5.00.
+		$revenue_type = 'ppu';
+
+		if ( 500 <= $amount_in_cents ) {
+			$revenue_type = 'sis';
+		}
+
+		return $revenue_type;
 	}
 }

@@ -12,7 +12,6 @@ use LaterPay\Revenue_Generator\Inc\Post_Types\Subscription;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Time_Pass;
 use \LaterPay\Revenue_Generator\Inc\Traits\Singleton;
 use \LaterPay\Revenue_Generator\Inc\Post_Types\Contribution_Preview;
-use \LaterPay\Revenue_Generator\Inc\Revenue_Generator_Client;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -746,41 +745,13 @@ class Frontend_Post {
 			);
 		}
 
-		$client_account = Client_Account::get_instance();
-		$endpoints      = $client_account->get_endpoints();
-
-		if ( is_wp_error( $endpoints ) ) {
-			wp_send_json_error(
-				__( 'Could not connect with merchant credentials.', 'revenue-generator' )
-			);
-		}
-
-		$merchant_credentials = Client_Account::get_merchant_credentials();
-
-		$client = new Revenue_Generator_Client(
-			$merchant_credentials['merchant_id'],
-			$merchant_credentials['merchant_key'],
-			$endpoints['api'],
-			$endpoints['web']
-		);
-
-		$contribution_urls = $client->get_contribution_urls(
-			[
-				'campaign_id' => $campaign_id,
-				'title' => $title,
-				'url' => $url,
-			]
-		);
-
+		$client_account   = Client_Account::get_instance();
 		$amount_in_cents  = $amount * 100;
-		$contribution_url = ( 500 <= $amount_in_cents ) ? $contribution_urls['sis'] : $contribution_urls['ppu'];
-		$currency         = $client_account->get_currency();
+		$contribution_url = $client_account->get_custom_contribution_url( $amount_in_cents, $campaign_id, $title, $url );
 
-		$contribution_url = add_query_arg(
-			'custom_pricing',
-			$currency['code'] . $amount_in_cents,
-			$contribution_url
-		);
+		if ( is_wp_error( $contribution_url ) ) {
+			wp_send_json_error();
+		}
 
 		// If it's a submit from AMP, pass headers so AMP handles redirect.
 		if ( $is_amp ) {
