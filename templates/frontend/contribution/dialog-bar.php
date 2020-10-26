@@ -12,13 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	// prevent direct access to this file.
 	exit;
 }
-
-$is_preview = Contribution_Preview::SLUG === get_post_type();
-$amp_class = ( function_exists( 'is_amp_endpoint' ) && is_amp_endpoint() ) ? ' is-amp' : '';
-$html_id = "rev_gen_contribution_{$contribution_id}";
 ?>
-
-<div class="rev-gen-contribution rev-gen-contribution--bar is-style-wide<?php echo esc_attr( $amp_class ); ?>" id="<?php echo esc_attr( $html_id ); ?>">
+<div class="rev-gen-contribution rev-gen-contribution--bar is-style-wide<?php echo ( $is_amp ) ? ' is-amp' : ''; ?>" id="<?php echo esc_attr( $html_id ); ?>">
 	<div class="rev-gen-contribution__inner">
 		<h2 class="rev-gen-contribution__title"<?php echo ( $is_preview ) ? ' contenteditable="true" data-bind="dialog_header"' : ''; ?>><?php echo esc_html( $dialog_header ); ?></h2>
 		<div class="rev-gen-contribution__description"<?php echo ( $is_preview ) ? ' contenteditable="true" data-bind="dialog_description"' : ''; ?>><?php echo esc_html( $dialog_description ); ?></div>

@@ -9,6 +9,7 @@ namespace LaterPay\Revenue_Generator\Inc;
 
 use \LaterPay\Revenue_Generator\Inc\Traits\Singleton;
 use \LaterPay\Revenue_Generator\Inc\Revenue_Generator_Client;
+use \LaterPay\Revenue_Generator\Inc\Post_Types\Contribution_Preview;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -268,10 +269,10 @@ class Shortcodes {
 			}
 		}
 
-		// View data for revenue-generator/views/contribution-dialog.php.
+		// View data for revenue-generator/templates/frontend/contribution/dialog-{type}.php.
 		$view_args = array(
 			'currency_symbol'    => $currency_config['symbol'],
-			'contribution_id'    => $config_data['ID'],
+			'contribution_id'    => $config_data['id'],
 			'campaign_id'        => $campaign_id,
 			'dialog_header'      => $config_data['dialog_header'],
 			'dialog_description' => $config_data['dialog_description'],
@@ -283,7 +284,14 @@ class Shortcodes {
 			'action_icons'       => [
 				'back_arrow_icon' => Config::$plugin_defaults['img_dir'] . 'back-arrow.svg',
 			],
+			'is_amp'             => ( function_exists( '\is_amp_endpoint' ) && \is_amp_endpoint() ),
+			'is_preview'         => ( Contribution_Preview::SLUG === get_post_type() ),
+			'html_id'            => "rev_gen_contribution_{$config_data['id']}",
 		);
+
+		if ( $view_args['is_preview'] ) {
+			$view_args['html_id'] = 'rev_gen_contribution_preview';
+		}
 
 		// Load the contributions dialog for User.
 		return View::render_template( "frontend/contribution/dialog-{$config_data['layout_type']}", $view_args );
