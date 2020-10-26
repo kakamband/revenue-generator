@@ -23,7 +23,7 @@ main {
 	}
 	*[contenteditable="true"] {
 		cursor: text;
-		&:focus {
+		&:not(button):focus {
 			border-radius: 10px;
 			outline: 2px solid #1d1d1d;
 		}

@@ -1,6 +1,7 @@
 $box-text-color:#1d1d1d;
 $box-dark-grey:#333;
 $box-font-helvetica: HelveticaNeue, serif;
+$box-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 $box-font-worksans:"LaterPay WorkSans", serif;
 $box-white:#fff;
 
@@ -20,7 +21,7 @@ $box-white:#fff;
 		padding: 30px 25px 18px;
 		border-radius: 5px;
 		overflow: hidden;
-		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+		font-family: $box-font;
 		box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
 		background-color: #fff;
 	}
@@ -29,7 +30,7 @@ $box-white:#fff;
 		margin: 0;
 		max-width: 100%;
 		border: 1px solid transparent;
-		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+		font-family: $box-font;
 		font-weight: bold;
 		line-height: 1.33;
 		font-size: 21px;
@@ -126,7 +127,7 @@ $box-white:#fff;
 		h3.rev-gen-contribution-custom__title {
 			margin: 0;
 			border: 1px solid transparent;
-			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+			font-family: $box-font;
 			line-height: 1.33;
 			font-size: 14px;
 			color: #1d1d1d;
@@ -179,7 +180,7 @@ $box-white:#fff;
 	}
 
 	&-footer {
-		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+		font-family: $box-font;
 
 		&__inner {
 			display: flex;
@@ -224,6 +225,30 @@ $box-white:#fff;
 			&__inner {
 				max-width: 100%;
 				padding: 15px 25px;
+			}
+		}
+	}
+
+	&--button {
+		.rev-gen-contribution {
+			&__inner {
+				padding: 0;
+				background-color: transparent;
+				box-shadow: none;
+			}
+			&__footer {
+				margin-top: 15px;
+			}
+			&__button {
+				max-width: 320px;
+				margin: 0 auto;
+				padding: 15px 30px;
+				border-radius: 5px;
+				font-family: $box-font;
+				font-weight: 500;
+				font-size: 16px;
+				color: $box-white;
+				background-color: $box-text-color;
 			}
 		}
 	}
