@@ -61,6 +61,19 @@ class Test_Paywall extends \WP_UnitTestCase {
 	 */
 	protected static $paywall_specifc;
 
+	/**
+	 * Paywall Categories.
+	 *
+	 * @var object
+	 */
+	protected static $paywall_categories;
+
+	/**
+	 * Paywall Categories Exclude.
+	 *
+	 * @var object
+	 */
+	protected static $paywall_categories_exclude;
 
 	/**
 	 * Subscription.
@@ -82,6 +95,13 @@ class Test_Paywall extends \WP_UnitTestCase {
 	 * @var object
 	 */
 	protected static $post;
+
+	/**
+	 * Categories.
+	 *
+	 * @var object
+	 */
+	protected static $categories;
 
 	/**
 	 * Setup Initial Data before.
@@ -233,6 +253,81 @@ class Test_Paywall extends \WP_UnitTestCase {
 			)
 		);
 
+		self::$categories = self::factory()->term->create_many(
+			3,
+			array(
+				'taxonomy' => 'category',
+			)
+		);
+
+		self::$paywall_categories = $factory->post->create_and_get(
+			array(
+				'post_type'    => 'rg_paywall',
+				'post_title'   => 'Paywall Categories',
+				'post_content' => 'Support http://revgen.test to get access to this content and more.',
+				'post_status'  => 'publish',
+				'post_author'  => self::$admin->ID,
+				'meta_input'   => array(
+					'_rg_title'             => 'Keep Reading',
+					'_rg_access_to'         => 'category',
+					'_rg_access_entity'     => array_map( 'strval', self::$categories ),
+					'_rg_preview_id'        => '2',
+					'_rg_specific_posts'    => '',
+					'_rg_individual_option' =>
+						array(
+							'title'        => 'Access Article Now',
+							'description'  => 'You\'ll only be charged once you\'ve reached $5.',
+							'price'        => '0.49',
+							'revenue'      => 'ppu',
+							'type'         => 'dynamic',
+							'custom_title' => '',
+							'custom_desc'  => '',
+						),
+					'_rg_options_order'     =>
+						array(
+							'individual'                  => '1',
+							'tlp_' . self::$time_pass->ID => '2',
+							'sub_' . self::$subscription->ID => '3',
+						),
+					'_rg_is_active'         => '1',
+				),
+			)
+		);
+
+		self::$paywall_categories_exclude = $factory->post->create_and_get(
+			array(
+				'post_type'    => 'rg_paywall',
+				'post_title'   => 'Paywall Excluded Categories',
+				'post_content' => 'Support http://revgen.test to get access to this content and more.',
+				'post_status'  => 'publish',
+				'post_author'  => self::$admin->ID,
+				'meta_input'   => array(
+					'_rg_title'             => 'Keep Reading',
+					'_rg_access_to'         => 'exclude_category',
+					'_rg_access_entity'     => self::$categories,
+					'_rg_preview_id'        => '2',
+					'_rg_specific_posts'    => '',
+					'_rg_individual_option' =>
+						array(
+							'title'        => 'Access Article Now',
+							'description'  => 'You\'ll only be charged once you\'ve reached $5.',
+							'price'        => '0.49',
+							'revenue'      => 'ppu',
+							'type'         => 'dynamic',
+							'custom_title' => '',
+							'custom_desc'  => '',
+						),
+					'_rg_options_order'     =>
+						array(
+							'individual'                  => '1',
+							'tlp_' . self::$time_pass->ID => '2',
+							'sub_' . self::$subscription->ID => '3',
+						),
+					'_rg_is_active'         => '1',
+				),
+			)
+		);
+
 	}
 
 	/**
@@ -359,12 +454,24 @@ class Test_Paywall extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test get paywall by categories
+	 * Test get paywall by categories.
 	 *
 	 * @covers Paywall::get_connected_paywall_by_categories
 	 */
-	public function test_get_connected_paywall_by_categories( ) {
-		// WIP.
+	public function test_get_connected_paywall_by_categories() {
+		wp_set_post_categories( self::$post->ID, self::$categories, true );
+		$categories_paywall_id = Utility::invoke_method( $this->_instance, 'get_connected_paywall_by_categories', array( self::$categories ) );
+		$this->assertEquals( $categories_paywall_id, self::$paywall_categories->ID );
+	}
+
+	/**
+	 * Test get paywall by categories.
+	 *
+	 * @covers Paywall::get_connected_paywall_in_excluded_categories
+	 */
+	public function test_get_connected_paywall_in_excluded_categories() {
+		$categories_excluded_paywall_id = Utility::invoke_method( $this->_instance, 'get_connected_paywall_in_excluded_categories', array( self::$categories ) );
+		$this->assertEquals( $categories_excluded_paywall_id, self::$paywall_categories_exclude->ID );
 	}
 
 }

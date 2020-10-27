@@ -350,17 +350,4 @@ class Test_Frontend_Post extends \WP_UnitTestCase {
 		$this->assertStringStartsWith( 'article_', $deleted_options[0] );
 	}
 
-	/**
-	 * Test Register preview Scripts and styles.
-	 *
-	 * @covers Frontend_Post::enqueue_preview_scripts_and_styles
-	 */
-	public function test_enqueue_preview_scripts_and_styles() {
-		$post_id = self::$post->ID;
-		$this->go_to( get_permalink( $post_id ) );
-		Utility::invoke_method( $this->_instance, 'enqueue_preview_scripts_and_styles' );
-		$this->assertTrue( wp_script_is( 'revenue-generator-preview-script' ) );
-		$this->assertTrue( wp_style_is( 'revenue-generator-preview' ) );
-	}
-
 }
