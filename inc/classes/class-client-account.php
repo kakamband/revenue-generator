@@ -69,6 +69,20 @@ class Client_Account {
 	protected $secret_algo = 'sha224';
 
 	/**
+	 * Boolean whether credentials are valid.
+	 *
+	 * @var boolean
+	 */
+	protected $credentials_valid = false;
+
+	/**
+	 * Boolean whether credentials has been validated.
+	 *
+	 * @var boolean
+	 */
+	protected $validated_credentials = false;
+
+	/**
 	 * Store connector endpoint used in the plugin.
 	 *
 	 * @var array Common values used for api related info throughout the plugin.
@@ -171,6 +185,10 @@ class Client_Account {
 	 * @return bool
 	 */
 	public function validate_merchant_account() {
+		if ( $this->validated_credentials ) {
+			return $this->credentials_valid;
+		}
+
 		$global_options = Config::get_global_options();
 		$region         = $global_options['merchant_region'];
 
@@ -210,6 +228,8 @@ class Client_Account {
 
 		// If account credentials are valid, proceed to checking the merchant domain.
 		if ( true === $are_credentials_valid ) {
+			$this->credentials_valid = true;
+
 			return $this->test_merchant_domain();
 		} else {
 			return new \WP_Error(
@@ -217,6 +237,8 @@ class Client_Account {
 				__( 'Merchant credentials are invalid.', 'revenue-generator' )
 			);
 		}
+
+		$this->validated_credentials = true;
 	}
 
 	/**
