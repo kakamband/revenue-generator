@@ -76,6 +76,13 @@ class Test_Paywall extends \WP_UnitTestCase {
 	protected static $paywall_categories_exclude;
 
 	/**
+	 * Paywall for posts
+	 *
+	 * @var object
+	 */
+	protected static $paywall_posts;
+
+	/**
 	 * Subscription.
 	 *
 	 * @var object
@@ -328,6 +335,40 @@ class Test_Paywall extends \WP_UnitTestCase {
 			)
 		);
 
+		self::$paywall_posts = $factory->post->create_and_get(
+			array(
+				'post_type'    => 'rg_paywall',
+				'post_title'   => 'Paywall Posts',
+				'post_content' => 'Support http://revgen.test to get access to this content and more.',
+				'post_status'  => 'publish',
+				'post_author'  => self::$admin->ID,
+				'meta_input'   => array(
+					'_rg_title'             => 'Keep Reading',
+					'_rg_access_to'         => 'posts',
+					'_rg_access_entity'     => '',
+					'_rg_preview_id'        => '2',
+					'_rg_specific_posts'    => '',
+					'_rg_individual_option' =>
+						array(
+							'title'        => 'Access Article Now',
+							'description'  => 'You\'ll only be charged once you\'ve reached $5.',
+							'price'        => '0.49',
+							'revenue'      => 'ppu',
+							'type'         => 'dynamic',
+							'custom_title' => '',
+							'custom_desc'  => '',
+						),
+					'_rg_options_order'     =>
+						array(
+							'individual'                  => '1',
+							'tlp_' . self::$time_pass->ID => '2',
+							'sub_' . self::$subscription->ID => '3',
+						),
+					'_rg_is_active'         => '1',
+				),
+			)
+		);
+
 	}
 
 	/**
@@ -387,7 +428,7 @@ class Test_Paywall extends \WP_UnitTestCase {
 	/**
 	 * Data provider for test_update_paywall.
 	 *
-	 * Passes diffrent type of data.
+	 * Passes different type of data.
 	 *
 	 * @return array {
 	 *    @type array{
@@ -465,13 +506,79 @@ class Test_Paywall extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test get paywall by categories.
+	 * Test get paywall by excluded categories.
 	 *
 	 * @covers Paywall::get_connected_paywall_in_excluded_categories
 	 */
 	public function test_get_connected_paywall_in_excluded_categories() {
 		$categories_excluded_paywall_id = Utility::invoke_method( $this->_instance, 'get_connected_paywall_in_excluded_categories', array( self::$categories ) );
 		$this->assertEquals( $categories_excluded_paywall_id, self::$paywall_categories_exclude->ID );
+	}
+
+	/**
+	 * Test get paywall for only post.
+	 *
+	 * @covers Paywall::get_paywall_for_only_posts
+	 */
+	public function test_get_paywall_for_only_posts() {
+		$paywall_posts_id = Utility::invoke_method( $this->_instance, 'get_paywall_for_only_posts' );
+		$this->assertEquals( $paywall_posts_id, self::$paywall_posts->ID );
+	}
+
+	/**
+	 * Test get all post and pages paywalls .
+	 *
+	 * @covers Paywall::get_paywall_for_all_posts
+	 */
+	public function test_get_paywall_for_all_posts() {
+		$all_paywall_id = Utility::invoke_method( $this->_instance, 'get_paywall_for_all_posts' );
+		$this->assertEquals( $all_paywall_id, self::$paywall->ID );
+	}
+
+	/**
+	 * Test get all paywalls.
+	 *
+	 * @param array $paywall_args different paywall argument.
+	 *
+	 * @covers Paywall::get_all_paywalls
+	 *
+	 * @dataProvider data_paywall_args
+	 */
+	public function test_get_all_paywalls( $paywall_args ) {
+		$all_paywalls = Utility::invoke_method( $this->_instance, 'get_all_paywalls', array( $paywall_args ) );
+
+		if ( 'DESC' === $paywall_args['order'] ) {
+			$this->assertEquals( self::$paywall_posts->ID, $all_paywalls[0]['id'] );
+		}
+		if ( 'ASC' === $paywall_args['order'] ) {
+			$this->assertEquals( self::$paywall->ID, $all_paywalls[0]['id'] );
+		}
+	}
+
+	/**
+	 * Data provider for test_update_paywall.
+	 *
+	 * Passes different type of data.
+	 *
+	 * @return array {
+	 *    @type array{
+	 *        @type array $paywall_data Paywall content.
+	 *    }
+	 * }
+	 */
+	public function data_paywall_args() {
+		return array(
+			array(
+				array(
+					'order' => 'DESC',
+				),
+			),
+			array(
+				array(
+					'order' => 'ASC',
+				),
+			),
+		);
 	}
 
 }
