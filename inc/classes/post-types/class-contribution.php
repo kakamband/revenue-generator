@@ -137,8 +137,9 @@ class Contribution extends Base {
 	 */
 	public function get_default_post() {
 		$post = [
-			'ID' => 0,
-			'post_title' => '',
+			'ID'          => 0,
+			'post_title'  => '',
+			'post_author' => '',
 		];
 
 		$meta = $this->get_default_meta();
