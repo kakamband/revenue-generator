@@ -60,7 +60,7 @@ $box-white:#fff;
 	}
 
 	&__donation {
-		min-width: 60px;
+		min-width: 75px;
 		border: solid 2px $box-text-color;
 		border-radius: 5px;
 		margin: 0 2px;
@@ -74,15 +74,21 @@ $box-white:#fff;
 		@extend .amount-text;
 
 		/* stylelint-disable declaration-no-important */
-		a {
+		a,
+		button {
 			display: block;
+			width: 100%;
+			height: 100%;
 			padding: 15px;
-			background: $box-white;
+			font-size: 14px;
+			background: $box-white !important;
 			color: $box-text-color !important;
 			border: 0;
 			box-shadow: none !important;
 			transition: background-color 0.05s ease-in !important;
 			text-decoration: none !important;
+			text-transform: none !important;
+			letter-spacing: 0 !important;
 			&:hover {
 				background: $box-text-color !important;
 				color: $box-white !important;
@@ -149,11 +155,15 @@ $box-white:#fff;
 			&-wrap {
 				flex: 1;
 			}
+			/* stylelint-disable declaration-no-important */
 			input {
-				width: 95%;
-				font-size: 16px;
-				color: $box-text-color;
+				width: 95% !important;
+				padding: 12px 10px !important;
+				font-size: 16px !important;
+				color: $box-text-color !important;
+				box-shadow: none !important;
 			}
+			/* stylelint-enable declaration-no-important */
 		}
 		&__symbol {
 			width: 15px;
@@ -167,17 +177,28 @@ $box-white:#fff;
 			font-weight: normal;
 			font-size: 12px;
 		}
-		&__send {
+		/* stylelint-disable declaration-no-important */
+		button.rev-gen-contribution-custom__send {
 			min-width: 90px;
 			max-height: 50px;
 			margin: 0;
-			padding: 14px 10px;
+			padding: 14px 10px !important;
 			border-radius: 5px;
-			font-weight: normal;
+			font-weight: 500;
 			font-size: 14px;
-			color: $box-white;
-			background-color: $box-text-color;
+			color: $box-white !important;
+			background-color: $box-text-color !important;
+			text-decoration: none !important;
+			box-shadow: none !important;
+			&:active,
+			&:hover {
+				color: $box-white !important;
+				background-color: $box-text-color !important;
+				text-decoration: none !important;
+				box-shadow: none !important;
+			}
 		}
+		/* stylelint-enable declaration-no-important */
 	}
 
 	&-footer {
@@ -234,8 +255,8 @@ $box-white:#fff;
 		.rev-gen-contribution {
 			&__inner {
 				padding: 0;
-				background-color: transparent;
 				box-shadow: none;
+				background-color: transparent;
 				text-align: center;
 			}
 			&__footer {
@@ -259,8 +280,12 @@ $box-white:#fff;
 					text-decoration: none;
 				}
 			}
-			&:not(.is-amp).rev-gen-contribution-modal {
-				display: none;
+			&:not(.is-amp) {
+				.rev-gen-contribution {
+					&-modal {
+						display: none;
+					}
+				}
 			}
 		}
 	}
@@ -281,6 +306,10 @@ $box-white:#fff;
 	.rev-gen-contribution {
 		opacity: 0;
 		transition: opacity 0.13s ease-in;
+		&__inner {
+			padding: 30px 25px 18px;
+			background-color: $box-white;
+		}
 	}
 	&.active {
 		opacity: 1;
@@ -288,6 +317,7 @@ $box-white:#fff;
 			opacity: 1;
 		}
 	}
+	/* stylelint-disable declaration-no-important */
 	&__close {
 		position: absolute;
 		top: 15px;
@@ -295,18 +325,23 @@ $box-white:#fff;
 		display: inline-block;
 		width: 15px;
 		height: 15px;
-		background: url(../img/icon-close.svg) no-repeat;
-		background-size: 15px 15px;
+		padding: 0 !important;
+		background: transparent url(../img/icon-close.svg) no-repeat !important;
+		background-size: 15px 15px !important;
 		opacity: 0.35;
 	}
+	/* stylelint-enable declaration-no-important */
 }
 
 .is-amp .rev-gen-contribution-modal {
 	opacity: 1;
-	.rev-gen-contribution-amp-wrap {
-		display: flex;
-		width: 100%;
-		height: 100%;
-		align-items: center;
+	.rev-gen-contribution {
+		opacity: 1;
+		&-amp-wrap {
+			display: flex;
+			width: 100%;
+			height: 100%;
+			align-items: center;
+		}
 	}
 }
