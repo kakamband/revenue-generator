@@ -200,12 +200,7 @@ class Shortcodes {
 
 		$campaign_id = str_replace( ' ', '-', strtolower( $campaign_name ) ) . '-' . (string) time();
 
-		$client = new Revenue_Generator_Client(
-			$merchant_credentials['merchant_id'],
-			$merchant_credentials['merchant_key'],
-			$endpoints['api'],
-			$endpoints['web']
-		);
+		$client = $client_account->get_client_instance();
 
 		if ( 'single' === $config_data['type'] ) {
 			// Configure single amount contribution.
@@ -273,7 +268,7 @@ class Shortcodes {
 		// View data for revenue-generator/templates/frontend/contribution/dialog-{type}.php.
 		$view_args = array(
 			'currency_symbol'    => $currency_config['symbol'],
-			'contribution_id'    => $config_data['id'],
+			'contribution_id'    => $config_data['ID'],
 			'campaign_id'        => $campaign_id,
 			'dialog_header'      => $config_data['dialog_header'],
 			'button_label'       => $config_data['button_label'],
@@ -288,7 +283,7 @@ class Shortcodes {
 			],
 			'is_amp'             => ( function_exists( '\is_amp_endpoint' ) && \is_amp_endpoint() ),
 			'is_preview'         => ( Contribution_Preview::SLUG === get_post_type() ),
-			'html_id'            => "rev_gen_contribution_{$config_data['id']}",
+			'html_id'            => "rev_gen_contribution_{$config_data['ID']}",
 		);
 
 		if ( $view_args['is_preview'] ) {
