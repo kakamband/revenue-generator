@@ -8,7 +8,7 @@ body {
 }
 
 main {
-	display: flex;
+	display: flex !important; /* stylelint-disable-line declaration-no-important */
 	width: 100%;
 	height: 100vh;
 	justify-content: center;
