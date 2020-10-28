@@ -6,7 +6,6 @@
  */
 
 use LaterPay\Revenue_Generator\Inc\View;
-use \LaterPay\Revenue_Generator\Inc\Post_Types\Contribution_Preview;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	// prevent direct access to this file.

@@ -244,12 +244,20 @@ $box-white:#fff;
 			&__button {
 				max-width: 320px;
 				padding: 15px 30px;
+				border: 0;
 				border-radius: 5px;
 				font-family: $box-font;
 				font-weight: 500;
 				font-size: 16px;
 				color: $box-white;
 				background-color: $box-text-color;
+				text-decoration: none;
+				&:hover,
+				&:active {
+					border: 0;
+					box-shadow: none;
+					text-decoration: none;
+				}
 			}
 			&:not(.is-amp).rev-gen-contribution-modal {
 				display: none;

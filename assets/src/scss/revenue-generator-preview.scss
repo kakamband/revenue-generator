@@ -28,4 +28,18 @@ main {
 			outline: 2px solid #1d1d1d;
 		}
 	}
+	&__section {
+		margin-bottom: 100px;
+		&:last-child {
+			margin-bottom: 0;
+		}
+		&-title {
+			font-size: 20px;
+			text-transform: uppercase;
+			box-shadow: none;
+			text-align: center;
+			pointer-events: none;
+			user-select: none;
+		}
+	}
 }

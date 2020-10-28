@@ -19,7 +19,7 @@ $contribution_data     = $contribution_instance->get( $contribution_id );
 $layout_type           = ( isset( $_GET['layout_type'] ) ) ? sanitize_text_field( $_GET['layout_type'] ) : $contribution_data['layout_type'];
 
 $shortcode             = sprintf(
-	'[laterpay_contribution name="%s" thank_you="%s" type="%s" custom_amount="%s" all_amounts="%s" all_revenues="%s" selected_amount="1" dialog_header="%s" dialog_description="%s" layout_type="%s"]',
+	'[laterpay_contribution name="%s" thank_you="%s" type="%s" custom_amount="%s" all_amounts="%s" all_revenues="%s" selected_amount="1" dialog_header="%s" dialog_description="%s" layout_type="%s" button_label="%s"]',
 	$contribution_data['name'],
 	$contribution_data['thank_you'],
 	$contribution_data['type'],
@@ -28,7 +28,8 @@ $shortcode             = sprintf(
 	$contribution_data['all_revenues'],
 	$contribution_data['dialog_header'],
 	$contribution_data['dialog_description'],
-	$layout_type
+	$layout_type,
+	$contribution_data['button_label']
 );
 ?>
 <!DOCTYPE html>

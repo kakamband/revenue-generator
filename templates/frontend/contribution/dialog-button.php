@@ -6,7 +6,6 @@
  */
 
 use LaterPay\Revenue_Generator\Inc\View;
-use \LaterPay\Revenue_Generator\Inc\Post_Types\Contribution_Preview;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	// prevent direct access to this file.
@@ -14,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 
+<?php if ( ! $is_preview ) : ?>
 <div class="rev-gen-contribution rev-gen-contribution--button is-style-wide<?php echo ( $is_amp ) ? ' is-amp' : ''; ?>" id="<?php echo esc_attr( $html_id ); ?>" data-type="button">
 	<div class="rev-gen-contribution__inner">
 		<?php if ( ! $is_amp ) : ?>
@@ -71,3 +71,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</amp-lightbox>
 	<?php endif; ?>
 </div>
+<?php else : ?>
+	<?php include REVENUE_GENERATOR_PLUGIN_DIR . '/templates/frontend/contribution/dialog-button-preview.php'; ?>
+<?php endif; ?>

@@ -308,6 +308,7 @@ class Admin {
 			'custom_amount'      => ( isset( $_REQUEST['custom-amount'] ) ) ? floatval( $_REQUEST['custom-amount'] ) : '',
 			'code'               => ( isset( $_REQUEST['code'] ) ) ? sanitize_text_field( $_REQUEST['code'] ) : '',
 			'layout_type'        => ( isset( $_REQUEST['layout_type'] ) ) ? sanitize_text_field( $_REQUEST['layout_type'] ) : '',
+			'button_label'       => ( isset( $_REQUEST['button_label'] ) ) ? sanitize_text_field( $_REQUEST['button_label'] ) : '',
 		];
 
 		$is_edit = false;

@@ -8,9 +8,9 @@
 				'keyup [contenteditable]': 'onEditableContentChange',
 			},
 
-			initialize() {},
-
 			onEditableContentChange( e ) {
+				e.stopPropagation();
+
 				const $el = $( e.target );
 				const attr = $el.data( 'bind' );
 				let value = $el.text();
