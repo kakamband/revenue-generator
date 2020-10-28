@@ -16,7 +16,7 @@ $box-white:#fff;
 
 .rev-gen-contribution {
 	width: 100%;
-	margin: 0 auto;
+	margin: 20px auto;
 	&__inner {
 		position: relative;
 		padding: 30px 25px 18px;
@@ -280,12 +280,10 @@ $box-white:#fff;
 					text-decoration: none;
 				}
 			}
-			&:not(.is-amp) {
-				.rev-gen-contribution {
-					&-modal {
-						display: none;
-					}
-				}
+		}
+		&:not(.is-amp) {
+			.rev-gen-contribution-modal {
+				display: none;
 			}
 		}
 	}

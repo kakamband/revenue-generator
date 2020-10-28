@@ -36,6 +36,10 @@ export class RevGenContribution {
 		for ( const amount of this.$o.amounts ) {
 			const link = amount.querySelector( 'a' );
 
+			if ( ! link ) {
+				continue;
+			}
+
 			/**
 			 * On mouse over, we either show or hide the 'contribute now, pay later'
 			 * helper message depending on the amount.
