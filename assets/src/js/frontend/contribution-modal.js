@@ -11,6 +11,10 @@ export class RevGenContributionModal {
 			el: '',
 		};
 
+		this.bindButtonEvents();
+	}
+
+	bindButtonEvents() {
 		this.$button.trigger.addEventListener(
 			'click',
 			this.open.bind( this )
