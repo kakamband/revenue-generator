@@ -124,6 +124,9 @@ export class RevGenContribution {
 		this.$o.customBox.form.addEventListener( 'submit', ( e ) => {
 			e.preventDefault();
 
+			this.$o.customBox.send.classList.add( 'loading' );
+			this.$o.customBox.send.setAttribute( 'disabled', true );
+
 			// Store reference to this context.
 			const self = this;
 
@@ -147,6 +150,9 @@ export class RevGenContribution {
 			 */
 			req.onreadystatechange = function() {
 				if ( 4 === this.readyState ) {
+					self.$o.customBox.send.classList.remove( 'loading' );
+					self.$o.customBox.send.removeAttribute( 'disabled' );
+
 					if ( 200 === this.status ) {
 						const res = JSON.parse( this.response );
 
@@ -216,89 +222,5 @@ export class RevGenContribution {
 		}
 
 		return amount;
-	}
-}
-
-/**
- * Loop through contribution elements found on page and initialize
- * `RevGenContribution` on DOM load.
- */
-document.addEventListener( 'DOMContentLoaded', () => {
-	const contributions = document.getElementsByClassName(
-		'rev-gen-contribution'
-	);
-
-	for ( const item of contributions ) {
-		if ( 'button' !== item.dataset.type ) {
-			new RevGenContribution( item );
-		} else {
-			new RevGenContributionModal( item );
-		}
-	}
-} );
-
-export class RevGenContributionModal {
-	constructor( el ) {
-		this.$button = {
-			trigger: el.querySelector( 'button' ),
-			modal: el.querySelector( '.rev-gen-contribution-modal' ),
-		};
-
-		this.$modal = {
-			el: '',
-		};
-
-		this.$button.trigger.addEventListener(
-			'click',
-			this.open.bind( this )
-		);
-	}
-
-	bindModalEvents() {
-		this.$modal.closeButton.addEventListener(
-			'click',
-			this.close.bind( this )
-		);
-	}
-
-	open( e ) {
-		e.preventDefault();
-
-		const modal = this.$button.modal.cloneNode( true );
-
-		this.$modal.el = modal;
-		this.$modal.contributionEl = modal.querySelector(
-			'.rev-gen-contribution'
-		);
-		this.$modal.closeButton = modal.querySelector(
-			'.rev-gen-contribution-modal__close'
-		);
-
-		document.querySelector( 'body' ).appendChild( modal );
-
-		this.bindModalEvents();
-		this.initContributionRequest();
-
-		setTimeout( function() {
-			modal.classList.add( 'active' );
-		}, 100 );
-	}
-
-	initContributionRequest() {
-		this.contributionInstance = new RevGenContribution(
-			this.$modal.contributionEl
-		);
-	}
-
-	close( e ) {
-		e.preventDefault();
-
-		const $modal = this.$modal.el;
-
-		$modal.classList.remove( 'active' );
-
-		setTimeout( function() {
-			document.querySelector( 'body' ).removeChild( $modal );
-		}, 200 );
 	}
 }

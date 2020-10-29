@@ -34,13 +34,14 @@ $is_amp = function_exists( 'is_amp_endpoint' ) && is_amp_endpoint();
 			<div class="rev-gen-contribution__input-wrap">
 				<label for="<?php echo esc_attr( $html_id ); ?>_custom_input"><?php esc_html_e( 'Enter custom amount', 'revenue-generator' ); ?></label>
 				<div class="rev-gen-contribution-custom__input">
-					<span class="rev-gen-contribution-custom__symbol">$</span>
+					<span class="rev-gen-contribution-custom__symbol"><?php echo esc_attr( $currency_symbol ); ?></span>
 					<input id="<?php echo esc_attr( $html_id ); ?>_custom_input" name="amount" type="number" value="" step="0.01" min="0" placeholder="<?php echo esc_attr( $default_amount ); ?>" onfocus="this.value = (this.value ? this.value : <?php echo esc_attr( $default_amount ); ?>);" onblur="<?php echo esc_attr( $onblur ); ?>">
 				</div>
 			</div>
 
-			<button class="rev-gen-contribution-custom__send">
-				<?php esc_html_e( 'Send Tip', 'revenue-generator' ); ?>
+			<button class="rev-gen-contribution-custom__send rev-gen-contribution-custom-send">
+				<span class="rev-gen-contribution-send__text"><?php esc_html_e( 'Send Tip', 'revenue-generator' ); ?></span>
+				<span class="rev-gen-contribution-send__loading"></span>
 			</button>
 		</form>
 	</div>

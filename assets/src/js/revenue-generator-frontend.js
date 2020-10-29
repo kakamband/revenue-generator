@@ -1,4 +1,4 @@
 /**
  * Import all required frontend scripts here.
  */
-import './frontend/contribution';
+import './frontend/dom-bindings';

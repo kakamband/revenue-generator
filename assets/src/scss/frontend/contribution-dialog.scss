@@ -53,7 +53,7 @@ $box-white:#fff;
 		display: flex;
 		flex-flow: row nowrap;
 		justify-content: center;
-		margin: 15px 0;
+		margin: 20px 0;
 		&.rev-gen-hidden {
 			display: none;
 		}
@@ -178,7 +178,7 @@ $box-white:#fff;
 			font-size: 12px;
 		}
 		/* stylelint-disable declaration-no-important */
-		button.rev-gen-contribution-custom__send {
+		button.rev-gen-contribution-custom-send {
 			min-width: 90px;
 			max-height: 50px;
 			margin: 0;
@@ -196,6 +196,27 @@ $box-white:#fff;
 				background-color: $box-text-color !important;
 				text-decoration: none !important;
 				box-shadow: none !important;
+			}
+			&:disabled {
+				opacity: 0.8;
+			}
+			.rev-gen-contribution-custom-send__loading {
+				display: none;
+			}
+			&.loading {
+				padding: 11px 10px !important;
+				.rev-gen-contribution-send__text {
+					display: none;
+				}
+				.rev-gen-contribution-send__loading {
+					display: inline-block;
+					width: 21px;
+					height: 21px;
+					background: url(../img/lp-logo-icon-white.svg) no-repeat;
+					background-size: 21px 21px;
+					transition: transform 0.2s ease-in-out;
+					animation: pulse-loading 1s infinite;
+				}
 			}
 		}
 		/* stylelint-enable declaration-no-important */
@@ -341,5 +362,20 @@ $box-white:#fff;
 			height: 100%;
 			align-items: center;
 		}
+	}
+}
+
+@keyframes pulse-loading {
+	0% {
+		transform: scale(1.1);
+	}
+	50% {
+		transform: scale(1.15);
+	}
+	75% {
+		transform: scale(1.1);
+	}
+	100% {
+		transform: scale(1);
 	}
 }
