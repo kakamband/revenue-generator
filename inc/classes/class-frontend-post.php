@@ -130,7 +130,7 @@ class Frontend_Post {
 	 */
 	protected function setup_hooks() {
 		add_action( 'wp_enqueue_scripts', [ $this, 'register_connector_assets' ] );
-		add_filter( 'wp_head', [ $this, 'add_connector_config' ] );
+		add_action( 'wp_head', [ $this, 'add_connector_config' ] );
 		add_filter( 'the_content', [ $this, 'revenue_generator_post_content' ] );
 	}
 
