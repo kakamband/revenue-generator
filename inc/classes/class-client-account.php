@@ -73,14 +73,14 @@ class Client_Account {
 	 *
 	 * @var boolean
 	 */
-	protected $credentials_valid = false;
+	protected $credentials_valid = null;
 
 	/**
-	 * Boolean whether credentials has been validated.
+	 * Client instance.
 	 *
-	 * @var boolean
+	 * @var Revenue_Generator_Client
 	 */
-	protected $validated_credentials = false;
+	protected $client = null;
 
 	/**
 	 * Store connector endpoint used in the plugin.
@@ -151,6 +151,7 @@ class Client_Account {
 	 */
 	protected function __construct() {
 		$this->setup_options();
+		$this->validate_merchant_account();
 	}
 
 	/**
@@ -158,7 +159,7 @@ class Client_Account {
 	 */
 	protected function setup_options() {
 		// Fresh install.
-		if ( false === get_option( 'lp_rg_merchant_credentials' ) ) {
+		if ( empty( self::get_merchant_credentials() ) ) {
 			// Set default data for merchant credentials.
 			update_option(
 				'lp_rg_merchant_credentials',
@@ -185,7 +186,7 @@ class Client_Account {
 	 * @return bool
 	 */
 	public function validate_merchant_account() {
-		if ( $this->validated_credentials ) {
+		if ( ! is_null( $this->credentials_valid ) ) {
 			return $this->credentials_valid;
 		}
 
@@ -237,8 +238,6 @@ class Client_Account {
 				__( 'Merchant credentials are invalid.', 'revenue-generator' )
 			);
 		}
-
-		$this->validated_credentials = true;
 	}
 
 	/**
@@ -353,20 +352,14 @@ class Client_Account {
 	/**
 	 * Get connector, API, and Web endpoints from merchant credentials.
 	 *
-	 * @return WP_Error|array
+	 * @return array
 	 */
 	public function get_endpoints() {
-		if ( ! $this->validate_merchant_account() ) {
-			return new \WP_Error( 'Endpoints could not be retrieved because merchant account is not valid.', 'revenue-generator' );
-		}
-
-		$endpoints = [
+		return [
 			'connector' => $this->connector_root,
 			'api'       => $this->api_root,
 			'web'       => $this->web_endpoint,
 		];
-
-		return $endpoints;
 	}
 
 	/**
@@ -384,18 +377,18 @@ class Client_Account {
 	 * @return Revenue_Generator_Client
 	 */
 	public function get_client_instance() {
-		$validate = $this->validate_merchant_account();
-
-		if ( ! $validate ) {
-			return $validate;
+		if ( ! is_null( $this->client ) ) {
+			return $this->client;
 		}
 
-		return new Revenue_Generator_Client(
+		$this->client = new Revenue_Generator_Client(
 			$this->merchant_id,
 			$this->merchant_api_key,
 			$this->api_root,
 			$this->web_endpoint
 		);
+
+		return $this->client;
 	}
 
 	/**
