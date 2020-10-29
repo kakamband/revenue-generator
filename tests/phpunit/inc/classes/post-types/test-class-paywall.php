@@ -229,7 +229,7 @@ class Test_Paywall extends \WP_UnitTestCase {
 		self::$paywall_specifc = $factory->post->create_and_get(
 			array(
 				'post_type'    => 'rg_paywall',
-				'post_title'   => 'Paywall Supported',
+				'post_title'   => 'Paywall Specific',
 				'post_content' => 'Support http://revgen.test to get access to this content and more.',
 				'post_status'  => 'publish',
 				'post_author'  => self::$admin->ID,
@@ -542,7 +542,7 @@ class Test_Paywall extends \WP_UnitTestCase {
 	 *
 	 * @covers Paywall::get_all_paywalls
 	 *
-	 * @dataProvider data_paywall_args
+	 * @dataProvider data_get_all_paywalls
 	 */
 	public function test_get_all_paywalls( $paywall_args ) {
 		$all_paywalls = Utility::invoke_method( $this->_instance, 'get_all_paywalls', array( $paywall_args ) );
@@ -556,17 +556,17 @@ class Test_Paywall extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Data provider for test_update_paywall.
+	 * Data provider for get_all_paywalls.
 	 *
 	 * Passes different type of data.
 	 *
 	 * @return array {
 	 *    @type array{
-	 *        @type array $paywall_data Paywall content.
+	 *        @type array $paywall_args Paywall filter arguments.
 	 *    }
 	 * }
 	 */
-	public function data_paywall_args() {
+	public function data_get_all_paywalls() {
 		return array(
 			array(
 				array(
@@ -576,6 +576,77 @@ class Test_Paywall extends \WP_UnitTestCase {
 			array(
 				array(
 					'order' => 'ASC',
+				),
+			),
+		);
+	}
+
+	/**
+	 * Test get all paywalls.
+	 *
+	 * @param array $search_term different paywall names.
+	 *
+	 * @covers Paywall::get_paywall_by_name
+	 *
+	 * @dataProvider data_get_paywall_by_name
+	 */
+	public function test_get_paywall_by_name( $search_term ) {
+		$searched_paywalls = Utility::invoke_method( $this->_instance, 'get_paywall_by_name', $search_term );
+		if ( ! empty( $searched_paywalls ) && 'All' !== $search_term[0] ) {
+					$this->assertContains( $search_term[0], $searched_paywalls[0]['name'] );
+		}
+
+		// Paywall contains all so it is matching with every paywall so we did this.
+		if ( 'All' === $search_term[0] ) {
+			foreach ( $searched_paywalls as $key => $searched_paywall ) {
+				if ( 'Paywall All' === $searched_paywall['name'] ) {
+					$this->assertContains( $search_term[0], $searched_paywall['name'] );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Data provider for get_paywall_by_name.
+	 *
+	 * Passes different type of data.
+	 *
+	 * @return array {
+	 *    @type array{
+	 *        @type array $search_term Paywall name.
+	 *    }
+	 * }
+	 */
+	public function data_get_paywall_by_name() {
+		return array(
+			array(
+				array(
+					'Supported',
+				),
+			),
+			array(
+				array(
+					'All',
+				),
+			),
+			array(
+				array(
+					'Specific',
+				),
+			),
+			array(
+				array(
+					'Categories',
+				),
+			),
+			array(
+				array(
+					'Excluded',
+				),
+			),
+			array(
+				array(
+					'Posts',
 				),
 			),
 		);
