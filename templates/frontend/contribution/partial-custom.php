@@ -8,8 +8,6 @@
 defined( 'ABSPATH' ) || exit;
 
 global $wp;
-
-$is_amp = function_exists( 'is_amp_endpoint' ) && is_amp_endpoint();
 ?>
 <div class="rev-gen-contribution__custom rev-gen-contribution-custom rev-gen-hidden" id="<?php echo esc_attr( $html_id ); ?>_custom" data-ppu-url="<?php echo esc_url( $contribution_urls['ppu'] ); ?>" data-sis-url="<?php echo esc_url( $contribution_urls['sis'] ); ?>" hidden>
 	<div class="rev-gen-contribution-custom__inner">
