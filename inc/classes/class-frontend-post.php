@@ -122,8 +122,9 @@ class Frontend_Post {
 			if ( ! empty( $merchant_credentials['merchant_key'] ) ) {
 				$this->merchant_api_key = $merchant_credentials['merchant_key'];
 			}
-			$this->setup_hooks();
 		}
+
+		$this->setup_hooks();
 	}
 
 	/**
@@ -132,10 +133,13 @@ class Frontend_Post {
 	protected function setup_hooks() {
 		add_action( 'wp_enqueue_scripts', [ $this, 'register_connector_assets' ] );
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_preview_scripts_and_styles' ] );
-		add_filter( 'wp_head', [ $this, 'add_connector_config' ] );
-		add_filter( 'the_content', [ $this, 'revenue_generator_post_content' ] );
 		add_action( 'wp_ajax_rg_contribution_contribute', [ $this, 'ajax_contribute_contribution' ] );
 		add_action( 'wp_ajax_nopriv_rg_contribution_contribute', [ $this, 'ajax_contribute_contribution' ] );
+
+		if ( ! empty( $is_merchant_verified ) ) {
+			add_filter( 'wp_head', [ $this, 'add_connector_config' ] );
+			add_filter( 'the_content', [ $this, 'revenue_generator_post_content' ] );
+		}
 	}
 
 	/**
@@ -214,6 +218,20 @@ class Frontend_Post {
 	 * Enqueue the connector script required for paywall.
 	 */
 	public function register_connector_assets() {
+		if ( ! is_singular( Post_Types::get_allowed_post_types() ) && Contribution_Preview::SLUG !== get_post_type() ) {
+			return;
+		}
+
+		$assets_instance = Assets::get_instance();
+
+		// Enqueue frontend styling for purchase overlay.
+		wp_enqueue_style(
+			'revenue-generator-frontend',
+			REVENUE_GENERATOR_BUILD_URL . 'css/revenue-generator-frontend.css',
+			[],
+			$assets_instance->get_asset_version( 'css/revenue-generator-frontend.css' )
+		);
+
 		if ( empty( $this->merchant_region ) ) {
 			return;
 		}
@@ -229,27 +247,16 @@ class Frontend_Post {
 		// @todo make sure to select eu based on locale, once upstream LaterPay starts supporting them.
 		$connector_url = $region_connector_urls['us'];
 
-		if ( is_singular( Post_Types::get_allowed_post_types() ) || Contribution_Preview::SLUG === get_post_type() ) {
-			$assets_instance = Assets::get_instance();
 
-			// Enqueue connector script based on region and environment.
-			// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.NoExplicitVersion -- Upstream script.
-			wp_enqueue_script(
-				'revenue-generator-classic-connector',
-				$connector_url,
-				[],
-				false,
-				true
-			);
-
-			// Enqueue frontend styling for purchase overlay.
-			wp_enqueue_style(
-				'revenue-generator-frontend',
-				REVENUE_GENERATOR_BUILD_URL . 'css/revenue-generator-frontend.css',
-				[],
-				$assets_instance->get_asset_version( 'css/revenue-generator-frontend.css' )
-			);
-		}
+		// Enqueue connector script based on region and environment.
+		// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.NoExplicitVersion -- Upstream script.
+		wp_enqueue_script(
+			'revenue-generator-classic-connector',
+			$connector_url,
+			[],
+			false,
+			true
+		);
 	}
 
 	/**
