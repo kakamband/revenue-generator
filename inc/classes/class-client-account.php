@@ -468,10 +468,6 @@ class Client_Account {
 	public function get_revenue_type( $amount_in_cents ) {
 		$amount_in_cents = (int) $amount_in_cents;
 
-		if ( empty( $amount_in_cents ) ) {
-			return false;
-		}
-
 		// Default revenue type for amounts less than 5.00.
 		$revenue_type = 'ppu';
 
