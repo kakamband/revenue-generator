@@ -34,6 +34,6 @@ defined( 'ABSPATH' ) || exit;
 	}
 	?>
 	<div class="rev-gen-contribution__donation rev-gen-contribution__donation--custom" on="tap:<?php echo esc_attr( $html_id ); ?>_donate.toggleVisibility,<?php echo esc_attr( $html_id ); ?>_custom.toggleVisibility">
-		<a href="#"><?php esc_html_e( 'Custom', 'revenue-generator' ); ?></a>
+		<button><?php esc_html_e( 'Custom', 'revenue-generator' ); ?></button>
 	</div>
 </div>

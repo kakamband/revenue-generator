@@ -4257,7 +4257,10 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				bindEvents();
 				addPaywall();
 			};
-			initializePage();
+
+			if ( $( '.rev-gen-preview-main' ).length ) {
+				initializePage();
+			}
 		}
 
 		revenueGeneratorPaywallPreview();

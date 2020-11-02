@@ -93,6 +93,7 @@ class Contribution extends Base {
 						'_rg_all_revenues'         => $contribution_data['all_revenues'],
 						'_rg_selected_amount'      => $contribution_data['selected_amount'],
 						'_rg_layout_type'          => $contribution_data['layout_type'],
+						'_rg_button_label'         => $contribution_data['button_label'],
 					],
 				]
 			);
@@ -136,8 +137,9 @@ class Contribution extends Base {
 	 */
 	public function get_default_post() {
 		$post = [
-			'ID' => 0,
-			'post_title' => '',
+			'ID'          => 0,
+			'post_title'  => '',
+			'post_author' => '',
 		];
 
 		$meta = $this->get_default_meta();
@@ -286,6 +288,7 @@ class Contribution extends Base {
 			'name'               => '',
 			'thank_you'          => '',
 			'dialog_header'      => __( 'Support the Author', 'revenue-generator' ),
+			'button_label'       => __( 'Support the Author', 'revenue-generator' ),
 			'dialog_description' => __( 'Pick your contribution below:', 'revenue-generator' ),
 			'custom_amount'      => '',
 			'all_amounts'        => array( 50, 100, 150 ),

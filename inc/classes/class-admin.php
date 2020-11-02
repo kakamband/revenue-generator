@@ -308,6 +308,7 @@ class Admin {
 			'custom_amount'      => ( isset( $_REQUEST['custom-amount'] ) ) ? floatval( $_REQUEST['custom-amount'] ) : '',
 			'code'               => ( isset( $_REQUEST['code'] ) ) ? sanitize_text_field( $_REQUEST['code'] ) : '',
 			'layout_type'        => ( isset( $_REQUEST['layout_type'] ) ) ? sanitize_text_field( $_REQUEST['layout_type'] ) : '',
+			'button_label'       => ( isset( $_REQUEST['button_label'] ) ) ? sanitize_text_field( $_REQUEST['button_label'] ) : '',
 		];
 
 		$is_edit = false;
@@ -1455,16 +1456,14 @@ class Admin {
 		// Update the option value.
 		update_option( 'lp_rg_merchant_credentials', $rg_merchant_credentials );
 
-		$is_valid = $client_account_instance->validate_merchant_account();
+		$is_valid = $client_account_instance->validate_merchant_account( true );
 
 		// Set merchant status to verified.
 		if ( true === $is_valid ) {
 			$rg_global_options                         = Config::get_global_options();
 			$rg_global_options['is_merchant_verified'] = '1';
 			update_option( 'lp_rg_global_options', $rg_global_options );
-		}
 
-		if ( $is_valid ) {
 			$response = array(
 				'success' => true,
 				'msg'     => esc_html__( 'Saved valid crendetials!', 'revenue-generator' ),

@@ -12,7 +12,6 @@ use LaterPay\Revenue_Generator\Inc\Post_Types\Subscription;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Time_Pass;
 use \LaterPay\Revenue_Generator\Inc\Traits\Singleton;
 use \LaterPay\Revenue_Generator\Inc\Post_Types\Contribution_Preview;
-use \LaterPay\Revenue_Generator\Inc\Revenue_Generator_Client;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -123,8 +122,9 @@ class Frontend_Post {
 			if ( ! empty( $merchant_credentials['merchant_key'] ) ) {
 				$this->merchant_api_key = $merchant_credentials['merchant_key'];
 			}
-			$this->setup_hooks();
 		}
+
+		$this->setup_hooks( $is_merchant_verified );
 	}
 
 	/**
@@ -133,10 +133,16 @@ class Frontend_Post {
 	protected function setup_hooks() {
 		add_action( 'wp_enqueue_scripts', [ $this, 'register_connector_assets' ] );
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_preview_scripts_and_styles' ] );
-		add_filter( 'wp_head', [ $this, 'add_connector_config' ] );
-		add_filter( 'the_content', [ $this, 'revenue_generator_post_content' ] );
 		add_action( 'wp_ajax_rg_contribution_contribute', [ $this, 'ajax_contribute_contribution' ] );
 		add_action( 'wp_ajax_nopriv_rg_contribution_contribute', [ $this, 'ajax_contribute_contribution' ] );
+
+		$global_options       = Config::get_global_options();
+		$is_merchant_verified = $global_options['is_merchant_verified'];
+
+		if ( ! empty( $is_merchant_verified ) ) {
+			add_action( 'wp_head', [ $this, 'add_connector_config' ] );
+			add_filter( 'the_content', [ $this, 'revenue_generator_post_content' ] );
+		}
 	}
 
 	/**
@@ -215,6 +221,20 @@ class Frontend_Post {
 	 * Enqueue the connector script required for paywall.
 	 */
 	public function register_connector_assets() {
+		if ( ! is_singular( Post_Types::get_allowed_post_types() ) && Contribution_Preview::SLUG !== get_post_type() ) {
+			return;
+		}
+
+		$assets_instance = Assets::get_instance();
+
+		// Enqueue frontend styling for purchase overlay.
+		wp_enqueue_style(
+			'revenue-generator-frontend',
+			REVENUE_GENERATOR_BUILD_URL . 'css/revenue-generator-frontend.css',
+			[],
+			$assets_instance->get_asset_version( 'css/revenue-generator-frontend.css' )
+		);
+
 		if ( empty( $this->merchant_region ) ) {
 			return;
 		}
@@ -230,27 +250,16 @@ class Frontend_Post {
 		// @todo make sure to select eu based on locale, once upstream LaterPay starts supporting them.
 		$connector_url = $region_connector_urls['us'];
 
-		if ( is_singular( Post_Types::get_allowed_post_types() ) || Contribution_Preview::SLUG === get_post_type() ) {
-			$assets_instance = Assets::get_instance();
 
-			// Enqueue connector script based on region and environment.
-			// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.NoExplicitVersion -- Upstream script.
-			wp_enqueue_script(
-				'revenue-generator-classic-connector',
-				$connector_url,
-				[],
-				false,
-				true
-			);
-
-			// Enqueue frontend styling for purchase overlay.
-			wp_enqueue_style(
-				'revenue-generator-frontend',
-				REVENUE_GENERATOR_BUILD_URL . 'css/revenue-generator-frontend.css',
-				[],
-				$assets_instance->get_asset_version( 'css/revenue-generator-frontend.css' )
-			);
-		}
+		// Enqueue connector script based on region and environment.
+		// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.NoExplicitVersion -- Upstream script.
+		wp_enqueue_script(
+			'revenue-generator-classic-connector',
+			$connector_url,
+			[],
+			false,
+			true
+		);
 	}
 
 	/**
@@ -746,41 +755,13 @@ class Frontend_Post {
 			);
 		}
 
-		$client_account = Client_Account::get_instance();
-		$endpoints      = $client_account->get_endpoints();
-
-		if ( is_wp_error( $endpoints ) ) {
-			wp_send_json_error(
-				__( 'Could not connect with merchant credentials.', 'revenue-generator' )
-			);
-		}
-
-		$merchant_credentials = Client_Account::get_merchant_credentials();
-
-		$client = new Revenue_Generator_Client(
-			$merchant_credentials['merchant_id'],
-			$merchant_credentials['merchant_key'],
-			$endpoints['api'],
-			$endpoints['web']
-		);
-
-		$contribution_urls = $client->get_contribution_urls(
-			[
-				'campaign_id' => $campaign_id,
-				'title' => $title,
-				'url' => $url,
-			]
-		);
-
+		$client_account   = Client_Account::get_instance();
 		$amount_in_cents  = $amount * 100;
-		$contribution_url = ( 500 <= $amount_in_cents ) ? $contribution_urls['sis'] : $contribution_urls['ppu'];
-		$currency         = $client_account->get_currency();
+		$contribution_url = $client_account->get_custom_contribution_url( $amount_in_cents, $campaign_id, $title, $url );
 
-		$contribution_url = add_query_arg(
-			'custom_pricing',
-			$currency['code'] . $amount_in_cents,
-			$contribution_url
-		);
+		if ( is_wp_error( $contribution_url ) ) {
+			wp_send_json_error();
+		}
 
 		// If it's a submit from AMP, pass headers so AMP handles redirect.
 		if ( $is_amp ) {

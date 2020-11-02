@@ -8,6 +8,7 @@
 namespace LaterPay\Revenue_Generator\Inc;
 
 use \LaterPay\Revenue_Generator\Inc\Traits\Singleton;
+use \LaterPay\Revenue_Generator\Inc\Revenue_Generator_Client;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -66,6 +67,27 @@ class Client_Account {
 	 * @var string
 	 */
 	protected $secret_algo = 'sha224';
+
+	/**
+	 * Boolean whether credentials are valid.
+	 *
+	 * @var bool
+	 */
+	protected $credentials_valid = false;
+
+	/**
+	 * Boolean whether credentials were validated.
+	 *
+	 * @var bool
+	 */
+	protected $checked_credentials = false;
+
+	/**
+	 * Client instance.
+	 *
+	 * @var Revenue_Generator_Client
+	 */
+	protected $client = null;
 
 	/**
 	 * Store connector endpoint used in the plugin.
@@ -136,6 +158,7 @@ class Client_Account {
 	 */
 	protected function __construct() {
 		$this->setup_options();
+		$this->validate_merchant_account();
 	}
 
 	/**
@@ -143,7 +166,7 @@ class Client_Account {
 	 */
 	protected function setup_options() {
 		// Fresh install.
-		if ( false === get_option( 'lp_rg_merchant_credentials' ) ) {
+		if ( empty( self::get_merchant_credentials() ) ) {
 			// Set default data for merchant credentials.
 			update_option(
 				'lp_rg_merchant_credentials',
@@ -167,9 +190,16 @@ class Client_Account {
 	/**
 	 * Validate provided merchant credentials and make test sure domain is valid.
 	 *
+	 * @param bool $force_validation Whether to force running through the whole method instead of returning previously
+	 *                               gathered result.
+	 *
 	 * @return bool
 	 */
-	public function validate_merchant_account() {
+	public function validate_merchant_account( $force_validation = false ) {
+		if ( ! $force_validation && $this->checked_credentials ) {
+			return $this->credentials_valid;
+		}
+
 		$global_options = Config::get_global_options();
 		$region         = $global_options['merchant_region'];
 
@@ -196,6 +226,11 @@ class Client_Account {
 
 		// Setup merchant credentials.
 		$merchant_credentials = self::get_merchant_credentials();
+
+		if ( empty( $merchant_credentials ) ) {
+			return false;
+		}
+
 		if ( ! empty( $merchant_credentials['merchant_id'] ) ) {
 			$this->merchant_id = $merchant_credentials['merchant_id'];
 		}
@@ -204,15 +239,19 @@ class Client_Account {
 			$this->merchant_api_key = $merchant_credentials['merchant_key'];
 		}
 
+		$this->checked_credentials = true;
+
 		// Check if account credentials are valid.
 		$are_credentials_valid = $this->test_merchant_credentials();
 
 		// If account credentials are valid, proceed to checking the merchant domain.
 		if ( true === $are_credentials_valid ) {
+			$this->credentials_valid = true;
+
 			return $this->test_merchant_domain();
-		} else {
-			return false;
 		}
+
+		return false;
 	}
 
 	/**
@@ -327,20 +366,14 @@ class Client_Account {
 	/**
 	 * Get connector, API, and Web endpoints from merchant credentials.
 	 *
-	 * @return WP_Error|array
+	 * @return array
 	 */
 	public function get_endpoints() {
-		if ( ! $this->validate_merchant_account() ) {
-			return new \WP_Error( 'Endpoints could not be retrieved because merchant account is not valid.', 'revenue-generator' );
-		}
-
-		$endpoints = [
+		return [
 			'connector' => $this->connector_root,
 			'api'       => $this->api_root,
 			'web'       => $this->web_endpoint,
 		];
-
-		return $endpoints;
 	}
 
 	/**
@@ -349,6 +382,99 @@ class Client_Account {
 	 * @return array Currency code and symbol.
 	 */
 	public function get_currency() {
-		return $this->currency_details[ $this->merchant_region ];
+		return self::$currency_details[ $this->merchant_region ];
+	}
+
+	/**
+	 * Returns instance of `Revenue_Generator_Client` class.
+	 *
+	 * @return Revenue_Generator_Client
+	 */
+	public function get_client_instance() {
+		if ( ! is_null( $this->client ) ) {
+			return $this->client;
+		}
+
+		$this->client = new Revenue_Generator_Client(
+			$this->merchant_id,
+			$this->merchant_api_key,
+			$this->api_root,
+			$this->web_endpoint
+		);
+
+		return $this->client;
+	}
+
+	/**
+	 * Get contribution URL based on parameters.
+	 *
+	 * @param int    $amount_in_cents Amount in cents.
+	 * @param string $campaign_id     Campaign ID.
+	 * @param string $title           Campaign title.
+	 * @param string $referral_url    URL to redirect to after contribution.
+	 *
+	 * @return string URL to redirect to for completing contribution.
+	 */
+	public function get_custom_contribution_url( $amount_in_cents, $campaign_id, $title, $referral_url ) {
+		if ( 0 >= (int) $amount_in_cents ) {
+			return new \WP_Error( 'invalid_amount', __( 'Amount cannot be zero.', 'revenue-generator' ) );
+		}
+
+		if ( empty( $campaign_id ) || empty( $title ) ) {
+			return new \WP_Error(
+				'invalid_campaign_details',
+				__( 'Campaign ID and Title are required params.', 'revenue-generator' )
+			);
+		}
+
+		if ( empty( $referral_url ) ) {
+			return new \WP_Error(
+				'invalid_referral_url',
+				__( 'Referral URL cannot be empty.', 'revenue-generator' )
+			);
+		}
+
+		$client       = $this->get_client_instance();
+		$currency     = $this->get_currency();
+		$revenue_type = $this->get_revenue_type( $amount_in_cents );
+
+		// Params as required by `get_single_contribution_url`.
+		$params = [
+			'campaign_id' => $campaign_id,
+			'title'       => $title,
+			'url'         => $referral_url,
+			'revenue'     => $revenue_type,
+		];
+
+		$url = $client->get_single_contribution_url( $params );
+
+		// Append query arg with custom price to the URL.
+		$url = add_query_arg(
+			'custom_pricing',
+			$currency['code'] . $amount_in_cents,
+			$url
+		);
+
+		return $url;
+	}
+
+	/**
+	 * Get revenue type by amount.
+	 *
+	 * @param int $amount_in_cents Amount in cents.
+	 *
+	 * @return string Revenue type.
+	 */
+	public function get_revenue_type( $amount_in_cents ) {
+		$amount_in_cents = (int) $amount_in_cents;
+
+		// Default revenue type for amounts less than 5.00.
+		$revenue_type = 'ppu';
+
+		if ( 500 <= $amount_in_cents ) {
+			$revenue_type = 'sis';
+		}
+
+		return $revenue_type;
 	}
 }

@@ -3,7 +3,7 @@
 /**
  * JS to handle contribution dialog.
  */
-export default class RevGenContribution {
+export class RevGenContribution {
 	constructor( el ) {
 		this.el = el;
 		this.$o = {
@@ -35,6 +35,10 @@ export default class RevGenContribution {
 	bindEvents() {
 		for ( const amount of this.$o.amounts ) {
 			const link = amount.querySelector( 'a' );
+
+			if ( ! link ) {
+				continue;
+			}
 
 			/**
 			 * On mouse over, we either show or hide the 'contribute now, pay later'
@@ -120,6 +124,9 @@ export default class RevGenContribution {
 		this.$o.customBox.form.addEventListener( 'submit', ( e ) => {
 			e.preventDefault();
 
+			this.$o.customBox.send.classList.add( 'loading' );
+			this.$o.customBox.send.setAttribute( 'disabled', true );
+
 			// Store reference to this context.
 			const self = this;
 
@@ -143,6 +150,9 @@ export default class RevGenContribution {
 			 */
 			req.onreadystatechange = function() {
 				if ( 4 === this.readyState ) {
+					self.$o.customBox.send.classList.remove( 'loading' );
+					self.$o.customBox.send.removeAttribute( 'disabled' );
+
 					if ( 200 === this.status ) {
 						const res = JSON.parse( this.response );
 
@@ -214,17 +224,3 @@ export default class RevGenContribution {
 		return amount;
 	}
 }
-
-/**
- * Loop through contribution elements found on page and initialize
- * `RevGenContribution` on DOM load.
- */
-document.addEventListener( 'DOMContentLoaded', () => {
-	const contributions = document.getElementsByClassName(
-		'rev-gen-contribution'
-	);
-
-	for ( const item of contributions ) {
-		new RevGenContribution( item );
-	}
-} );
