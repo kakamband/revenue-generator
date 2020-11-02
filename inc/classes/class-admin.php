@@ -1456,16 +1456,14 @@ class Admin {
 		// Update the option value.
 		update_option( 'lp_rg_merchant_credentials', $rg_merchant_credentials );
 
-		$is_valid = $client_account_instance->validate_merchant_account();
+		$is_valid = $client_account_instance->validate_merchant_account( true );
 
 		// Set merchant status to verified.
 		if ( true === $is_valid ) {
 			$rg_global_options                         = Config::get_global_options();
 			$rg_global_options['is_merchant_verified'] = '1';
 			update_option( 'lp_rg_global_options', $rg_global_options );
-		}
 
-		if ( $is_valid ) {
 			$response = array(
 				'success' => true,
 				'msg'     => esc_html__( 'Saved valid crendetials!', 'revenue-generator' ),
