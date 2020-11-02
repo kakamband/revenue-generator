@@ -124,20 +124,22 @@ class Frontend_Post {
 			}
 		}
 
-		$this->setup_hooks();
+		$this->setup_hooks( $is_merchant_verified );
 	}
 
 	/**
 	 * Setup options.
+	 *
+	 * @param bool $is_merchant_verified Whether merchant has credentials verified.
 	 */
-	protected function setup_hooks() {
+	protected function setup_hooks( $is_merchant_verified = false ) {
 		add_action( 'wp_enqueue_scripts', [ $this, 'register_connector_assets' ] );
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_preview_scripts_and_styles' ] );
 		add_action( 'wp_ajax_rg_contribution_contribute', [ $this, 'ajax_contribute_contribution' ] );
 		add_action( 'wp_ajax_nopriv_rg_contribution_contribute', [ $this, 'ajax_contribute_contribution' ] );
 
 		if ( ! empty( $is_merchant_verified ) ) {
-			add_filter( 'wp_head', [ $this, 'add_connector_config' ] );
+			add_action( 'wp_head', [ $this, 'add_connector_config' ] );
 			add_filter( 'the_content', [ $this, 'revenue_generator_post_content' ] );
 		}
 	}
