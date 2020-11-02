@@ -226,6 +226,11 @@ class Client_Account {
 
 		// Setup merchant credentials.
 		$merchant_credentials = self::get_merchant_credentials();
+
+		if ( empty( $merchant_credentials ) ) {
+			return false;
+		}
+
 		if ( ! empty( $merchant_credentials['merchant_id'] ) ) {
 			$this->merchant_id = $merchant_credentials['merchant_id'];
 		}
