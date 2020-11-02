@@ -73,7 +73,7 @@ class Client_Account {
 	 *
 	 * @var bool
 	 */
-	protected $are_credentials_valid = false;
+	protected $credentials_valid = false;
 
 	/**
 	 * Boolean whether credentials were validated.
