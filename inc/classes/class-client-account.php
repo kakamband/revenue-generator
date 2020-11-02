@@ -71,9 +71,16 @@ class Client_Account {
 	/**
 	 * Boolean whether credentials are valid.
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
-	protected $credentials_valid = null;
+	protected $are_credentials_valid = false;
+
+	/**
+	 * Boolean whether credentials were validated.
+	 *
+	 * @var bool
+	 */
+	protected $checked_credentials = false;
 
 	/**
 	 * Client instance.
@@ -183,10 +190,13 @@ class Client_Account {
 	/**
 	 * Validate provided merchant credentials and make test sure domain is valid.
 	 *
+	 * @param bool $force_validation Whether to force running through the whole method instead of returning previously
+	 *                               gathered result.
+	 *
 	 * @return bool
 	 */
-	public function validate_merchant_account() {
-		if ( ! is_null( $this->credentials_valid ) ) {
+	public function validate_merchant_account( $force_validation = false ) {
+		if ( ! $force_validation && $this->checked_credentials ) {
 			return $this->credentials_valid;
 		}
 
@@ -224,6 +234,8 @@ class Client_Account {
 			$this->merchant_api_key = $merchant_credentials['merchant_key'];
 		}
 
+		$this->checked_credentials = true;
+
 		// Check if account credentials are valid.
 		$are_credentials_valid = $this->test_merchant_credentials();
 
@@ -232,12 +244,9 @@ class Client_Account {
 			$this->credentials_valid = true;
 
 			return $this->test_merchant_domain();
-		} else {
-			return new \WP_Error(
-				'invalid_merchant_credentials',
-				__( 'Merchant credentials are invalid.', 'revenue-generator' )
-			);
 		}
+
+		return false;
 	}
 
 	/**
