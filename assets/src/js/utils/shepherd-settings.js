@@ -23,6 +23,7 @@ export const shepherdSettings = {
 							on: 'bottom',
 						},
 						buttons: [ 'skip', 'next' ],
+						classes: 'fade-in',
 					},
 				},
 				amount: {
@@ -49,6 +50,7 @@ export const shepherdSettings = {
 								window.dispatchEvent( event );
 							},
 						},
+						classes: 'fade-in',
 					},
 				},
 			},
@@ -66,6 +68,7 @@ export const shepherdSettings = {
 							on: 'top',
 						},
 						buttons: [ 'skip', 'next' ],
+						classes: 'fade-in',
 					},
 				},
 				submit: {
@@ -81,6 +84,7 @@ export const shepherdSettings = {
 							on: 'top',
 						},
 						buttons: [ 'skip', 'gotIt' ],
+						classes: 'fade-in',
 					},
 				},
 			},
