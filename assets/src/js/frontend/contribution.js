@@ -1,4 +1,4 @@
-/* global FormData, XMLHttpRequest */
+/* global FormData, XMLHttpRequest, ResizeObserver */
 
 /**
  * JS to handle contribution dialog.
@@ -60,6 +60,31 @@ export class RevGenContribution {
 			link.addEventListener( 'mouseout', () => {
 				this.$o.tip.classList.add( 'rev-gen-hidden' );
 			} );
+
+			const observer = new ResizeObserver( ( els ) => {
+				els.forEach( ( el ) => {
+					const breakpoints = el.target.dataset.breakpoints
+						? JSON.parse( el.target.dataset.breakpoints )
+						: '';
+
+					if ( ! breakpoints ) {
+						return;
+					}
+
+					Object.keys( breakpoints ).forEach( ( breakpoint ) => {
+						const minWidth = breakpoints[ breakpoint ];
+						const className = 'size-' + breakpoint;
+
+						if ( el.contentRect.width >= minWidth ) {
+							el.target.classList.add( className );
+						} else {
+							el.target.classList.remove( className );
+						}
+					} );
+				} );
+			} );
+
+			observer.observe( this.el );
 		}
 
 		/**

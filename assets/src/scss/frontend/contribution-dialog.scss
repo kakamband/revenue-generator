@@ -270,6 +270,43 @@ $box-white:#fff;
 				padding: 15px 25px;
 			}
 		}
+		&.size-large {
+			h2.rev-gen-contribution__title {
+				min-width: 250px;
+				margin-right: 15px;
+				text-align: left;
+			}
+			.rev-gen-contribution {
+				&__inner {
+					display: flex;
+					align-items: center;
+					padding: 15px;
+				}
+				&__description {
+					min-width: 250px;
+					text-align: left;
+				}
+				&__donate {
+					align-self: flex-end;
+					margin: 0 0 0 auto;
+				}
+				&__tip {
+					display: none;
+				}
+				&-custom {
+					margin: 0 0 0 auto;
+					label {
+						display: none;
+					}
+				}
+				&-footer {
+					margin-left: 15px;
+					a {
+						width: 75px;
+					}
+				}
+			}
+		}
 	}
 
 	&--button {

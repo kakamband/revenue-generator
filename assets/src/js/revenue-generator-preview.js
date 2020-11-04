@@ -1,4 +1,4 @@
-/* globals jQuery, Backbone */
+/* globals jQuery, Backbone, ResizeObserver */
 ( ( $ ) => {
 	$( function() {
 		const ContributionView = Backbone.View.extend( {
@@ -6,6 +6,10 @@
 
 			events: {
 				'keyup [contenteditable]': 'onEditableContentChange',
+			},
+
+			initialize() {
+				this.bindEvents();
 			},
 
 			onEditableContentChange( e ) {
@@ -39,6 +43,33 @@
 				} );
 
 				return validatedValue;
+			},
+
+			bindEvents() {
+				const observer = new ResizeObserver( ( els ) => {
+					els.forEach( ( el ) => {
+						const breakpoints = el.target.dataset.breakpoints
+							? JSON.parse( el.target.dataset.breakpoints )
+							: '';
+
+						if ( ! breakpoints ) {
+							return;
+						}
+
+						Object.keys( breakpoints ).forEach( ( breakpoint ) => {
+							const minWidth = breakpoints[ breakpoint ];
+							const className = 'size-' + breakpoint;
+
+							if ( el.contentRect.width >= minWidth ) {
+								el.target.classList.add( className );
+							} else {
+								el.target.classList.remove( className );
+							}
+						} );
+					} );
+				} );
+
+				observer.observe( this.$el[ 0 ] );
 			},
 		} );
 
