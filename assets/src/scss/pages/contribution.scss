@@ -457,6 +457,11 @@ body.revenue-generator_page_revenue-generator-contribution {
 					background-color: rgba(0, 0, 0, 0.5);
 					color: #fff;
 				}
+				&.shepherd-target {
+					position: relative;
+					z-index: 999;
+					background-color: #000;
+				}
 			}
 		}
 		&-inputs {
@@ -470,6 +475,11 @@ body.revenue-generator_page_revenue-generator-contribution {
 				border: 1px solid transparent;
 				font-size: 1.2em;
 				background-color: #a0a0a01f;
+				&.shepherd-target {
+					position: relative;
+					z-index: 999;
+					background-color: #fff;
+				}
 			}
 		}
 		&__helper-message {

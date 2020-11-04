@@ -1,5 +1,7 @@
-/* globals jQuery, Backbone, ResizeObserver */
-( ( $ ) => {
+/* globals jQuery, Backbone, Shepherd, ResizeObserver, Event, _ */
+import { shepherdSettings } from './utils/shepherd-settings';
+
+( ( $, _ ) => {
 	$( function() {
 		const ContributionView = Backbone.View.extend( {
 			el: '.rev-gen-contribution',
@@ -9,7 +11,13 @@
 			},
 
 			initialize() {
+				const self = this;
+
 				this.bindEvents();
+
+				$( window ).load( function() {
+					self.initializeTour();
+				} );
 			},
 
 			onEditableContentChange( e ) {
@@ -71,8 +79,55 @@
 
 				observer.observe( this.$el[ 0 ] );
 			},
+
+			initializeTour() {
+				this.tour = this.createTour();
+				this.addTourSteps();
+				this.tour.start();
+
+				window.addEventListener( 'tour-complete', function() {
+					const event = new Event( 'tour-start' );
+					window.parent.dispatchEvent( event );
+				} );
+			},
+
+			addTourSteps() {
+				const self = this;
+
+				const buttons = shepherdSettings.buttons;
+
+				_( buttons ).each( function( button, key ) {
+					buttons[ key ].action = self.tour[ button.action ];
+				} );
+
+				_( shepherdSettings.contribution.steps.preview ).each( function(
+					step
+				) {
+					const props = step.shepherdProps;
+					const buttonsProp = [];
+
+					props.buttons.forEach( ( item ) => {
+						buttonsProp.push( buttons[ item ] );
+					} );
+
+					props.buttons = buttonsProp;
+
+					self.tour.addStep( props );
+				} );
+			},
+
+			createTour() {
+				const tour = new Shepherd.Tour( {
+					defaultStepOptions: {
+						classes: 'rev-gen-tutorial-card',
+						scrollTo: { behavior: 'smooth', block: 'center' },
+					},
+				} );
+
+				return tour;
+			},
 		} );
 
 		new ContributionView();
 	} );
-} )( jQuery );
+} )( jQuery, _ );
