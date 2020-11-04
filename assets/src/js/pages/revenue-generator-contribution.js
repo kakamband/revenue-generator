@@ -360,7 +360,8 @@ window.handleIframeLoad = ( iframe ) => {
 
 					props.buttons = buttonsProp;
 
-					const tourStep = self.tour.addStep( props )
+					const tourStep = self.tour
+						.addStep( props )
 						.on( 'before-hide', () => {
 							const optionClasses = tourStep.options.classes;
 							tourStep.options.classes = optionClasses.replace(
