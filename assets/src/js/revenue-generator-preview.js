@@ -21,14 +21,14 @@ import { tourSettings } from './utils/tour-settings';
 
 				this.bindEvents();
 
-				//if (
-				//	0 ===
-				//	parseInt( options.globalOptions.contribution_tutorial_done )
-				//) {
-				$( window ).load( function() {
-					self.initializeTour();
-				} );
-				//}
+				if (
+					0 ===
+					parseInt( options.globalOptions.contribution_tutorial_done )
+				) {
+					$( window ).load( function() {
+						self.initializeTour();
+					} );
+				}
 			},
 
 			onEditableContentChange( e ) {
@@ -94,23 +94,21 @@ import { tourSettings } from './utils/tour-settings';
 			initializeTour() {
 				this.tour = new RevGenTour( {
 					steps: tourSettings.contribution.steps.preview,
-					trackCallback: ( trackingProps ) => {
-						window.parent.trackTourStep( trackingProps );
+					onStart: () => {
+						window.parent.updateTourProgress();
+					},
+					onProgress: ( step ) => {
+						if ( step.options.tracking ) {
+							window.parent.trackTourStep( step.options.tracking );
+						}
+
+						window.parent.updateTourProgress();
 					},
 					onComplete: () => {
-						const event = new Event( 'tour-complete' );
-						window.dispatchEvent( event );
+						const event = new Event( 'rg-tour-start' );
+						window.parent.dispatchEvent( event );
 					},
 				} );
-
-				window.addEventListener( 'tour-complete', function() {
-					const event = new Event( 'tour-start' );
-					window.parent.dispatchEvent( event );
-				} );
-			},
-
-			trackTourEvent( trackingProps ) {
-				window.parent.trackTourStep( trackingProps );
 			},
 		} );
 

@@ -85,11 +85,16 @@ $contribution_builder_data = apply_filters( 'rg_contribution_builder_data', $con
 				<a href="#" id="rg_js_toggle_preview" class="rg-contribution-builder__preview-toggle" data-expand-text="<?php esc_html_e( 'Expand preview', 'revenue-generator' ); ?>" data-collapse-text="<?php esc_html_e( 'Collapse preview', 'revenue-generator' ); ?>"><?php esc_html_e( 'Expand preview', 'revenue-generator' ); ?></a>
 
 				<iframe src="<?php echo esc_url( Contribution::get_preview_post_url() ); ?>&id=<?php echo esc_attr( $contribution_data['ID'] ); ?>" width="100%" height="100%" id="rg-contribution-builder-preview" onload="javascript:handleIframeLoad(this)" class="loading"></iframe>
+
+				<ul class="rg-contribution-builder__tour-nav rg-tour-nav" id="rg-tour-progress">
+					<?php for ( $i = 0; $i < 4; $i++ ) : ?>
+						<li class="rg-tour-nav__item"><?php echo $i + 1; ?></li>
+					<?php endfor; ?>
+				</ul>
 			</section>
 		</div>
 	</div>
 </div>
-<?php View::render_footer_backend(); ?>
 <!-- Template for ShortCode modal -->
 <script type="text/template" id="tmpl-revgen-info-shortcode">
 	<div class="rev-gen-contribution-main-info-modal rev-gen-preview-main-info-modal campaign-name-info-modal">

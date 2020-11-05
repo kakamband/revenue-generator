@@ -11,7 +11,8 @@ class RevGenTour {
 			autoStart: true,
 			context: '',
 			steps: {},
-			trackCallback: () => {},
+			onStart: () => {},
+			onProgress: () => {},
 			onComplete: () => {},
 		};
 
@@ -34,13 +35,13 @@ class RevGenTour {
 
 		if ( this.options.autoStart ) {
 			this.tour.start();
+			this.options.onStart();
 		}
 
 		Shepherd.on( 'complete', () => {
 			const currentStep = Shepherd.activeTour.getCurrentStep();
-			const trackingProps = currentStep.options.tracking;
 
-			self.options.trackCallback( trackingProps );
+			self.options.onProgress( currentStep );
 			self.options.onComplete();
 		} );
 
@@ -52,7 +53,7 @@ class RevGenTour {
 				trackingProps.action = 'Exit Tour';
 			}
 
-			self.options.trackCallback( trackingProps );
+			self.options.onProgress( currentStep );
 		} );
 	}
 
@@ -90,8 +91,8 @@ class RevGenTour {
 					tourStep.updateStepOptions( tourStep.options );
 				} )
 				.on( 'hide', () => {
-					if ( 'function' === typeof self.options.trackCallback ) {
-						self.options.trackCallback( tourStep.options.tracking );
+					if ( 'function' === typeof self.options.onProgress ) {
+						self.options.onProgress( tourStep );
 					}
 
 					tourStep.el.removeAttribute( 'hidden' );

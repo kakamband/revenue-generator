@@ -40,6 +40,31 @@ window.trackTourStep = ( trackingProps ) => {
 	);
 };
 
+window.updateTourProgress = () => {
+	const tourProgress = document.getElementById( 'rg-tour-progress' );
+	tourProgress.style.display = 'block';
+
+	const activeStep = tourProgress.querySelector( '.active' );
+	let nextStep = '';
+
+	if ( activeStep ) {
+		nextStep = activeStep.nextElementSibling;
+
+		activeStep.classList.add( 'visited' );
+		activeStep.classList.remove( 'active' );
+	} else {
+		nextStep = tourProgress.children[0];
+	}
+
+	if ( ! nextStep ) {
+		tourProgress.style.display = 'none';
+
+		return;
+	}
+
+	nextStep.classList.add( 'active' );
+}
+
 ( ( $, Backbone ) => {
 	$( function() {
 		const $o = {
@@ -78,7 +103,7 @@ window.trackTourStep = ( trackingProps ) => {
 
 				const self = this;
 
-				window.addEventListener( 'tour-start', function() {
+				window.addEventListener( 'rg-tour-start', function() {
 					self.initializeTour();
 				} );
 
@@ -89,7 +114,13 @@ window.trackTourStep = ( trackingProps ) => {
 			initializeTour() {
 				this.tour = new RevGenTour( {
 					steps: tourSettings.contribution.steps.builder,
-					trackCallback: window.trackTourStep,
+					onProgress: ( step ) => {
+						if ( step.options.tracking ) {
+							window.trackTourStep( step.options.tracking );
+						}
+
+						window.updateTourProgress();
+					}
 				} );
 			},
 

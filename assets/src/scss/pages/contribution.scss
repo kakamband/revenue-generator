@@ -540,6 +540,13 @@ body.revenue-generator_page_revenue-generator-contribution {
 				}
 			}
 		}
+
+		&__tour-nav {
+			position: absolute;
+			top: 20px;
+			right: 40px;
+			z-index: 9999;
+		}
 	}
 
 	&-layout-select {
@@ -600,6 +607,41 @@ body.revenue-generator_page_revenue-generator-contribution {
 		}
 		input:checked + .rg-contribution-layout-type__preview {
 			opacity: 1;
+		}
+	}
+}
+
+.rg-tour-nav {
+	display: none;
+	margin: 0;
+	padding: 0;
+	&__item {
+		cursor: default;
+		pointer-events: none;
+		display: inline-block;
+		width: 14px;
+		height: 14px;
+		margin-right: 5px;
+		border: 2px solid rgba(255, 255, 255, 0.6);
+		border-radius: 50%;
+		line-height: 1.5;
+		font-size: 9px;
+		text-decoration: none;
+		text-align: center;
+		color: rgba(255, 255, 255, 0.6);
+		background-color: transparent;
+		&:last-child {
+			margin-right: 0;
+		}
+		&.active {
+			font-weight: 500;
+			border-color: #fff;
+			color: #333;
+			background-color: #fff;
+		}
+		&.visited {
+			opacity: 0.8;
+			background-color: rgba(0, 0, 0, .6);
 		}
 	}
 }
