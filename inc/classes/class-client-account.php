@@ -158,7 +158,6 @@ class Client_Account {
 	 */
 	protected function __construct() {
 		$this->setup_options();
-		$this->validate_merchant_account();
 	}
 
 	/**
@@ -290,6 +289,8 @@ class Client_Account {
 	 * @return string
 	 */
 	private function build_test_fetch_url() {
+		$this->validate_merchant_account();
+
 		// Demo params to verify merchant domain.
 		$fetch_url_params = build_query(
 			[
@@ -332,6 +333,8 @@ class Client_Account {
 	 * @return string
 	 */
 	private function build_validate_signature_url() {
+		$this->validate_merchant_account();
+
 		$validation_url_params = build_query(
 			[
 				'cp'   => $this->merchant_id,
@@ -369,6 +372,8 @@ class Client_Account {
 	 * @return array
 	 */
 	public function get_endpoints() {
+		$this->validate_merchant_account();
+
 		return [
 			'connector' => $this->connector_root,
 			'api'       => $this->api_root,
@@ -394,6 +399,8 @@ class Client_Account {
 		if ( ! is_null( $this->client ) ) {
 			return $this->client;
 		}
+
+		$this->validate_merchant_account();
 
 		$this->client = new Revenue_Generator_Client(
 			$this->merchant_id,
