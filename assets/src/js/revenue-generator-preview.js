@@ -21,14 +21,14 @@ import { tourSettings } from './utils/tour-settings';
 
 				this.bindEvents();
 
-				if (
-					0 ===
-					parseInt( options.globalOptions.contribution_tutorial_done )
-				) {
+				//if (
+				//	0 ===
+				//	parseInt( options.globalOptions.contribution_tutorial_done )
+				//) {
 					$( window ).load( function() {
 						self.initializeTour();
 					} );
-				}
+				//}
 			},
 
 			onEditableContentChange( e ) {

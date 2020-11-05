@@ -69,17 +69,16 @@ class RevGenTour {
 
 		Object.keys( steps ).forEach( function( key ) {
 			const step = steps[ key ];
-			const props = step.shepherdProps;
 			const buttonsProp = [];
 
-			props.buttons.forEach( ( item ) => {
+			step.buttons.forEach( ( item ) => {
 				buttonsProp.push( buttons[ item ] );
 			} );
 
-			props.buttons = buttonsProp;
+			step.buttons = buttonsProp;
 
 			const tourStep = self.tour
-				.addStep( props )
+				.addStep( step )
 				.on( 'before-hide', () => {
 					const optionClasses = tourStep.options.classes;
 
