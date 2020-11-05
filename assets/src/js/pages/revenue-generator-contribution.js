@@ -11,7 +11,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 import { isURL, addQueryArgs } from '@wordpress/url';
 import { RevGenTour } from '../utils/tour';
 import { tourSettings } from '../utils/tour-settings';
-import { copyToClipboard } from '../utils/helpers';
+import { copyToClipboard } from '../helpers/index';
 
 const options = revenueGeneratorGlobalOptions;
 

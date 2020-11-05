@@ -8,7 +8,7 @@
  */
 import '../utils';
 import { RevGenModal } from '../utils/rev-gen-modal';
-import { copyToClipboard } from '../utils/helpers';
+import { copyToClipboard } from '../helpers/index';
 
 ( function( $ ) {
 	$( function() {
