@@ -8,6 +8,7 @@
  */
 import '../utils';
 import { RevGenModal } from '../utils/rev-gen-modal';
+import { copyToClipboard} from '../utils/helpers';
 
 ( function( $ ) {
 	$( function() {
@@ -35,6 +36,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				contributionDelete: $(
 					'.rev-gen-dashboard__contribution-delete'
 				),
+				contributionCopyShortcode: $( '.rev-gen-dashboard__link--copy-shortcode' ),
 
 				// Dashboard footer area.
 				restartTour: $( '#rg_js_RestartTutorial' ),
@@ -322,6 +324,11 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							// noop
 						},
 					} );
+				} );
+
+				$o.contributionCopyShortcode.on( 'click', function( e ) {
+					const code = $( e.target ).data( 'shortcode' );
+					copyToClipboard( code );
 				} );
 
 				/**

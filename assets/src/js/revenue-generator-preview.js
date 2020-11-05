@@ -23,7 +23,9 @@ import { tourSettings } from './utils/tour-settings';
 
 				if (
 					0 ===
-					parseInt( options.globalOptions.is_contribution_tutorial_completed )
+					parseInt(
+						options.globalOptions.is_contribution_tutorial_completed
+					)
 				) {
 					$( window ).load( function() {
 						self.initializeTour();

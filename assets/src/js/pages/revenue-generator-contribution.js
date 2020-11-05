@@ -11,6 +11,7 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 import { isURL, addQueryArgs } from '@wordpress/url';
 import { RevGenTour } from '../utils/tour';
 import { tourSettings } from '../utils/tour-settings';
+import { copyToClipboard } from '../utils/helpers';
 
 const options = revenueGeneratorGlobalOptions;
 
@@ -136,7 +137,7 @@ window.updateTourProgress = () => {
 							data: formData,
 							dataType: 'json',
 						} );
-					}
+					},
 				} );
 			},
 
@@ -416,20 +417,6 @@ window.updateTourProgress = () => {
 			}
 
 			return merchantId;
-		};
-
-		/**
-		 * Copy provided text to clipboard.
-		 *
-		 * @param {string} codeText Code to be copied.
-		 * @return {void}
-		 */
-		const copyToClipboard = function( codeText ) {
-			const $temp = $( '<input>' );
-			$( 'body' ).append( $temp );
-			$temp.val( codeText ).select();
-			document.execCommand( 'copy' );
-			$temp.remove();
 		};
 
 		const showAccountActivationModal = function() {
