@@ -76,15 +76,14 @@ export const tourSettings = {
 				},
 				submit: {
 					id: 'rg-tutorial-submit',
-					text:
-						sprintf(
-							__(
-								'When you’re ready, click here to copy your customized %1$sshortcode%2$s.',
-								'revenue-generator'
-							),
-							'<a target="_blank" href="https://wordpress.com/support/shortcodes/">',
-							'</a>'
+					text: sprintf(
+						__(
+							'When you’re ready, click here to copy your customized %1$sshortcode%2$s.',
+							'revenue-generator'
 						),
+						'<a target="_blank" href="https://wordpress.com/support/shortcodes/">',
+						'</a>'
+					),
 					attachTo: {
 						element: '#rg-contribution-submit',
 						on: 'top',

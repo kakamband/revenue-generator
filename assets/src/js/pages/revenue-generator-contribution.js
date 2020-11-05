@@ -53,7 +53,7 @@ window.updateTourProgress = () => {
 		activeStep.classList.add( 'visited' );
 		activeStep.classList.remove( 'active' );
 	} else {
-		nextStep = tourProgress.children[0];
+		nextStep = tourProgress.children[ 0 ];
 	}
 
 	if ( ! nextStep ) {
@@ -63,7 +63,7 @@ window.updateTourProgress = () => {
 	}
 
 	nextStep.classList.add( 'active' );
-}
+};
 
 ( ( $, Backbone ) => {
 	$( function() {
@@ -120,6 +120,22 @@ window.updateTourProgress = () => {
 						}
 
 						window.updateTourProgress();
+					},
+					onComplete: () => {
+						// Create form data.
+						const formData = {
+							action: 'rg_complete_tour',
+							config_key: 'is_contribution_tutorial_completed',
+							config_value: 1,
+							security: options.rg_paywall_nonce,
+						};
+
+						$.ajax( {
+							url: options.ajaxUrl,
+							method: 'POST',
+							data: formData,
+							dataType: 'json',
+						} );
 					}
 				} );
 			},
@@ -415,31 +431,6 @@ window.updateTourProgress = () => {
 			document.execCommand( 'copy' );
 			$temp.remove();
 		};
-
-		/**
-		 * Complete the tour.
-		 */
-		//const completeTheTour = function() {
-		//	// Create form data.
-		//	const formData = {
-		//		action: 'rg_complete_tour',
-		//		config_key: 'is_contribution_tutorial_completed',
-		//		config_value: 1,
-		//		security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
-		//	};
-
-		//	// Delete the option.
-		//	$.ajax( {
-		//		url: revenueGeneratorGlobalOptions.ajaxUrl,
-		//		method: 'POST',
-		//		data: formData,
-		//		dataType: 'json',
-		//	} ).done( function( r ) {
-		//		if ( r.success ) {
-		//			window.location.reload();
-		//		}
-		//	} );
-		//};
 
 		const showAccountActivationModal = function() {
 			new RevGenModal( {

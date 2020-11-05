@@ -99,7 +99,9 @@ import { tourSettings } from './utils/tour-settings';
 					},
 					onProgress: ( step ) => {
 						if ( step.options.tracking ) {
-							window.parent.trackTourStep( step.options.tracking );
+							window.parent.trackTourStep(
+								step.options.tracking
+							);
 						}
 
 						window.parent.updateTourProgress();
