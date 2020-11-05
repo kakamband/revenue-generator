@@ -1,4 +1,4 @@
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 export const tourSettings = {
 	contribution: {
@@ -12,10 +12,7 @@ export const tourSettings = {
 							'revenue-generator'
 						) +
 						'<br><br>' +
-						__(
-							'Click on text to edit it.',
-							'revenue-generator'
-						),
+						__( 'Click on text to edit it.', 'revenue-generator' ),
 					attachTo: {
 						element: '.rev-gen-contribution__inner',
 						on: 'bottom',
@@ -36,9 +33,14 @@ export const tourSettings = {
 							'revenue-generator'
 						) +
 						'<br><br>' +
-						__(
-							'Amounts less than $5 will default to pay later.',
-							'revenue-generator'
+						sprintf(
+							/* translators: %1$s laterpay.net link tag, %2$s laterpay.net link closing tag */
+							__(
+								'Amounts less than $5 will default to %1$spay later%2$s.',
+								'revenue-generator'
+							),
+							'<a target="_blank" href="https://www.laterpay.net/academy/getting-started-with-laterpay-the-difference-between-pay-now-pay-later">',
+							'</a>'
 						),
 					attachTo: {
 						element: '.rev-gen-contribution__donation',
@@ -74,10 +76,15 @@ export const tourSettings = {
 				},
 				submit: {
 					id: 'rg-tutorial-submit',
-					text: __(
-						'When you’re ready, click here to copy your customized shortcode.',
-						'revenue-generator'
-					),
+					text:
+						sprintf(
+							__(
+								'When you’re ready, click here to copy your customized %1$sshortcode%2$s.',
+								'revenue-generator'
+							),
+							'<a target="_blank" href="https://wordpress.com/support/shortcodes/">',
+							'</a>'
+						),
 					attachTo: {
 						element: '#rg-contribution-submit',
 						on: 'top',

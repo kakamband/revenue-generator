@@ -25,9 +25,9 @@ import { tourSettings } from './utils/tour-settings';
 				//	0 ===
 				//	parseInt( options.globalOptions.contribution_tutorial_done )
 				//) {
-					$( window ).load( function() {
-						self.initializeTour();
-					} );
+				$( window ).load( function() {
+					self.initializeTour();
+				} );
 				//}
 			},
 
