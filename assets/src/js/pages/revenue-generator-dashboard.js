@@ -8,7 +8,7 @@
  */
 import '../utils';
 import { RevGenModal } from '../utils/rev-gen-modal';
-import { copyToClipboard} from '../utils/helpers';
+import { copyToClipboard } from '../utils/helpers';
 
 ( function( $ ) {
 	$( function() {
@@ -36,7 +36,9 @@ import { copyToClipboard} from '../utils/helpers';
 				contributionDelete: $(
 					'.rev-gen-dashboard__contribution-delete'
 				),
-				contributionCopyShortcode: $( '.rev-gen-dashboard__link--copy-shortcode' ),
+				contributionCopyShortcode: $(
+					'.rev-gen-dashboard__link--copy-shortcode'
+				),
 
 				// Dashboard footer area.
 				restartTour: $( '#rg_js_RestartTutorial' ),

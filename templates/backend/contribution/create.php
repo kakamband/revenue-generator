@@ -87,8 +87,8 @@ $contribution_builder_data = apply_filters( 'rg_contribution_builder_data', $con
 				<iframe src="<?php echo esc_url( Contribution::get_preview_post_url() ); ?>&id=<?php echo esc_attr( $contribution_data['ID'] ); ?>" width="100%" height="100%" id="rg-contribution-builder-preview" onload="javascript:handleIframeLoad(this)" class="loading"></iframe>
 
 				<ul class="rg-contribution-builder__tour-nav rg-tour-nav" id="rg-tour-progress">
-					<?php for ( $i = 0; $i < 4; $i++ ) : ?>
-						<li class="rg-tour-nav__item"><?php echo $i + 1; ?></li>
+					<?php for ( $i = 1; $i <= 4; $i++ ) : ?>
+						<li class="rg-tour-nav__item"><?php echo esc_attr( $i ); ?></li>
 					<?php endfor; ?>
 				</ul>
 			</section>

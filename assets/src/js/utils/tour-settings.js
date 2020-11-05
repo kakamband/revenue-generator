@@ -77,6 +77,7 @@ export const tourSettings = {
 				submit: {
 					id: 'rg-tutorial-submit',
 					text: sprintf(
+						/* translators: %1$s wordpress.com documentation link opening tag, %2$s link closing tag */
 						__(
 							'When you’re ready, click here to copy your customized %1$sshortcode%2$s.',
 							'revenue-generator'
