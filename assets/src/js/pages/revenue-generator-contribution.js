@@ -31,7 +31,15 @@ window.handleIframeLoad = ( iframe ) => {
 	iframe.classList.remove( 'loading' );
 };
 
-window.trackTourStep = ( trackingProps ) => {
+window.trackTourStep = ( step ) => {
+	const trackingProps = step.options.tracking;
+
+	if ( step.options.cancelled ) {
+		if ( 'Continue' === trackingProps.action ) {
+			trackingProps.action = 'Exit Tour';
+		}
+	}
+
 	rgGlobal.sendLPGAEvent(
 		trackingProps.event,
 		trackingProps.category,
@@ -115,9 +123,9 @@ window.updateTourProgress = () => {
 			initializeTour() {
 				this.tour = new RevGenTour( {
 					steps: tourSettings.contribution.steps.builder,
-					onProgress: ( step ) => {
+					onStepHide: ( step ) => {
 						if ( step.options.tracking ) {
-							window.trackTourStep( step.options.tracking );
+							window.trackTourStep( step );
 						}
 
 						window.updateTourProgress();

@@ -2,7 +2,13 @@
 import { tourSettings } from './tour-settings';
 
 class RevGenTour {
+	/**
+	 * Constructor
+	 *
+	 * @param {Object} options - Tour options.
+	 */
 	constructor( options ) {
+		/** @type {Object} */
 		const defaultOptions = {
 			stepOptions: {
 				classes: 'rev-gen-tutorial-card',
@@ -12,56 +18,73 @@ class RevGenTour {
 			context: '',
 			steps: {},
 			onStart: () => {},
-			onProgress: () => {},
+			onStepHide: () => {},
 			onComplete: () => {},
 		};
 
+		/** @type {Object} */
 		this.options = {
 			...defaultOptions,
 			...options,
 		};
 
+		// Call init method to set up tour.
 		this.init();
 	}
 
+	/**
+	 * Bindings.
+	 */
 	init() {
 		const self = this;
 
+		// Create new Shepherd tour.
 		this.tour = new Shepherd.Tour( {
 			defaultStepOptions: self.options.stepOptions,
 		} );
 
+		// Add tour steps.
 		this.addTourSteps();
 
+		// If autostart, call Shepherd's `.start()` method and `onStart()` callback.
 		if ( this.options.autoStart ) {
 			this.tour.start();
 			this.options.onStart();
 		}
 
+		/**
+		 * When tour is complete, call `onStepHide()` and `onComplete()` functions.
+		 */
 		Shepherd.on( 'complete', () => {
 			const currentStep = Shepherd.activeTour.getCurrentStep();
 
-			self.options.onProgress( currentStep );
+			self.options.onStepHide( currentStep );
 			self.options.onComplete();
 		} );
 
+		/**
+		 * When tour is cancelled, add a cancelled flag to the step and call 'onStepHide()`.
+		 */
 		Shepherd.on( 'cancel', () => {
 			const currentStep = Shepherd.activeTour.getCurrentStep();
-			const trackingProps = currentStep.options.tracking;
+			currentStep.options.cancelled = true;
 
-			if ( 'Continue' === trackingProps.action ) {
-				trackingProps.action = 'Exit Tour';
-			}
-
-			self.options.onProgress( currentStep );
+			self.options.onStepHide( currentStep );
 		} );
 	}
 
+	/**
+	 * Add tour steps from `tourSettings`.
+	 */
 	addTourSteps() {
 		const self = this;
 		const steps = this.options.steps;
 		const buttons = tourSettings.buttons;
 
+		/**
+		 * Map actions represented by a string in `tourSettings` JSON to the actual
+		 * callable tour methods.
+		 */
 		Object.keys( buttons ).forEach( function( key ) {
 			const button = buttons[ key ];
 
@@ -72,10 +95,13 @@ class RevGenTour {
 			const step = steps[ key ];
 			const buttonsProp = [];
 
+			/**
+			 * Add buttons represented by a string in `tourSettings` JSON to the step
+			 * in the format understandable by Shepherd.
+			 */
 			step.buttons.forEach( ( item ) => {
 				buttonsProp.push( buttons[ item ] );
 			} );
-
 			step.buttons = buttonsProp;
 
 			const tourStep = self.tour
@@ -92,7 +118,7 @@ class RevGenTour {
 				} )
 				.on( 'hide', () => {
 					if ( 'function' === typeof self.options.onProgress ) {
-						self.options.onProgress( tourStep );
+						self.options.onStepHide( tourStep );
 					}
 
 					tourStep.el.removeAttribute( 'hidden' );

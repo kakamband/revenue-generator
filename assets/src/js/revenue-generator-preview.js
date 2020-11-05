@@ -4,10 +4,7 @@ import { tourSettings } from './utils/tour-settings';
 
 ( ( $ ) => {
 	$( function() {
-		window.revenueGeneratorGlobalOptions =
-			window.parent.revenueGeneratorGlobalOptions;
-
-		const options = window.revenueGeneratorGlobalOptions;
+		const options = window.parent.revenueGeneratorGlobalOptions;
 
 		const ContributionView = Backbone.View.extend( {
 			el: '.rev-gen-contribution',
@@ -99,11 +96,9 @@ import { tourSettings } from './utils/tour-settings';
 					onStart: () => {
 						window.parent.updateTourProgress();
 					},
-					onProgress: ( step ) => {
+					onStepHide: ( step ) => {
 						if ( step.options.tracking ) {
-							window.parent.trackTourStep(
-								step.options.tracking
-							);
+							window.parent.trackTourStep( step );
 						}
 
 						window.parent.updateTourProgress();
