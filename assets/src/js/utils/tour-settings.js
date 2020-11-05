@@ -1,7 +1,6 @@
-/* global Event */
 import { __ } from '@wordpress/i18n';
 
-export const shepherdSettings = {
+export const tourSettings = {
 	contribution: {
 		steps: {
 			preview: {
@@ -24,6 +23,11 @@ export const shepherdSettings = {
 						},
 						buttons: [ 'skip', 'next' ],
 						classes: 'fade-in',
+						tracking: {
+							category: 'LP RevGen Contributions Tutorial',
+							event: '1 - Text Edit',
+							action: 'Continue',
+						},
 					},
 				},
 				amount: {
@@ -44,13 +48,12 @@ export const shepherdSettings = {
 							on: 'top',
 						},
 						buttons: [ 'skip', 'next' ],
-						when: {
-							destroy() {
-								const event = new Event( 'tour-complete' );
-								window.dispatchEvent( event );
-							},
-						},
 						classes: 'fade-in',
+						tracking: {
+							category: 'LP RevGen Contributions Tutorial',
+							event: '2 - Amount Edit',
+							action: 'Continue',
+						},
 					},
 				},
 			},
@@ -69,6 +72,11 @@ export const shepherdSettings = {
 						},
 						buttons: [ 'skip', 'next' ],
 						classes: 'fade-in',
+						tracking: {
+							category: 'LP RevGen Contributions Tutorial',
+							event: '3 - Campaign Name',
+							action: 'Continue',
+						},
 					},
 				},
 				submit: {
@@ -85,6 +93,11 @@ export const shepherdSettings = {
 						},
 						buttons: [ 'skip', 'gotIt' ],
 						classes: 'fade-in',
+						tracking: {
+							category: 'LP RevGen Contributions Tutorial',
+							event: '4 - Generate Code',
+							action: 'Complete',
+						},
 					},
 				},
 			},
@@ -93,7 +106,7 @@ export const shepherdSettings = {
 	buttons: {
 		skip: {
 			text: __( 'Skip Tour', 'revenue-generator' ),
-			action: 'complete',
+			action: 'cancel',
 			classes: 'shepherd-content-skip-tour',
 		},
 		next: {

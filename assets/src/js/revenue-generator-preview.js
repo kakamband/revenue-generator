@@ -1,8 +1,14 @@
-/* globals jQuery, Backbone, Shepherd, ResizeObserver, Event, _ */
-import { shepherdSettings } from './utils/shepherd-settings';
+/* globals jQuery, Backbone, ResizeObserver, Event */
+import { RevGenTour } from './utils/tour';
+import { tourSettings } from './utils/tour-settings';
 
-( ( $, _ ) => {
+( ( $ ) => {
 	$( function() {
+		window.revenueGeneratorGlobalOptions =
+			window.parent.revenueGeneratorGlobalOptions;
+
+		const options = window.revenueGeneratorGlobalOptions;
+
 		const ContributionView = Backbone.View.extend( {
 			el: '.rev-gen-contribution',
 
@@ -15,9 +21,14 @@ import { shepherdSettings } from './utils/shepherd-settings';
 
 				this.bindEvents();
 
-				$( window ).load( function() {
-					self.initializeTour();
-				} );
+				if (
+					0 ===
+					parseInt( options.globalOptions.contribution_tutorial_done )
+				) {
+					$( window ).load( function() {
+						self.initializeTour();
+					} );
+				}
 			},
 
 			onEditableContentChange( e ) {
@@ -81,9 +92,16 @@ import { shepherdSettings } from './utils/shepherd-settings';
 			},
 
 			initializeTour() {
-				this.tour = this.createTour();
-				this.addTourSteps();
-				this.tour.start();
+				this.tour = new RevGenTour( {
+					steps: tourSettings.contribution.steps.preview,
+					trackCallback: ( trackingProps ) => {
+						window.parent.trackTourStep( trackingProps );
+					},
+					onComplete: () => {
+						const event = new Event( 'tour-complete' );
+						window.dispatchEvent( event );
+					},
+				} );
 
 				window.addEventListener( 'tour-complete', function() {
 					const event = new Event( 'tour-start' );
@@ -91,43 +109,11 @@ import { shepherdSettings } from './utils/shepherd-settings';
 				} );
 			},
 
-			addTourSteps() {
-				const self = this;
-
-				const buttons = shepherdSettings.buttons;
-
-				_( buttons ).each( function( button, key ) {
-					buttons[ key ].action = self.tour[ button.action ];
-				} );
-
-				_( shepherdSettings.contribution.steps.preview ).each( function(
-					step
-				) {
-					const props = step.shepherdProps;
-					const buttonsProp = [];
-
-					props.buttons.forEach( ( item ) => {
-						buttonsProp.push( buttons[ item ] );
-					} );
-
-					props.buttons = buttonsProp;
-
-					self.tour.addStep( props );
-				} );
-			},
-
-			createTour() {
-				const tour = new Shepherd.Tour( {
-					defaultStepOptions: {
-						classes: 'rev-gen-tutorial-card',
-						scrollTo: { behavior: 'smooth', block: 'center' },
-					},
-				} );
-
-				return tour;
+			trackTourEvent( trackingProps ) {
+				window.parent.trackTourStep( trackingProps );
 			},
 		} );
 
 		new ContributionView();
 	} );
-} )( jQuery, _ );
+} )( jQuery );
