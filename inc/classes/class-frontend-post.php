@@ -725,7 +725,6 @@ class Frontend_Post {
 			'revenue-generator-preview-script',
 			REVENUE_GENERATOR_BUILD_URL . '/revenue-generator-preview.js',
 			array(
-				'jquery',
 				'backbone',
 				'revenue-generator-shepherd',
 			),

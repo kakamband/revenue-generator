@@ -85,13 +85,13 @@ class RevGenTour {
 		 * Map actions represented by a string in `tourSettings` JSON to the actual
 		 * callable tour methods.
 		 */
-		Object.keys( buttons ).forEach( function( key ) {
+		Object.keys( buttons ).forEach( ( key ) => {
 			const button = buttons[ key ];
 
 			buttons[ key ].action = self.tour[ button.action ];
 		} );
 
-		Object.keys( steps ).forEach( function( key ) {
+		Object.keys( steps ).forEach( ( key ) => {
 			const step = steps[ key ];
 			const buttonsProp = [];
 
@@ -131,4 +131,4 @@ class RevGenTour {
 	}
 }
 
-export { RevGenTour };
+export { RevGenTour, tourSettings };
