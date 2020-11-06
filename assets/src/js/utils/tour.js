@@ -15,7 +15,6 @@ class RevGenTour {
 				scrollTo: { behavior: 'smooth', block: 'center' },
 			},
 			autoStart: true,
-			context: '',
 			steps: {},
 			onStart: () => {},
 			onStepHide: () => {},
