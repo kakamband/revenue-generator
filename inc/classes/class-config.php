@@ -58,8 +58,8 @@ class Config {
 					'average_post_publish_count'         => '',
 					'merchant_currency'                  => 'USD',
 					'merchant_region'                    => 'US',
-					'is_paywall_tutorial_completed'      => 0,
-					'is_contribution_tutorial_completed' => 0,
+					'paywall_tutorial_done'              => 0,
+					'contribution_tutorial_done'         => 0,
 					'is_merchant_verified'               => 0,
 				]
 			);

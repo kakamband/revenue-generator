@@ -10,6 +10,7 @@ namespace LaterPay\Revenue_Generator\Inc\Post_Types;
 use LaterPay\Revenue_Generator\Inc\Config;
 use LaterPay\Revenue_Generator\Inc\Post_Types;
 use LaterPay\Revenue_Generator\Inc\View;
+use LaterPay\Revenue_Generator\Inc\Post_Types\Contribution_Preview;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -38,6 +39,17 @@ class Contribution extends Base {
 	 * @var string
 	 */
 	const ADMIN_EDIT_SLUG = 'revenue-generator-contribution';
+
+	/**
+	 * Extends parent `setup_hooks()` method to add its own hooks.
+	 *
+	 * @return void
+	 */
+	protected function setup_hooks() {
+		parent::setup_hooks();
+
+		add_filter( 'rg_contribution_builder_data', [ $this, 'filter_builder_contribution_data' ] );
+	}
 
 	/**
 	 * To get list of labels for paywall post type.
@@ -80,6 +92,8 @@ class Contribution extends Base {
 						'_rg_dialog_description'   => $contribution_data['dialog_description'],
 						'_rg_all_revenues'         => $contribution_data['all_revenues'],
 						'_rg_selected_amount'      => $contribution_data['selected_amount'],
+						'_rg_layout_type'          => $contribution_data['layout_type'],
+						'_rg_button_label'         => $contribution_data['button_label'],
 					],
 				]
 			);
@@ -123,8 +137,9 @@ class Contribution extends Base {
 	 */
 	public function get_default_post() {
 		$post = [
-			'ID' => 0,
-			'post_title' => '',
+			'ID'          => 0,
+			'post_title'  => '',
+			'post_author' => '',
 		];
 
 		$meta = $this->get_default_meta();
@@ -155,6 +170,7 @@ class Contribution extends Base {
 			}
 
 			$contribution_post = $contribution_post->to_array();
+			$contribution_post = array_intersect_key( $contribution_post, $this->get_default_post() );
 			$contribution_meta = get_post_meta( $id, '', true );
 
 			$meta = $this->unprefix_meta( $contribution_meta );
@@ -272,12 +288,14 @@ class Contribution extends Base {
 			'name'               => '',
 			'thank_you'          => '',
 			'dialog_header'      => __( 'Support the Author', 'revenue-generator' ),
+			'button_label'       => __( 'Support the Author', 'revenue-generator' ),
 			'dialog_description' => __( 'Pick your contribution below:', 'revenue-generator' ),
 			'custom_amount'      => '',
 			'all_amounts'        => array( 50, 100, 150 ),
 			'all_revenues'       => '',
 			'selected_amount'    => '',
 			'code'               => '',
+			'layout_type'        => 'box',
 		];
 	}
 
@@ -440,6 +458,67 @@ class Contribution extends Base {
 		}
 
 		return $sql;
+	}
+
+	/**
+	 * Get preview URL of Contribution preview.
+	 *
+	 * @return string $url Post preview URL.
+	 */
+	public static function get_preview_post_url() {
+		$url     = '';
+		$post_id = 0;
+
+		$posts = get_posts(
+			[
+				'post_type'      => Contribution_Preview::SLUG,
+				'posts_per_page' => 1,
+				'post_status'    => 'draft',
+				'fields'         => 'ids',
+			]
+		);
+
+		if ( ! empty( $posts ) ) {
+			$post_id = $posts[0];
+		} else {
+			$post_id = wp_insert_post(
+				[
+					'post_type' => Contribution_Preview::SLUG,
+					'post_status' => 'draft',
+				]
+			);
+		}
+
+		$url = add_query_arg(
+			[
+				'p'         => $post_id,
+				'post_type' => Contribution_Preview::SLUG,
+				'preview'   => 'true',
+			],
+			site_url()
+		);
+
+		return $url;
+	}
+
+	/**
+	 * Filters contribution data before passing it to builder.
+	 *
+	 * @hooked filter `rg_contribution_builder_data`
+	 *
+	 * @param array $data Contribution data.
+	 *
+	 * @return array
+	 */
+	public function filter_builder_contribution_data( $data ) {
+		// Convert amounts from cents back to floats for use in the builder.
+		foreach ( $data['all_amounts'] as $key => $amount ) {
+			$data['all_amounts'][ $key ] = (int) $amount / 100;
+		}
+
+		$data['amounts'] = $data['all_amounts'];
+
+		return $data;
 	}
 
 }

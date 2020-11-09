@@ -11,6 +11,7 @@ use LaterPay\Revenue_Generator\Inc\Post_Types\Paywall;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Subscription;
 use LaterPay\Revenue_Generator\Inc\Post_Types\Time_Pass;
 use \LaterPay\Revenue_Generator\Inc\Traits\Singleton;
+use \LaterPay\Revenue_Generator\Inc\Post_Types\Contribution_Preview;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -121,8 +122,9 @@ class Frontend_Post {
 			if ( ! empty( $merchant_credentials['merchant_key'] ) ) {
 				$this->merchant_api_key = $merchant_credentials['merchant_key'];
 			}
-			$this->setup_hooks();
 		}
+
+		$this->setup_hooks( $is_merchant_verified );
 	}
 
 	/**
@@ -130,8 +132,17 @@ class Frontend_Post {
 	 */
 	protected function setup_hooks() {
 		add_action( 'wp_enqueue_scripts', [ $this, 'register_connector_assets' ] );
-		add_action( 'wp_head', [ $this, 'add_connector_config' ] );
-		add_filter( 'the_content', [ $this, 'revenue_generator_post_content' ] );
+		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_preview_scripts_and_styles' ] );
+		add_action( 'wp_ajax_rg_contribution_contribute', [ $this, 'ajax_contribute_contribution' ] );
+		add_action( 'wp_ajax_nopriv_rg_contribution_contribute', [ $this, 'ajax_contribute_contribution' ] );
+
+		$global_options       = Config::get_global_options();
+		$is_merchant_verified = $global_options['is_merchant_verified'];
+
+		if ( ! empty( $is_merchant_verified ) ) {
+			add_action( 'wp_head', [ $this, 'add_connector_config' ] );
+			add_filter( 'the_content', [ $this, 'revenue_generator_post_content' ] );
+		}
 	}
 
 	/**
@@ -206,6 +217,20 @@ class Frontend_Post {
 	 * Enqueue the connector script required for paywall.
 	 */
 	public function register_connector_assets() {
+		if ( ! is_singular( Post_Types::get_allowed_post_types() ) && Contribution_Preview::SLUG !== get_post_type() ) {
+			return;
+		}
+
+		$assets_instance = Assets::get_instance();
+
+		// Enqueue frontend styling for purchase overlay.
+		wp_enqueue_style(
+			'revenue-generator-frontend',
+			REVENUE_GENERATOR_BUILD_URL . 'css/revenue-generator-frontend.css',
+			[],
+			$assets_instance->get_asset_version( 'css/revenue-generator-frontend.css' )
+		);
+
 		if ( empty( $this->merchant_region ) ) {
 			return;
 		}
@@ -221,27 +246,16 @@ class Frontend_Post {
 		// @todo make sure to select eu based on locale, once upstream LaterPay starts supporting them.
 		$connector_url = $region_connector_urls['us'];
 
-		if ( is_singular( Post_Types::get_allowed_post_types() ) ) {
-			$assets_instance = Assets::get_instance();
 
-			// Enqueue connector script based on region and environment.
-			// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.NoExplicitVersion -- Upstream script.
-			wp_enqueue_script(
-				'revenue-generator-classic-connector',
-				$connector_url,
-				[],
-				false,
-				true
-			);
-
-			// Enqueue frontend styling for purchase overlay.
-			wp_enqueue_style(
-				'revenue-generator-frontend',
-				REVENUE_GENERATOR_BUILD_URL . 'css/revenue-generator-frontend.css',
-				[],
-				$assets_instance->get_asset_version( 'css/revenue-generator-frontend.css' )
-			);
-		}
+		// Enqueue connector script based on region and environment.
+		// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.NoExplicitVersion -- Upstream script.
+		wp_enqueue_script(
+			'revenue-generator-classic-connector',
+			$connector_url,
+			[],
+			false,
+			true
+		);
 	}
 
 	/**
@@ -678,5 +692,89 @@ class Frontend_Post {
 		} else {
 			return $paywall_instance->get_purchase_option_data_by_paywall_id( $this->connected_paywall_id );
 		}
+	}
+
+	/**
+	 * Enqueue styles and scripts needed for preview pane.
+	 *
+	 * @hooked action `wp_enqueue_scripts`
+	 *
+	 * @return void
+	 */
+	public function enqueue_preview_scripts_and_styles() {
+		wp_enqueue_style(
+			'revenue-generator-preview',
+			REVENUE_GENERATOR_BUILD_URL . '/css/revenue-generator-preview.css',
+			[],
+			REVENUE_GENERATOR_VERSION
+		);
+
+		wp_register_script(
+			'revenue-generator-shepherd',
+			REVENUE_GENERATOR_BUILD_URL . 'vendor/shepherd/shepherd.min.js',
+			[],
+			'8.0.1',
+			true
+		);
+
+		wp_enqueue_script(
+			'revenue-generator-preview-script',
+			REVENUE_GENERATOR_BUILD_URL . '/revenue-generator-preview.js',
+			array(
+				'backbone',
+				'revenue-generator-shepherd',
+			),
+			REVENUE_GENERATOR_VERSION
+		);
+	}
+
+	/**
+	 * Handle custom contribution form submit.
+	 *
+	 * @hooked action `wp_ajax_rg_contribution_contribute`
+	 * @hooked action `wp_ajax_nopriv_rg_contribution_contribute`
+	 *
+	 * @return void
+	 */
+	public function ajax_contribute_contribution() {
+		check_ajax_referer( 'rg_contribution_contribute', 'nonce' );
+
+		$amount      = ( isset( $_REQUEST['amount'] ) ) ? (float) $_REQUEST['amount'] : 0;
+		$campaign_id = ( isset( $_REQUEST['campaign_id'] ) ) ? sanitize_text_field( $_REQUEST['campaign_id'] ) : '';
+		$title       = ( isset( $_REQUEST['title'] ) ) ? sanitize_text_field( $_REQUEST['title'] ) : '';
+		$url         = ( isset( $_REQUEST['url'] ) ) ? esc_url_raw( $_REQUEST['url'] ) : '';
+		$is_amp      = ( isset( $_REQUEST['is_amp'] ) && 1 === (int) $_REQUEST['is_amp'] );
+
+		// If amount is empty, there's nothing to contribute so return early.
+		if ( empty( $amount ) ) {
+			wp_send_json_error(
+				__( 'Contribution amount cannot be empty.', 'revenue-generator' )
+			);
+		}
+
+		// We need campaign details in order to create URL, so no fun if not supplied.
+		if ( empty( $campaign_id ) || empty( $title ) || empty( $url ) ) {
+			wp_send_json_error(
+				__( 'Campaign details cannot be empty.', 'revenue-generator' )
+			);
+		}
+
+		$client_account   = Client_Account::get_instance();
+		$amount_in_cents  = $amount * 100;
+		$contribution_url = $client_account->get_custom_contribution_url( $amount_in_cents, $campaign_id, $title, $url );
+
+		if ( is_wp_error( $contribution_url ) ) {
+			wp_send_json_error();
+		}
+
+		// If it's a submit from AMP, pass headers so AMP handles redirect.
+		if ( $is_amp ) {
+			header( 'AMP-Redirect-To: ' . $contribution_url );
+			header( 'Access-Control-Expose-Headers: AMP-Redirect-To' );
+		}
+
+		wp_send_json_success(
+			$contribution_url
+		);
 	}
 }

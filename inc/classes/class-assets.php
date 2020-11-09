@@ -91,6 +91,8 @@ class Assets {
 			REVENUE_GENERATOR_BUILD_URL . 'revenue-generator-admin.js',
 			[
 				'jquery',
+				'backbone',
+				'underscore',
 				'revenue-generator-shepherd',
 				'revenue-generator-select2',
 				'revenue-generator-tippy',

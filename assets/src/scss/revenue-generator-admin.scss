@@ -9,3 +9,21 @@ i.mce-i-laterpay-logo::before,
 	font-family: laterpay-wordpress-icons, serif !important;
 }
 /* stylelint-enable declaration-no-important */
+
+.rev-gen-footer {
+	position: fixed;
+	bottom: 10px;
+	z-index: -1;
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+	color: #808080;
+	span {
+		display: inline-block;
+		margin-right: 5px;
+	}
+	img {
+		width: 80px;
+		vertical-align: middle;
+	}
+}

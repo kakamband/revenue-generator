@@ -16,6 +16,7 @@ const finalConfig = (mode) => {
 				'revenue-generator-admin'    : ['./assets/src/js/revenue-generator-admin.js', './assets/src/scss/revenue-generator-admin.scss'],
 				'revenue-generator-frontend'    : ['./assets/src/js/revenue-generator-frontend.js', './assets/src/scss/revenue-generator-frontend.scss'],
 				'revenue-generator-dashboard': './assets/src/scss/revenue-generator-dashboard.scss',
+				'revenue-generator-preview': ['./assets/src/js/revenue-generator-preview.js', './assets/src/scss/revenue-generator-preview.scss'],
 			},
 			output   : {
 				path: path.resolve(__dirname, 'assets/build'),

@@ -203,6 +203,10 @@ class Admin {
 					'period'      => '1',
 				],
 			],
+			'welcome' => [
+				'isMainWelcomeDone'    => ! empty( $current_global_options['is_welcome_done'] ),
+				'isPaywallWelcomeDone' => ! empty( $current_global_options['average_post_publish_count'] ),
+			],
 		];
 
 		$rg_script_data['rg_global_config_nonce'] = wp_create_nonce( 'rg_global_config_nonce' );
@@ -240,14 +244,14 @@ class Admin {
 		// Check if setup is done, and load page accordingly.
 		$is_paywall_setup_done = empty( $current_global_options['average_post_publish_count'] ) ? false : true;
 		$is_welcome_setup_done = ( ! empty( $current_global_options['is_welcome_done'] ) ) ? $current_global_options['is_welcome_done'] : false;
-		$dashboard_callback    = '';
+		$dashboard_callback    = 'load_welcome_screen';
 
-		if ( ! empty( $is_welcome_setup_done ) && 'contribution' === $is_welcome_setup_done ) {
-			$dashboard_callback = 'load_contribution';
-		} elseif ( ! empty( $is_welcome_setup_done ) && 'paywall' === $is_welcome_setup_done ) {
-			$dashboard_callback = ( ! empty( $is_paywall_setup_done ) ) ? 'load_dashboard' : 'load_welcome_screen_paywall';
-		} else {
-			$dashboard_callback = 'load_welcome_screen';
+		if ( ! empty( $is_welcome_setup_done ) ) {
+			if ( 'contribution' === $is_welcome_setup_done ) {
+				$dashboard_callback = 'load_contribution';
+			} else if ( 'paywall' === $is_welcome_setup_done && ! empty( $is_paywall_setup_done ) ) {
+				$dashboard_callback = 'load_dashboard';
+			}
 		}
 
 		// Add main menu page.
@@ -266,10 +270,7 @@ class Admin {
 		if ( ! empty( $menus ) ) {
 			foreach ( $menus as $key => $page_data ) {
 				$slug          = $page_data['url'];
-				$page_callback = (
-					'dashboard' === $page_data['method'] && false === $is_paywall_setup_done ) ?
-					'load_welcome_screen_paywall' :
-					'load_' . $page_data['method'];
+				$page_callback = 'load_' . $page_data['method'];
 
 				add_submenu_page(
 					'revenue-generator',
@@ -300,12 +301,14 @@ class Admin {
 
 		$contribution_data = [
 			'ID'                 => ( isset( $_REQUEST['ID'] ) ) ? intval( $_REQUEST['ID'] ) : 0,
-			'name'               => ( isset( $_REQUEST['title'] ) ) ? sanitize_text_field( $_REQUEST['title'] ) : '',
+			'name'               => ( isset( $_REQUEST['name'] ) ) ? sanitize_text_field( $_REQUEST['name'] ) : '',
 			'thank_you'          => ( isset( $_REQUEST['thank_you'] ) ) ? esc_url_raw( $_REQUEST['thank_you'] ) : '',
 			'dialog_header'      => ( isset( $_REQUEST['dialog_header'] ) ) ? sanitize_text_field( $_REQUEST['dialog_header'] ) : '',
 			'dialog_description' => ( isset( $_REQUEST['dialog_description'] ) ) ? sanitize_text_field( $_REQUEST['dialog_description'] ) : '',
 			'custom_amount'      => ( isset( $_REQUEST['custom-amount'] ) ) ? floatval( $_REQUEST['custom-amount'] ) : '',
 			'code'               => ( isset( $_REQUEST['code'] ) ) ? sanitize_text_field( $_REQUEST['code'] ) : '',
+			'layout_type'        => ( isset( $_REQUEST['layout_type'] ) ) ? sanitize_text_field( $_REQUEST['layout_type'] ) : '',
+			'button_label'       => ( isset( $_REQUEST['button_label'] ) ) ? sanitize_text_field( $_REQUEST['button_label'] ) : '',
 		];
 
 		$is_edit = false;
@@ -315,43 +318,22 @@ class Admin {
 		}
 
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$amounts = isset( $_REQUEST['amounts'] ) ? $_REQUEST['amounts'] : [];
+		$amounts      = isset( $_REQUEST['amounts'] ) ? $_REQUEST['amounts'] : [];
+		$all_amounts  = [];
+		$all_revenues = [];
 
-		$all_amounts     = ( ! empty( $amounts ) ) ? json_decode( wp_unslash( $amounts ), true ) : array();
-		$filtered_prices = [];
+		foreach ( $amounts as $index => $amount ) {
+			$float_amount = (float) $amount;
 
-		// Sanitize the all amounts input.
-		$filters = [
-			'price'       => FILTER_SANITIZE_STRING,
-			'revenue'     => FILTER_SANITIZE_STRING,
-			'is_selected' => FILTER_VALIDATE_BOOLEAN,
-		];
-
-		$options = [
-			'price'       => [
-				'flags' => FILTER_NULL_ON_FAILURE,
-			],
-			'revenue'     => [
-				'flags' => FILTER_NULL_ON_FAILURE,
-			],
-			'is_selected' => [
-				'flags' => FILTER_NULL_ON_FAILURE,
-			],
-		];
-
-		$selected_amount = 1;
-		// Loop through the user input an build an array to be processed by shortcode generator.
-		foreach ( $all_amounts as $id => $amount_array ) {
-			foreach ( $amount_array as $key => $value ) {
-				$filtered_prices[ $id ][ $key ] = filter_var( $value, $filters[ $key ], $options[ $key ] );
-				if ( true === $amount_array['is_selected'] ) {
-					$selected_amount = $id + 1;
-				}
+			if ( 0.0 < $float_amount ) {
+				$all_amounts[] = $float_amount * 100;
 			}
+
+			$all_revenues[] = ( 1.99 < $float_amount ) ? 'sis' : 'ppu';
 		}
 
-		$contribution_data['all_amounts']  = array_column( $filtered_prices, 'price' );
-		$contribution_data['all_revenues'] = array_column( $filtered_prices, 'revenue' );
+		$contribution_data['all_amounts']  = $all_amounts;
+		$contribution_data['all_revenues'] = $all_revenues;
 
 		$contribution_id   = $contribution_instance->save( $contribution_data );
 		$message           = __( 'Oops! Something went wrong. Please try again.', 'revenue-generator' );
@@ -545,25 +527,6 @@ class Admin {
 	 *
 	 * @codeCoverageIgnore -- Test will be covered in e2e tests.
 	 */
-	public function load_welcome_screen_paywall() {
-		self::load_assets();
-		$welcome_page_data = [
-			'low_count_icon'  => Config::$plugin_defaults['img_dir'] . 'low-publish.svg',
-			'high_count_icon' => Config::$plugin_defaults['img_dir'] . 'high-publish.svg',
-		];
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output is escaped in template file.
-		echo View::render_template( 'backend/welcome/welcome-paywall', $welcome_page_data );
-
-		return '';
-	}
-
-	/**
-	 * Load admin welcome screen.
-	 *
-	 * @return string
-	 *
-	 * @codeCoverageIgnore -- Test will be covered in e2e tests.
-	 */
 	public function load_welcome_screen() {
 		self::load_assets();
 		$welcome_page_data = [
@@ -590,11 +553,11 @@ class Admin {
 		if ( in_array( $current_screen->id, $dashboard_pages, true ) && ! empty( $admin_menus ) ) {
 			// Check if tutorial is completed, and load page accordingly.
 			$is_welcome_setup_done         = empty( $current_global_options['average_post_publish_count'] ) ? false : true;
-			$is_paywall_tutorial_completed = (bool) $current_global_options['is_paywall_tutorial_completed'];
+			$paywall_tutorial_done = (bool) $current_global_options['paywall_tutorial_done'];
 
 			$paywall_page = add_query_arg( [ 'page' => $admin_menus['paywall']['url'] ], admin_url( 'admin.php' ) );
 
-			if ( true === $is_welcome_setup_done && false === $is_paywall_tutorial_completed ) {
+			if ( true === $is_welcome_setup_done && false === $paywall_tutorial_done ) {
 				wp_safe_redirect( $paywall_page );
 				exit;
 			}
@@ -1493,16 +1456,14 @@ class Admin {
 		// Update the option value.
 		update_option( 'lp_rg_merchant_credentials', $rg_merchant_credentials );
 
-		$is_valid = $client_account_instance->validate_merchant_account();
+		$is_valid = $client_account_instance->validate_merchant_account( true );
 
 		// Set merchant status to verified.
 		if ( true === $is_valid ) {
 			$rg_global_options                         = Config::get_global_options();
 			$rg_global_options['is_merchant_verified'] = '1';
 			update_option( 'lp_rg_global_options', $rg_global_options );
-		}
 
-		if ( $is_valid ) {
 			$response = array(
 				'success' => true,
 				'msg'     => esc_html__( 'Saved valid crendetials!', 'revenue-generator' ),
@@ -1667,7 +1628,7 @@ class Admin {
 		// Get all data and sanitize it.
 		$should_restart = filter_input( INPUT_POST, 'restart_tour', FILTER_SANITIZE_NUMBER_INT );
 		$tour_type      = filter_input( INPUT_POST, 'tour_type', FILTER_SANITIZE_STRING );
-		$config_key     = ( ! empty( $tour_type ) ) ? $tour_type : 'is_paywall_tutorial_completed';
+		$config_key     = ( ! empty( $tour_type ) ) ? $tour_type : 'paywall_tutorial_done';
 
 		// Check and verify data exits.
 		if ( 1 === absint( $should_restart ) ) {
