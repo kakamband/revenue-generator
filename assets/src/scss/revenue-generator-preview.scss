@@ -43,3 +43,15 @@ main {
 		}
 	}
 }
+
+@import "components/shepherd";
+
+.rev-gen-tutorial-card {
+	width: 240px;
+}
+
+.shepherd-target {
+	position: relative;
+	z-index: 999;
+	background-color: #fff;
+}

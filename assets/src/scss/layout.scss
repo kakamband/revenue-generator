@@ -1,18 +1,14 @@
-@import "vendor/shepherd.css";
-
 body {
 	background: #fff;
 }
+
+@import "components/shepherd";
 
 .rev-gen-layout-wrapper {
 	width: 100%;
 	color: #1d1d1d;
 	font-family: HelveticaNeue, serif;
 	min-height: 750px;
-
-	.shepherd-target {
-		background-color: #fff;
-	}
 
 	button,
 	a {
@@ -35,86 +31,6 @@ body {
 	p {
 		height: 20px;
 		font-size: 20px;
-	}
-}
-
-.rev-gen-tutorial-card {
-	width: 200px;
-	height: 130px;
-	background-color: #1e1e1e;
-	color: #fff;
-	padding: 15px 10px;
-	border-radius: 5px;
-	z-index: 999999;
-
-	.info-link {
-		color: #fff;
-		text-decoration: underline;
-	}
-
-	.shepherd-arrow {
-		color: #000;
-	}
-
-	.shepherd-text {
-		padding: 5px;
-		min-height: 35px;
-		font-family: HelveticaNeue, serif;
-		font-size: 16px;
-		font-weight: normal;
-		font-stretch: normal;
-		font-style: normal;
-		line-height: 1.25;
-		letter-spacing: normal;
-		color: #fff;
-		a {
-			color: #fff;
-		}
-	}
-
-	.shepherd-button {
-		background: transparent;
-		color: #fff;
-		text-transform: uppercase;
-		border: 0;
-		cursor: pointer;
-		padding: 0;
-		font-family: HelveticaNeue, serif;
-		font-size: 14px;
-		font-weight: bold;
-		font-stretch: normal;
-		font-style: normal;
-		line-height: 1.29;
-		letter-spacing: normal;
-	}
-
-	.shepherd-footer {
-		position: absolute;
-		bottom: 20px;
-		right: 0;
-	}
-
-	.shepherd-content-skip-tour {
-		position: relative;
-		right: 80px;
-		font-family: HelveticaNeue, serif;
-		font-size: 14px;
-		font-weight: normal;
-		font-stretch: normal;
-		font-style: normal;
-		line-height: 1.29;
-		letter-spacing: normal;
-		color: #fff;
-	}
-
-	.shepherd-content-complete-tour-element {
-		position: relative;
-		left: -15px;
-	}
-
-	.shepherd-content-next-tour-element {
-		position: relative;
-		left: -15px;
 	}
 }
 
@@ -160,10 +76,6 @@ body {
 		max-width: 90px;
 		vertical-align: middle;
 	}
-}
-
-.shepherd-modal-overlay-container {
-	display: none;
 }
 
 .blury {
@@ -346,113 +258,6 @@ body.modal-blur select.rev-gen__select2 + .select2-container .select2-selection-
 	}
 	&--help {
 		font-size: 14px;
-	}
-}
-
-// Fade In.
-.fade-in {
-	animation: fadeIn ease 0.8;
-	-webkit-animation: fadeIn ease 0.8s;
-	-moz-animation: fadeIn ease 0.8s;
-	-o-animation: fadeIn ease 0.8s;
-	-ms-animation: fadeIn ease 0.8s;
-}
-
-@keyframes fadeIn {
-	0% {
-		opacity: 0;
-	}
-	100% {
-		opacity: 1;
-	}
-}
-
-@-moz-keyframes fadeIn {
-	0% {
-		opacity: 0;
-	}
-	100% {
-		opacity: 1;
-	}
-}
-
-@-webkit-keyframes fadeIn {
-	0% {
-		opacity: 0;
-	}
-	100% {
-		opacity: 1;
-	}
-}
-
-@-o-keyframes fadeIn {
-	0% {
-		opacity: 0;
-	}
-	100% {
-		opacity: 1;
-	}
-}
-
-@-ms-keyframes fadeIn {
-	0% {
-		opacity: 0;
-	}
-	100% {
-		opacity: 1;
-	}
-}
-
-// Fade Out.
-.fade-out {
-	animation: fadeOut ease 0.8s;
-	-webkit-animation: fadeOut ease 0.8s;
-	-moz-animation: fadeOut ease 0.8s;
-	-o-animation: fadeOut ease 0.8s;
-	-ms-animation: fadeOut ease 0.8s;
-}
-@keyframes fadeOut {
-	0% {
-		opacity: 1;
-	}
-	100% {
-		opacity: 0;
-	}
-}
-
-@-moz-keyframes fadeOut {
-	0% {
-		opacity: 1;
-	}
-	100% {
-		opacity: 0;
-	}
-}
-
-@-webkit-keyframes fadeOut {
-	0% {
-		opacity: 1;
-	}
-	100% {
-		opacity: 0;
-	}
-}
-
-@-o-keyframes fadeOut {
-	0% {
-		opacity: 1;
-	}
-	100% {
-		opacity: 0;
-	}
-}
-
-@-ms-keyframes fadeOut {
-	0% {
-		opacity: 1;
-	}
-	100% {
-		opacity: 0;
 	}
 }
 

@@ -62,14 +62,14 @@ $contribution_builder_data = apply_filters( 'rg_contribution_builder_data', $con
 
 					<section class="rg-contribution-builder-inputs">
 						<div class="rg-contribution-builder__input-wrap">
-							<input type="text" placeholder="<?php esc_html_e( 'Campaign Name', 'revenue-generator' ); ?>" value="<?php echo esc_attr( $contribution_data['post_title'] ); ?>" data-bind="name" required data-validate>
+							<input type="text" placeholder="<?php esc_html_e( 'Campaign Name', 'revenue-generator' ); ?>" value="<?php echo esc_attr( $contribution_data['post_title'] ); ?>" data-bind="name" id="rg-contribution-campaign-name" required data-validate>
 							<p class="input-error-text"><?php esc_html_e( 'This field is required' ); ?>.</p>
 						</div>
 						<div class="rg-contribution-builder__input-wrap">
 							<input type="text" placeholder="<?php esc_html_e( 'Link to Thank You Page', 'revenue-generator' ); ?>" value="<?php echo esc_attr( $contribution_data['thank_you'] ); ?>" data-bind="thank_you" data-validate data-validation="url">
 							<p class="input-error-text"><?php esc_html_e( 'Please enter valid URL', 'revenue-generator' ); ?>.</p>
 						</div>
-						<input type="submit" class="rev-gen__button" value="<?php esc_html_e( 'Save', 'revenue-generator' ); ?>" disabled="disabled" data-default-text="<?php esc_html_e( 'Save', 'revenue-generator' ); ?>">
+						<input type="submit" class="rev-gen__button" value="<?php esc_html_e( 'Save and Copy Code', 'revenue-generator' ); ?>" disabled="disabled" id="rg-contribution-submit" data-default-text="<?php esc_html_e( 'Save and Copy Code', 'revenue-generator' ); ?>">
 					</section>
 
 					<input type="hidden" name="security" value="<?php echo esc_attr( wp_create_nonce( 'rg_contribution_nonce' ) ); ?>">
@@ -85,11 +85,16 @@ $contribution_builder_data = apply_filters( 'rg_contribution_builder_data', $con
 				<a href="#" id="rg_js_toggle_preview" class="rg-contribution-builder__preview-toggle" data-expand-text="<?php esc_html_e( 'Expand preview', 'revenue-generator' ); ?>" data-collapse-text="<?php esc_html_e( 'Collapse preview', 'revenue-generator' ); ?>"><?php esc_html_e( 'Expand preview', 'revenue-generator' ); ?></a>
 
 				<iframe src="<?php echo esc_url( Contribution::get_preview_post_url() ); ?>&id=<?php echo esc_attr( $contribution_data['ID'] ); ?>" width="100%" height="100%" id="rg-contribution-builder-preview" onload="javascript:handleIframeLoad(this)" class="loading"></iframe>
+
+				<ul class="rg-contribution-builder__tour-nav rg-tour-nav" id="rg-tour-progress">
+					<?php for ( $i = 1; $i <= 4; $i++ ) : ?>
+						<li class="rg-tour-nav__item"><?php echo esc_attr( $i ); ?></li>
+					<?php endfor; ?>
+				</ul>
 			</section>
 		</div>
 	</div>
 </div>
-<?php View::render_footer_backend(); ?>
 <!-- Template for ShortCode modal -->
 <script type="text/template" id="tmpl-revgen-info-shortcode">
 	<div class="rev-gen-contribution-main-info-modal rev-gen-preview-main-info-modal campaign-name-info-modal">

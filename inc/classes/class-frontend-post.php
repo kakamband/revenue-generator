@@ -709,16 +709,24 @@ class Frontend_Post {
 		wp_enqueue_style(
 			'revenue-generator-preview',
 			REVENUE_GENERATOR_BUILD_URL . '/css/revenue-generator-preview.css',
-			array(),
+			[],
 			REVENUE_GENERATOR_VERSION
+		);
+
+		wp_register_script(
+			'revenue-generator-shepherd',
+			REVENUE_GENERATOR_BUILD_URL . 'vendor/shepherd/shepherd.min.js',
+			[],
+			'8.0.1',
+			true
 		);
 
 		wp_enqueue_script(
 			'revenue-generator-preview-script',
 			REVENUE_GENERATOR_BUILD_URL . '/revenue-generator-preview.js',
 			array(
-				'jquery',
 				'backbone',
+				'revenue-generator-shepherd',
 			),
 			REVENUE_GENERATOR_VERSION
 		);

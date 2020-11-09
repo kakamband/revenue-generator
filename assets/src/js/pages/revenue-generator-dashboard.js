@@ -8,6 +8,7 @@
  */
 import '../utils';
 import { RevGenModal } from '../utils/rev-gen-modal';
+import { copyToClipboard } from '../helpers/index';
 
 ( function( $ ) {
 	$( function() {
@@ -34,6 +35,9 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 				laterpayLoader: $( '.laterpay-loader-wrapper' ),
 				contributionDelete: $(
 					'.rev-gen-dashboard__contribution-delete'
+				),
+				contributionCopyShortcode: $(
+					'.rev-gen-dashboard__link--copy-shortcode'
 				),
 
 				// Dashboard footer area.
@@ -322,6 +326,11 @@ import { RevGenModal } from '../utils/rev-gen-modal';
 							// noop
 						},
 					} );
+				} );
+
+				$o.contributionCopyShortcode.on( 'click', function( e ) {
+					const code = $( e.target ).data( 'shortcode' );
+					copyToClipboard( code );
 				} );
 
 				/**

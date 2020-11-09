@@ -1,4 +1,4 @@
-/* global revenueGeneratorGlobalOptions, Shepherd, rgGlobal, Backbone, _, RevGenContributionData */
+/* global revenueGeneratorGlobalOptions, rgGlobal, Backbone, _, RevGenContributionData */
 /**
  * JS to handle plugin settings screen interactions.
  */
@@ -7,9 +7,10 @@
  * Internal dependencies.
  */
 import '../utils';
-import { __, sprintf } from '@wordpress/i18n';
 import { RevGenModal } from '../utils/rev-gen-modal';
 import { isURL, addQueryArgs } from '@wordpress/url';
+import { RevGenTour, tourSettings } from '../utils/tour';
+import { copyToClipboard } from '../helpers/index';
 
 const options = revenueGeneratorGlobalOptions;
 
@@ -27,6 +28,49 @@ window.handlePreviewUpdate = ( attr, value ) => {
 
 window.handleIframeLoad = ( iframe ) => {
 	iframe.classList.remove( 'loading' );
+};
+
+window.trackTourStep = ( step ) => {
+	const trackingProps = step.options.tracking;
+
+	if ( step.options.cancelled ) {
+		if ( 'Continue' === trackingProps.action ) {
+			trackingProps.action = 'Exit Tour';
+		}
+	}
+
+	rgGlobal.sendLPGAEvent(
+		trackingProps.event,
+		trackingProps.category,
+		trackingProps.action,
+		0,
+		true
+	);
+};
+
+window.updateTourProgress = () => {
+	const tourProgress = document.getElementById( 'rg-tour-progress' );
+	tourProgress.style.display = 'block';
+
+	const activeStep = tourProgress.querySelector( '.active' );
+	let nextStep = '';
+
+	if ( activeStep ) {
+		nextStep = activeStep.nextElementSibling;
+
+		activeStep.classList.add( 'visited' );
+		activeStep.classList.remove( 'active' );
+	} else {
+		nextStep = tourProgress.children[ 0 ];
+	}
+
+	if ( ! nextStep ) {
+		tourProgress.style.display = 'none';
+
+		return;
+	}
+
+	nextStep.classList.add( 'active' );
 };
 
 ( ( $, Backbone ) => {
@@ -65,21 +109,43 @@ window.handleIframeLoad = ( iframe ) => {
 					),
 				};
 
-				this.initializeTour();
+				const self = this;
+
+				window.addEventListener( 'rg-tour-start', function() {
+					self.initializeTour();
+				} );
 
 				this.listenTo( this, 'preview-update', this.onPreviewUpdate );
 				this.listenTo( this.model, 'change', this.onModelChange );
 			},
 
 			initializeTour() {
-				if (
-					0 ===
-					parseInt( options.globalOptions.contribution_tutorial_done )
-				) {
-					const tour = initializeTour();
-					addTourSteps( tour );
-					startWelcomeTour( tour );
-				}
+				this.tour = new RevGenTour( {
+					steps: tourSettings.contribution.steps.builder,
+					onStepHide: ( step ) => {
+						if ( step.options.tracking ) {
+							window.trackTourStep( step );
+						}
+
+						window.updateTourProgress();
+					},
+					onComplete: () => {
+						// Create form data.
+						const formData = {
+							action: 'rg_complete_tour',
+							config_key: 'is_contribution_tutorial_completed',
+							config_value: 1,
+							security: options.rg_paywall_nonce,
+						};
+
+						$.ajax( {
+							url: options.ajaxUrl,
+							method: 'POST',
+							data: formData,
+							dataType: 'json',
+						} );
+					},
+				} );
 			},
 
 			onPreviewUpdate( data ) {
@@ -350,8 +416,6 @@ window.handleIframeLoad = ( iframe ) => {
 			} );
 		};
 
-		initApp();
-
 		const getMerchantId = function() {
 			let merchantId = options.merchant_id;
 
@@ -360,424 +424,6 @@ window.handleIframeLoad = ( iframe ) => {
 			}
 
 			return merchantId;
-		};
-
-		/**
-		 * Copy provided text to clipboard.
-		 *
-		 * @param {string} codeText Code to be copied.
-		 * @return {void}
-		 */
-		const copyToClipboard = function( codeText ) {
-			const $temp = $( '<input>' );
-			$( 'body' ).append( $temp );
-			$temp.val( codeText ).select();
-			document.execCommand( 'copy' );
-			$temp.remove();
-		};
-
-		/**
-		 * Initialize the tour object.
-		 *
-		 * @return {Shepherd.Tour} Shepherd tour object.
-		 */
-		const initializeTour = function() {
-			return new Shepherd.Tour( {
-				defaultStepOptions: {
-					classes: 'rev-gen-tutorial-card',
-					scrollTo: true,
-					scrollToHandler: ( e ) => {
-						$( 'html, body' ).animate(
-							{
-								scrollTop:
-									$( e ).offset().top -
-									$( window ).height() / 2 -
-									$( e ).height(),
-							},
-							1000
-						);
-					},
-				},
-			} );
-		};
-
-		/**
-		 * Add required info steps for the merchant.
-		 *
-		 * @param {Shepherd.Tour} tour Tour object.
-		 */
-		const addTourSteps = function( tour ) {
-			const skipTourButton = {
-				text: __( 'Skip Tour', 'revenue-generator' ),
-				action: tour.complete,
-				classes: 'shepherd-content-skip-tour',
-			};
-
-			const nextButton = {
-				text: __( 'Next >', 'revenue-generator' ),
-				action: tour.next,
-				classes: 'shepherd-content-next-tour-element',
-			};
-
-			const tutorialEventCategory = 'LP RevGen Contributions Tutorial';
-			const tutorialEventLabelContinue = 'Continue';
-			const tutorialEventLabelComplete = 'Complete';
-
-			// Add tutorial step for main search.
-			const step1 = tour
-				.addStep( {
-					id: 'rg-contribution-header-description',
-					text: __( 'Click to edit', 'revenue-generator' ),
-					attachTo: {
-						element: '#rev-gen-contribution-main-header-section',
-						on: 'top',
-					},
-					arrow: true,
-					classes: 'rev-gen-tutorial-contribution-title fade-in',
-					buttons: [ skipTourButton, nextButton ],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'1 - Text Edit',
-								tutorialEventCategory,
-								tutorialEventLabelContinue,
-								0,
-								true
-							);
-						},
-					},
-				} )
-				.on( 'before-hide', function() {
-					const optionClasses = step1.options.classes;
-					step1.options.classes = optionClasses.replace(
-						'fade-in',
-						'fade-out'
-					);
-					step1.updateStepOptions( step1.options );
-				} )
-				.on( 'hide', function() {
-					$( step1.el ).removeAttr( 'hidden' );
-					setTimeout( function() {
-						$( step1.el ).attr( 'hidden', '' );
-					}, 700 );
-				} );
-
-			// Add tutorial step for editing header title
-			const step2 = tour
-				.addStep( {
-					id: 'rg-contribution-amount-first',
-					text: __(
-						'Click to edit each amount',
-						'revenue-generator'
-					),
-					attachTo: {
-						element:
-							'.rev-gen-contribution-main--box-donation:first-child',
-						on: 'top',
-					},
-					arrow: true,
-					classes: 'rev-gen-tutorial-contribution-title fade-in',
-					buttons: [ nextButton ],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'2 - Amount Edit',
-								tutorialEventCategory,
-								tutorialEventLabelContinue,
-								0,
-								true
-							);
-						},
-					},
-				} )
-				.on( 'before-hide', function() {
-					const optionClasses = step2.options.classes;
-					step2.options.classes = optionClasses.replace(
-						'fade-in',
-						'fade-out'
-					);
-					step2.updateStepOptions( step2.options );
-				} )
-				.on( 'hide', function() {
-					$( step2.el ).removeAttr( 'hidden' );
-					setTimeout( function() {
-						$( step2.el ).attr( 'hidden', '' );
-					}, 700 );
-				} );
-
-			// Add tutorial step for option item.
-			const step3 = tour
-				.addStep( {
-					id: 'rg-contribution-amount-second',
-					text: sprintf(
-						/* translators: %1$s laterpay.net link tag, %2$s laterpay.net link closing tag */
-						__(
-							'Amounts less than $5 will default to %1$s pay later %2$s',
-							'revenue-generator'
-						),
-						'<a target="_blank" href="https://www.laterpay.net/academy/getting-started-with-laterpay-the-difference-between-pay-now-pay-later">',
-						'</a>'
-					),
-					attachTo: {
-						element:
-							'.rev-gen-contribution-main--box-donation:nth-child(2)',
-						on: 'top',
-					},
-					arrow: true,
-					classes: 'rev-gen-tutorial-contribution-title fade-in',
-					buttons: [ nextButton ],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'3 - PN v PL',
-								tutorialEventCategory,
-								tutorialEventLabelContinue,
-								0,
-								true
-							);
-						},
-					},
-				} )
-				.on( 'before-hide', function() {
-					const optionClasses = step3.options.classes;
-					step3.options.classes = optionClasses.replace(
-						'fade-in',
-						'fade-out'
-					);
-					step3.updateStepOptions( step3.options );
-				} )
-				.on( 'hide', function() {
-					$( step3.el ).removeAttr( 'hidden' );
-					setTimeout( function() {
-						$( step3.el ).attr( 'hidden', '' );
-					}, 700 );
-				} );
-
-			// Add tutorial step for option item edit button.
-			const step4 = tour
-				.addStep( {
-					id: 'rg-contribution-campaign-name',
-					text: __(
-						"Enter the description that you would like to appear on your customer's invoice",
-						'revenue-generator'
-					),
-					attachTo: {
-						element: '#rg_contribution_campaign_name',
-						on: 'top',
-					},
-					arrow: true,
-					classes: 'rev-gen-tutorial-contribution-title fade-in',
-					buttons: [ nextButton ],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'4 - Campaign Name',
-								tutorialEventCategory,
-								tutorialEventLabelContinue,
-								0,
-								true
-							);
-						},
-					},
-				} )
-				.on( 'before-hide', function() {
-					const optionClasses = step4.options.classes;
-					step4.options.classes = optionClasses.replace(
-						'fade-in',
-						'fade-out'
-					);
-					step4.updateStepOptions( step4.options );
-				} )
-				.on( 'hide', function() {
-					$( step4.el ).removeAttr( 'hidden' );
-					setTimeout( function() {
-						$( step4.el ).attr( 'hidden', '' );
-					}, 700 );
-				} );
-
-			// Add tutorial step for paywall actions publish.
-			const step5 = tour
-				.addStep( {
-					id: 'rg-contribution-generate-button',
-					text: sprintf(
-						/* translators: %1$s WP.org shortcodes support page opening link tag, %2$s WP.org shortcodes support page closing link tag */
-						__(
-							'When you’re ready, click here to copy your customized %1$s shortcode %2$s',
-							'revenue-generator'
-						),
-						'<a target="_blank" href="https://wordpress.com/support/shortcodes/">',
-						'</a>'
-					),
-					attachTo: {
-						element: '.rev-gen-contribution-main-generate-button',
-						on: 'right',
-					},
-					arrow: true,
-					classes: 'fade-in',
-					buttons: [
-						{
-							text: __( 'Complete', 'revenue-generator' ),
-							action: tour.next,
-							classes: 'shepherd-content-complete-tour-element',
-						},
-					],
-					when: {
-						hide() {
-							rgGlobal.sendLPGAEvent(
-								'5 - Generate Code',
-								tutorialEventCategory,
-								tutorialEventLabelComplete,
-								0,
-								true
-							);
-						},
-					},
-				} )
-				.on( 'before-hide', function() {
-					const optionClasses = step5.options.classes;
-					step5.options.classes = optionClasses.replace(
-						'fade-in',
-						'fade-out'
-					);
-					step5.updateStepOptions( step5.options );
-				} )
-				.on( 'hide', function() {
-					$( step5.el ).removeAttr( 'hidden' );
-					setTimeout( function() {
-						$( step5.el ).attr( 'hidden', '' );
-					}, 700 );
-				} );
-		};
-
-		/**
-		 * Handle the tour of the paywall elements.
-		 *
-		 * @param {Shepherd.Tour} tour Tour object.
-		 */
-		const startWelcomeTour = function( tour ) {
-			// Show exit tour button.
-			$( $o.exitTour ).css( {
-				visibility: 'visible',
-				'pointer-events': 'all',
-				cursor: 'pointer',
-			} );
-
-			// Blur out the wrapper and disable events, to highlight the tour elements.
-			$o.body.addClass( 'modal-blur' );
-			$o.body.find( 'input' ).addClass( 'input-blur' );
-			$o.body
-				.find( '*[contenteditable="true"]' )
-				.removeAttr( 'contenteditable' );
-			$o.contributionBox.addClass( 'faded' );
-			$o.rgContributionWrapper.css( {
-				'pointer-events': 'none',
-			} );
-
-			$o.emailSupportButton.hide();
-
-			const directionalKeys = [
-				'ArrowUp',
-				'ArrowDown',
-				'ArrowRight',
-				'ArrowLeft',
-			];
-			const disableArrowKeys = function( e ) {
-				if ( directionalKeys.includes( e.key ) ) {
-					e.preventDefault();
-					return false;
-				}
-			};
-
-			// Disable arrow events.
-			$( document ).keydown( disableArrowKeys );
-
-			// Remove the blurry class and allow click events.
-			Shepherd.on( 'complete', function() {
-				// Revert to original state.
-				$o.body.removeClass( 'modal-blur' );
-				$o.body.find( 'input' ).removeClass( 'input-blur' );
-				$o.contributionBox.removeClass( 'faded' );
-
-				$o.rgContributionWrapper.css( {
-					'pointer-events': 'unset',
-				} );
-
-				// Hide exit tour button.
-				$( $o.exitTour ).remove();
-
-				$o.emailSupportButton.hide();
-
-				// Enable arrow events.
-				$( document ).unbind( 'keydown', disableArrowKeys );
-
-				const currentStep = Shepherd.activeTour.getCurrentStep();
-				let tutorialEventAction = '';
-				let tutorialEventLabel = 'Exit Tour';
-
-				switch ( currentStep.id ) {
-					case 'rg-contribution-header-description':
-						tutorialEventAction = '1 - Text Edit';
-						break;
-					case 'rg-contribution-amount-first':
-						tutorialEventAction = '2 - Amount Edit';
-						break;
-					case 'rg-contribution-amount-second':
-						tutorialEventAction = '3 - PN v PL';
-						break;
-					case 'rg-contribution-campaign-name':
-						tutorialEventAction = '4 - Campaign Name';
-						break;
-					case 'rg-contribution-generate-button':
-						tutorialEventAction = '5 - Generate Code';
-						tutorialEventLabel = 'Complete';
-						break;
-				}
-
-				const tutorialEventCategory =
-					'LP RevGen Contributions Tutorial';
-
-				// Send GA exit event.
-				rgGlobal.sendLPGAEvent(
-					tutorialEventAction,
-					tutorialEventCategory,
-					tutorialEventLabel,
-					0,
-					true
-				);
-
-				setTimeout( function() {
-					// Complete the tour, and update plugin option.
-					completeTheTour();
-				}, 500 );
-			} );
-
-			// Start the tour.
-			tour.start();
-		};
-
-		/**
-		 * Complete the tour.
-		 */
-		const completeTheTour = function() {
-			// Create form data.
-			const formData = {
-				action: 'rg_complete_tour',
-				config_key: 'is_contribution_tutorial_completed',
-				config_value: 1,
-				security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
-			};
-
-			// Delete the option.
-			$.ajax( {
-				url: revenueGeneratorGlobalOptions.ajaxUrl,
-				method: 'POST',
-				data: formData,
-				dataType: 'json',
-			} ).done( function( r ) {
-				if ( r.success ) {
-					window.location.reload();
-				}
-			} );
 		};
 
 		const showAccountActivationModal = function() {
@@ -930,6 +576,8 @@ window.handleIframeLoad = ( iframe ) => {
 				return success;
 			}
 		};
+
+		initApp();
 
 		/**
 		 * Show the loader.
