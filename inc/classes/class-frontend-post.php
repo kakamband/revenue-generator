@@ -161,54 +161,50 @@ class Frontend_Post {
 				wp_dequeue_script( 'revenue-generator-classic-connector' );
 				return;
 			}
+
+			$this->paywall_header_title = ( ! empty( $paywall_data['title'] ) ) ? $paywall_data['title'] : esc_html__( 'Keep Reading', 'revenue-generator' );
+
+			$connector_config = [
+				'appearance'   => $appearance_config,
+				'translations' => [
+					'purchaseOverlay' => [
+						'heading'                   => $this->paywall_header_title,
+						'currentArticle'            => empty( $this->individual_article_title ) ? esc_html__( 'Access Article Now', 'revenue-generator' ) : esc_html( $this->individual_article_title ),
+						'currentArticleDescription' => empty( $this->individual_article_description ) ? esc_html__( 'You\'ll only be charged once you\'ve reached $5.', 'revenue-generator' ) : esc_html( $this->individual_article_description ),
+					],
+				],
+			];
+
+			if ( ! empty( $deleted_articles ) ) {
+				$connector_config['articleId'] = $deleted_articles;
+			}
+
+			$connector_config['callbacks'] = [
+				'onUserHasAccess' => 'revenueGeneratorHideTeaserContent',
+			];
+
+			$post_payload_data = $this->get_post_payload();
+
+			if ( ! empty( $post_payload_data ) ) {
+				$payload = json_decode( $post_payload_data['payload'] );
+
+				foreach ( $payload as $key => $item ) {
+					$connector_config[ $key ] = $item;
+				}
+			}
 			?>
+			<script>
+				function revenueGeneratorHideTeaserContent() {
+					document.querySelector('.lp-teaser-content').style.display = 'none';
+				}
+			</script>
 			<!-- LaterPay Connector In-Page Configuration for appearance layout and deleted purchase options. -->
 			<script type="application/json" id="laterpay-connector">
-			<?php
-
-				$this->paywall_header_title = ( ! empty( $paywall_data['title'] ) ) ? $paywall_data['title'] : esc_html__( 'Keep Reading', 'revenue-generator' );
-
-				$appearance_and_deleted_config = [
-					'appearance'   => $appearance_config,
-					'translations' => [
-						'purchaseOverlay' => [
-							'heading'                   => $this->paywall_header_title,
-							'currentArticle'            => empty( $this->individual_article_title ) ? esc_html__( 'Access Article Now', 'revenue-generator' ) : esc_html( $this->individual_article_title ),
-							'currentArticleDescription' => empty( $this->individual_article_description ) ? esc_html__( 'You\'ll only be charged once you\'ve reached $5.', 'revenue-generator' ) : esc_html( $this->individual_article_description ),
-						],
-					],
-				];
-				if ( ! empty( $deleted_articles ) ) {
-					$appearance_and_deleted_config['articleId'] = $deleted_articles;
-				}
-				echo wp_json_encode( $appearance_and_deleted_config );
-				?>
+				<?php echo wp_json_encode( $connector_config ); ?>
 			</script>
 			<?php
-			$post_payload_data = $this->get_post_payload();
 			if ( ! empty( $post_payload_data ) ) {
 				?>
-				<!-- LaterPay Connector In-Page Configuration for handling teaser whe user has access.  -->
-				<script type="text/javascript">
-					function revenueGeneratorHideTeaserContent() {
-						document.querySelector('.lp-teaser-content').style.display = 'none';
-					}
-				</script>
-				<!-- LaterPay Connector In-Page Configuration for callbacks -->
-				<script type="application/json" id="laterpay-connector">
-					{
-						"callbacks": {
-							"onUserHasAccess": "revenueGeneratorHideTeaserContent"
-						}
-					}
-				</script>
-				<!-- LaterPay Connector In-Page Configuration for purchase options -->
-				<script type="application/json" id="laterpay-connector">
-				<?php
-					/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- added json string is secure and escaped.*/
-					echo $post_payload_data['payload'];
-				?>
-				</script>
 				<meta property="laterpay:connector:config_token" content="<?php echo esc_attr( $post_payload_data['token'] ); ?>" />
 				<?php
 			} else {
