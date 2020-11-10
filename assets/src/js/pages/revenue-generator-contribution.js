@@ -77,7 +77,10 @@ window.updateTourProgress = () => {
 	$( function() {
 		const $o = {
 			loader: $( '.laterpay-loader-wrapper' ),
+			snackBar: $( '#rg_js_SnackBar' ),
 		};
+
+		let accountActivationModal = '';
 
 		const MainView = Backbone.View.extend( {
 			el: '#rg-contribution-builder-app',
@@ -97,7 +100,6 @@ window.updateTourProgress = () => {
 
 				this.$o = {
 					form: $( '#rg_js_form', this.$el ),
-					snackBar: $( '#rg_js_SnackBar', this.$el ),
 					submitButton: $( 'input[type=submit]', this.$el ),
 					helperMessage: $(
 						'.rg-contribution-builder__helper-message',
@@ -332,7 +334,7 @@ window.updateTourProgress = () => {
 						data: formData,
 						dataType: 'json',
 					} ).done( function( r ) {
-						self.$o.snackBar.showSnackbar( r.msg, 1500 );
+						$o.snackBar.showSnackbar( r.msg, 1500 );
 
 						if ( r.success ) {
 							copyToClipboard( r.code );
@@ -427,11 +429,16 @@ window.updateTourProgress = () => {
 		};
 
 		const showAccountActivationModal = function() {
-			new RevGenModal( {
+			/* global Event */
+			const closeEvent = new Event( 'rev-gen-modal-close' );
+
+			accountActivationModal = new RevGenModal( {
 				id: 'rg-modal-account-activation',
 				keepOpen: true,
 				templateData: {},
-				onConfirm: () => {
+				onConfirm: ( e, el ) => {
+					el.dispatchEvent( closeEvent );
+
 					showAccountModal();
 				},
 				onCancel: ( e, el ) => {
@@ -449,8 +456,6 @@ window.updateTourProgress = () => {
 						} else {
 							window.open( signUpURL.EU, '_blank' );
 						}
-						/* global Event */
-						const closeEvent = new Event( 'rev-gen-modal-close' );
 						el.dispatchEvent( closeEvent );
 						showAccountModal();
 					}
@@ -474,27 +479,40 @@ window.updateTourProgress = () => {
 				id: 'rg-modal-connect-account',
 				keepOpen: true,
 				templateData: {},
+				bindings: ( el ) => {
+					const $el = $( el );
+					const $merchantID = $( '#rev-gen-merchant-id', $el );
+					const $merchantKey = $( '#rev-gen-api-key', $el );
+					const $button = $( '#rg_js_modal_confirm', $el );
+
+					$( 'input', $el ).on( 'keyup', () => {
+						if ( $merchantID.val() && $merchantKey.val() ) {
+							$button.removeAttr( 'disabled' );
+						} else {
+							$button.attr( 'disabled', 'disabled' );
+						}
+					} );
+				},
 				onConfirm: async ( e, el ) => {
 					const closeEvent = new Event( 'rev-gen-modal-close' );
 					const $el = $( el );
+					const $tryAgain = $( '#rg_js_restartVerification', $el );
 					const merchantID = $( '#rev-gen-merchant-id', $el ).val();
 					const merchantKey = $( '#rev-gen-api-key', $el ).val();
-					const $tryAgain = $( '#rg_js_restartVerification', $el );
 
 					$el.addClass( 'loading' );
-
-					const verify = verifyAccountCredentials(
-						merchantID,
-						merchantKey
-					);
 
 					$tryAgain.on( 'click', function() {
 						el.dispatchEvent( closeEvent );
 						showAccountModal();
 					} );
 
+					const verify = await verifyAccountCredentials(
+						merchantID,
+						merchantKey
+					);
+
 					if ( verify ) {
-						$el.removeClass( 'loading' );
 						window.RevGenApp.vars.merchant_id = merchantID;
 						el.dispatchEvent( closeEvent );
 					} else {
@@ -511,70 +529,65 @@ window.updateTourProgress = () => {
 		 * @param {string}  merchantKey Merchant Key.
 		 */
 		const verifyAccountCredentials = function( merchantId, merchantKey ) {
-			if ( ! $o.requestSent ) {
-				$o.requestSent = true;
-
-				// Create form data.
-				const formData = {
-					action: 'rg_verify_account_credentials',
-					merchant_id: merchantId,
-					merchant_key: merchantKey,
-					security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
-				};
-
-				let eventLabel = '';
+			return new Promise( ( response ) => {
 				let success = false;
 
-				// Validate merchant details.
-				$.ajax( {
-					url: revenueGeneratorGlobalOptions.ajaxUrl,
-					method: 'POST',
-					async: false,
-					data: formData,
-					dataType: 'json',
-				} ).done( function( r ) {
-					$o.requestSent = false;
+				if ( ! $o.requestSent ) {
+					$o.requestSent = true;
 
-					// set connecting merchant ID.
-					revenueGeneratorGlobalOptions.merchant_id = r.merchant_id;
+					// Create form data.
+					const formData = {
+						action: 'rg_verify_account_credentials',
+						merchant_id: merchantId,
+						merchant_key: merchantKey,
+						security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
+					};
 
-					if ( true === r.success ) {
-						$o.isPublish = true;
-						showLoader();
+					let eventLabel = '';
 
-						setTimeout( function() {
-							// Explicitly change loclized data.
-							revenueGeneratorGlobalOptions.globalOptions.is_merchant_verified =
-								'1';
-							hideLoader();
-							// Display message about Credentails.
-							$o.snackBar.showSnackbar( r.msg, 1500 );
-						}, 2000 );
-						eventLabel = 'Success';
+					// Validate merchant details.
+					$.ajax( {
+						url: revenueGeneratorGlobalOptions.ajaxUrl,
+						method: 'POST',
+						data: formData,
+						dataType: 'json',
+					} ).done( function( r ) {
+						$o.requestSent = false;
 
-						success = true;
-					} else {
-						// If there is error show Modal Error.
-						$o.isPublish = true;
-						eventLabel = 'Failure - ' + r.msg;
+						// set connecting merchant ID.
+						revenueGeneratorGlobalOptions.merchant_id = r.merchant_id;
 
-						success = false;
-					}
+						if ( true === r.success ) {
+							setTimeout( function() {
+								// Explicitly change loclized data.
+								revenueGeneratorGlobalOptions.globalOptions.is_merchant_verified =
+									'1';
+								// Display message about Credentails.
+								$o.snackBar.showSnackbar( r.msg, 1500 );
+							}, 2000 );
+							eventLabel = 'Success';
 
-					// Send GA Event.
-					const eventCategory = 'LP RevGen Account';
-					const eventAction = 'Connect Account';
-					rgGlobal.sendLPGAEvent(
-						eventAction,
-						eventCategory,
-						eventLabel,
-						0,
-						true
-					);
-				} );
+							success = true;
+						} else {
+							eventLabel = 'Failure - ' + r.msg;
+							success = false;
+						}
 
-				return success;
-			}
+						response( success );
+
+						// Send GA Event.
+						const eventCategory = 'LP RevGen Account';
+						const eventAction = 'Connect Account';
+						rgGlobal.sendLPGAEvent(
+							eventAction,
+							eventCategory,
+							eventLabel,
+							0,
+							true
+						);
+					} );
+				}
+			} );
 		};
 
 		initApp();
