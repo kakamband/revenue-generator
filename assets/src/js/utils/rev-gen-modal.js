@@ -40,6 +40,9 @@ class RevGenModal {
 			onCancel: () => {
 				// noop
 			},
+			bindings: () => {
+
+			},
 			autoShow: true,
 			keepOpen: false,
 			closeOutside: false,
@@ -135,11 +138,15 @@ class RevGenModal {
 			'rev-gen-modal-close',
 			this.hide.bind( this )
 		);
+
+		if ( 'function' === typeof this.options.bindings ) {
+			this.options.bindings( this.el );
+		}
 	}
 
 	/**
 	 * Callback when `confirm` button is clicked.
-	 
+
 - Calls `onConfirm` callback function as defined in options passed to the instance.
 - Closes modal.
 	 *
@@ -155,7 +162,7 @@ class RevGenModal {
 
 	/**
 	 * Callback when `cancel` button is clicked.
-	 
+
 - Calls `onCancel` callback function as defined in options passed to the instance.
 - Closes modal.
 	 *
