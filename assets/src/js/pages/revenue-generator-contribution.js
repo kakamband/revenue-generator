@@ -80,8 +80,6 @@ window.updateTourProgress = () => {
 			snackBar: $( '#rg_js_SnackBar' ),
 		};
 
-		let accountActivationModal = '';
-
 		const MainView = Backbone.View.extend( {
 			el: '#rg-contribution-builder-app',
 
@@ -432,7 +430,7 @@ window.updateTourProgress = () => {
 			/* global Event */
 			const closeEvent = new Event( 'rev-gen-modal-close' );
 
-			accountActivationModal = new RevGenModal( {
+			new RevGenModal( {
 				id: 'rg-modal-account-activation',
 				keepOpen: true,
 				templateData: {},
@@ -540,7 +538,8 @@ window.updateTourProgress = () => {
 						action: 'rg_verify_account_credentials',
 						merchant_id: merchantId,
 						merchant_key: merchantKey,
-						security: revenueGeneratorGlobalOptions.rg_paywall_nonce,
+						security:
+							revenueGeneratorGlobalOptions.rg_paywall_nonce,
 					};
 
 					let eventLabel = '';
@@ -555,7 +554,8 @@ window.updateTourProgress = () => {
 						$o.requestSent = false;
 
 						// set connecting merchant ID.
-						revenueGeneratorGlobalOptions.merchant_id = r.merchant_id;
+						revenueGeneratorGlobalOptions.merchant_id =
+							r.merchant_id;
 
 						if ( true === r.success ) {
 							setTimeout( function() {

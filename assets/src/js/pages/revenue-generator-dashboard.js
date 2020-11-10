@@ -332,7 +332,10 @@ import { copyToClipboard } from '../helpers/index';
 					const code = $( e.target ).data( 'shortcode' );
 					copyToClipboard( code );
 
-					$o.snackBar.showSnackbar( revenueGeneratorGlobalOptions.rg_code_copy_msg, 1500 );
+					$o.snackBar.showSnackbar(
+						revenueGeneratorGlobalOptions.rg_code_copy_msg,
+						1500
+					);
 				} );
 
 				/**
