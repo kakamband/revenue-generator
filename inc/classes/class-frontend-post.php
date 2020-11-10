@@ -702,6 +702,10 @@ class Frontend_Post {
 	 * @return void
 	 */
 	public function enqueue_preview_scripts_and_styles() {
+		if ( Contribution_Preview::SLUG !== get_post_type() ) {
+			return;
+		}
+
 		wp_enqueue_style(
 			'revenue-generator-preview',
 			REVENUE_GENERATOR_BUILD_URL . '/css/revenue-generator-preview.css',
