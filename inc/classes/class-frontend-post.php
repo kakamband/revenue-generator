@@ -246,6 +246,17 @@ class Frontend_Post {
 		// @todo make sure to select eu based on locale, once upstream LaterPay starts supporting them.
 		$connector_url = $region_connector_urls['us'];
 
+		// Append merchant ID and plugin version to Connector script URL.
+		$credentials = Client_Account::get_merchant_credentials();
+		$merchant_id = ( ! empty( $credentials ) ) ? $credentials['merchant_id'] : '';
+
+		$connector_url = add_query_arg(
+			[
+				'wp'     => $merchant_id,
+				'revgen' => REVENUE_GENERATOR_VERSION,
+			],
+			$connector_url
+		);
 
 		// Enqueue connector script based on region and environment.
 		// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.NoExplicitVersion -- Upstream script.
