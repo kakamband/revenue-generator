@@ -19,7 +19,7 @@ const ContributionView = Backbone.View.extend( {
 			0 ===
 			parseInt( options.globalOptions.is_contribution_tutorial_completed )
 		) {
-			window.addEventListener( 'DOMContentLoaded', () => {
+			window.addEventListener( 'load', () => {
 				self.initializeTour();
 			} );
 		}
