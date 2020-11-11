@@ -916,7 +916,7 @@ class Admin {
 		$is_paywall_setup_done = empty( $current_global_options['average_post_publish_count'] ) ? false : true;
 
 		if ( $is_paywall_setup_done || ( ! empty( $is_welcome_setup_done ) && 'contribution' === $is_welcome_setup_done ) ) {
-			if ( apply_filters( 'rg_paywalls_enabled', true ) ) {
+			if ( apply_filters( 'rg_paywalls_enabled', REVENUE_GENERATOR_HAS_PAYWALLS ) ) {
 				$menus['dashboard'] = [
 					'url'    => 'revenue-generator-dashboard',
 					'title'  => __( 'Paywall', 'revenue-generator' ),
@@ -925,7 +925,7 @@ class Admin {
 				];
 			}
 
-			if ( apply_filters( 'rg_contributions_enabled', true ) ) {
+			if ( apply_filters( 'rg_contributions_enabled', REVENUE_GENERATOR_HAS_CONTRIBUTIONS ) ) {
 				$menus['contributions'] = [
 					'url'    => Contribution::ADMIN_DASHBOARD_SLUG,
 					'title'  => __( 'Contributions', 'revenue-generator' ),
@@ -941,7 +941,7 @@ class Admin {
 				];
 			}
 
-			if ( apply_filters( 'rg_paywalls_enabled', true ) ) {
+			if ( apply_filters( 'rg_paywalls_enabled', REVENUE_GENERATOR_HAS_PAYWALLS ) ) {
 				$menus['paywall'] = [
 					'url'    => 'revenue-generator-paywall',
 					'title'  => __( 'New Paywall', 'revenue-generator' ),
