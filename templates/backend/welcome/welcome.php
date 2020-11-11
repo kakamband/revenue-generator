@@ -32,14 +32,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<h1 class="rev-gen-welcome__title"><?php esc_html_e( 'Where would you like to start?', 'revenue-generator' ); ?></h1>
 
 			<div class="rev-gen-welcome__buttons-wrap">
+				<?php if ( apply_filters( 'rg_contributions_enabled', true ) ) : ?>
 				<div id="rg_Contribution" class="rev-gen-card">
 					<img class="rev-gen-card__icon" alt="<?php esc_attr_e( 'Create contribution icon', 'revenue-generator' ); ?>" src="<?php echo esc_url( $welcome_contribution_icon ); ?>">
 					<h5 class="rev-gen-card__title"><?php esc_html_e( 'Create Contribution', 'revenue-generator' ); ?></h5>
 				</div>
+				<?php endif; ?>
+
+				<?php if ( apply_filters( 'rg_paywalls_enabled', true ) ) : ?>
 				<div id="rg_Paywall" class="rev-gen-card">
 					<img class="rev-gen-card__icon" alt="<?php esc_attr_e( 'Create Paywall icon', 'revenue-generator' ); ?>" src="<?php echo esc_url( $welcome_paywall_icon ); ?>">
 					<h5 class="rev-gen-card__title"><?php esc_html_e( 'Create Paywall', 'revenue-generator' ); ?></h5>
 				</div>
+				<?php endif; ?>
 			</div>
 		</section>
 	</section>
