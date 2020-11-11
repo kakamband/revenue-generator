@@ -331,6 +331,11 @@ import { copyToClipboard } from '../helpers/index';
 				$o.contributionCopyShortcode.on( 'click', function( e ) {
 					const code = $( e.target ).data( 'shortcode' );
 					copyToClipboard( code );
+
+					$o.snackBar.showSnackbar(
+						revenueGeneratorGlobalOptions.rg_code_copy_msg,
+						1500
+					);
 				} );
 
 				/**

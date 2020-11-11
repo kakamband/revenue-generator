@@ -17,9 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="rev-gen-contribution rev-gen-contribution--button is-style-wide<?php echo ( $is_amp ) ? ' is-amp' : ''; ?>" id="<?php echo esc_attr( $html_id ); ?>" data-type="button">
 	<div class="rev-gen-contribution__inner">
 		<?php if ( ! $is_amp ) : ?>
-			<button class="rev-gen-contribution__button"<?php echo ( $is_preview ) ? ' contenteditable="true" data-bind="dialog_header"' : ''; ?>><?php echo esc_html( $dialog_header ); ?></button>
+			<button class="rev-gen-contribution__button"<?php echo ( $is_preview ) ? ' contenteditable="true" data-bind="dialog_header"' : ''; ?>><?php echo esc_html( $button_label ); ?></button>
 		<?php else : ?>
-			<button class="rev-gen-contribution__button" on="tap:<?php echo esc_attr( $html_id ); ?>_modal"><?php echo esc_html( $dialog_header ); ?></button>
+			<button class="rev-gen-contribution__button" on="tap:<?php echo esc_attr( $html_id ); ?>_modal"><?php echo esc_html( $button_label ); ?></button>
 		<?php endif; ?>
 		<div class="rev-gen-contribution__footer rev-gen-contribution-footer">
 			<?php include REVENUE_GENERATOR_PLUGIN_DIR . '/templates/frontend/contribution/partial-footer.php'; ?>
