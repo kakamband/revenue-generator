@@ -231,7 +231,8 @@ class Frontend_Post {
 			$assets_instance->get_asset_version( 'css/revenue-generator-frontend.css' )
 		);
 
-		if ( empty( $this->merchant_region ) ) {
+		// Return early if merchant region is empty or when paywalls feature is disabled.
+		if ( empty( $this->merchant_region ) || ! REVENUE_GENERATOR_HAS_PAYWALLS ) {
 			return;
 		}
 
@@ -279,6 +280,11 @@ class Frontend_Post {
 	public function revenue_generator_post_content( $post_content ) {
 		// Bail early, if unsupported post type.
 		if ( ! is_singular( Post_Types::get_allowed_post_types() ) ) {
+			return $post_content;
+		}
+
+		// Return early if paywalls feature is disabled.
+		if ( ! REVENUE_GENERATOR_HAS_PAYWALLS ) {
 			return $post_content;
 		}
 

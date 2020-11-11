@@ -82,5 +82,7 @@ class Plugin {
 		define( 'REVENUE_GENERATOR_PLUGIN_URL', plugins_url( '', REVENUE_GENERATOR_PLUGIN_FILE ) );
 		define( 'REVENUE_GENERATOR_BUILD_DIR', REVENUE_GENERATOR_PLUGIN_DIR . '/assets/build/' );
 		define( 'REVENUE_GENERATOR_BUILD_URL', plugins_url( '/assets/build/', REVENUE_GENERATOR_PLUGIN_FILE ) );
+		define( 'REVENUE_GENERATOR_HAS_PAYWALLS', apply_filters( 'rg_paywalls_enabled', true ) );
+		define( 'REVENUE_GENERATOR_HAS_CONTRIBUTIONS', apply_filters( 'rg_contributions_enabled', true ) );
 	}
 }

@@ -916,33 +916,39 @@ class Admin {
 		$is_paywall_setup_done = empty( $current_global_options['average_post_publish_count'] ) ? false : true;
 
 		if ( $is_paywall_setup_done || ( ! empty( $is_welcome_setup_done ) && 'contribution' === $is_welcome_setup_done ) ) {
-			$menus['dashboard'] = [
-				'url'    => 'revenue-generator-dashboard',
-				'title'  => __( 'Paywall', 'revenue-generator' ),
-				'cap'    => 'manage_options',
-				'method' => 'dashboard',
-			];
+			if ( REVENUE_GENERATOR_HAS_PAYWALLS ) {
+				$menus['dashboard'] = [
+					'url'    => 'revenue-generator-dashboard',
+					'title'  => __( 'Paywall', 'revenue-generator' ),
+					'cap'    => 'manage_options',
+					'method' => 'dashboard',
+				];
+			}
 
-			$menus['contributions'] = [
-				'url'    => Contribution::ADMIN_DASHBOARD_SLUG,
-				'title'  => __( 'Contributions', 'revenue-generator' ),
-				'cap'    => 'manage_options',
-				'method' => 'contributions',
-			];
+			if ( REVENUE_GENERATOR_HAS_CONTRIBUTIONS ) {
+				$menus['contributions'] = [
+					'url'    => Contribution::ADMIN_DASHBOARD_SLUG,
+					'title'  => __( 'Contributions', 'revenue-generator' ),
+					'cap'    => 'manage_options',
+					'method' => 'contributions',
+				];
 
-			$menus['contribution'] = [
-				'url'    => Contribution::ADMIN_EDIT_SLUG,
-				'title'  => __( 'Contribution', 'revenue-generator' ),
-				'cap'    => 'manage_options',
-				'method' => 'contribution',
-			];
+				$menus['contribution'] = [
+					'url'    => Contribution::ADMIN_EDIT_SLUG,
+					'title'  => __( 'Contribution', 'revenue-generator' ),
+					'cap'    => 'manage_options',
+					'method' => 'contribution',
+				];
+			}
 
-			$menus['paywall'] = [
-				'url'    => 'revenue-generator-paywall',
-				'title'  => __( 'New Paywall', 'revenue-generator' ),
-				'cap'    => 'manage_options',
-				'method' => 'paywall',
-			];
+			if ( REVENUE_GENERATOR_HAS_PAYWALLS ) {
+				$menus['paywall'] = [
+					'url'    => 'revenue-generator-paywall',
+					'title'  => __( 'New Paywall', 'revenue-generator' ),
+					'cap'    => 'manage_options',
+					'method' => 'paywall',
+				];
+			}
 
 			$menus['settings'] = [
 				'url'    => 'revenue-generator-settings',

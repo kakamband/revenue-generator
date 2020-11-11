@@ -289,8 +289,6 @@ class Client_Account {
 	 * @return string
 	 */
 	private function build_test_fetch_url() {
-		$this->validate_merchant_account();
-
 		// Demo params to verify merchant domain.
 		$fetch_url_params = build_query(
 			[
