@@ -32,7 +32,7 @@ class Shortcodes {
 	 * Setup Shortcodes.
 	 */
 	public function setup_shortcodes() {
-		if ( apply_filters( 'rg_contributions_enabled', REVENUE_GENERATOR_HAS_CONTRIBUTIONS ) ) {
+		if ( REVENUE_GENERATOR_HAS_CONTRIBUTIONS ) {
 			add_shortcode( 'laterpay_contribution', array( $this, 'render_contribution_dialog' ) );
 			add_action( 'wp_enqueue_scripts', array( $this, 'register_shortcode_assets' ) );
 		}
