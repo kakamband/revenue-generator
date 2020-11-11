@@ -231,7 +231,7 @@ class Frontend_Post {
 			$assets_instance->get_asset_version( 'css/revenue-generator-frontend.css' )
 		);
 
-		if ( empty( $this->merchant_region ) ) {
+		if ( empty( $this->merchant_region ) || ! apply_filters( 'rg_paywalls_enabled', true ) ) {
 			return;
 		}
 
@@ -279,6 +279,10 @@ class Frontend_Post {
 	public function revenue_generator_post_content( $post_content ) {
 		// Bail early, if unsupported post type.
 		if ( ! is_singular( Post_Types::get_allowed_post_types() ) ) {
+			return $post_content;
+		}
+
+		if ( ! apply_filters( 'rg_paywalls_enabled', true ) ) {
 			return $post_content;
 		}
 

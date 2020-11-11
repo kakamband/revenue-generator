@@ -25,16 +25,17 @@ class Shortcodes {
 	 */
 	protected function __construct() {
 		// Setup required hooks.
-		$this->setup_shortcodes();
-
+		add_action( 'init', [ $this, 'setup_shortcodes' ] );
 	}
 
 	/**
 	 * Setup Shortcodes.
 	 */
-	private function setup_shortcodes() {
-		add_shortcode( 'laterpay_contribution', array( $this, 'render_contribution_dialog' ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'register_shortcode_assets' ) );
+	public function setup_shortcodes() {
+		if ( apply_filters( 'rg_contributions_enabled', true ) ) {
+			add_shortcode( 'laterpay_contribution', array( $this, 'render_contribution_dialog' ) );
+			add_action( 'wp_enqueue_scripts', array( $this, 'register_shortcode_assets' ) );
+		}
 	}
 
 	/**
