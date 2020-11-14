@@ -242,16 +242,20 @@ class Admin {
 		$current_global_options = Config::get_global_options();
 
 		// Check if setup is done, and load page accordingly.
-		$is_paywall_setup_done = empty( $current_global_options['average_post_publish_count'] ) ? false : true;
 		$is_welcome_setup_done = ( ! empty( $current_global_options['is_welcome_done'] ) ) ? $current_global_options['is_welcome_done'] : false;
-		$dashboard_callback    = 'load_welcome_screen';
 
-		if ( ! empty( $is_welcome_setup_done ) ) {
-			if ( 'contribution' === $is_welcome_setup_done ) {
+		switch ( $is_welcome_setup_done ) {
+			case 'contribution':
 				$dashboard_callback = 'load_contribution';
-			} else if ( 'paywall' === $is_welcome_setup_done && ! empty( $is_paywall_setup_done ) ) {
+				break;
+
+			case 'paywall':
 				$dashboard_callback = 'load_dashboard';
-			}
+				break;
+
+			default:
+				$dashboard_callback = 'load_welcome_screen';
+				break;
 		}
 
 		// Add main menu page.
@@ -913,9 +917,8 @@ class Admin {
 
 		// Check if tutorial is completed, and load page accordingly.
 		$is_welcome_setup_done = ( ! empty( $current_global_options['is_welcome_done'] ) ) ? $current_global_options['is_welcome_done'] : false;
-		$is_paywall_setup_done = empty( $current_global_options['average_post_publish_count'] ) ? false : true;
 
-		if ( $is_paywall_setup_done || ( ! empty( $is_welcome_setup_done ) && 'contribution' === $is_welcome_setup_done ) ) {
+		if ( ! empty( $is_welcome_setup_done ) ) {
 			if ( REVENUE_GENERATOR_HAS_PAYWALLS ) {
 				$menus['dashboard'] = [
 					'url'    => 'revenue-generator-dashboard',
